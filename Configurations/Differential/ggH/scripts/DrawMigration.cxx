@@ -1,5 +1,0 @@
-{
-  
-//   draw response matrix
-  
-}
