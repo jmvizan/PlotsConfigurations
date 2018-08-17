@@ -1,0 +1,34 @@
+############
+
+T2tt
+
+ISR vs NoISR          -> improve B and E limits, but O limits get worst in close to W diagonal
+ISRZMET vs NoISRZMET  -> the worsening of O limits when comparing NoISR and ISR is reduced
+ISR ZMET vs ISR       -> adding ZMET slightly improve O limits close to W diagonal (~0.96)
+3Reg vs 3Reg NoISR    -> O limits comparison close to W diagonal get better (average ~1)
+Adding ZMET           -> no much difference in ISR vs NoISR comparison
+3Reg vs 3Reg ZMET     -> better agreement of 3Reg and 3RegZMET O limits close to W diagonal than with 2Reg (~0.99 vs ~0.96)
+3Reg vs 2Reg          -> limits improve with 3Reg: close to W diagonal 0.92-0.95 (B), 0.9 (E), 0.7-0.9 (O)
+Adding ZMET           -> similar as above, differences in O slightly reduced
+
+############
+
+TChiSlep
+
+ISR vs NoISR          -> adding ISR make limits worst at high DM and somewhat better at low DM (MET bins not optimized)
+                         Worsening at high DM reduced with 3Reg
+ZMET vs no ZMET       -> similar as T2tt: B get a bit worst (~1.03), O get a but better (~0.98)
+3Reg vs 2Reg          -> B and E: improvements decreasing with C1 mass and increasing with N1 mass. 
+                         For O, get worst (~1.04) at high C1 mass
+
+
+############
+
+TChiWW
+
+2Reg, ISR effct       -> mejora de limites B de unos puntos, mas a alta DM, but worst limites O 
+3Reg, ISR effct       -> mejora de limites B de unos puntos, mas a alta DM. Para O lo mismo de B!
+  " adding ZMET       -> as without ZMET
+3Reg vs 2Reg          -> large improvements (0.6-0.8)
+3Reg, ZMET effect     -> small variations (1.01B, 0.99 O)
+3RegZMET              -> O worst than E, ~within Do

@@ -1,0 +1,11 @@
+#####
+ChiWW_mChi1_Xm138_Xm1
+ChiWW_mChi1_Xm163_Xm1
+ChiWW_mChi1_Xm188_Xm1
+ChiWW_mChi1_Xm213_Xm1
+ChiWW_mChi1_Xm238_Xm1
+ChiWW_mChi1_Xm263_Xm1
+ChiWW_mChi1_Xm288_Xm1
+ChiWW_mChi1_Xm338_Xm1
+#####
+

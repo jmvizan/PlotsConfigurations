@@ -1,22 +1,14 @@
- # example of configuration file
+# example of configuration file
 
 tag = 'mytest'
 
 outputDir = 'Shapes'
 outputDirDatacard = 'tempDatacards'
- 
-#inputDir = '/eos/cms/store/user/scodella/Stop/MiniTrees/Feb2017_minitrees_blind/rootfiles/'
-#inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfiles1703/'
-#inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfiles1704/'
-#inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfilesOct17/'
-inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfilesNoTopPt/'
-#inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfilesISR15/'
-#inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfilesTrgEmu/'
-#inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfiles2R/'
-#inputDir = '/eos/cms/store/user/scodella/Stop/MiniTrees/minitrees_36fb/rootfiles/'
+
+inputDir = '/afs/cern.ch/user/s/scodella/work/Stop/CodeDevelopment/CMSSW_8_0_21/src/AnalysisCMS/minitreesB/rootfiles/'
 
 # luminosity to normalize to
-lumi = 35.867
+lumi = 36.
 
 # set of mc samples: 0j1j, vbf
 #mcset = 'general.py'
@@ -28,9 +20,7 @@ lumi = 35.867
 
 variablesFile = 'variables.py' # file with list of variables
 
-#cutsFile = 'cuts_all.py' # file with list of cuts
-#cutsFile = 'cuts_stop.py' # file with list of cuts
-cutsFile = 'cuts_chargino.py' # file with list of cuts
+cutsFile = 'cutsVR.py' # file with list of cuts
 
 samplesFile = 'samples.py' # file with list of samples
 
@@ -47,7 +37,7 @@ nuisancesFile = 'nuisances.py'
 ## shape range. can be an
 ## - hard-coded label
 ## - a tuple (nx,xmin,xmax)
-## - 2d tuple (nx,xmin,xmax,ny,ymin,ymax)
+y## - 2d tuple (nx,xmin,xmax,ny,ymin,ymax)
 ## - 1d array ([x0,..,xn],)
 ## - 2d array ([x0,..,xn],[y0,...,ym])
 #range = 'mth-mll-hilospin'

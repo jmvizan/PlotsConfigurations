@@ -1,4 +1,4 @@
- # example of configuration file
+# example of configuration file
 
 tag = 'mytest'
 
@@ -8,10 +8,7 @@ outputDirDatacard = 'tempDatacards'
 #inputDir = '/eos/cms/store/user/scodella/Stop/MiniTrees/Feb2017_minitrees_blind/rootfiles/'
 #inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfiles1703/'
 #inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfiles1704/'
-#inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfilesOct17/'
-inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfilesNoTopPt/'
-#inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfilesISR15/'
-#inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfilesTrgEmu/'
+inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfiles/'
 #inputDir = '/afs/cern.ch/work/s/scodella/Stop/CodeDevelopment/CMSSW_8_0_26_patch1/src/AnalysisCMS/minitrees/rootfiles2R/'
 #inputDir = '/eos/cms/store/user/scodella/Stop/MiniTrees/minitrees_36fb/rootfiles/'
 
@@ -28,14 +25,13 @@ lumi = 35.867
 
 variablesFile = 'variables.py' # file with list of variables
 
-#cutsFile = 'cuts_all.py' # file with list of cuts
 #cutsFile = 'cuts_stop.py' # file with list of cuts
 cutsFile = 'cuts_chargino.py' # file with list of cuts
 
 samplesFile = 'samples.py' # file with list of samples
 
 structureFile = 'structure.py'
-nuisancesFile = 'nuisances.py'
+nuisancesFile = 'nuisances_test.py'
 
 # dataset to use: Data2012, Data2012A, Data2012B, SI125
 #dataset = 'Data2012'
