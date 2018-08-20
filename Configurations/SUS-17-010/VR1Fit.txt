@@ -1,0 +1,23 @@
+# Create datacards for VR
+./createDatacardsVR.sh
+
+# combine them
+./combineDatacardsVR.sh
+
+# Fit to VR1 Tag
+./MaxLikelihoodFit.sh VR1Tag
+
+# Compute shape uncertainty from VR1 Tag
+root -l -b -q 'FitAnalyzer.C("FitVR1Tag")'
+
+# Create datacards for VR including shape uncertainty from VR1 Tag
+./createDatacardsVR.sh
+
+# combine them
+./combineDatacardsVR.sh
+
+# Fit to VR1 
+./MaxLikelihoodFit.sh VR1
+
+# Compute shape uncertainty from VR1 NoTag
+root -l -b -q 'FitAnalyzer.C("FitVR1")'
