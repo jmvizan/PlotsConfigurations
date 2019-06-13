@@ -3,12 +3,13 @@
 #variables = {}
     
 #                    
-variables['Mellell']  = {   'name': 'mll',            #   variable name    
-                            'range' : (100,0,200),   #   variable range
-                        }
+variables['mt2ll']  = {   'name': 'mt2ll',       #   variable name    
+                          'range' : (7,0,140),   #   variable range
+                          }
+
+variables['mt2llgen']  = {   'name': 'mt2llgen',    #   variable name    
+                             'range' : (7,0,140),   #   variable range
+                             }
 
 
-variables['test2']    = {   'name': 'mll',            #   variable name    
-                            'range' : (100,0,200),   #   variable range
-                        }
 
