@@ -1,6 +1,6 @@
 # example of configuration file
 
-tag = 'mytest'
+tag = 'mytesttag'
 
 # luminosity to normalize to
 lumi = 35.9

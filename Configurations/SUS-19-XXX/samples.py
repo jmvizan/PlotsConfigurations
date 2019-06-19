@@ -11,14 +11,14 @@ if  'cern' in SITE :
     treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
     treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
 
-directoryBkg  = treeBaseDirMC   + 'Summer16_102X_nAODv4_Full2016v4/MCl1loose2016__MCCorr2016__susyMT2/'
-directorySig  = treeBaseDirMC   + 'Summer16FS_102X_nAODv4_Full2016v4/susyGen__susyW__MCl1loose2016__MCCorr2016FS__susyMT2/'
-directoryData = treeBaseDirData + 'Run2016_102X_nAODv4_Full2016v4/DATAl1loose2016__susyMT2data/'
+directoryBkg  = treeBaseDirMC   + 'Summer16_102X_nAODv4_Full2016v4/MCl1loose2016__MCCorr2016__susyMT2__btagPerEvent/'
+directorySig  = treeBaseDirMC   + 'Summer16FS_102X_nAODv4_Full2016v4/susyGen__susyW__MCl1loose2016__MCCorr2016FS__susyMT2__btagPerEvent/'
+directoryData = treeBaseDirData + 'Run2016_102X_nAODv4_Full2016v4/DATAl1loose2016__susyMT2data__btagPerEventData/'
 
 ### MC weights
 
 XSWeight      = 'baseW'
-SFweight      = 'puWeight'
+SFweight      = 'puWeight*btagWeight'
 
 ### Filters
 
