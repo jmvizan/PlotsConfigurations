@@ -1,6 +1,6 @@
 # example of configuration file
 
-tag = 'mytesttag'
+tag = 'test'
 
 # luminosity to normalize to
 lumi = 35.9
@@ -14,6 +14,9 @@ cutsFile = 'cuts.py'
 # file with list of samples
 samplesFile = 'samples.py' 
 
+# file with the definition of the mass points for the signals
+#signalMassPointsFile = 'signalMassPoints.py'
+
 # file with list of samples
 plotFile = 'plots.py' 
 
@@ -22,8 +25,6 @@ outputDir = 'Shapes'
 
 # used by mkPlot to define output directory for plots
 outputDirPlots = 'Plots'
-
-maxLogCratio = 1000
 
 # used by mkDatacards to define output directory for datacards
 outputDirDatacard = 'datacards'
