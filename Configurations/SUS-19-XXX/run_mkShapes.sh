@@ -31,11 +31,14 @@ else
     fi
     if [ $# -lt 3 ]; then
 	SIGSET='SM'
-	SPLIT=Samples
+	if [ $TAG == 'btagefficiencies' ]; then
+	    SIGSET='Backgrounds'
+	fi
+	SPLIT='Samples'
     else
 	SIGSET=$3
 	if [ $# -lt 4 ]; then
-	    SPLIT=Samples
+	    SPLIT='Samples'
 	else
 	    SPLIT=$4
 	fi

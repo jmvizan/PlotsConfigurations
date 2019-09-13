@@ -12,14 +12,14 @@ else
     else 
 	TAG=$1
     fi
-    if [ $# <2 ]; then
+    if [ $# -lt 2 ]; then
 	SIGSET='SM'
     else
 	SIGSET=$2
     fi
 fi
 
-mkPlot.py --pycfg=configuration.py --tag=$TAG --inputFile=./Shapes/plots_$TAG_$SIGSET.root --outputDirPlots=./Plots/$TAG --maxLogCratio=1000 
+mkPlot.py --pycfg=configuration.py --tag=$TAG --sigset=$SIGSET --inputFile=./Shapes/plots_${TAG}_$SIGSET.root --outputDirPlots=./Plots/$TAG --maxLogCratio=1000 
 
 cp ./Plots/index.php ./Plots/$TAG/
 

@@ -11,25 +11,39 @@ DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
 EE = SF+' && fabs(Lepton_pdgId[0])==11'
 MM = SF+' && fabs(Lepton_pdgId[0])==13'
 
-"""
+
 btagAlgo = 'btagDeepB'
-btagWP = '0.6321'
-BTAG = '((CleanJet_pt[0]>=20. && fabs(CleanJet_eta[0])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[0]]>='+btagWP+') || \
-         (CleanJet_pt[1]>=20. && fabs(CleanJet_eta[1])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[1]]>='+btagWP+') || \
-         (CleanJet_pt[2]>=20. && fabs(CleanJet_eta[2])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[2]]>='+btagWP+') || \
-         (CleanJet_pt[3]>=20. && fabs(CleanJet_eta[3])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[3]]>='+btagWP+') || \
-         (CleanJet_pt[4]>=20. && fabs(CleanJet_eta[4])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[4]]>='+btagWP+') || \
-         (CleanJet_pt[5]>=20. && fabs(CleanJet_eta[5])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[5]]>='+btagWP+') || \
-         (CleanJet_pt[6]>=20. && fabs(CleanJet_eta[6])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[6]]>='+btagWP+') || \
-         (CleanJet_pt[7]>=20. && fabs(CleanJet_eta[7])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[7]]>='+btagWP+') || \
-         (CleanJet_pt[8]>=20. && fabs(CleanJet_eta[8])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[8]]>='+btagWP+') || \
-         (CleanJet_pt[9]>=20. && fabs(CleanJet_eta[9])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[9]]>='+btagWP+') || \
-         (CleanJet_pt[5]>=20. && fabs(CleanJet_eta[5])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[5]]>='+btagWP+'))'
+btagWP   = '2016M'
+btagCut  = '0.6321'
+btagEtaMax = '2.4'
+"""
+BTAG = '((CleanJet_pt[0]>=20. && fabs(CleanJet_eta[0])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[0]]>='+btagCut+') || \
+         (CleanJet_pt[1]>=20. && fabs(CleanJet_eta[1])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[1]]>='+btagCut+') || \
+         (CleanJet_pt[2]>=20. && fabs(CleanJet_eta[2])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[2]]>='+btagCut+') || \
+         (CleanJet_pt[3]>=20. && fabs(CleanJet_eta[3])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[3]]>='+btagCut+') || \
+         (CleanJet_pt[4]>=20. && fabs(CleanJet_eta[4])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[4]]>='+btagCut+') || \
+         (CleanJet_pt[5]>=20. && fabs(CleanJet_eta[5])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[5]]>='+btagCut+') || \
+         (CleanJet_pt[6]>=20. && fabs(CleanJet_eta[6])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[6]]>='+btagCut+') || \
+         (CleanJet_pt[7]>=20. && fabs(CleanJet_eta[7])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[7]]>='+btagCut+') || \
+         (CleanJet_pt[8]>=20. && fabs(CleanJet_eta[8])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[8]]>='+btagCut+') || \
+         (CleanJet_pt[9]>=20. && fabs(CleanJet_eta[9])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[9]]>='+btagCut+') || \
+         (CleanJet_pt[5]>=20. && fabs(CleanJet_eta[5])<2.4 && Jet_'+btagAlgo+'[CleanJet_jetIdx[5]]>='+btagCut+'))'
 """
 BTAG = '(leadingPtTagged>=20.)' 
 VETO = '!'+BTAG
 
 #cuts = {}
+
+if opt.tag=='btagefficiencies':
+
+    jetKinSelection = 'CleanJet_pt>=20. && abs(CleanJet_eta)<'+btagEtaMax
+    jetTagSelection = 'Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+btagCut
+    cuts['taggablejets_b'] = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])==5'
+    cuts['taggablejets_c'] = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])==4'
+    cuts['taggablejets_l'] = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])<4 '
+    cuts[btagAlgo+'_'+btagWP+'_b']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])==5 && '+jetTagSelection
+    cuts[btagAlgo+'_'+btagWP+'_c']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])==4 && '+jetTagSelection
+    cuts[btagAlgo+'_'+btagWP+'_l']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])<4  && '+jetTagSelection
 
 if 'Preselection' in opt.tag:
 

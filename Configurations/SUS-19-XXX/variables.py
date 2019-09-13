@@ -14,6 +14,25 @@ nbjets = '2*(trailingPtTagged>=20.)+(leadingPtTagged>=20. && trailingPtTagged<20
 
 # variables = {}
 
+if 'btagefficiencies' in opt.tag: 
+    
+    variables['jetpteta']      = {  'name'  : 'abs(Jet_eta):Jet_pt',                                             #   variable name    
+                                    'range' : ([20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 400, 1000],[0.,0.2,0.4,0.8,1.2,1.6,2.0,2.5]),  #   variable range
+                                    'xaxis' : '2D eta:#pt',                                                      #   x axis name
+                                    'fold'  : 1                                                                  #   fold overflow
+                                    }
+                                   
+    variables['jetpt']  = { 'name'  : 'Jet_pt',                              #   variable name    
+                            'range' : ([20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 400, 1000],[1]), #   variable range
+                            'xaxis' : 'jet'+pt+gv,                           #   x axis name
+                            'fold'  : 1                                      #   fold overflow
+                            } 
+    
+    variables['jeteta'] = { 'name'  : 'abs(Jet_eta)',              #   variable name    
+                            'range' : ([0.,0.2,0.4,0.8,1.2,1.6,2.0,2.5],[1]),  #   variable range
+                            'xaxis' : 'jet pseudorapodity',        #   x axis name
+                            } 
+                            
 if 'Preselection' in opt.tag:
 
     variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
