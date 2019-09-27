@@ -46,11 +46,12 @@ structure['HWW']  = {
                   'isSignal' : 0,
                   'isData'   : 0 
               }       
-      
-structure['VZ']  = {  
-                  'isSignal' : 0,
-                  'isData'   : 0 
-              }            
+                
+if '2018' not in opt.tag :
+    structure['VZ']  = {  
+        'isSignal' : 0,
+        'isData'   : 0 
+    }            
       
 structure['VVV']  = {  
                   'isSignal' : 0,

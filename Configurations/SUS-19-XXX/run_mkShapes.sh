@@ -2,6 +2,14 @@
 
 if [ $# == 0 ]; then
     echo ''
+    echo 'Please provide data taking year:'; 
+    echo '  0. 2016 '
+    echo '  1. 2017'
+    echo '  2. 2018'
+    echo ''
+    exit
+elif [ $# == 1 ]; then
+    echo ''
     echo 'Please provide tag value:'; 
     echo '  0. Preselection: shapes for data/MC comparison of various kinematic observables '
     echo '  1. ValidationRegions'
@@ -10,15 +18,24 @@ if [ $# == 0 ]; then
     exit
 else
     if [ $1 == '0' ]; then
-	TAG='Preselection'
+	YEAR='2016'
     elif [ $1 == '1' ]; then
-	TAG='ValidationRegions'
+	YEAR='2017'
     elif [ $1 == '2' ]; then
+	YEAR='2018'	
+    else 
+	YEAR=$1
+    fi
+    if [ $2 == '0' ]; then
+	TAG='Preselection'
+    elif [ $2 == '1' ]; then
+	TAG='ValidationRegions'
+    elif [ $2 == '2' ]; then
 	TAG='SignalRegions'
     else 
-	TAG=$1
+	TAG=$2
     fi
-    if [ $# == 1 ] || [ $2 == '0' ] || [ $2 == 'shapes' ]; then
+    if [ $# == 2 ] || [ $3 == '0' ] || [ $3 == 'shapes' ]; then
 	BATCH=True
 	QUEUE=testmatch
 	DOHADD=False
@@ -29,27 +46,29 @@ else
 	DOHADD=True
 	KEEPINPUT=True
     fi
-    if [ $# -lt 3 ]; then
+    if [ $# -lt 4 ]; then
 	SIGSET='SM'
 	if [ $TAG == 'btagefficiencies' ]; then
 	    SIGSET='Backgrounds'
 	fi
 	SPLIT='Samples'
     else
-	SIGSET=$3
-	if [ $# -lt 4 ]; then
+	SIGSET=$4
+	if [ $# -lt 5 ]; then
 	    SPLIT='Samples'
 	else
-	    SPLIT=$4
+	    SPLIT=$5
 	fi
     fi
 fi
 
+mkdir -p ./Shapes/$YEAR/$SPLIT
+
 if [ $BATCH == True ]; then
-    mkShapes.py --pycfg=configuration.py --tag=$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$SPLIT --doBatch=True --batchQueue=testmatch --batchSplit=$SPLIT
+    mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$SPLIT --doBatch=True --batchQueue=testmatch --batchSplit=$SPLIT
 else 
-    mkShapes.py --pycfg=configuration.py --tag=$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$SPLIT --batchSplit=$SPLIT --doHadd=True --doNotCleanup 
-    mv ./Shapes/$SPLIT/plots_$TAG.root ./Shapes/plots_${TAG}_${SIGSET}.root    
+    mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$SPLIT --batchSplit=$SPLIT --doHadd=True --doNotCleanup 
+    mv ./Shapes/$YEAR/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/plots_${TAG}_${SIGSET}.root    
 fi
 
 #mkShapes.py --pycfg=configuration.py --tag=$TAG --treeName=Events --outputDir=./Shapes --doBatch=$BATCH --batchQueue=$QUEUE --batchSplit=Samples --doHadd=$DOHADD --doNotCleanup]==$KEEPINPUT

@@ -3,7 +3,7 @@
 tag = 'test'
 
 # luminosity to normalize to
-lumi = 35.9
+lumi = 1.
 
 # file with list of variables
 variablesFile = 'variables.py' 

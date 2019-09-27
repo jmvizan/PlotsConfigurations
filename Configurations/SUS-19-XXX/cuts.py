@@ -5,12 +5,12 @@
 massZ = '91.1876'
 vetoZ = 'fabs(mll-'+massZ+')>15.'
 
-OC = 'mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
+LepId = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])==2'
+OC = LepId + ' && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
 SF = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1]) && '+vetoZ
 DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
 EE = SF+' && fabs(Lepton_pdgId[0])==11'
 MM = SF+' && fabs(Lepton_pdgId[0])==13'
-
 
 btagAlgo = 'btagDeepB'
 btagWP   = '2016M'
@@ -44,6 +44,13 @@ if opt.tag=='btagefficiencies':
     cuts[btagAlgo+'_'+btagWP+'_b']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])==5 && '+jetTagSelection
     cuts[btagAlgo+'_'+btagWP+'_c']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])==4 && '+jetTagSelection
     cuts[btagAlgo+'_'+btagWP+'_l']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])<4  && '+jetTagSelection
+
+if 'Test' in opt.tag:
+
+    cuts['TwoLep_em'] = OC+' && '+DF+' && ptmiss>=80'
+    cuts['TwoLep_em_tag'] = '(' + OC+' && '+DF+' && ptmiss>=80)*btagWeight_1tag'
+    cuts['TwoLep_em_notag'] = '(' + OC+' && '+DF+' && ptmiss>=80)*(1.-btagWeight_1tag)'
+
 
 if 'Preselection' in opt.tag:
 

@@ -1,6 +1,6 @@
 # plot configuration
 
-legend['lumi'] = 'L = 35.9/fb'
+legend['lumi'] = 'L = '+str(opt.lumi)+'/fb'
 legend['sqrt'] = '#sqrt{s} = 13 TeV'
 
 sl  = '#font[12]{l}'
@@ -60,12 +60,20 @@ groupPlot['WZ']  = {
                         'samples'  : ['WZ'] 
                        }
 
-groupPlot['Others']  = {  
-                         'nameHR' : 'Minor bkg.',
-                         'isSignal' : 0,
-                         'color': 394, #  kYellow-6
-                         'samples'  : ['ttW', 'VZ', 'VVV', 'HWW']
-                        } 
+if '2018' not in opt.tag :
+    groupPlot['Others']  = {  
+        'nameHR' : 'Minor bkg.',
+        'isSignal' : 0,
+        'color': 394, #  kYellow-6
+        'samples'  : ['ttW', 'VZ', 'VVV', 'HWW']
+    }
+elif '2018' in opt.tag : 
+    groupPlot['Others']  = {  
+        'nameHR' : 'Minor bkg.',
+        'isSignal' : 0,
+        'color': 394, #  kYellow-6
+        'samples'  : ['ttW', 'VVV', 'HWW']
+    }
 
 
 #plot = {}
@@ -137,7 +145,8 @@ plot['ttW'] = {
                   'scale'    : 1.0
                   }
 
-plot['VZ'] = { 
+if '2018' not in opt.tag :
+    plot['VZ'] = { 
                   'nameHR' : 'VZ (#rightarrow 2' + sl + '2q)',
                   'color'    : 394, #  kYellow-6
                   'isSignal' : 0,
