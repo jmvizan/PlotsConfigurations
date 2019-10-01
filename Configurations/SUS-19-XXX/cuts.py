@@ -58,6 +58,22 @@ if 'Preselection' in opt.tag:
     cuts['TwoLep_ee'] = OC+' && '+EE+' && ptmiss>=80'
     cuts['TwoLep_mm'] = OC+' && '+MM+' && ptmiss>=80'
 
+if 'TopControlRegion' in opt.tag:
+
+    cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20)' #*btagWeight_1tag'
+    cuts['Top_ee'] = '(' + OC+' && '+EE+' && ptmiss>=50)' #*btagWeight_1tag'
+    cuts['Top_mm'] = '(' + OC+' && '+MM+' && ptmiss>=50)' #*btagWeight_1tag'
+
+if 'WWControlRegion' in opt.tag:
+
+    cuts['WW_em'] = '(' + OC+' && '+DF+' && ptmiss>=70 && nCleanJet==0)'
+
+if 'DYControlRegion' in opt.tag:
+
+    DY = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1]) && !('+vetoZ+')'
+    cuts['DY_ee'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==11 && ptmiss>=20)' #*(1.-btagWeight_1tag)'
+    cuts['DY_mm'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==13 && ptmiss>=20)' #*(1.-btagWeight_1tag)'
+
 if 'Validation' in opt.tag:
 
     cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+BTAG

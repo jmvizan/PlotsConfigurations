@@ -41,7 +41,7 @@ if 'btagefficiencies' in opt.tag:
                             'xaxis' : 'jet pseudorapodity',        #   x axis name
                             } 
                             
-if 'Preselection' in opt.tag:
+if 'Preselection' in opt.tag or 'TopControlRegion' in opt.tag or 'WWControlRegion' in opt.tag or 'DYControlRegion' in opt.tag:
 
     variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
                                     'range' : (  40,    0.,  400.),    #   variable range
