@@ -60,19 +60,32 @@ if 'Preselection' in opt.tag:
 
 if 'TopControlRegion' in opt.tag:
 
-    cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20)' #*btagWeight_1tag'
-    cuts['Top_ee'] = '(' + OC+' && '+EE+' && ptmiss>=50)' #*btagWeight_1tag'
-    cuts['Top_mm'] = '(' + OC+' && '+MM+' && ptmiss>=50)' #*btagWeight_1tag'
+    if 'Data' in opt.sigset:
+        cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20) && '+BTAG 
+        cuts['Top_ee'] = '(' + OC+' && '+EE+' && ptmiss>=50) && '+BTAG 
+        cuts['Top_mm'] = '(' + OC+' && '+MM+' && ptmiss>=50) && '+BTAG 
+
+    if 'Backgrounds' in opt.sigset:
+        cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20)*btagWeight_1tag'
+        cuts['Top_ee'] = '(' + OC+' && '+EE+' && ptmiss>=50)*btagWeight_1tag'
+        cuts['Top_mm'] = '(' + OC+' && '+MM+' && ptmiss>=50)*btagWeight_1tag'
 
 if 'WWControlRegion' in opt.tag:
 
-    cuts['WW_em'] = '(' + OC+' && '+DF+' && ptmiss>=70 && nCleanJet==0)'
+    cuts['WW_metcut'] = '(' + OC+' && '+DF+' && ptmiss>=70 && nCleanJet==0)'
+    cuts['WW_nometcut'] = '(' + OC+' && '+DF+' && nCleanJet==0)'
 
 if 'DYControlRegion' in opt.tag:
 
     DY = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1]) && !('+vetoZ+')'
-    cuts['DY_ee'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==11 && ptmiss>=20)' #*(1.-btagWeight_1tag)'
-    cuts['DY_mm'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==13 && ptmiss>=20)' #*(1.-btagWeight_1tag)'
+
+    if 'Data' in opt.sigset:
+        cuts['DY_ee'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==11 && ptmiss>=20) && '+VETO
+        cuts['DY_mm'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==13 && ptmiss>=20) && '+VETO
+
+    if 'Backgrounds' in opt.sigset:
+        cuts['DY_ee'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==11 && ptmiss>=20)*(1.-btagWeight_1tag)'
+        cuts['DY_mm'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==13 && ptmiss>=20)*(1.-btagWeight_1tag)'
 
 if 'Validation' in opt.tag:
 
