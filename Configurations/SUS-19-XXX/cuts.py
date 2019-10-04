@@ -65,7 +65,7 @@ if 'TopControlRegion' in opt.tag:
         cuts['Top_ee'] = '(' + OC+' && '+EE+' && ptmiss>=50) && '+BTAG 
         cuts['Top_mm'] = '(' + OC+' && '+MM+' && ptmiss>=50) && '+BTAG 
 
-    if 'Backgrounds' in opt.sigset:
+    else: #if 'Backgrounds' in opt.sigset:
         cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20)*btagWeight_1tag'
         cuts['Top_ee'] = '(' + OC+' && '+EE+' && ptmiss>=50)*btagWeight_1tag'
         cuts['Top_mm'] = '(' + OC+' && '+MM+' && ptmiss>=50)*btagWeight_1tag'
@@ -83,19 +83,45 @@ if 'DYControlRegion' in opt.tag:
         cuts['DY_ee'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==11 && ptmiss>=20) && '+VETO
         cuts['DY_mm'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==13 && ptmiss>=20) && '+VETO
 
-    if 'Backgrounds' in opt.sigset:
+    else: #if 'Backgrounds' in opt.sigset:
         cuts['DY_ee'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==11 && ptmiss>=20)*(1.-btagWeight_1tag)'
         cuts['DY_mm'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==13 && ptmiss>=20)*(1.-btagWeight_1tag)'
 
-if 'Validation' in opt.tag:
+if 'HighPtMissControlRegion' in opt.tag:
 
-    cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+BTAG
-    cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+VETO
-    
-    cuts['VR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+BTAG
-    cuts['VR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+VETO
+    if 'Data' in opt.sigset:
+        cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+BTAG
+        cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+VETO
+        cuts['VR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+BTAG
+        cuts['VR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+VETO
 
-if 'Signal' in opt.tag:
+    else:
+        cuts['VR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*btagWeight_1tag'
+        cuts['VR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*(1.-btagWeight_1tag)'
+        cuts['VR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*btagWeight_1tag'
+        cuts['VR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*(1.-btagWeight_1tag)'
+
+if 'TopValidationRegion' in opt.tag:
+
+    if 'Data' in opt.sigset:
+        cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+BTAG
+        cuts['VR1_Tag_sf']   = OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+BTAG
+
+    else:
+        cuts['VR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*btagWeight_1tag'
+        cuts['VR1_Tag_sf']   = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*btagWeight_1tag'
+
+if 'WWValidationRegion' in opt.tag:
+
+    if 'Data' in opt.sigset:
+        cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+VETO
+        cuts['VR1_Veto_sf']  = OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
+
+    else:
+        cuts['VR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*(1.-btagWeight_1tag)'
+        cuts['VR1_Veto_sf']  = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
+
+if 'SignalRegions' in opt.tag:
 
     cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+BTAG
     cuts['SR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+VETO

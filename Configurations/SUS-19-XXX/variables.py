@@ -41,7 +41,7 @@ if 'btagefficiencies' in opt.tag:
                             'xaxis' : 'jet pseudorapodity',        #   x axis name
                             } 
                             
-if 'Preselection' in opt.tag or 'TopControlRegion' in opt.tag or 'WWControlRegion' in opt.tag or 'DYControlRegion' in opt.tag:
+if 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag:
 
     variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
                                     'range' : (  40,    0.,  400.),    #   variable range
@@ -92,11 +92,6 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                      'xaxis' : mt2 + pll + gv,         #   x axis name
                                      'fold'  : 1                       #   fold overflow
                                  }
-    
-    variables['mt2llgen']      = {   'name'  : 'mt2llgen',             #   variable name    
-                                     'range' : (   7,    0.,  140.),   #   variable range
-                                     'xaxis' : mt2 + pll + gv,         #   x axis name
-                                     'fold'  : 1                       #   fold overflow
-                                 }
+
 
 
