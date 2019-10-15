@@ -23,6 +23,7 @@ else
 	YEAR='2018'	
     else 
 	YEAR=$1
+    fi
     TAG=$2
     SIGSET='SM-'$3
     if [ $# == 3 ]; then
