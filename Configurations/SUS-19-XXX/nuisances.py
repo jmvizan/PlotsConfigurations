@@ -62,6 +62,44 @@ for cut in cuts.keys():
 
 # mt2ll backgrounds
 
+mt2llRegions = ['Veto', 'SR1_', 'SR2_', 'SR3_']
+mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
+mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
+mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
+
+for mt2llregion in mt2llRegions: 
+    for mt2llbin in range(len(mt2llBins)):
+
+        mt2llsystname = mt2llregion + mt2llBins[mt2llbin]
+        mt2llweightUp = '(mt2ll>='+mt2llEdges[mt2llbin]+' && mt2ll<'+mt2llEdges[mt2llbin+1]+') ? '+str(1.+mt2llSystematics[mt2llbin])+' : 1.'  
+        mt2llweightDo = '(mt2ll>='+mt2llEdges[mt2llbin]+' && mt2ll<'+mt2llEdges[mt2llbin+1]+') ? '+str(1.-mt2llSystematics[mt2llbin])+' : 1.'  
+        
+        nuisances['Top_'+mt2llsystname]  = {
+               'name'  : 'Top_'+mt2llsystname+year,
+               'samples'  : { 
+                   'ttbar' : [ mt2llweightUp, mt2llweightDo],
+                   'tW'    : [ mt2llweightUp, mt2llweightDo],
+               },
+               'kind'  : 'weight',
+               'type'  : 'shape',
+               'cuts'  : [ ]           
+              }
+        
+        nuisances['WW_'+mt2llsystname]  = {
+               'name'  : 'WW_'+mt2llsystname+year,
+               'samples'  : { 
+                   'WW' : [ mt2llweightUp, mt2llweightDo],
+               },
+               'kind'  : 'weight',
+               'type'  : 'shape',
+               'cuts'  : [ ]           
+              }
+
+        for cut in cuts.keys():
+            if mt2llregion in cut:
+                nuisances['Top_'+mt2llsystname]['cuts'].append(cut)
+                nuisances['WW_' +mt2llsystname]['cuts'].append(cut)
+
 # rate parameters
 
 # mt2ll signal
