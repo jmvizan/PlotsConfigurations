@@ -48,8 +48,8 @@ if opt.tag=='btagefficiencies':
 if 'Test' in opt.tag:
 
     cuts['TwoLep_em'] = OC+' && '+DF+' && ptmiss>=80'
-    cuts['TwoLep_em_tag'] = '(' + OC+' && '+DF+' && ptmiss>=80)*btagWeight_1tag'
-    cuts['TwoLep_em_notag'] = '(' + OC+' && '+DF+' && ptmiss>=80)*(1.-btagWeight_1tag)'
+    cuts['TwoLep_em_Tag'] = '(' + OC+' && '+DF+' && ptmiss>=80)*btagWeight_1tag'
+    cuts['TwoLep_em_Veto'] = '(' + OC+' && '+DF+' && ptmiss>=80)*(1.-btagWeight_1tag)'
 
 
 if 'Preselection' in opt.tag:

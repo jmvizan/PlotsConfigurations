@@ -27,7 +27,7 @@ else
     TAG=$2
     SIGSET='SM-'$3
     if [ $# == 3 ]; then
-	FILESET='SM-'$3
+	FILESET=$SIGSET
     else
 	FILESET=$4
     fi
@@ -35,4 +35,4 @@ fi
 
 mkdir -p ./Datacards/$YEAR
 
-mkDatacards.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --outputDirDatacard=./Datacards/$YEAR/$2 --inputFile=./Shapes/$YEAR/plots_${TAG}_${FILESET}.root 
+mkDatacards.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --outputDirDatacard=./Datacards/$YEAR/$3 --inputFile=./Shapes/$YEAR/plots_${TAG}_${FILESET}.root 
