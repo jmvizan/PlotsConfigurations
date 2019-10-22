@@ -67,13 +67,13 @@ for cut in cuts.keys():
     if '_Veto' in cut:
         nuisances['btag0b']['cuts'].append(cut)
 
-# LHE weights
+### LHE weights
 
-# JES and MET
+### JES and MET
 
-# mt2ll backgrounds
+### mt2ll backgrounds
 
-mt2llRegions = ['Veto', 'SR1_', 'SR2_', 'SR3_']
+mt2llRegions = ['SR1_', 'SR2_', 'SR3_']
 mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
 mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
 mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
@@ -111,27 +111,86 @@ for mt2llregion in mt2llRegions:
                 nuisances['Top_'+mt2llsystname]['cuts'].append(cut)
                 nuisances['WW_' +mt2llsystname]['cuts'].append(cut)
 
-# rate parameters
+### rate parameters
 
-for mt2llregion in mt2llRegions: 
+rateparameters = {
+    'Topnorm' :  { 
+        'samples' : [ 'ttbar', 'tW' ],
+        'subcut'  : '',
+    },
+    'WWnorm'  : {
+        'samples' : [ 'WW' ],
+        'subcut'  : '',
+    },
+    'NoJetRate_JetBack' : {
+        'samples' : [ 'ttbar', 'tW', 'ttW', 'ttZ' ],
+        'subcut'  : '_NoJet_',
+        'limits'  : '[0.5,1.5]',
+    },
+    'JetRate_JetBack' : {
+        'samples'  : [ 'ttbar', 'tW', 'ttW', 'ttZ' ],
+        'subcut'   : '_NoTag_',
+        'bondrate' : 'NoJetRate_JetBack',
+    },
+    'NoJetRate_DibosonBack' : {
+        'samples' : [ 'WW', 'WZ' ],
+        'subcut'  : '_NoJet_',
+        'limits'  : '[0.7,1.3]'
+    },
+    'JetRate_DibosonBack' : {
+        'samples' : [ 'WW', 'WZ' ],
+        'subcut'  : '_NoTag_',
+        'bondrate' : 'NoJetRate_DibosonBack',
+    },
+}
 
-    rateparamname = mt2llregion+'rateparam'
+if hasattr(opt, 'inputFile'):
+    for mt2llregion in mt2llRegions: 
+        for rateparam in rateparameters: 
+            
+            rateparamname = rateparam + '_' + mt2llregion
+            
+            for sample in rateparameters[rateparam]['samples']:
+                
+                nuisances[sample+rateparamname]  = {
+                    'name'  : rateparamname+year,
+                    'samples'  : { sample : '1.00' },
+                    'type'  : 'rateParam',
+                    'cuts'  : [ ] 
+                }
+                
+                if 'limits' in rateparameters[rateparam].keys():
+                    nuisances[sample+rateparamname]['limits'] = rateparameters[rateparam]['limits'] 
+                    
+                for cut in cuts.keys():
+                    if mt2llregion in cut and rateparameters[rateparam]['subcut'] in  cut:
 
-    nuisances['Top_'+rateparamname]  = {
-        'name'  : 'Top_'+rateparamname+year,
-        'samples'  : {
-            '04_TTTo2L2Nu' : '1.00',
-            '05_ST' : '1.00',
-        },
-        'type'  : 'rateParam',
-        'cuts'  : [ ] 
-    }
+                        nuisances[sample+rateparamname]['cuts'].append(cut)
+                        
+                        if 'bondrate' in rateparameters[rateparam].keys():
 
-    for cut in cuts.keys():
-        if mt2llregion in cut:
-            nuisances['Top_'+rateparamname]['cuts'].append(cut)
+                            bond_formula = '1+@0/@1*(1.-@2)' 
+                                
+                            fileIn = ROOT.TFile(opt.inputFile, "READ")
 
-# mt2ll signal
+                            nuisances[sample+rateparamname]['bond'] = {}
+
+                            for variable in variables.keys():
+
+                                histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
+                                cutB = rateparameters[rateparam]['subcut']
+                                cutA = rateparameters[rateparameters[rateparam]['bondrate']]['subcut']
+                                histoA = fileIn.Get(cut.replace(cutB, cutA)+'/'+variable+'/histo_'+sample)
+                                yieldB = '%-.4f' % histoB.Integral()
+                                yieldA = '%-.4f' % histoA.Integral()
+            
+                                bond_parameters = yieldA+','+yieldB+','+rateparameters[rateparam]['bondrate']+'_'+mt2llregion+year
+
+                                nuisances[sample+rateparamname]['bond'][variable] =  { bond_formula : bond_parameters }
+
+                            fileIn.Close()
+
+### mt2ll signal
 
 nuisances['mt2ll']  = {
                'name'  : 'mt2ll'+year,
