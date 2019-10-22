@@ -1,6 +1,6 @@
-# nuisances
+### nuisances
 
-# general parameters
+### general parameters
 if '2016' in opt.tag : 
     year = '_2016'
     lumi_uncertainty = '1.025'
@@ -11,7 +11,18 @@ elif '2018' in opt.tag :
     year = '_2018'
     lumi_uncertainty = '1.025'
 
-#nuisances = {}
+###nuisances = {}
+ 
+### statistical uncertainty
+
+nuisances['stat']  = {
+              'type'  : 'auto',   # Use the following if you want to apply the automatic combine MC stat nuisances.
+              'maxPoiss'  : '10',     # Number of threshold events for Poisson modelling
+              'includeSignal'  : '1', # Include MC stat nuisances on signal processes (1=True, 0=False)
+              'samples' : {}
+             }
+
+### lnN
 
 # luminosity -> https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#TabLum
 nuisances['lumi']  = {
@@ -22,10 +33,12 @@ nuisances['lumi']  = {
 for sample in samples.keys():
     if sample!='DATA':
         nuisances['lumi']  ['samples'][sample] = lumi_uncertainty 
- 
-# statistical uncertainty
 
-# scale factors
+# background normalization
+
+### shapes
+
+# b-tagging scale factors
 nuisances['btag1b']  = {
                'name'  : 'btagb'+year,
                'samples'  : { },
@@ -53,8 +66,6 @@ for sample in samples.keys():
 for cut in cuts.keys():
     if '_Veto' in cut:
         nuisances['btag0b']['cuts'].append(cut)
-
-# background normalization
 
 # LHE weights
 
@@ -102,6 +113,24 @@ for mt2llregion in mt2llRegions:
 
 # rate parameters
 
+for mt2llregion in mt2llRegions: 
+
+    rateparamname = mt2llregion+'rateparam'
+
+    nuisances['Top_'+rateparamname]  = {
+        'name'  : 'Top_'+rateparamname+year,
+        'samples'  : {
+            '04_TTTo2L2Nu' : '1.00',
+            '05_ST' : '1.00',
+        },
+        'type'  : 'rateParam',
+        'cuts'  : [ ] 
+    }
+
+    for cut in cuts.keys():
+        if mt2llregion in cut:
+            nuisances['Top_'+rateparamname]['cuts'].append(cut)
+
 # mt2ll signal
 
 nuisances['mt2ll']  = {
@@ -115,4 +144,5 @@ for model in signalMassPoints:
         for massPoint in signalMassPoints[model]:
             if massPoint in opt.sigset: 
               nuisances['mt2ll']  ['samples'][massPoint] = ['1.2', '0.8'] # placeholder
+
 
