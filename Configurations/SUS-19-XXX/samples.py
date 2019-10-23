@@ -68,8 +68,12 @@ if 'WZ' in opt.tag or 'ZZ' in opt.tag :
 ### MC weights
 
 XSWeight       = 'baseW*genWeight'
-LepWeight      = 'Lepton_tightElectron_cutBasedMediumPOG_IdIsoSF[0]*Lepton_tightElectron_cutBasedMediumPOG_IdIsoSF[1]*Lepton_tightMuon_mediumRelIsoTight_IdIsoSF[0]*Lepton_tightMuon_mediumRelIsoTight_IdIsoSF[1]'
-LepWeightFS    = 'Lepton_tightElectron_cutBasedMediumPOG_FastSimSF[0]*Lepton_tightElectron_cutBasedMediumPOG_FastSimSF[1]*Lepton_tightMuon_mediumRelIsoTight_FastSimSF[0]*Lepton_tightMuon_mediumRelIsoTight_FastSimSF[1]'
+EleWeight      = 'Lepton_tightElectron_cutBasedMediumPOG_IdIsoSF[0]*Lepton_tightElectron_cutBasedMediumPOG_IdIsoSF[1]'
+MuoWeight      = 'Lepton_tightMuon_mediumRelIsoTight_IdIsoSF[0]*Lepton_tightMuon_mediumRelIsoTight_IdIsoSF[1]'
+LepWeight      = EleWeight + '*' + MuoWeight
+EleWeightFS    = EleWeight.replace('IdIsoSF', 'FastSimSF')
+MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
+LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
 SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight 
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS

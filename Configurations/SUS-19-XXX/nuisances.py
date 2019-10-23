@@ -25,53 +25,145 @@ nuisances['stat']  = {
 ### lnN
 
 # luminosity -> https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#TabLum
+
 nuisances['lumi']  = {
                'name'  : 'lumi_13TeV'+year,
                'samples'  : { },
                'type'  : 'lnN',
-              }
+}
 for sample in samples.keys():
-    if sample!='DATA':
+    if sample!='DATA' and sample!='ZZ'  and sample!='ttZ' and sample!='WZ'  and sample!='DY':
         nuisances['lumi']  ['samples'][sample] = lumi_uncertainty 
 
-# background normalization
+# trigger
+
+nuisances['trigger']  = {
+               'name'  : 'trigger'+year,
+               'samples'  : { },
+               'type'  : 'lnN',
+}
+for sample in samples.keys():
+    if sample!='DATA' and sample!='ZZ'  and sample!='ttZ' and sample!='WZ'  and sample!='DY':
+        nuisances['trigger']  ['samples'][sample] = '1.02'
+
+# background cross sections and scale factors
+
+normBackgrounds = {
+    #'ttbar' : { 'all'   : { '1.10' : [ '_All' ]                    } }, # -> rate parameter
+    'tW'    : { 'all'   : { '1.10' : [ '_All' ]                    } }, 
+    #'WW'    : { 'all'   : { '1.10' : [ '_All' ]                    } }, # -> rate parameter
+    'ttW'   : { 'all'   : { '1.50' : [ '_All' ]                    } },
+    'VZ'    : { 'all'   : { '1.50' : [ '_All' ]                    } },
+    'VVV'   : { 'all'   : { '1.50' : [ '_All' ]                    } },
+    'WZ'    : { 'all'   : { '1.50' : [ '_All' ]                    } }, # 0.97 +/- 0.09
+    'ttZ'   : { 'all'   : { '1.50' : [ '_All' ]                    } }, # 1.44 +/- 0.3
+    'ZZ'    : { 'nojet' : { '1.26' : [ '_NoJet' ]                  },   # 0.74 +/- 0.19
+                'jet'   : { '1.14' : [ '_NoTag', '_Tag' ]          },   # 1.21 +/- 0.17
+                'veto'  : { '1.12' : [ '_Veto' ]                   } }, # 1.06 +/- 0.12
+    'DY'    : { 'jet  ' : { '1.32' : [ '_Tag', '_Veto', '_NoTag' ] },
+                'nojet' : { '2.00' : [ '_NoJet' ]                  } },
+}
+
+for background in normBackgrounds:
+    for region in normBackgrounds[background]:
+        nuisancename = 'norm'+background+region
+        value, subregions = normBackgrounds[background][region].items()[0]
+        nuisances[nuisancename]  = {
+            'name'    : nuisancename+year, 
+            'samples' : { background : value },
+            'cuts'    : [ ], 
+            'type'    : 'lnN',
+        }
+        for cut in cuts.keys():
+            for subregion in subregions:
+                if subregion=='_All' or subregion in cut:
+                    nuisances[nuisancename]['cuts'].append(cut)
+                    break
 
 ### shapes
 
+# lepton reco, id, iso, fastsim
+
+weightEle   = '('+EleWeight.replase('IdiIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
+weightMuo   = '('+MuoWeight.replase('IdiIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
+weightLep   = '('+LepWeight.replase('IdiIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
+weightEleFS = weightEle.replace('IdIsoSF', 'FastSimSF')
+weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
+weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
+
+leptonSF = { 
+    #'trakreco'        : [ '1.', '1.' ], ->  no scale factor required 
+    #'electronIdIso'   : [ weightEle.replace('Syst', 'Up'),   weightEle.replace('Syst', 'Down')   ],
+    #'muonIdIso'       : [ weightMuo.replace('Syst', 'Up'),   weightMuo.replace('Syst', 'Down')   ],
+    'leptonIdIso'     : [ weightLep.replace('Syst', 'Up'),   weightLep.replace('Syst', 'Down')   ], 
+    #'electronIdIsoFS' : [ weightEleFS.replace('Syst', 'Up'), weightEleFS.replace('Syst', 'Down') ],
+    #'muonIdIsoFS'     : [ weightMuoFS.replace('Syst', 'Up'), weightMuoFS.replace('Syst', 'Down') ],
+    'leptonIdIsoFS'   : [ weightLepFS.replace('Syst', 'Up'), weightLepFS.replace('Syst', 'Down') ], 
+}
+
+for scalefactor in leptonSF:
+    nuisances[scalefactor]  = {
+        'name'  : scalefactor+year,
+        'samples'  : { },
+        'kind'  : 'weight',
+        'type'  : 'shape',
+        'type'  : 'lnN',
+    }
+    if 'FS' not in scalefactor:
+        for sample in samples.keys():
+            if sample!='DATA':
+                nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
+    else:
+        for model in signalMassPoints:
+            if model in opt.sigset:
+                for massPoint in signalMassPoints[model]:
+                    if massPoint in opt.sigset: 
+                        nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
+
 # b-tagging scale factors
-nuisances['btag1b']  = {
-               'name'  : 'btagb'+year,
-               'samples'  : { },
-               'kind'  : 'weight',
-               'type'  : 'shape',
-               'cuts'  : [ ]           
-              }
-for sample in samples.keys():
-    if sample!='DATA':
-        nuisances['btag1b']['samples'][sample] = ['btagWeight_1tag_b_up/btagWeight_1tag', 'btagWeight_1tag_b_down/btagWeight_1tag']
-for cut in cuts.keys():
-    if '_Tag' in cut:
-        nuisances['btag1b']['cuts'].append(cut)
 
-nuisances['btag0b']  = {
-               'name'  : 'btagb'+year,
-               'samples'  : { },
-               'kind'  : 'weight',
-               'type'  : 'shape',
-               'cuts'  : [ ]           
-              }
-for sample in samples.keys():
-    if sample!='DATA':
-        nuisances['btag0b']['samples'][sample] = ['(1.-btagWeight_1tag_b_up)/(1.-btagWeight_1tag)', '(1.-btagWeight_1tag_b_down)/(1.-btagWeight_1tag)']
-for cut in cuts.keys():
-    if '_Veto' in cut:
-        nuisances['btag0b']['cuts'].append(cut)
+weight1b = 'btagWeight_1tag_syst/btagWeight_1tag'
+weight0b = '(1.-btagWeight_1tag_syst)/(1.-btagWeight_1tag)'
 
-### LHE weights
+btagSF = {
+    'btag1b'     : [ weight1b.replace('syst', 'b_up'),         weight1b.replace('syst', 'b_down') ],
+    'btag0b'     : [ weight0b.replace('syst', 'b_up'),         weight0b.replace('syst', 'b_down') ],
+    'mistag1b'   : [ weight1b.replace('syst', 'l_up'),         weight1b.replace('syst', 'l_down') ],
+    'mistag0b'   : [ weight0b.replace('syst', 'l_up'),         weight0b.replace('syst', 'l_down') ],
+    'btag1bFS'   : [ weight1b.replace('syst', 'b_up_fastsim'), weight1b.replace('syst', 'b_down_fastsim') ],
+    'btag0bFS'   : [ weight0b.replace('syst', 'b_up_fastsim'), weight0b.replace('syst', 'b_down_fastsim') ],
+    'ctag1bFS'   : [ weight1b.replace('syst', 'c_up_fastsim'), weight1b.replace('syst', 'c_down_fastsim') ],
+    'ctag0bFS'   : [ weight0b.replace('syst', 'c_up_fastsim'), weight0b.replace('syst', 'c_down_fastsim') ],
+    'mistag1bFS' : [ weight1b.replace('syst', 'l_up_fastsim'), weight1b.replace('syst', 'l_down_fastsim') ],
+    'mistag0bFS' : [ weight0b.replace('syst', 'l_up_fastsim'), weight0b.replace('syst', 'l_down_fastsim') ],
+}
 
-### JES and MET
+for scalefactor in btagSF:
+    nuisances[scalefactor]  = {
+        'name'  : scalefactor+year,
+        'samples'  : { },
+        'kind'  : 'weight',
+        'type'  : 'shape',
+        'cuts'  : [ ]           
+    }
+    if 'FS' not in scalefactor:
+        for sample in samples.keys():
+            if sample!='DATA':
+                nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
+    else:
+        for model in signalMassPoints:
+            if model in opt.sigset:
+                for massPoint in signalMassPoints[model]:
+                    if massPoint in opt.sigset: 
+                        nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
+    for cut in cuts.keys():
+        if ('1b' in scalefactor and '_Tag' in cut) or 
+           ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut)):
+            nuisances[scalefactor]['cuts'].append(cut)
 
-### mt2ll backgrounds
+### mt2ll backgrounds (special case for shape uncertainties)
+
+# mt2ll top and WW
 
 mt2llRegions = ['SR1_', 'SR2_', 'SR3_']
 mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
@@ -110,6 +202,28 @@ for mt2llregion in mt2llRegions:
             if mt2llregion in cut:
                 nuisances['Top_'+mt2llsystname]['cuts'].append(cut)
                 nuisances['WW_' +mt2llsystname]['cuts'].append(cut)
+
+# mt2ll DY (from control regions)
+ 
+# mt2ll ZZ (from k-factors)
+
+# mt2ll signal
+
+nuisances['mt2ll']  = {
+               'name'  : 'mt2ll'+year,
+               'samples'  : { },
+               'kind'  : 'weight',
+               'type'  : 'shape',
+              }
+for model in signalMassPoints:
+    if model in opt.sigset:
+        for massPoint in signalMassPoints[model]:
+            if massPoint in opt.sigset: 
+              nuisances['mt2ll']  ['samples'][massPoint] = ['1.2', '0.8'] # placeholder
+
+### LHE weights
+
+### JES and MET
 
 ### rate parameters
 
@@ -190,18 +304,5 @@ if hasattr(opt, 'inputFile'):
 
                             fileIn.Close()
 
-### mt2ll signal
-
-nuisances['mt2ll']  = {
-               'name'  : 'mt2ll'+year,
-               'samples'  : { },
-               'kind'  : 'weight',
-               'type'  : 'shape',
-              }
-for model in signalMassPoints:
-    if model in opt.sigset:
-        for massPoint in signalMassPoints[model]:
-            if massPoint in opt.sigset: 
-              nuisances['mt2ll']  ['samples'][massPoint] = ['1.2', '0.8'] # placeholder
 
 
