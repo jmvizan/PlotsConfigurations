@@ -68,9 +68,9 @@ for background in normBackgrounds:
 
 # lepton reco, id, iso, fastsim
 
-weightEle   = '('+EleWeight.replase('IdiIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
-weightMuo   = '('+MuoWeight.replase('IdiIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
-weightLep   = '('+LepWeight.replase('IdiIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
+weightEle   = '('+EleWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
+weightMuo   = '('+MuoWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
+weightLep   = '('+LepWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
 weightEleFS = weightEle.replace('IdIsoSF', 'FastSimSF')
 weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
 weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
@@ -136,8 +136,7 @@ for scalefactor in btagSF:
                     if sample in signalMassPoints[model].keys():
                         nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
     for cut in cuts.keys():
-        if ('1b' in scalefactor and '_Tag' in cut) or 
-           ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut)):
+        if ('1b' in scalefactor and '_Tag' in cut) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut)):
             nuisances[scalefactor]['cuts'].append(cut)
 
 # pileup
@@ -150,7 +149,7 @@ nuisances['pileup']  = {
 }
 for sample in samples.keys():
     if sample!='DATA':
-        nuisances['pileup']['samples'][sample] = [ 'puWeightPu/puWeight', 'puWeightDown/puWeight' ] 
+        nuisances['pileup']['samples'][sample] = [ 'puWeightUp/puWeight', 'puWeightDown/puWeight' ] 
 
 # nonprompt lepton rate
 
@@ -162,7 +161,7 @@ nuisances['nonpromptLep']  = {
 }
 for sample in samples.keys():
     if sample!='DATA':
-        nuisances['nonpromptLep']['samples'][sample] = [ 'nonpromptLepSF_Up/nonpromptLepSF', 'nonpromptLepSF_Down/nonpromptLepSF' ] 
+        nuisances['nonpromptLep']['samples'][sample] = [ nonpromptLepSF_Up+'/'+nonpromptLepSF, nonpromptLepSF_Down+'/'+nonpromptLepSF ] 
 
 # top pt reweighting
 
@@ -187,7 +186,7 @@ for sample in samples.keys():
             isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
         elif 'TChi' in model:
             isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
-        elif:
+        else:
             print 'ERROR: no isrW implementation for model', model
         if sample in signalMassPoints[model].keys():
             nuisances['isrFS']['samples'][sample] = isrWeight
@@ -240,8 +239,8 @@ for mt2llregion in mt2llRegions:
 
 # mt2ll signal
 
-nuisances['metfastsim']  = {
-    'name'  : 'metfastsim',
+nuisances['ptmissfastsim']  = {
+    'name'  : 'ptmissfastsim', # mismodeling correlated through the years?
     'samples'  : { },
     'kind'  : 'tree',
     'type'  : 'shape',
@@ -251,7 +250,7 @@ nuisances['metfastsim']  = {
 for sample in samples.keys():
     for model in signalMassPoints:
         if sample in signalMassPoints[model].keys():
-            nuisances['metfastsim']['samples'][sample] = ['1.', '1.']
+            nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
 ### LHE weights
 
@@ -336,5 +335,21 @@ if hasattr(opt, 'inputFile'):
 
                             fileIn.Close()
 
+### Nasty tricks ...
+
+if 'SignalRegions' not in opt.tag and 'ControlRegion' not in opt.tag:
+
+    nuisances.clear()
+
+elif 'ControlRegion' in opt.tag:
+
+    nuisanceToRemove = [ ] 
+
+    for nuisance in nuisances:
+        if nuisance!='stat' and nuisance!='lumi': # example ...
+            nuisanceToRemove.append(nuisance)
+            
+    for nuisance in nuisanceToRemove:
+        del nuisances[nuisance]
 
 

@@ -89,15 +89,13 @@ SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*is
 #nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.50', 'rateDown' : '0.50' } 
 nonpromptLep = { 'rate' : '1.08', 'rateUp' : '1.29', 'rateDown' : '0.87' } 
 promptLeptons = 'Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]'
-nonpromptLepSF      = '( promptLeptons + (1. - promptLeptons)*' + nonpromptLep['rate']      + ')'
-nonpromptLepSF_Up   = '( promptLeptons + (1. - promptLeptons)*' + nonpromptLep['rateUp']    + ')'
-nonpromptLepSF_Down = '( promptLeptons + (1. - promptLeptons)*' + nonpromptLep['rateDown']  + ')'
+nonpromptLepSF      = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rate']      + ')'
+nonpromptLepSF_Up   = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateUp']    + ')'
+nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateDown']  + ')'
 SFweight   += '*' + nonpromptLepSF
 SFweightFS += '*' + nonpromptLepSF
 
 ### Special weights
-
-
 
 # background cross sections and scale factors
 
@@ -190,7 +188,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                             'FilesPerJob' : 2 ,
                             }
 
-    if 'btagefficiencies' not in opt.tag and 'Test' not in opt.tag :
+    if 'btagefficiencies' not in opt.tag and 'Test' not in opt.tag:
     
         tWext = ''
         if '2018' in opt.tag : 

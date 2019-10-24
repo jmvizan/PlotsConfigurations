@@ -141,6 +141,7 @@ if 'StopSignalRegions' in opt.tag:
     
         cuts['SR3_Tag_sf']   = OC+' && '+SF+' && ptmiss>=300 && '+BTAG
         cuts['SR3_Veto_sf']  = OC+' && '+SF+' && ptmiss>=300 && '+VETO
+
     else:
         cuts['SR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200)*btagWeight_1tag'
         cuts['SR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200)*(1.-btagWeight_1tag)'
@@ -159,3 +160,4 @@ if 'StopSignalRegions' in opt.tag:
 
         cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300)*btagWeight_1tag'
         cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300)*(1.-btagWeight_1tag)'
+
