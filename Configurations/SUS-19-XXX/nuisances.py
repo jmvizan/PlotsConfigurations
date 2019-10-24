@@ -48,22 +48,6 @@ for sample in samples.keys():
 
 # background cross sections and scale factors
 
-normBackgrounds = {
-    #'ttbar' : { 'all'   : { '1.10' : [ '_All' ]                    } }, # -> rate parameter
-    'tW'    : { 'all'   : { '1.10' : [ '_All' ]                    } }, 
-    #'WW'    : { 'all'   : { '1.10' : [ '_All' ]                    } }, # -> rate parameter
-    'ttW'   : { 'all'   : { '1.50' : [ '_All' ]                    } },
-    'VZ'    : { 'all'   : { '1.50' : [ '_All' ]                    } },
-    'VVV'   : { 'all'   : { '1.50' : [ '_All' ]                    } },
-    'WZ'    : { 'all'   : { '1.50' : [ '_All' ]                    } }, # 0.97 +/- 0.09
-    'ttZ'   : { 'all'   : { '1.50' : [ '_All' ]                    } }, # 1.44 +/- 0.3
-    'ZZ'    : { 'nojet' : { '1.26' : [ '_NoJet' ]                  },   # 0.74 +/- 0.19
-                'jet'   : { '1.14' : [ '_NoTag', '_Tag' ]          },   # 1.21 +/- 0.17
-                'veto'  : { '1.12' : [ '_Veto' ]                   } }, # 1.06 +/- 0.12
-    'DY'    : { 'jet  ' : { '1.32' : [ '_Tag', '_Veto', '_NoTag' ] },
-                'nojet' : { '2.00' : [ '_NoJet' ]                  } },
-}
-
 for background in normBackgrounds:
     for region in normBackgrounds[background]:
         nuisancename = 'norm'+background+region
@@ -184,12 +168,13 @@ for sample in samples.keys():
 
 nuisances['toppt']  = {
     'name'  : 'toppt', # assuming the mismodeling is correlated through the years 
-    'samples'  : { 'ttbar' : [ '1./'+Top_pTrw, '1.' ] },
+    'samples'  : { 'ttbar' : [ systematicTopPt+'/'+centralTopPt, '1.' ] },
     'kind'  : 'weight',
     'type'  : 'shape',
 }
 
 # isr fastsim
+
 nuisances['isrFS']  = {
     'name'  : 'isrFS', # assuming the mismodeling is correlated through the years 
     'samples'  : { },
@@ -224,25 +209,25 @@ for mt2llregion in mt2llRegions:
         mt2llweightDo = '(mt2ll>='+mt2llEdges[mt2llbin]+' && mt2ll<'+mt2llEdges[mt2llbin+1]+') ? '+str(1.-mt2llSystematics[mt2llbin])+' : 1.'  
         
         nuisances['Top_'+mt2llsystname]  = {
-               'name'  : 'Top_'+mt2llsystname+year,
-               'samples'  : { 
-                   'ttbar' : [ mt2llweightUp, mt2llweightDo],
-                   'tW'    : [ mt2llweightUp, mt2llweightDo],
-               },
-               'kind'  : 'weight',
-               'type'  : 'shape',
-               'cuts'  : [ ]           
-              }
+            'name'  : 'Top_'+mt2llsystname+year,
+            'samples'  : { 
+                'ttbar' : [ mt2llweightUp, mt2llweightDo],
+                'tW'    : [ mt2llweightUp, mt2llweightDo],
+            },
+            'kind'  : 'weight',
+            'type'  : 'shape',
+            'cuts'  : [ ]           
+        }
         
         nuisances['WW_'+mt2llsystname]  = {
-               'name'  : 'WW_'+mt2llsystname+year,
-               'samples'  : { 
-                   'WW' : [ mt2llweightUp, mt2llweightDo],
-               },
-               'kind'  : 'weight',
-               'type'  : 'shape',
-               'cuts'  : [ ]           
-              }
+            'name'  : 'WW_'+mt2llsystname+year,
+            'samples'  : { 
+                'WW' : [ mt2llweightUp, mt2llweightDo],
+            },
+            'kind'  : 'weight',
+            'type'  : 'shape',
+            'cuts'  : [ ]           
+        }
 
         for cut in cuts.keys():
             if mt2llregion in cut:
@@ -256,15 +241,17 @@ for mt2llregion in mt2llRegions:
 # mt2ll signal
 
 nuisances['metfastsim']  = {
-               'name'  : 'metfastsim',
-               'samples'  : { },
-               'kind'  : 'tree',
-               'type'  : 'shape',
-              }
+    'name'  : 'metfastsim',
+    'samples'  : { },
+    'kind'  : 'tree',
+    'type'  : 'shape',
+    'folderUp':   directorySig.replace('__susyMT2FS', '__susyMT2FSreco'),
+    'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
+}
 for sample in samples.keys():
     for model in signalMassPoints:
         if sample in signalMassPoints[model].keys():
-            nuisances['metfastsim']['samples'][sample] = ['1.2', '0.8'] # placeholder
+            nuisances['metfastsim']['samples'][sample] = ['1.', '1.']
 
 ### LHE weights
 

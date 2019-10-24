@@ -121,7 +121,7 @@ if 'WWValidationRegion' in opt.tag:
         cuts['VR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*(1.-btagWeight_1tag)'
         cuts['VR1_Veto_sf']  = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
 
-if 'SignalRegions' in opt.tag:
+if 'StopSignalRegions' in opt.tag:
     
     if 'Data' in opt.sigset:
         cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+BTAG

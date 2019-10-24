@@ -67,7 +67,11 @@ if 'WZ' in opt.tag or 'ZZ' in opt.tag :
 
 ### MC weights
 
+# generation weights
+
 XSWeight       = 'baseW*genWeight'
+
+# lepton weights
 
 EleWeight      = 'Lepton_tightElectron_cutBasedMediumPOG_IdIsoSF[0]*Lepton_tightElectron_cutBasedMediumPOG_IdIsoSF[1]'
 MuoWeight      = 'Lepton_tightMuon_mediumRelIsoTight_IdIsoSF[0]*Lepton_tightMuon_mediumRelIsoTight_IdIsoSF[1]'
@@ -80,9 +84,7 @@ SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
 
-### Special weights
-
-Top_pTrw = '(TMath::Sqrt( TMath::Exp(0.0615-0.0005*topGenPt) * TMath::Exp(0.0615-0.0005*antitopGenPt) ) )'
+# nonprompt lepton rate
 
 #nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.50', 'rateDown' : '0.50' } 
 nonpromptLep = { 'rate' : '1.08', 'rateUp' : '1.29', 'rateDown' : '0.87' } 
@@ -92,6 +94,34 @@ nonpromptLepSF_Up   = '( promptLeptons + (1. - promptLeptons)*' + nonpromptLep['
 nonpromptLepSF_Down = '( promptLeptons + (1. - promptLeptons)*' + nonpromptLep['rateDown']  + ')'
 SFweight   += '*' + nonpromptLepSF
 SFweightFS += '*' + nonpromptLepSF
+
+### Special weights
+
+
+
+# background cross sections and scale factors
+
+normBackgrounds = {
+    #'ttbar' : { 'all'   : { '1.10' : [ '_All' ]                    } }, # -> rate parameter
+    'tW'    : { 'all'   : { '1.10' : [ '_All' ]                    } }, 
+    #'WW'    : { 'all'   : { '1.10' : [ '_All' ]                    } }, # -> rate parameter
+    'ttW'   : { 'all'   : { '1.50' : [ '_All' ]                    } },
+    'VZ'    : { 'all'   : { '1.50' : [ '_All' ]                    } },
+    'VVV'   : { 'all'   : { '1.50' : [ '_All' ]                    } },
+    'WZ'    : { 'all'   : { '1.50' : [ '_All' ]                    } }, # 0.97 +/- 0.09
+    'ttZ'   : { 'all'   : { '1.50' : [ '_All' ]                    } }, # 1.44 +/- 0.3
+    'ZZ'    : { 'nojet' : { '1.26' : [ '_NoJet' ]                  },   # 0.74 +/- 0.19
+                'jet'   : { '1.14' : [ '_NoTag', '_Tag' ]          },   # 1.21 +/- 0.17
+                'veto'  : { '1.12' : [ '_Veto' ]                   } }, # 1.06 +/- 0.12
+    'DY'    : { 'jet  ' : { '1.32' : [ '_Tag', '_Veto', '_NoTag' ] },
+                'nojet' : { '2.00' : [ '_NoJet' ]                  } },
+}
+
+# top pt reweighting
+
+Top_pTrw = '(TMath::Sqrt( TMath::Exp(0.0615-0.0005*topGenPt) * TMath::Exp(0.0615-0.0005*antitopGenPt) ) )'
+centralTopPt = Top_pTrw 
+systematicTopPt = '1.'
 
 ### Data info
 
@@ -149,7 +179,7 @@ elif '2018' in opt.tag :
 if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     samples['ttbar'] = {    'name'   :   getSampleFiles(directoryBkg,'TTTo2L2Nu',False,'nanoLatino_'),
-                            'weight' : XSWeight+'*'+SFweight+'*'+Top_pTrw ,
+                            'weight' : XSWeight+'*'+SFweight+'*'+centralTopPt ,
                             'FilesPerJob' : 2 ,
                         }
 
@@ -176,7 +206,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             ttZext = '_ext2'
         samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZext,False,'nanoLatino_') + 
                                              getSampleFiles(directoryBkg,'TTZToQQ',                False,'nanoLatino_'),
-                                'weight' : XSWeight+'*'+SFweight ,
+                                'weight' : XSWeight+'*'+SFweight+'*1.44' ,
                                 'FilesPerJob' : 2 ,
                                 }
         
