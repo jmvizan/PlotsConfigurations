@@ -76,7 +76,7 @@ MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
 LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
 SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight 
 SFweight       = SFweightCommon + '*' + METFilters_MC
-SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS
+SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
 
 ### Special weights
 

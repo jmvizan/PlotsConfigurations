@@ -11,7 +11,7 @@ elif '2018' in opt.tag :
     year = '_2018'
     lumi_uncertainty = '1.025'
 
-###nuisances = {}
+### nuisances = {}
  
 ### statistical uncertainty
 
@@ -109,15 +109,13 @@ for scalefactor in leptonSF:
         'type'  : 'shape',
         'type'  : 'lnN',
     }
-    if 'FS' not in scalefactor:
-        for sample in samples.keys():
-            if sample!='DATA':
+    for sample in samples.keys():
+        if sample!='DATA':
+            if 'FS' not in scalefactor:
                 nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
-    else:
-        for model in signalMassPoints:
-            if model in opt.sigset:
-                for massPoint in signalMassPoints[model]:
-                    if massPoint in opt.sigset: 
+            else:
+                for model in signalMassPoints:
+                    if sample in signalMassPoints[model].keys():
                         nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
 
 # b-tagging scale factors
@@ -146,20 +144,62 @@ for scalefactor in btagSF:
         'type'  : 'shape',
         'cuts'  : [ ]           
     }
-    if 'FS' not in scalefactor:
-        for sample in samples.keys():
-            if sample!='DATA':
+    for sample in samples.keys():
+        if sample!='DATA':
+            if 'FS' not in scalefactor:
                 nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
-    else:
-        for model in signalMassPoints:
-            if model in opt.sigset:
-                for massPoint in signalMassPoints[model]:
-                    if massPoint in opt.sigset: 
+            else:
+                for model in signalMassPoints:
+                    if sample in signalMassPoints[model].keys():
                         nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
     for cut in cuts.keys():
         if ('1b' in scalefactor and '_Tag' in cut) or 
            ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut)):
             nuisances[scalefactor]['cuts'].append(cut)
+
+# pileup
+
+nuisances['pileup']  = {
+    'name'  : 'pileup', # inelastic cross section correlated through the years
+    'samples'  : { },
+    'kind'  : 'weight',
+    'type'  : 'shape',
+    'type'  : 'lnN',
+}
+for sample in samples.keys():
+    if sample!='DATA':
+        nuisances['pileup']['samples'][sample] = [ 'puWeightPu/puWeight', 'puWeightDown/puWeight' ] 
+
+# fake
+
+# top pt reweighting
+
+nuisances['toppt']  = {
+    'name'  : 'toppt', # assuming the mismodeling is correlated through the years 
+    'samples'  : { 'ttbar' : [ '1./'+Top_pTrw, '1.' ] },
+    'kind'  : 'weight',
+    'type'  : 'shape',
+    'type'  : 'lnN',
+}
+
+# isr fastsim
+nuisances['isrFS']  = {
+    'name'  : 'isrFS', # assuming the mismodeling is correlated through the years 
+    'samples'  : { },
+    'kind'  : 'weight',
+    'type'  : 'shape',
+    'type'  : 'lnN',
+}
+for sample in samples.keys():
+    for model in signalMassPoints:
+        if 'T2' in model:
+            isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
+        elif 'TChi' in model:
+            isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
+        elif:
+            print 'ERROR: no isrW implementation for model', model
+        if sample in signalMassPoints[model].keys():
+            nuisances['isrFS']['samples'][sample] = isrWeight
 
 ### mt2ll backgrounds (special case for shape uncertainties)
 
@@ -209,17 +249,16 @@ for mt2llregion in mt2llRegions:
 
 # mt2ll signal
 
-nuisances['mt2ll']  = {
-               'name'  : 'mt2ll'+year,
+nuisances['metfastsim']  = {
+               'name'  : 'metfastsim',
                'samples'  : { },
-               'kind'  : 'weight',
+               'kind'  : 'tree',
                'type'  : 'shape',
               }
-for model in signalMassPoints:
-    if model in opt.sigset:
-        for massPoint in signalMassPoints[model]:
-            if massPoint in opt.sigset: 
-              nuisances['mt2ll']  ['samples'][massPoint] = ['1.2', '0.8'] # placeholder
+for sample in samples.keys():
+    for model in signalMassPoints:
+        if sample in signalMassPoints[model].keys():
+            nuisances['metfastsim']['samples'][sample] = ['1.2', '0.8'] # placeholder
 
 ### LHE weights
 
