@@ -107,7 +107,6 @@ for scalefactor in leptonSF:
         'samples'  : { },
         'kind'  : 'weight',
         'type'  : 'shape',
-        'type'  : 'lnN',
     }
     for sample in samples.keys():
         if sample!='DATA':
@@ -164,13 +163,22 @@ nuisances['pileup']  = {
     'samples'  : { },
     'kind'  : 'weight',
     'type'  : 'shape',
-    'type'  : 'lnN',
 }
 for sample in samples.keys():
     if sample!='DATA':
         nuisances['pileup']['samples'][sample] = [ 'puWeightPu/puWeight', 'puWeightDown/puWeight' ] 
 
-# fake
+# nonprompt lepton rate
+
+nuisances['nonpromptLep']  = {
+    'name'  : 'nonpromptLep'+year, 
+    'samples'  : { },
+    'kind'  : 'weight',
+    'type'  : 'shape',
+}
+for sample in samples.keys():
+    if sample!='DATA':
+        nuisances['nonpromptLep']['samples'][sample] = [ 'nonpromptLepSF_Up/nonpromptLepSF', 'nonpromptLepSF_Down/nonpromptLepSF' ] 
 
 # top pt reweighting
 
@@ -179,7 +187,6 @@ nuisances['toppt']  = {
     'samples'  : { 'ttbar' : [ '1./'+Top_pTrw, '1.' ] },
     'kind'  : 'weight',
     'type'  : 'shape',
-    'type'  : 'lnN',
 }
 
 # isr fastsim
@@ -188,7 +195,6 @@ nuisances['isrFS']  = {
     'samples'  : { },
     'kind'  : 'weight',
     'type'  : 'shape',
-    'type'  : 'lnN',
 }
 for sample in samples.keys():
     for model in signalMassPoints:

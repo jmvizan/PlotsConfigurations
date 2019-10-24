@@ -68,12 +68,14 @@ if 'WZ' in opt.tag or 'ZZ' in opt.tag :
 ### MC weights
 
 XSWeight       = 'baseW*genWeight'
+
 EleWeight      = 'Lepton_tightElectron_cutBasedMediumPOG_IdIsoSF[0]*Lepton_tightElectron_cutBasedMediumPOG_IdIsoSF[1]'
 MuoWeight      = 'Lepton_tightMuon_mediumRelIsoTight_IdIsoSF[0]*Lepton_tightMuon_mediumRelIsoTight_IdIsoSF[1]'
 LepWeight      = EleWeight + '*' + MuoWeight
 EleWeightFS    = EleWeight.replace('IdIsoSF', 'FastSimSF')
 MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
 LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
+
 SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight 
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
@@ -81,6 +83,15 @@ SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*is
 ### Special weights
 
 Top_pTrw = '(TMath::Sqrt( TMath::Exp(0.0615-0.0005*topGenPt) * TMath::Exp(0.0615-0.0005*antitopGenPt) ) )'
+
+#nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.50', 'rateDown' : '0.50' } 
+nonpromptLep = { 'rate' : '1.08', 'rateUp' : '1.29', 'rateDown' : '0.87' } 
+promptLeptons = 'Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]'
+nonpromptLepSF      = '( promptLeptons + (1. - promptLeptons)*' + nonpromptLep['rate']      + ')'
+nonpromptLepSF_Up   = '( promptLeptons + (1. - promptLeptons)*' + nonpromptLep['rateUp']    + ')'
+nonpromptLepSF_Down = '( promptLeptons + (1. - promptLeptons)*' + nonpromptLep['rateDown']  + ')'
+SFweight   += '*' + nonpromptLepSF
+SFweightFS += '*' + nonpromptLepSF
 
 ### Data info
 
