@@ -30,6 +30,8 @@ Default: all'           , default="all")
     parser.add_option('--test'              , dest='test'              , help='Run on test mode'           , default=False)
     parser.add_option('--sigmp'             , dest='signalMPcfg'      , help='Signal Mass Point cfg file'               , default='signalMassPoints.py')
     # read default parsing options as well
+    
+
     hwwtools.addOptions(parser)
     hwwtools.loadOptDefaults(parser)
     (opt, args) = parser.parse_args()
@@ -84,32 +86,21 @@ Default: all'           , default="all")
         for massPoint in signalMassPoints[model]:
             #print opt.sigset, "<-sigset, masspoint->", massPoint
             if opt.sigset not in massPoint:  continue
-            print "Mass Point:", massPoint
+            #print "Mass Point:", massPoint
             for year in years:
                 mpLoc='./Datacards/'+year+'/'+massPoint
-                if(os.path.exists(mpLoc) is not True):
+                if(os.path.exists(mpLoc) is not True): 
                     if(doTest is True):print "MassPoint does not exist:", massPoint
                     continue
+                print "Masspoint",massPoint,"exists"
+                exec(open('run_CombineTools.py'))
+            '''
+            for year in years:
                 for cut in cuts: 
                     for variable in variables:
                         thisDC=year+'/'+massPoint+'/'+cut+'/'+variable+"/datacard.txt  "
                         tagDC =cut #Could be changed to more complex in the future
                         dirDC+=tagDC+'=./Datacards/'+thisDC
                         print "Datacard: ", thisDC
-    finalDC='allDC.txt'
-    #Actually combine the DC
-    doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
-    if(doTest is False):
-        combCommand+=dirDC+">"+finalDC
-        print "Combining Datacards:"
-        os.system(doCombcmsenv+combCommand)
-        print "Final Datacard:", finalDC
-    else:
-        print "In test. Thus,  no DC combination is done"
-    #Calculate the limits
-    if(doLimits is True):
-        combCommand='combine -M AsymptoticLimits --run '+opt.limrun +' ' +finalDC+' -n allDC'+opt.limrun
-        print "sending combination", combCommand
-        os.system(doCombcmsenv+combCommand)
-    else:
-        print "Limit option set to false: no limits were calculated"
+    
+            '''
