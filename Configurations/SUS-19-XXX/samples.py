@@ -100,9 +100,9 @@ SFweightFS += '*' + nonpromptLepSF
 # background cross section uncertainties and normalization scale factors
 
 normBackgrounds = {
-    'ttbar' : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
+    #'ttbar' : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
     'tW'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
-    'WW'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
+    #'WW'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
     'ttW'   : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selections' : { '_All'   : '1.' } } },
     'VZ'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selections' : { '_All'   : '1.' } } },
     'VVV'   : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selections' : { '_All'   : '1.' } } },
