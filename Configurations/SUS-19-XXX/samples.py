@@ -387,14 +387,10 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 #exec(open(opt.signalMassPointsFile).read())
 exec(open('./signalMassPoints.py').read())
 
-signalSet = opt.sigset.replace('SM-', '')
-signalSet = signalSet.replace('Backgrounds-', '')
-signalSet = signalSet.replace('Data-', '')
-
 for model in signalMassPoints:
-    if model in signalSet:
+    if model in opt.sigset:
         for massPoint in signalMassPoints[model]:
-            if signalSet in massPoint:
+            if massPointInSignalSet(massPoint, opt.sigset):
 
                 samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,'nanoLatino_'),
                                        'weight' : XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut'] ,

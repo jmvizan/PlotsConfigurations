@@ -1,5 +1,65 @@
 signalMassPoints = {}
 
+def massPointInSignalSet(massPoint, sigSet):
+
+    if massPoint in sigSet:
+        return True
+
+    signalSet = sigSet.replace('SM-', '')
+    signalSet = signalSet.replace('Backgrounds-', '')
+    signalSet = signalSet.replace('Data-', '')
+
+    if signalSet in massPoint:
+        return True
+
+    for model in signalMassPoints:
+        if model in signalSet:
+
+            massFlags = [ 'mS-', 'mC-', 'mX-' ] 
+
+            massPointTerms = massPoint.split('_')
+
+            signalSet = signalSet.replace(model+'_', '')
+            signalSetConditions = signalSet.split('_')
+
+            for condition in signalSetConditions:
+
+                conditionApplied = False
+
+                if 'to' not in condition:
+
+                    if condition not in massPoint:
+                        return False
+
+                    conditionApplied = True
+
+                else:
+                    
+                    for massFlag in massFlags:
+                        if massFlag in condition:
+                            for massPointTerm in massPointTerms:
+                                if massFlag in massPointTerm:
+
+                                    massPointTermValue = float(massPointTerm.replace(massFlag, ''))
+
+                                    condition = condition.replace(massFlag, '')
+                                    lowerMass  = float(condition.split('to')[0]) 
+                                    higherMass = float(condition.split('to')[1])
+
+                                    if massPointTermValue<lowerMass or massPointTermValue>higherMass:
+                                        return False
+
+                                    conditionApplied = True
+
+                if conditionApplied==False:
+                    return False
+
+            return True
+
+    # No known model found in signalSet
+    return False
+
+
 signalMassPoints['T2tt'] = {}
 
 for mStop in range( 150,  2001, 25):

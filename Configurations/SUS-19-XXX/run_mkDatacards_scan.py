@@ -37,7 +37,7 @@ exec(open('./signalMassPoints.py').read())
 for model in signalMassPoints:
     if model in sigset:
         for massPoint in signalMassPoints[model]:
-            if sigset in massPoint:
+            if massPointInSignalSet(massPoint, sigset):
 
                 os.system('./run_mkDatacards.sh '+year+' '+tag+' '+massPoint+' '+fileset)
                

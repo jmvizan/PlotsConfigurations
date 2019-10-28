@@ -182,13 +182,13 @@ nuisances['isrFS']  = {
 }
 for sample in samples.keys():
     for model in signalMassPoints:
-        if 'T2' in model:
-            isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
-        elif 'TChi' in model:
-            isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
-        else:
-            print 'ERROR: no isrW implementation for model', model
         if sample in signalMassPoints[model].keys():
+            if 'T2' in model:
+                isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
+            elif 'TChi' in model:
+                isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
+            else:
+                print 'ERROR: no isrW implementation for model', model
             nuisances['isrFS']['samples'][sample] = isrWeight
 
 ### mt2ll backgrounds (special case for shape uncertainties)

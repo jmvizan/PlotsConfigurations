@@ -71,7 +71,7 @@ structure['DY']  = {
 for model in signalMassPoints:
     if model in opt.sigset:
         for massPoint in signalMassPoints[model]:
-            if massPoint in opt.sigset:  
+            if massPointInSignalSet(massPoint, opt.sigset):
 
                 structure[massPoint]  = {  
                     'isSignal' : 1,
