@@ -23,10 +23,9 @@ if __name__ == '__main__':
     parser.add_option('--sigset'            , dest='sigset'            , help='Tag used for the sigset file name'           , default="")
     parser.add_option('--years'             , dest='years'             , help='Year to be processed. \
 Default: all'           , default="all")
+    parser.add_option('--merge'            , dest='merge'             , help='Merge Datacards. Default=True'            , default=True)
     parser.add_option('--limits'            , dest='limits'            , help='Use higgs combine to calculate limits. Default=True'           , default=True)
     parser.add_option('--limrun'            , dest='limrun'            , help='Type of limit to be calculated. Default=blind'           , default='blind')
-    
-
     parser.add_option('--test'              , dest='test'              , help='Run on test mode'           , default=False)
     parser.add_option('--sigmp'             , dest='signalMPcfg'      , help='Signal Mass Point cfg file'               , default='signalMassPoints.py')
     # read default parsing options as well
@@ -44,10 +43,13 @@ Default: all'           , default="all")
     else:
         years=["2016","2017","2018"]
 
+
     doTest=False
     if(opt.test=='True' or opt.test=='true' or opt.test=='T' or opt.test=='t'):
         doTest=True
-
+    doMerge=False
+    if(opt.merge=='True' or opt.merge=='true' or opt.merge=='T' or opt.merge=='t'):
+        doMerge=True
     doLimits=False
     if(opt.limits=='True' or opt.limits=='true' or opt.limits=='T' or opt.limits=='t'):
         doLimits=True
@@ -59,6 +61,7 @@ Default: all'           , default="all")
     print " combineLocation    = ", opt.combineLocation  
     print " Combination Cfg    = ", opt.combcfg
     print " Run on test mode   = ", doTest
+    print " Merge Datacards    = ", doMerge
     print " Calculate limits   = ", doLimits
     print "\n"
 
@@ -66,18 +69,38 @@ Default: all'           , default="all")
         print "On Test mode"
         opt.sigset="T2tt_mS-450_mX-350"
 
-    # Create Needed dictionnary from other files
+    # Check whether any of the input config files exist
+    isVarsF = os.path.exists(opt.variablesFile)
+    isCutsF = os.path.exists(opt.cutsFile)
+    isSignF = os.path.exists(opt.signalMPcfg)
+    cfgsF={}
+    fMiss=''
+    fIsMiss= False
+    vals = [isVarsF, isCutsF, isSignF]
+    keys = ["Variables", "Cuts", "Signal"]
+    for i in range(0, len(keys)):
+        cfgsF[keys[i]]=vals[i]
+        if vals[i] is False:
+            fMiss+= keys[i] +" "
+            fIsMiss=True
+    #Stop the program if some file is missing
+    if(fIsMiss is True):
+        error=fMiss+"file Missing, check the input"
+        raise NameError(error)
+
+    #Generate dictionaries with variables and cuts
     variables = {}
     cuts = {}
-    print "cuts file", opt.cutsFile
-    if (os.path.exists(opt.variablesFile)):  exec(open(opt.variablesFile).read())
-    if (os.path.exists(opt.cutsFile))     :  exec(open(opt.cutsFile).read())
-    if (os.path.exists(opt.signalMPcfg))  :  exec(open(opt.signalMPcfg).read())
+    if (isVarsF):  exec(open(opt.variablesFile).read())
+    if (isCutsF):  exec(open(opt.cutsFile).read())
+    if (isSignF):  exec(open(opt.signalMPcfg).read())
+    
+    #Loop over Signal mass points year cuts and variables, to get all Datacards
     cmsenv=' eval `scramv1 runtime -sh` '
     dirDC=''
     tagDC=''
     combCommand=opt.combcfg+' '
-    #Loop over Signal mass points year cuts and variables, to get all Datacards
+    thereIsDC=False
     for model in signalMassPoints:
         print "Model:", model,"\tSignal set", opt.sigset
         if model not in opt.sigset:  continue
@@ -86,30 +109,48 @@ Default: all'           , default="all")
             if opt.sigset not in massPoint:  continue
             print "Mass Point:", massPoint
             for year in years:
-                mpLoc='./Datacards/'+year+'/'+massPoint
-                if(os.path.exists(mpLoc) is not True):
-                    if(doTest is True):print "MassPoint does not exist:", massPoint
-                    continue
-                for cut in cuts: 
+                for cut in cuts:
+                    mpLoc='./Datacards/'+year+'/'+massPoint
+                    cutLoc=mpLoc+'/'+cut
+                    #print os.path.exists(mpLoc), mpLoc, "cuts", cuts, variables
+                    if(os.path.exists(mpLoc) is not True):
+                        print "Folder for MassPoint", massPoint," does not exist:"
+                        continue
+                    elif(os.path.exists(cutLoc) is not True):
+                        print "Folder for Cut", cut, "Does not exist"
+                        continue
                     for variable in variables:
-                        thisDC=year+'/'+massPoint+'/'+cut+'/'+variable+"/datacard.txt  "
+                        thisDC=cutLoc+'/'+variable+"/datacard.txt"
                         tagDC =cut #Could be changed to more complex in the future
-                        dirDC+=tagDC+'=./Datacards/'+thisDC
-                        print "Datacard: ", thisDC
-    finalDC='allDC.txt'
-    #Actually combine the DC
-    doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
-    if(doTest is False):
-        combCommand+=dirDC+">"+finalDC
-        print "Combining Datacards:"
-        os.system(doCombcmsenv+combCommand)
-        print "Final Datacard:", finalDC
+                        dirDC+=tagDC+'='+thisDC+' '
+                        if(os.path.exists(thisDC) is True):
+                            thereIsDC=True
+                            print "Datacard: ", thisDC
+                        else:
+                            if(doTest):print "DC", thisDC, "does not exist"
+    #Do not combine DC nor calculate limits if no DC is found
+    if(thereIsDC is False):
+        print "there are no Datacards in the folder under the input parameters"
     else:
-        print "In test. Thus,  no DC combination is done"
-    #Calculate the limits
-    if(doLimits is True):
-        combCommand='combine -M AsymptoticLimits --run '+opt.limrun +' ' +finalDC+' -n allDC'+opt.limrun
-        print "sending combination", combCommand
-        os.system(doCombcmsenv+combCommand)
-    else:
-        print "Limit option set to false: no limits were calculated"
+    
+        #Actually combine the DC
+        finalDC='allDC.txt'
+        doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
+        if(doMerge is True and thereIsDC is True):
+            combCommand+=dirDC+">"+finalDC
+            combPrint=''
+            if(doTest): combPrint=combCommand
+            print "Combining Datacards:", combPrint
+            os.system(doCombcmsenv+combCommand)
+            print "Final Datacard:", finalDC
+        else:
+            print "\n Data card merging option set to false: no DC combination is done"
+            
+        #Calculate the limits
+        #Note that currently it would only calculate the last MP
+        if(doLimits is True and thereIsDC is True):
+            combCommand='combine -M AsymptoticLimits --run '+opt.limrun +' ' +finalDC+' -n allDC'+opt.limrun
+            print "Sending combination", combCommand
+            os.system(doCombcmsenv+combCommand)
+        else:
+            print "Limit option set to false: no limits were calculated"
