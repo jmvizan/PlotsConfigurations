@@ -97,22 +97,25 @@ SFweightFS += '*' + nonpromptLepSF
 
 ### Special weights
 
-# background cross sections and scale factors
+# background cross section uncertainties and normalization scale factors
 
 normBackgrounds = {
-    #'ttbar' : { 'all'   : { '1.10' : [ '_All' ]                    } }, # -> rate parameter
-    'tW'    : { 'all'   : { '1.10' : [ '_All' ]                    } }, 
-    #'WW'    : { 'all'   : { '1.10' : [ '_All' ]                    } }, # -> rate parameter
-    'ttW'   : { 'all'   : { '1.50' : [ '_All' ]                    } },
-    'VZ'    : { 'all'   : { '1.50' : [ '_All' ]                    } },
-    'VVV'   : { 'all'   : { '1.50' : [ '_All' ]                    } },
-    'WZ'    : { 'all'   : { '1.50' : [ '_All' ]                    } }, # 0.97 +/- 0.09
-    'ttZ'   : { 'all'   : { '1.50' : [ '_All' ]                    } }, # 1.44 +/- 0.3
-    'ZZ'    : { 'nojet' : { '1.26' : [ '_NoJet' ]                  },   # 0.74 +/- 0.19
-                'jet'   : { '1.14' : [ '_NoTag', '_Tag' ]          },   # 1.21 +/- 0.17
-                'veto'  : { '1.12' : [ '_Veto' ]                   } }, # 1.06 +/- 0.12
-    'DY'    : { 'jet  ' : { '1.32' : [ '_Tag', '_Veto', '_NoTag' ] },
-                'nojet' : { '2.00' : [ '_NoJet' ]                  } },
+    'ttbar' : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
+    'tW'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
+    'WW'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
+    'ttW'   : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selections' : { '_All'   : '1.' } } },
+    'VZ'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selections' : { '_All'   : '1.' } } },
+    'VVV'   : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selections' : { '_All'   : '1.' } } },
+    'WZ'    : { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selections' : { '_All'   : '1.' } } },
+    'ttZ'   : { 'all'   : { 'scalefactor' : { '1.44' : '0.36' }, 'selections' : { '_All'   : '1.' } } },
+    'ZZ'    : { 'nojet' : { 'scalefactor' : { '0.74' : '0.19' }, 'selections' : { '_NoJet' : '(nCleanJet==0)' } },  
+                'notag' : { 'scalefactor' : { '1.21' : '0.17' }, 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
+                                                                                  '_Tag'   : '(leadingPtTagged>=20.)'  } },   
+                'veto'  : { 'scalefactor' : { '1.06' : '0.12' }, 'selections' : { '_Veto'  : '(leadingPtTagged<20.)' } }, }, 
+    'DY'    : { 'nojet' : { 'scalefactor' : { '1.00' : '1.00' }, 'selections' : { '_NoJet' : '(nCleanJet==0)' } },
+                'notag' : { 'scalefactor' : { '1.00' : '0.32' }, 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
+                                                                                  '_Tag'   : '(leadingPtTagged>=20.)',
+                                                                                  '_Veto'  : '(leadingPtTagged<20.)' } }, },
 }
 
 # top pt reweighting
@@ -176,7 +179,7 @@ elif '2018' in opt.tag :
 
 if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
-    samples['ttbar'] = {    'name'   :   getSampleFiles(directoryBkg,'TTTo2L2Nu',False,'nanoLatino_'),
+    samples['ttbar'] = {    'name'   : getSampleFiles(directoryBkg,'TTTo2L2Nu',False,'nanoLatino_'),
                             'weight' : XSWeight+'*'+SFweight+'*'+centralTopPt ,
                             'FilesPerJob' : 2 ,
                         }
@@ -204,7 +207,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             ttZext = '_ext2'
         samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZext,False,'nanoLatino_') + 
                                              getSampleFiles(directoryBkg,'TTZToQQ',                False,'nanoLatino_'),
-                                'weight' : XSWeight+'*'+SFweight+'*1.44' ,
+                                'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 }
         

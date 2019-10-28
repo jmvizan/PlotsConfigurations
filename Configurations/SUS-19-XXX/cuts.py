@@ -161,3 +161,57 @@ if 'StopSignalRegions' in opt.tag:
         cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300)*btagWeight_1tag'
         cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300)*(1.-btagWeight_1tag)'
 
+# apply background scale factors
+    
+if 'SignalRegions' in opt.tag:
+        
+    for background in normBackgrounds:
+        if background in samples:
+            for region in normBackgrounds[background]:
+                
+                selections = [ ] 
+                normBackgrounds[background][region]['cuts'] = [ ]
+
+                regionScaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
+
+                for selection in normBackgrounds[background][region]['selections']:
+
+                    usedSelection = False
+
+                    for cut in cuts:
+                        if selection=='_All' or selection in cut: 
+                            normBackgrounds[background][region]['cuts'].append(cut)
+                            usedSelection = True
+
+                    if usedSelection:
+
+                        selections.append(selection)
+
+                        #if float(regionScaleFactor)!=1.:
+                        #
+                        #    selectionCut = normBackgrounds[background][region]['selections'][selection]
+                        #    selectionWeight = '(!'+selectionCut+')+'+selectionCut+'*'+regionScaleFactor
+                        #    samples[background]['weight'] += '*('+selectionWeight+')'
+                
+                if selections and float(regionScaleFactor)!=1.:
+
+                    regionCut = '1.'
+
+                    if len(selections)==1:
+                        regionCut = normBackgrounds[background][region]['selections'][selections[0]]
+                    else:
+                        if '_Tag' in selections and '_NoTag' in selections and '_NoJet' not in selections:
+                            regionCut = 'nCleanJet>=1'
+                        elif '_Tag' in selections and '_Veto' in selections:
+                            regionCut = '1.'
+
+                    # Patches for ZZ veto
+                    if '_Tag' in selections and '_Veto' not in selections and '_NoTag' not in selections:
+                        regionCut = 'nCleanJet>=1'
+                    if '_Veto' in selections and '_Tag' not in selections:
+                        regionCut = 'nCleanJet==0'
+                        regionScaleFactor = normBackgrounds[background]['nojet']['scalefactor'].keys()[0]
+
+                    regionWeight = '(!'+regionCut+')+'+regionCut+'*'+regionScaleFactor
+                    samples[background]['weight'] += '*('+regionWeight+')'
+                    

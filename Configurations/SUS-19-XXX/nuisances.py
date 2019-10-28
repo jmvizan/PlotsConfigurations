@@ -3,13 +3,16 @@
 ### general parameters
 if '2016' in opt.tag : 
     year = '_2016'
-    lumi_uncertainty = '1.025'
+    lumi_uncertainty    = '1.025'
+    trigger_uncertainty = '1.020'
 elif '2017' in opt.tag : 
     year = '_2017'
     lumi_uncertainty = '1.023'
+    trigger_uncertainty = '1.020'
 elif '2018' in opt.tag : 
     year = '_2018'
     lumi_uncertainty = '1.025'
+    trigger_uncertainty = '1.020'
 
 ### nuisances = {}
  
@@ -44,25 +47,22 @@ nuisances['trigger']  = {
 }
 for sample in samples.keys():
     if sample!='DATA' and sample!='ZZ'  and sample!='ttZ' and sample!='WZ'  and sample!='DY':
-        nuisances['trigger']  ['samples'][sample] = '1.02'
+        nuisances['trigger']  ['samples'][sample] = trigger_uncertainty
 
-# background cross sections and scale factors
+# background cross section and scale factor uncertainties
 
 for background in normBackgrounds:
-    for region in normBackgrounds[background]:
-        nuisancename = 'norm'+background+region
-        value, subregions = normBackgrounds[background][region].items()[0]
-        nuisances[nuisancename]  = {
-            'name'    : nuisancename+year, 
-            'samples' : { background : value },
-            'cuts'    : [ ], 
-            'type'    : 'lnN',
-        }
-        for cut in cuts.keys():
-            for subregion in subregions:
-                if subregion=='_All' or subregion in cut:
-                    nuisances[nuisancename]['cuts'].append(cut)
-                    break
+    if background in samples:
+        for region in normBackgrounds[background]:
+            nuisancename = 'norm'+background+region
+            scalefactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
+            scalefactorerror = normBackgrounds[background][region]['scalefactor'][scalefactor]
+            nuisances[nuisancename]  = {
+                'name'    : nuisancename+year, 
+                'samples' : { background : str(1.+float(scalefactorerror)/float(scalefactor)) },
+                'cuts'    : normBackgrounds[background][region]['cuts'], 
+                'type'    : 'lnN',
+            }
 
 ### shapes
 
@@ -337,11 +337,7 @@ if hasattr(opt, 'inputFile'):
 
 ### Nasty tricks ...
 
-if 'SignalRegions' not in opt.tag and 'ControlRegion' not in opt.tag:
-
-    nuisances.clear()
-
-elif 'ControlRegion' in opt.tag:
+if 'ControlRegion' in opt.tag:
 
     nuisanceToRemove = [ ] 
 
@@ -351,5 +347,10 @@ elif 'ControlRegion' in opt.tag:
             
     for nuisance in nuisanceToRemove:
         del nuisances[nuisance]
+
+elif 'SignalRegions' not in opt.tag:
+
+    nuisances.clear()
+
 
 
