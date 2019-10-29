@@ -15,8 +15,6 @@ def massPointInSignalSet(massPoint, sigSet):
     for model in signalMassPoints:
         if model in signalSet:
 
-            massFlags = [ 'mS-', 'mC-', 'mX-' ] 
-
             massPointTerms = massPoint.split('_')
 
             signalSet = signalSet.replace(model+'_', '')
@@ -35,21 +33,21 @@ def massPointInSignalSet(massPoint, sigSet):
 
                 else:
                     
-                    for massFlag in massFlags:
-                        if massFlag in condition:
-                            for massPointTerm in massPointTerms:
-                                if massFlag in massPointTerm:
+                    massFlag = condition.split('-')[0] + '-'
+                    massRange = condition.split('-')[1]
 
-                                    massPointTermValue = float(massPointTerm.replace(massFlag, ''))
+                    for massPointTerm in massPointTerms:
+                        if massFlag in massPointTerm:
 
-                                    condition = condition.replace(massFlag, '')
-                                    lowerMass  = float(condition.split('to')[0]) 
-                                    higherMass = float(condition.split('to')[1])
-
-                                    if massPointTermValue<lowerMass or massPointTermValue>higherMass:
-                                        return False
-
-                                    conditionApplied = True
+                            massPointTermValue = float(massPointTerm.replace(massFlag, ''))
+                            
+                            lowerMass  = float(massRange.split('to')[0]) 
+                            higherMass = float(massRange.split('to')[1])
+                            
+                            if massPointTermValue<lowerMass or massPointTermValue>higherMass:
+                                return False
+                                
+                            conditionApplied = True
 
                 if conditionApplied==False:
                     return False
