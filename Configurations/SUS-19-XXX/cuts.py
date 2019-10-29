@@ -162,8 +162,13 @@ if 'StopSignalRegions' in opt.tag:
         cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300)*(1.-btagWeight_1tag)'
 
 # apply background scale factors
-    
-if 'SignalRegions' in opt.tag:
+ 
+try:
+    normBackgrounds
+except NameError:
+    normBackgrounds = None
+   
+if 'SignalRegions' in opt.tag and normBackgrounds is not None:
         
     for background in normBackgrounds:
         if background in samples:

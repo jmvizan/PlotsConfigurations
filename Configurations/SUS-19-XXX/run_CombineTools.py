@@ -7,9 +7,9 @@ import LatinoAnalysis.Gardener.hwwtools as hwwtools
 from LatinoAnalysis.Tools.commonTools import *
 
 COMBINE = os.getenv('COMBINE')
-SUS19 = os.getenv('SUS19')
+PWD = os.getenv('PWD')
 if(type(COMBINE) is None): COMBINE = " "
-if(type(SUS19) is None): SUS19 = " "
+if(type(PWD) is None): PWD = " "
 
 if __name__ == '__main__':
 
@@ -44,15 +44,10 @@ Default: all'           , default="all")
         years=["2016","2017","2018"]
 
 
-    doTest=False
-    if(opt.test=='True' or opt.test=='true' or opt.test=='T' or opt.test=='t'):
-        doTest=True
-    doMerge=False
-    if(opt.merge=='True' or opt.merge=='true' or opt.merge=='T' or opt.merge=='t'):
-        doMerge=True
-    doLimits=False
-    if(opt.limits=='True' or opt.limits=='true' or opt.limits=='T' or opt.limits=='t'):
-        doLimits=True
+    doTest = opt.test
+    doMerge = opt.merge
+    doLimits = opt.limits
+
     print "\n\t Optional arguments"
     print " tag                = ", opt.tag
     print " sigset             = ", opt.sigset
