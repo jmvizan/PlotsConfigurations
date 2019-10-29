@@ -1,5 +1,7 @@
 #!/bin/bash
 
+declare -a years=('2016' '2017' '2018')
+
 if [ $# -lt 3 ]; then
     echo ''
     echo 'Please provide data taking year:'; 
@@ -15,7 +17,9 @@ if [ $# -lt 3 ]; then
     echo ''
     exit
 else
-    if [ $1 == '0' ]; then
+    if [ $1 == '-1' ]; then
+	YEAR='2016-2017-2018'
+    elif [ $1 == '0' ]; then
 	YEAR='2016'
     elif [ $1 == '1' ]; then
 	YEAR='2017'
@@ -33,6 +37,12 @@ else
     fi
 fi
 
-mkdir -p ./Datacards/$YEAR
+for year in "${years[@]}"; do
+    if [[ $YEAR =~ $year ]]; then
 
-mkDatacards.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --outputDirDatacard=./Datacards/$YEAR/$3 --inputFile=./Shapes/$YEAR/plots_${TAG}_${FILESET}.root 
+	mkdir -p ./Datacards/$YEAR
+
+	mkDatacards.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --outputDirDatacard=./Datacards/$YEAR/$3 --inputFile=./Shapes/$YEAR/plots_${TAG}_${FILESET}.root 
+
+    fi
+done
