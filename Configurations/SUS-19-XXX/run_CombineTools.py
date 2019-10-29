@@ -101,7 +101,7 @@ Default: all'           , default="all")
         if model not in opt.sigset:  continue
         for massPoint in signalMassPoints[model]:
             #print opt.sigset, "<-sigset, masspoint->", massPoint
-            if opt.sigset not in massPoint:  continue
+            if not massPointInSignalSet(massPoint, opt.sigset):  continue
             print "Mass Point:", massPoint
             for year in years:
                 for cut in cuts:
@@ -129,13 +129,14 @@ Default: all'           , default="all")
     else:
     
         #Actually combine the DC
-        finalDC='allDC.txt'
+        finalDC='allDC_'+opt.sigset+'.txt'
         doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
         if(doMerge is True and thereIsDC is True):
             combCommand+=dirDC+">"+finalDC
             combPrint=''
             if(doTest): combPrint=combCommand
             print "Combining Datacards:", combPrint
+            print doCombcmsenv+combCommand
             os.system(doCombcmsenv+combCommand)
             print "Final Datacard:", finalDC
         else:
@@ -144,8 +145,13 @@ Default: all'           , default="all")
         #Calculate the limits
         #Note that currently it would only calculate the last MP
         if(doLimits is True and thereIsDC is True):
-            combCommand='combine -M AsymptoticLimits --run '+opt.limrun +' ' +finalDC+' -n allDC'+opt.limrun
+            combCommand='combine -M AsymptoticLimits --run '+opt.limrun +' ' +finalDC+' -n allDC'+opt.limrun+'_'+opt.sigset
             print "Sending combination", combCommand
             os.system(doCombcmsenv+combCommand)
         else:
             print "Limit option set to false: no limits were calculated"
+
+    
+    os.system('mv allDC*.txt Datacards/')
+    os.system('mv higgs*.root Datacards/')
+
