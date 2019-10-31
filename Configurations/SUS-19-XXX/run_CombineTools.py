@@ -97,16 +97,16 @@ Default: all'           , default="all")
     for model in signalMassPoints:
         print "Model:", model,"\tSignal set", opt.sigset
         if model not in opt.sigset:  continue
-        for massPoint in signalMassPoints[model]:
-            dirDC=''
-            #print opt.sigset, "<-sigset, masspoint->", massPoint
-            if not massPointInSignalSet(massPoint, opt.sigset):  continue
-            mpLoc='./Datacards/'+year+'/'+massPoint
-            if(os.path.exists(mpLoc) is not True):
-                print "\n Folder for MassPoint", massPoint," does not exist:"
-                continue
-            print "Mass Point:", massPoint
-            for year in years:
+        for year in years:
+            for massPoint in signalMassPoints[model]:
+                dirDC=''
+                #print opt.sigset, "<-sigset, masspoint->", massPoint
+                #if not massPointInSignalSet(massPoint, opt.sigset):  continue
+                mpLoc='./Datacards/'+year+'/'+massPoint
+                if(os.path.exists(mpLoc) is not True):
+                    if(doTest is True): print "\n Folder for MassPoint", massPoint," does not exist:"
+                    continue
+                    print "Mass Point:", massPoint, mpLoc
                 for cut in cuts:
                     cutLoc=mpLoc+'/'+cut
                     #print os.path.exists(mpLoc), mpLoc, "cuts", cuts, variables
@@ -119,39 +119,38 @@ Default: all'           , default="all")
                         dirDC+=tagDC+'='+thisDC+' '
                         if(os.path.exists(thisDC) is True):
                             thereIsDC=True
-                            print "Datacard: ", thisDC
+                            print "Datacard: ", thisDC, "dirDC="
                         else:
                             if(doTest):print "DC", thisDC, "does not exist"
-            #Do not combine DC nor calculate limits if no DC is found
-            mergeCommand=''
-            combCommand =''
-            if(thereIsDC is False):
-                print "there are no Datacards in the folder under the input parameters"
-            else:
-    
-                #Actually merge the DC
-                finalDC='allDC_'+massPoint+'.txt'
-                print "FINAL DC:", finalDC
-                doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
-                if(doMerge is True and thereIsDC is True):
-                    mergeCommand=opt.combcfg+' '+dirDC+">"+finalDC
-                    mergePrint=''
-                    if(doTest): mergePrint=mergeCommand
-                    print "Combining Datacards:", mergePrint, "\t<---"
-                    #os.system(doCombcmsenv+mergeCommand)
-                    print "Final Datacard:", finalDC
+                #Do not combine DC nor calculate limits if no DC is found
+                mergeCommand=''
+                combCommand =''
+                if(thereIsDC is False):
+                    print "there are no Datacards in the folder under the input parameters"
                 else:
-                    print "\n Data card merging option set to false: no DC combination is done"
+                    #Actually merge the DC
+                    finalDC='allDC_'+massPoint+'.txt'
+                    print "FINAL DC:", finalDC
+                    doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
+                    if(doMerge is True and thereIsDC is True):
+                        mergeCommand=opt.combcfg+' '+dirDC+">"+finalDC
+                        mergePrint=''
+                        if(doTest): mergePrint=mergeCommand
+                        print "Combining Datacards:", mergeCommand, "\t<---"
+                        #os.system(doCombcmsenv+mergeCommand)
+                        print "Final Datacard:", finalDC
+                    else:
+                        print "\n Data card merging option set to false: no DC combination is done"
 
-                #Calculate the limits
-                if(doLimits is True and thereIsDC is True):
-                    combCommand='combine -M AsymptoticLimits --run '+opt.limrun +' ' +finalDC+' -n allDC'+opt.limrun+'_'+massPoint
-                    print "Sending combination", combCommand
-                    #os.system(doCombcmsenv+combCommand)
-                else:
-                    print "Limit option set to false: no limits were calculated"
+                    #Calculate the limits
+                    if(doLimits is True and thereIsDC is True):
+                        combCommand='combine -M AsymptoticLimits --run '+opt.limrun +' ' +finalDC+' -n allDC'+opt.limrun+'_'+massPoint
+                        print "Sending combination", combCommand
+                        #os.system(doCombcmsenv+combCommand)
+                    else:
+                        print "Limit option set to false: no limits were calculated"
 
-                os.system(doCombcmsenv+mergeCommand+";"+combCommand)
-    os.system('mv allDC*.txt Datacards/')
-    os.system('mv higgs*.root Datacards/')
+                    os.system(doCombcmsenv+mergeCommand+";"+combCommand)
+#os.system('mv allDC*.txt Datacards/')
+#os.system('mv higgs*.root Datacards/')
 
