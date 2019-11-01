@@ -24,7 +24,21 @@ def massPointInSignalSet(massPoint, sigSet):
 
                 conditionApplied = False
 
-                if 'to' not in condition:
+                if 'dm-' in condition:
+                    
+                    deltaMass = float(massPointTerms[1].split('-')[1]) - float(massPointTerms[2].split('-')[1]) 
+
+                    if 'to' not in condition:
+                        if deltaMass!=float(condition.split('-')[1]):
+                            return False
+                    else:
+                        massRange = condition.split('-')[1]
+                        if deltaMass<float(massRange.split('to')[0]) or deltaMass>float(massRange.split('to')[1]):
+                            return False
+
+                    conditionApplied = True
+
+                elif 'to' not in condition:
 
                     if condition not in massPoint:
                         return False
