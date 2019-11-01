@@ -27,7 +27,7 @@ outputDir = 'Shapes'
 outputDirPlots = 'Plots'
 
 # used by mkDatacards to define output directory for datacards
-outputDirDatacard = 'datacards'
+outputDirDatacard = 'Datacards'
 
 # structure file for datacard
 structureFile = 'structure.py'
