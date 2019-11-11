@@ -51,18 +51,19 @@ for sample in samples.keys():
 
 # background cross section and scale factor uncertainties
 
-for background in normBackgrounds:
-    if background in samples:
-        for region in normBackgrounds[background]:
-            nuisancename = 'norm'+background+region
-            scalefactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
-            scalefactorerror = normBackgrounds[background][region]['scalefactor'][scalefactor]
-            nuisances[nuisancename]  = {
-                'name'    : nuisancename+year, 
-                'samples' : { background : str(1.+float(scalefactorerror)/float(scalefactor)) },
-                'cuts'    : normBackgrounds[background][region]['cuts'], 
-                'type'    : 'lnN',
-            }
+if 'SignalRegions' in opt.tag:
+    for background in normBackgrounds:
+        if background in samples:
+            for region in normBackgrounds[background]:
+                nuisancename = 'norm'+background+region
+                scalefactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
+                scalefactorerror = normBackgrounds[background][region]['scalefactor'][scalefactor]
+                nuisances[nuisancename]  = {
+                    'name'    : nuisancename+year, 
+                    'samples' : { background : str(1.+float(scalefactorerror)/float(scalefactor)) },
+                    'cuts'    : normBackgrounds[background][region]['cuts'], 
+                    'type'    : 'lnN',
+                }
 
 ### shapes
 
@@ -94,12 +95,8 @@ for scalefactor in leptonSF:
     }
     for sample in samples.keys():
         if sample!='DATA':
-            if 'FS' not in scalefactor:
+            if 'FS' not in scalefactor or 'fastsim' in samples[sample].keys():
                 nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
-            else:
-                for model in signalMassPoints:
-                    if sample in signalMassPoints[model].keys():
-                        nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
 
 # b-tagging scale factors
 
@@ -129,12 +126,8 @@ for scalefactor in btagSF:
     }
     for sample in samples.keys():
         if sample!='DATA':
-            if 'FS' not in scalefactor:
+            if 'FS' not in scalefactor or 'fastsim' in samples[sample].keys():
                 nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
-            else:
-                for model in signalMassPoints:
-                    if sample in signalMassPoints[model].keys():
-                        nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
     for cut in cuts.keys():
         if ('1b' in scalefactor and '_Tag' in cut) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut)):
             nuisances[scalefactor]['cuts'].append(cut)
@@ -248,12 +241,35 @@ nuisances['ptmissfastsim']  = {
     'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
 }
 for sample in samples.keys():
-    for model in signalMassPoints:
-        if sample in signalMassPoints[model].keys():
-            nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
+    if 'fastsim' in samples[sample].keys():
+        nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
 ### LHE weights
 
+# LHE scale variation weights (w_var / w_nominal)
+# [0] is muR=0.50000E+00 muF=0.50000E+00
+# [1] is muR=0.50000E+00 muF=0.10000E+01
+# [2] is muR=0.50000E+00 muF=0.20000E+01
+# [3] is muR=0.10000E+01 muF=0.50000E+00
+# [4] is muR=0.10000E+01 muF=0.10000E+01
+# [5] is muR=0.10000E+01 muF=0.20000E+01
+# [6] is muR=0.20000E+01 muF=0.50000E+00
+# [7] is muR=0.20000E+01 muF=0.10000E+01
+# [8] is muR=0.20000E+01 muF=0.20000E+01
+
+#variations = ['LHEScaleWeight[%d]' % i for i in [0, 1, 3, 5, 7, 8]]
+"""
+nuisances['QCDscale'] = {
+    'name': 'QCDscale', # Scales correlated through the years?
+    #'kind': 'weight_envelope',
+    'kind': 'weight',
+    'type': 'shape',
+    'samples': { },
+}
+for sample in samples.keys():
+    if sample!='DATA':
+        nuisances['QCDscale']['samples'][sample] = [ 'LHEScaleWeight[8]', 'LHEScaleWeight[0]' ] 
+"""
 ### JES and MET
 
 ### rate parameters
