@@ -1,0 +1,7 @@
+executable            = run_AnalysisMP.py 
+arguments             = 0 StopSignalRegions T2tt_mS-450_mX-275 $(ClusterId) $(ProcId)
+output                = Condor/test/hello.$(ClusterId).$(ProcId).out
+error                 = Condor/test/hello.$(ClusterId).$(ProcId).err
+log                   = Condor/test/hello.$(ClusterId).log
++JobFlavour   = tomorrow
+queue

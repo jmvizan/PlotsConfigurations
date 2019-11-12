@@ -40,8 +40,8 @@ if __name__ == '__main__':
     if 'SM-' not in fileset:
         fileset = 'SM-' + fileset
     opts= "--years="+yearset+" --tag="+tag+" --sigset="+sigset
-    print  "python run_CombineTools.py"+opts
     name='run_CombineTools.py'
-    os.system(name+' '+opts)
+    print "Command sent:\t", name+' '+opts,'\n'
+    os.system('python '+name+' '+opts)
 
     years = yearset.split('-')
