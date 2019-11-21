@@ -158,7 +158,7 @@ def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMake
         if reMakeHistos or not fileExist(outputFileName):
             fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName)
 
-def plotLimits(year, tags, sigset, limitOptions, plotOption):
+def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
                  
     if plotOption!='Histograms':
         if plotOption=='Contours':
@@ -166,6 +166,10 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption):
         else:
             print 'Error: unkown option', plotOption, 'for limit comparison'
         exit()
+
+    emptyBinsOption = ''			
+    if fillemptybins==False:		
+        emptyBinsOption = '_noFillEmptyBins'
 
     # Get the objects
     tagObj = [ ] 
@@ -175,7 +179,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption):
         if tag=='':
             continue
             
-        tagFileName = getFileName('./Limits/' + year + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1])
+        tagFileName = getFileName('./Limits/' + year + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + emptyBinsOption)
 
         if not fileExist(tagFileName):
             print 'Error: input file', tagFileName, 'not found'
@@ -202,7 +206,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption):
         if plotOption=='Histograms':
             tagObj[0].Divide(tagObj[1])
 
-    plotTitle += '_' + sigset + '_' + limitOptions[0] + '_' + plotOption
+    plotTitle += '_' + sigset + '_' + limitOptions[0] + '_' + plotOption + emptyBinsOption
     tagObj[0].SetTitle(plotTitle)
 
     tagObj[0].Draw('textcolz')
@@ -271,7 +275,7 @@ if __name__ == '__main__':
         makeMassScanHistograms(year, opt.compareTo, opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
 
     if plotOption=='Histograms' or plotOption=='Contours':
-        plotLimits(year, [ opt.tag, opt.compareTo ], opt.sigset, limitOptions, plotOption)
+        plotLimits(year, [ opt.tag, opt.compareTo ], opt.sigset, limitOptions, plotOption, fillEmpties)
 
 """
 #include "TCanvas.h"
