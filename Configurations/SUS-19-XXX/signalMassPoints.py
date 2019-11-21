@@ -95,10 +95,11 @@ for mStop in range( 150,  2001, 25):
             
         mLSP = mNeutralino
         if mLSP==0: mLSP = 1
+        if mLSP==514: mLSP=513
         if mStop-mLSP==75: mLSP = mStop - 87 
             
         massPointName = 'T2tt' + '_mS-' + str(mStop) + '_mX-' + str(mLSP)
-        massPointCut = '(susyMstop==' + str(mStop) + ' && susyMLSP==' + str(mLSP) + ')'
+        massPointCut = '(25*int(susyMstop/25)==' + str(mStop) + ' && susyMLSP==' + str(mLSP) + ')'
 
         massPoint = {}
         massPoint['massPointDataset'] = datasetName
