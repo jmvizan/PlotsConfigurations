@@ -22,18 +22,12 @@ tag=sys.argv[2]
 
 sigset=sys.argv[3]
 
-if len(sys.argv)>=5:
+if len(sys.argv)==5:
     fileset=sys.argv[4]
 else:
     fileset=sigset
-
-if (len(sys.argv)==6):
-    isLocal=sys.argv[5]
-else:
-    isLocal=''
-if ('SM-' not in fileset and isLocal!='-1'):
+if 'SM-' not in fileset:
     fileset = 'SM-' + fileset
-
 
 exec(open('./signalMassPoints.py').read())
 
@@ -47,12 +41,5 @@ for year in years:
         if model in sigset:
             for massPoint in signalMassPoints[model]:
                 if massPointInSignalSet(massPoint, sigset):
-                    inputF='./Shapes/'+year+'/plots_'+tag+'_'+fileset+'.root'
-                    if(isLocal=='-1'):
-                        inputF=fileset
-                    os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+massPoint+' --inputFile='+inputF) 
-                    #os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+massPoint+' --inputFile=/afs/cern.ch/work/s/scodella/public/SUSY/plots_StopSignalRegions_SM-T2tt_mS-425to600.root')
-               
-
-
-                
+                      
+                    os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+massPoint+' --inputFile=./Shapes/'+year+'/plots_'+tag+'_'+fileset+'.root') 
