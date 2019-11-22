@@ -31,7 +31,7 @@ else
     elif [ $2 == '1' ]; then
 	TAG='ValidationRegions'
     elif [ $2 == '2' ]; then
-	TAG='SignalRegions'
+	TAG='StopSignalRegions'
     else 
 	TAG=$2
     fi
