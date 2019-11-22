@@ -46,8 +46,8 @@ def fillEmptyBins(sigset, histo):
     else:
         print 'Warning: strategy for filling empty bins not available for model', model
 
-def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName):
-
+def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName, noempties):
+    
     # Get mass points and mass limits
     modelHistogramSettings = { 'T2tt' : { #'X' : { 'binWidth' : 12.5, 'minCenter' : 1.0,  'maxCenter' :  1.0, 'label' : 'M_{#tilde t_{1}} [GeV]'        },
                                           'X' : { 'binWidth' : 12.5, 'minCenter' : 0.5,  'maxCenter' :  0.5, 'label' : 'M_{#tilde t_{1}} [GeV]'        },
@@ -58,31 +58,31 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     massPoints = { }
     massLimits = { 'X' : { 'min' : 999999., 'max' : -1. }, 'Y' : { 'min' : 999999., 'max' : -1. } }
 
-    #inputDirectory = './Limits/'+year+'/'
-    inputDirectory = './Datacards/'
-
+    inputDirectory = './Limits/'+year+'/'
+    #inputDirectory = './Datacards/'
+    
     limitType = 'blind' if (limitOption=='Blind') else 'expected'
-
     for model in signalMassPoints:
         if model in sigset:
-
             if model in modelHistogramSettings.keys():
                 histogramSettings = modelHistogramSettings[model]
             else:
                 print 'Error: histogram setting for model', model, 'not available'
                 exit()
-
-            for massPoint in signalMassPoints[model]:
+            
+            for massPoint in sorted(signalMassPoints[model]):
+                #print "masspoint", massPoint
+                #print massPointInSignalSet(massPoint,sigset)
                 if massPointInSignalSet(massPoint, sigset):
-                    
-                    #inputFileName = inputDirectory + massPoint + '/higgsCombineallDCblind_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
-                    inputFileName = inputDirectory + '/higgsCombineallDCblind_' + massPoint + '.AsymptoticLimits.mH120.root'
+                    print "masspoint", massPoint
+                    #Inputfilename- = inputDirectory + massPoint + '/higgsCombineallDCblind_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
+                    inputFileName = inputDirectory+ massPoint + '/higgsCombine_StopSignalRegions_Blind.AsymptoticLimits.mH120.root'
                     inputFile = ROOT.TFile(inputFileName, 'READ')
                 
                     inputTree = inputFile.Get('limit')
                     
                     if inputTree:
-                        
+                        #print "I am indeed reading the tree<---"
                         massX = float(massPoint.split('_')[1].split('-')[1])
                         massY = float(massPoint.split('_')[2].split('-')[1])
 
@@ -100,8 +100,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                             if inputTree.quantileExpected==-1.:
                                 massPointLimits['histo_r_observed'] =  inputTree.limit
                             elif inputTree.quantileExpected==0.5:
-                                if massX==575.:
-                                    print massX
                                 massPointLimits['histo_r_'+limitType] =  inputTree.limit
                             elif round(inputTree.quantileExpected, 2)==0.84:
                                 massPointLimits['histo_r_'+limitType+'_up'] =  inputTree.limit
@@ -111,7 +109,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                         massPoints[massPoint]['limits'] = massPointLimits
                     
                     inputFile.Close()
-    
+    print"make histos"
     # Create and fill histograms
     histoMin, histoMax, histoBin = { }, { }, { } 
     for axis in [ 'X', 'Y' ]:
@@ -139,7 +137,8 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     
     # Save histogram file
     if fillemptybins==False:
-        outputFileName = outputFileName.replace('.root', '_noFillEmptyBins' + '.root')
+        outputFileName = outputFileName.replace('.root', noempties + '.root')
+        print "Output root file: ",outputFileName
     outputFile = ROOT.TFile(outputFileName, 'recreate')
 
     for histo in massScanHistos:
@@ -149,14 +148,13 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 
     outputFile.Close()
 
-def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMakeHistos):
-
+def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMakeHistos, noempties):
     if tag!='':
 
-        outputFileName = getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
-
+        outputFileName = getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption+noempties)
+        print "HISTOGRAMS saved in", outputFileName
         if reMakeHistos or not fileExist(outputFileName):
-            fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName)
+            fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName, noempties)
 
 def plotLimits(year, tags, sigset, limitOptions, plotOption):
                  
@@ -175,7 +173,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption):
         if tag=='':
             continue
             
-        tagFileName = getFileName('./Limits/' + year + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1])
+        tagFileName = getFileName('./Limits/' + year + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1] )#+ doEmpties)
 
         if not fileExist(tagFileName):
             print 'Error: input file', tagFileName, 'not found'
@@ -187,6 +185,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption):
             objectName = 'histo_r_'+limitOptions[0].lower()
 
         obj = tagFile.Get(objectName)
+        print "--->obj", obj, "\t FILE", tagFileName, "\t OBJECT", objectName
         obj.SetDirectory(0)
         tagObj.append(obj)
 
@@ -222,7 +221,7 @@ if __name__ == '__main__':
     parser.add_option('--tag'          , dest='tag'          , help='Tag used for the tag file name'              , default='Test')
     parser.add_option('--sigset'       , dest='sigset'       , help='Model and mass point range'                  , default='')
     parser.add_option('--limitoption'  , dest='limitOption'  , help='Observed (0), Expected (1), Blind (2) limit' , default='Blind')
-    parser.add_option('--sigmp'        , dest='signalMPcfg'  , help='Signal mass point cfg file'                  , default='./signalMassPoints.py')
+    parser.add_option('--sigmp'        , dest='signalMPcfg'  , help='Signal mass point cfg file'                  , default='./signalMassPoints.py') 
     parser.add_option('--nomakehistos' , dest='noMakeHistos' , help='Do not make the mass scan histograms'        , default=False, action='store_true')
     parser.add_option('--remakehistos' , dest='reMakeHistos' , help='Redo the mass scan histograms'               , default=False, action='store_true')
     parser.add_option('--nofillempties', dest='noFillEmpties', help='Do not fill empty bins'                      , default=False, action='store_true')
@@ -258,20 +257,23 @@ if __name__ == '__main__':
 
     fillEmpties = not opt.noFillEmpties
 
+    noempties=''
+    if(fillEmpties is False):noempties='_noFillEmptyBins'
     if opt.plotOption=='0':
         plotOption = 'Histograms'
     elif opt.plotOption=='1':
         plotOption = 'Contours'
     else:
         plotOption = opt.plotOption
-
+    
     if not opt.noMakeHistos:
         exec(open(opt.signalMPcfg).read())
-        makeMassScanHistograms(year, opt.tag,       opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
-        makeMassScanHistograms(year, opt.compareTo, opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
+        makeMassScanHistograms(year, opt.tag,       opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos,noempties)
+        makeMassScanHistograms(year, opt.compareTo, opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos,noempties)
 
     if plotOption=='Histograms' or plotOption=='Contours':
         plotLimits(year, [ opt.tag, opt.compareTo ], opt.sigset, limitOptions, plotOption)
+    print "\n------Finished analising the limits------"
 
 """
 #include "TCanvas.h"
