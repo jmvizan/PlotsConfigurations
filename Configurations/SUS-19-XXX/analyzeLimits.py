@@ -58,8 +58,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     massPoints = { }
     massLimits = { 'X' : { 'min' : 999999., 'max' : -1. }, 'Y' : { 'min' : 999999., 'max' : -1. } }
 
-    #inputDirectory = './Limits/'+year+'/'
-    inputDirectory = './Datacards/'
+    inputDirectory = './Limits/'+year+'/'
 
     limitType = 'blind' if (limitOption=='Blind') else 'expected'
 
@@ -75,8 +74,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
             for massPoint in signalMassPoints[model]:
                 if massPointInSignalSet(massPoint, sigset):
                     
-                    #inputFileName = inputDirectory + massPoint + '/higgsCombineallDCblind_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
-                    inputFileName = inputDirectory + '/higgsCombineallDCblind_' + massPoint + '.AsymptoticLimits.mH120.root'
+                    inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
                     inputFile = ROOT.TFile(inputFileName, 'READ')
                 
                     inputTree = inputFile.Get('limit')
@@ -100,8 +98,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                             if inputTree.quantileExpected==-1.:
                                 massPointLimits['histo_r_observed'] =  inputTree.limit
                             elif inputTree.quantileExpected==0.5:
-                                if massX==575.:
-                                    print massX
                                 massPointLimits['histo_r_'+limitType] =  inputTree.limit
                             elif round(inputTree.quantileExpected, 2)==0.84:
                                 massPointLimits['histo_r_'+limitType+'_up'] =  inputTree.limit
@@ -138,8 +134,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
             massScanHistos[limit].SetBinContent(massPointBin, massPoints[massPoint]['limits'][limit])
     
     # Save histogram file
-    if fillemptybins==False:
-        outputFileName = outputFileName.replace('.root', '_noFillEmptyBins' + '.root')
     outputFile = ROOT.TFile(outputFileName, 'recreate')
 
     for histo in massScanHistos:
@@ -154,6 +148,9 @@ def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMake
     if tag!='':
 
         outputFileName = getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
+
+        if fillemptybins==False:
+            outputFileName = outputFileName.replace('.root', '_noFillEmptyBins' + '.root')
 
         if reMakeHistos or not fileExist(outputFileName):
             fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName)
