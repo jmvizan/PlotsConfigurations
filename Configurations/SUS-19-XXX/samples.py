@@ -22,6 +22,10 @@ if  'cern' in SITE :
         treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
     else :
         treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
+elif 'ifca' in SITE:
+    treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in opt.tag :
     ProductionMC   = 'Summer16_102X_nAODv4_Full2016v4/MCSusy2016__MCCorr2016Susy'
