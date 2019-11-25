@@ -43,8 +43,3 @@ for year in years:
                 if massPointInSignalSet(massPoint, sigset):
                       
                     os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+massPoint+' --inputFile=./Shapes/'+year+'/plots_'+tag+'_'+fileset+'.root') 
-
-               
-
-
-                
