@@ -46,7 +46,7 @@ def fillEmptyBins(sigset, histo):
     else:
         print 'Warning: strategy for filling empty bins not available for model', model
 
-def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName, noempties):
+def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName):
     
     # Get mass points and mass limits
     modelHistogramSettings = { 'T2tt' : { #'X' : { 'binWidth' : 12.5, 'minCenter' : 1.0,  'maxCenter' :  1.0, 'label' : 'M_{#tilde t_{1}} [GeV]'        },
@@ -143,7 +143,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 
     outputFile.Close()
 
-def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMakeHistos, noempties):
+def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMakeHistos):
     if tag!='':
       
         outputFileName = getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
@@ -152,7 +152,7 @@ def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMake
             outputFileName = outputFileName.replace('.root', '_noFillEmptyBins' + '.root')
             
         if reMakeHistos or not fileExist(outputFileName):
-            fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName, noempties)
+            fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName)
 
 def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
                  
@@ -259,8 +259,6 @@ if __name__ == '__main__':
 
     fillEmpties = not opt.noFillEmpties
 
-    noempties=''
-    if(fillEmpties is False):noempties='_noFillEmptyBins'
     if opt.plotOption=='0':
         plotOption = 'Histograms'
     elif opt.plotOption=='1':
@@ -270,8 +268,8 @@ if __name__ == '__main__':
     
     if not opt.noMakeHistos:
         exec(open(opt.signalMPcfg).read())
-        makeMassScanHistograms(year, opt.tag,       opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos,noempties)
-        makeMassScanHistograms(year, opt.compareTo, opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos,noempties)
+        makeMassScanHistograms(year, opt.tag,       opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
+        makeMassScanHistograms(year, opt.compareTo, opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
 
     if plotOption=='Histograms' or plotOption=='Contours': 
         plotLimits(year, [ opt.tag, opt.compareTo ], opt.sigset, limitOptions, plotOption, fillEmpties) 
