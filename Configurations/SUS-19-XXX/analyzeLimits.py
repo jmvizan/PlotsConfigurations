@@ -70,8 +70,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                 exit()
             
             for massPoint in sorted(signalMassPoints[model]):
-                #print "masspoint", massPoint
-                #print massPointInSignalSet(massPoint,sigset)
+
                 if massPointInSignalSet(massPoint, sigset): 
                   
                     inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
@@ -80,7 +79,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                     inputTree = inputFile.Get('limit')
                     
                     if inputTree:
-                        #print "I am indeed reading the tree<---"
+
                         massX = float(massPoint.split('_')[1].split('-')[1])
                         massY = float(massPoint.split('_')[2].split('-')[1])
 
@@ -187,7 +186,6 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
             objectName = 'histo_r_'+limitOptions[0].lower()
 
         obj = tagFile.Get(objectName)
-        print "--->obj", obj, "\t FILE", tagFileName, "\t OBJECT", objectName
         obj.SetDirectory(0)
         tagObj.append(obj)
 
