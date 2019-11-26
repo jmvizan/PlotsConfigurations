@@ -30,19 +30,19 @@ def fillEmptyBins(sigset, histo):
                                     histo.SetBinContent(xb, yb, histo.GetBinContent(xb, yb+1))
                                 elif histo.GetBinContent(xb, yb-1)>0.:
                                     binContent = (histo.GetBinContent(xb, yb+1)+histo.GetBinContent(xb, yb-1))/2.
-                                    histo.SetBinContent(xb, yb, binContent)
+                                    histo.SetBinContent(xb, yb, round(binContent, 2))
 
                             if iter==1 and histo.GetBinContent(xb+1, yb)>0 and histo.GetBinContent(xb-1, yb)>0.:
                                 binContent = (histo.GetBinContent(xb+1, yb)+histo.GetBinContent(xb-1, yb))/2.
-                                histo.SetBinContent(xb, yb, binContent)
+                                histo.SetBinContent(xb, yb, round(binContent, 2))
 
                             if iter==2 and massX-massY<90. and histo.GetBinContent(xb+1, yb+1)>0. and histo.GetBinContent(xb-1, yb-1)>0.:
                                 binContent = (histo.GetBinContent(xb+1, yb+1)+histo.GetBinContent(xb-1, yb-1))/2.
-                                histo.SetBinContent(xb, yb, binContent)
+                                histo.SetBinContent(xb, yb, round(binContent, 2))
 
                             if iter==3 and massX-massY==175. and histo.GetBinContent(xb+1, yb+1)>0. and histo.GetBinContent(xb-1, yb-1)>0.:
                                 binContent = (histo.GetBinContent(xb+1, yb+1)+histo.GetBinContent(xb-1, yb-1))/2.
-                                histo.SetBinContent(xb, yb, binContent)
+                                histo.SetBinContent(xb, yb, round(binContent, 2))
                                 
     else:
         print 'Warning: strategy for filling empty bins not available for model', model
@@ -98,13 +98,13 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                         for event in inputTree :
 
                             if inputTree.quantileExpected==-1.:
-                                massPointLimits['histo_r_observed'] =  inputTree.limit
+                                massPointLimits['histo_r_observed'] = round(inputTree.limit, 2)
                             elif inputTree.quantileExpected==0.5:
-                                massPointLimits['histo_r_'+limitType] =  inputTree.limit
+                                massPointLimits['histo_r_'+limitType] = round(inputTree.limit, 2)
                             elif round(inputTree.quantileExpected, 2)==0.84:
-                                massPointLimits['histo_r_'+limitType+'_up'] =  inputTree.limit
+                                massPointLimits['histo_r_'+limitType+'_up'] = round(inputTree.limit, 2)
                             elif round(inputTree.quantileExpected, 2)==0.16:
-                                massPointLimits['histo_r_'+limitType+'_down'] =  inputTree.limit
+                                massPointLimits['histo_r_'+limitType+'_down'] = round(inputTree.limit, 2)
 
                         massPoints[massPoint]['limits'] = massPointLimits
                     
@@ -199,7 +199,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
-    plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 600, 400)
+    plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 900, 600)
     
     plotTitle = tags[0]
     
