@@ -3,6 +3,7 @@ import os
 import sys
 import ROOT
 import optparse
+from array import *
 
 def fileExist(fileName):
     return os.path.isfile(fileName)
@@ -46,6 +47,8 @@ def fillEmptyBins(sigset, histo):
     else:
         print 'Warning: strategy for filling empty bins not available for model', model
 
+maxMassY = -1.
+
 def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName):
     
     # Get mass points and mass limits
@@ -87,7 +90,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                         massLimits['X']['max']  = max(massLimits['X']['max'], massX)
                         massLimits['Y']['min']  = min(massLimits['Y']['min'], massY)
                         massLimits['Y']['max']  = max(massLimits['Y']['max'], massY)
-                        
+
                         massPoints[massPoint] = { 'massX' : massX, 'massY' : massY }
 
                         massPointLimits = { } 
@@ -106,7 +109,10 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                         massPoints[massPoint]['limits'] = massPointLimits
                     
                     inputFile.Close()
-    
+
+    global maxMassY
+    maxMassY = massLimits['Y']['max']
+
     # Create and fill histograms
     histoMin, histoMax, histoBin = { }, { }, { } 
     for axis in [ 'X', 'Y' ]:
@@ -190,7 +196,8 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         tagObj.append(obj)
 
     # Draw comparison
-    ROOT.gStyle.SetOptStat(0)
+    ROOT.gStyle.SetOptStat(ROOT.kFALSE)
+    ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
     plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 600, 400)
     
@@ -202,10 +209,38 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
             tagObj[0].Divide(tagObj[1])
 
     plotTitle += '_' + sigset + '_' + limitOptions[0] + '_' + plotOption + emptyBinsOption
-    tagObj[0].SetTitle(plotTitle)
+    tagObj[0].SetTitle(plotTitle)   
+   
+    tagObj[0].GetXaxis().SetLabelFont(42)
+    tagObj[0].GetXaxis().SetTitleFont(42)
+    tagObj[0].GetXaxis().SetLabelSize(0.035)
+    tagObj[0].GetXaxis().SetTitleSize(0.035)
+    tagObj[0].GetXaxis().SetTitleOffset(1.2)
+    tagObj[0].GetYaxis().SetLabelFont(42)
+    tagObj[0].GetYaxis().SetTitleFont(42)
+    tagObj[0].GetYaxis().SetLabelSize(0.035)
+    tagObj[0].GetZaxis().SetTitleSize(0.035)
+    tagObj[0].GetZaxis().SetLabelFont(42)
+    tagObj[0].GetZaxis().SetTitleFont(42)
+    tagObj[0].GetZaxis().SetLabelSize(0.035)
+    tagObj[0].GetZaxis().SetTitleSize(0.035)
+
+    tagObj[0].SetMinimum(0)
+    tagObj[0].SetMaximum(3)
+
+    tagObj[0].GetYaxis().SetRange(1, tagObj[0].GetYaxis().FindBin(maxMassY)+1);
+
+    NRGBs = 5
+    NCont = 255
+    stops = array("d",[0.00, 0.34, 0.61, 0.84, 1.00])
+    red = array("d",[0.50, 0.50, 1.00, 1.00, 1.00])
+    green = array("d",[ 0.50, 1.00, 1.00, 0.60, 0.50])
+    blue = array("d",[1.00, 1.00, 0.50, 0.40, 0.50])
+    ROOT.TColor.CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont)
+    ROOT.gStyle.SetNumberContours(NCont)
 
     tagObj[0].Draw('textcolz')
- 
+
     outputFileName = getFileName('./Plots/' + year + '/Limits', plotTitle, '.png')
     plotCanvas.Print(outputFileName)
 
