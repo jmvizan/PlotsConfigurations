@@ -1,24 +1,18 @@
 signalMassPoints = {}
 
-def massPointInSignalSet(massPoint, sigSet):
+def massPointPass(massPoint, sigSetItem):
 
-    if massPoint in sigSet:
-        return True
-
-    signalSet = sigSet.replace('SM-', '')
-    signalSet = signalSet.replace('Backgrounds-', '')
-    signalSet = signalSet.replace('Data-', '')
-
-    if signalSet in massPoint:
-        return True
+    if sigSetItem.count('_')<2:
+        if sigSetItem in massPoint:
+            return True
 
     for model in signalMassPoints:
-        if model in signalSet:
+        if model in sigSetItem:
 
             massPointTerms = massPoint.split('_')
-
-            signalSet = signalSet.replace(model+'_', '')
-            signalSetConditions = signalSet.split('_')
+            
+            sigSetItem = sigSetItem.replace(model+'_', '')
+            signalSetConditions = sigSetItem.split('_')
 
             for condition in signalSetConditions:
 
@@ -40,7 +34,7 @@ def massPointInSignalSet(massPoint, sigSet):
 
                 elif 'to' not in condition:
 
-                    if condition not in massPoint:
+                    if condition!=massPointTerms[1] and condition!=massPointTerms[2]:
                         return False
 
                     conditionApplied = True
@@ -68,9 +62,26 @@ def massPointInSignalSet(massPoint, sigSet):
 
             return True
 
-    # No known model found in signalSet
+    # No known model found in sigSetItem
     return False
 
+def massPointInSignalSet(massPoint, sigSet):
+
+    signalSet = sigSet.replace('SM-', '')
+    signalSet = signalSet.replace('Backgrounds-', '')
+    signalSet = signalSet.replace('Data-', '')
+
+    sigSetList = signalSet.split(',')
+
+    if massPoint in sigSetList:
+        return True
+
+    for sigSetItem in sigSetList:
+
+        if massPointPass(massPoint, sigSetItem):
+            return True
+
+    return False
 
 signalMassPoints['T2tt'] = {}
 
@@ -95,11 +106,10 @@ for mStop in range( 150,  2001, 25):
             
         mLSP = mNeutralino
         if mLSP==0: mLSP = 1
-        if mLSP==514: mLSP=513
         if mStop-mLSP==75: mLSP = mStop - 87 
             
         massPointName = 'T2tt' + '_mS-' + str(mStop) + '_mX-' + str(mLSP)
-        massPointCut = '(25*int(susyMstop/25)==' + str(mStop) + ' && susyMLSP==' + str(mLSP) + ')'
+        massPointCut = '(25*int(susyMstop/25)==' + str(mStop) + ' && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
 
         massPoint = {}
         massPoint['massPointDataset'] = datasetName
