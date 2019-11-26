@@ -1,12 +1,11 @@
 import os,sys
 from datetime import datetime
 import numpy as np
-if len(sys.argv)<4:      
-    print 'Please, specify year, tag and sigset values, in that order'
-    sys.exit() 
+
+#Function to create sub file
 def makeSubFile(filename,year,tag,sigset):
-    f= open(filename,"w+")
-    arguments=year+' '+tag+' '+sigset
+    f = open(filename,"w+")
+    arguments = year+' '+tag+' '+sigset
     print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"
     f.write("executable            = run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
@@ -17,119 +16,90 @@ def makeSubFile(filename,year,tag,sigset):
     f.write("queue\n")
     f.close() 
 
+#Create log file
 def writetolog(filename,line,doheader):
     print filename.split('/')[1].split('.')[0].split(',')
 
     if(os.path.exists(filename) is False):
         print "creating file:"
-        f= open(filename,"w+")
+        f = open(filename,"w+")
     else:
-        f= open(filename,"a+")
+        f = open(filename,"a+")
     # Textual month, day and year
     if(doheader is True):
         now = datetime.now()
-        d2 = now.strftime("%d %B, %Y, at %H:%M:%S")
+        d2  = now.strftime("%d %B, %Y, at %H:%M:%S")
         f.write(d2+"\nSUBMITTING FILES\n\n")
     f.write(line+'\n')
     f.close()
     print "line", line
+
+#Remove specifical events
+def rreplace(s, old, new, occurrence):
+    li = s.rsplit(old, occurrence)
+    return new.join(li)
+
+if len(sys.argv)<4:      
+    print 'Please, specify year, tag and sigset values, in that order'
+    sys.exit() 
+
 #Take args
-year  = sys.argv[1]
-tag   = sys.argv[2]
-sigset= sys.argv[3]
+year   = sys.argv[1]
+tag    = sys.argv[2]
+sigset = sys.argv[3]
 
 exec(open("signalMassPoints.py").read())
 
 
-
+#Look for masspoints in the sigset
 mpInSigset=[]
 for model in signalMassPoints:
     print "Model:", model,"\tSignal set", sigset
     if model not in sigset:  continue
     for massPoint in signalMassPoints[model]:
         if(massPointInSignalSet(massPoint,sigset)): mpInSigset.append(massPoint)
-            #            print "this", sigset, massPoint
-            #print "sigset", sigset
-
         if massPoint not in sigset: continue
         print "Mass Point:", massPoint
 
-
-
-
-#sortMP=sorted(includedMP)
-nchunk=4
-chunks = [sorted(mpInSigset)[x:x+nchunk] for x in xrange(0, len(mpInSigset), nchunk)]
-doheader=True
-logfile="Condor/"+sigset+".log"
-subfilename="Condor/submitMPtemp.sub"
-lastmp=''
-#for mp in sigset.split(','):
-#    print compare(mp,lastmp)
-#    lastmp=mp
-sigsets=sigset.split(',')
-inc=''#sigsets[0][0]+'-'
-i=0
-'''
-for l in sigsets[0]:
-    inc+=l
-    dash=True
-    #print l, sigsets[1][i]
-    for othermp in sigsets[1:]:
-        l2= othermp[i]
-        print l,l2.isdigit(), othermp
-        if(l is not l2 and l2.isdigit() is False):
-            if(dash is True): inc+='-'
-            inc+=l2
-        dash=False
-    i+=
-
-writefp=True
-print inc, sigsets[1].split('_'),"\n-------------------\n"#.split('-')
+#Make a more human-readable logfile if necessary
+sigsets     = sigset.split(',')
+firstsigset = sigsets[0].split('_')
+writesigset = firstsigset    
 for i in range(0,len(sigsets)):
-    if i is 0: 
-        if(len(sigsets) is 0): inc=sigsets[0]
-        continue
-    firstsigset = sigsets[0].split('_')
-    thissigset  = sigsets[i].split('_')
+    if i is 0: continue
+    diffmp = ''
+    thissigset  = sigsets[i].split('_')    
     if(len(firstsigset) is not len(thissigset)): continue
     for j in range(0,len(thissigset)):
-        
-        #for part in sigsets[i].split('_'):
-        #if
-        firstdashpart = (firstsigset[j]+'_').split('-')
-        thisdashpart  = (thissigset[j]+'_').split('-')
-        print firstdashpart, len(firstdashpart)
-        if(len(firstdashpart) is not len (thisdashpart)): continue
-        for k in range(0,len(thisdashpart)):
-            firstpart=firstdashpart[k]
-            thispart=thisdashpart[k]
-            if(k <len(firstdashpart)-1): 
-                firstpart+='-'
-                thispart +='-'
-            print"first-->", firstpart
-            if(writefp is True): 
-                inc+=firstpart
-            if(thispart!= firstpart):
-                inc+=thispart
-                writefp=False
-            elif(thispart ==firstpart): writefp=True
-            
-            #print "--------> ",inc
-        #print firstpart,thispart
-    #print sigsets[i].split('_')
+#        print firstsigset[j], thissigset[j]
+        if(firstsigset[j]!=thissigset[j]):
+            if(j<len(thissigset)-1): diffmp='-'
+            firstpart = (firstsigset[j]+'_').split('-')
+            thispart  = (thissigset[j]+'_').split('-')
+            writesigset[j]+=diffmp+'-'+thissigset[j]
 
-print 'INC\n'+inc+'\n'
+#remove duplicate mS and similars            
+nmS = writesigset[1].count('mS')
+nmX = writesigset[2].count('mX')
+if(nmS>1):   writesigset[1] = rreplace(writesigset[1] , 'mS', '', nmS - 1)
+elif(nmX>1): writesigset[2] = rreplace(writesigset[2] , 'mX', '', nmX - 1)
+    
+print writesigset
+lognm   = '_'.join(writesigset)
+logfile = "Condor/"+lognm+".log"
 
-#if any(entry.startswith('John:') in entry for entry in sigset.split(',')): print "e"
-print sigset, sigset[0].replace(sigset[1],"")
 
-'''
+
+#divide masspoints in sets of four and send jobs
+nchunk      = 4
+chunks      = [sorted(mpInSigset)[x:x+nchunk] for x in xrange(0, len(mpInSigset), nchunk)]
+doheader    = True
+subfilename ="Condor/submitMPtemp.sub"
 for i in chunks:
-    argsigset= ",".join(i)
-    line="\nMPs: "+argsigset
+    doheader  = False
+    argsigset = ",".join(i)
+    line      = "\nMPs: "+argsigset
     writetolog(logfile, line,doheader)
-    doheader=False
     makeSubFile(subfilename, year, tag, argsigset)
     submit="condor_submit "+subfilename+" >>"+logfile
     print submit
@@ -138,7 +108,4 @@ for i in chunks:
 writetolog(logfile,"----------------------------------" ,doheader)
 
 print "\nCODE SHOULD BE SENT, MORE INFO IN LOG FILE:\n--> ", logfile
-    #os.system("cat "+filename)
-    #continue
-#print smp.massPointInSignalSet('t2tt','5')
-
+    

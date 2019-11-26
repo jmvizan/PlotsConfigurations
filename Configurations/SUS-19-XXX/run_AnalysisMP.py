@@ -2,16 +2,16 @@
 import timeit
 import optparse
 import sys, os
-#import LatinoAnalysis.Gardener.hwwtools as hwwtools
 
-# functions used in everyday life ...
-#from LatinoAnalysis.Tools.commonTools import *
-'''
-COMBINE = os.getenv('COMBINE')
-SUS19 = os.getenv('SUS19')
-if(type(COMBINE) is None): COMBINE = " "
-if(type(SUS19) is None): SUS19 = " "
-'''
+#To be updated to a more general option
+SUS19='/afs/cern.ch/work/p/pmatorra/private/CMSSW_10_2_14/src/PlotsConfigurations/Configurations/SUS-19-XXX/'
+print "cwddir before the change", os.getcwd()
+cmsenv=' eval `scramv1 runtime -sh` '
+abspath = os.path.abspath(__file__)
+dname = os.path.dirname(abspath)
+os.chdir(dname)
+
+
 if __name__ == '__main__':
 
     if len(sys.argv)<4:
@@ -39,9 +39,12 @@ if __name__ == '__main__':
         fileset=sigset
     if 'SM-' not in fileset:
         fileset = 'SM-' + fileset
-    opts= "--years="+yearset+" --tag="+tag+" --sigset="+sigset
-    name='run_CombineTools.py'
-    print "Command sent:\t", name+' '+opts,'\n'
-    os.system('python '+name+' '+opts)
+    
+    opts= "--years="+yearset+" --tag="+tag+" --sigset="+sigset 
+    name='python run_CombineTools.py'
+    command= ' '+name+' '+opts
+    print "Command sent:\t", command,'\n','CWD:', os.getcwd()
+    print "ABSPATH", abspath, "\tOSCWD", os.getcwd(), "\tLONGER OPTION", os.path.dirname(os.path.realpath(__file__))
+    os.system('cd '+ SUS19+ '; '+cmsenv+';'+command)
 
     years = yearset.split('-')
