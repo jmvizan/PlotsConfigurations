@@ -105,21 +105,21 @@ if 'TopValidationRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
         cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+BTAG
-        cuts['VR1_Tag_sf']   = OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+BTAG
+        cuts['VR1_Tag_jets'] = OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+BTAG
 
     else:
         cuts['VR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*btagWeight_1tag'
-        cuts['VR1_Tag_sf']   = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*btagWeight_1tag'
+        cuts['VR1_Tag_jets'] = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*btagWeight_1tag'
 
 if 'WWValidationRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
-        cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+VETO
-        cuts['VR1_Veto_sf']  = OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
+        cuts['VR1_Veto_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+VETO
+        cuts['VR1_Veto_0jet'] = OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
 
     else:
-        cuts['VR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*(1.-btagWeight_1tag)'
-        cuts['VR1_Veto_sf']  = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
+        cuts['VR1_Veto_em']   = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*(1.-btagWeight_1tag)'
+        cuts['VR1_Veto_0jet'] = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
 
 if 'StopSignalRegions' in opt.tag:
     
