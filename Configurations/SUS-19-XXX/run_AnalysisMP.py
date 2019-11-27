@@ -29,6 +29,15 @@ if __name__ == '__main__':
     else:
         yearset=sys.argv[1]
 
+    if   sys.argv[2]== '0':
+        tag='Preselection'
+    elif sys.argv[2]== '1':
+        tag='ValidationRegions'
+    elif sys.argv[2]=='2':
+        tag='StopSignalRegions'
+    else:
+        tag=sys.argv[2]
+
     tag=sys.argv[2]
 
     sigset=sys.argv[3]
