@@ -144,6 +144,19 @@ for sample in samples.keys():
     if sample!='DATA':
         nuisances['pileup']['samples'][sample] = [ 'puWeightUp/puWeight', 'puWeightDown/puWeight' ] 
 
+# ECAL prefiring
+"""
+if '2016' in opt.tag or '2017' in opt.tag: 
+    nuisances['prefiring']  = {
+        'name'  : 'prefiring'+year, 
+        'samples'  : { },
+        'kind'  : 'weight',
+        'type'  : 'shape',
+    }
+    for sample in samples.keys():
+        if sample!='DATA':
+            nuisances['pileup']['samples'][sample] = [ 'PrefireWeight_Up/PrefireWeight', 'PrefireWeight_Down/PrefireWeight' ] 
+"""
 # nonprompt lepton rate
 
 nuisances['nonpromptLep']  = {
