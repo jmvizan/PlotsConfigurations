@@ -20,30 +20,37 @@ def fillEmptyBins(sigset, histo):
             for xb in range(1, histo.GetNbinsX()+1):
                 #massX = histo.GetXaxis().GetBinLowEdge(xb)
                 massX = histo.GetXaxis().GetBinCenter(xb)
-                for yb in range(1, histo.GetNbinsY()+1):
+                for yb in range(2, histo.GetNbinsY()+1):
                     massY = histo.GetYaxis().GetBinCenter(yb);
-                    if massX-massY>80.:
-                        if histo.GetBinContent(xb, yb)==0.:
+                    if histo.GetBinContent(xb, yb)==0.:
+                         
+                        if massX-massY>80. and massX-massY<=300.:
 
-                            if iter==0 and histo.GetBinContent(xb, yb+1)>0.:
-                                if histo.GetYaxis().GetBinLowEdge(yb)<=0.:
-                                    histo.SetBinContent(xb, yb, histo.GetBinContent(xb, yb+1))
-                                elif histo.GetBinContent(xb, yb-1)>0.:
-                                    binContent = (histo.GetBinContent(xb, yb+1)+histo.GetBinContent(xb, yb-1))/2.
+                            if iter==0 and massX%25==0:
+                                binContent = (histo.GetBinContent(xb, yb+1)+histo.GetBinContent(xb, yb-1))/2.
+                                histo.SetBinContent(xb, yb, round(binContent, 2))
+                        
+                        elif massX-massY>300.:
+
+                            if iter<=1 and massX%50==0:
+
+                                if iter==0 and massY%50==25:
+                                    binContent = (histo.GetBinContent(xb, yb-2)+histo.GetBinContent(xb, yb+2))/2.
                                     histo.SetBinContent(xb, yb, round(binContent, 2))
 
-                            if iter==1 and histo.GetBinContent(xb+1, yb)>0 and histo.GetBinContent(xb-1, yb)>0.:
-                                binContent = (histo.GetBinContent(xb+1, yb)+histo.GetBinContent(xb-1, yb))/2.
-                                histo.SetBinContent(xb, yb, round(binContent, 2))
-
-                            if iter==2 and massX-massY<90. and histo.GetBinContent(xb+1, yb+1)>0. and histo.GetBinContent(xb-1, yb-1)>0.:
-                                binContent = (histo.GetBinContent(xb+1, yb+1)+histo.GetBinContent(xb-1, yb-1))/2.
-                                histo.SetBinContent(xb, yb, round(binContent, 2))
-
-                            if iter==3 and massX-massY==175. and histo.GetBinContent(xb+1, yb+1)>0. and histo.GetBinContent(xb-1, yb-1)>0.:
-                                binContent = (histo.GetBinContent(xb+1, yb+1)+histo.GetBinContent(xb-1, yb-1))/2.
-                                histo.SetBinContent(xb, yb, round(binContent, 2))
+                                elif iter==1 and massY%25!=0:
+                                    binContent = (histo.GetBinContent(xb, yb-1)+histo.GetBinContent(xb, yb+1))/2.
+                                    histo.SetBinContent(xb, yb, round(binContent, 2))
                                 
+                            elif iter==2 and massX%50==25:
+                                binContent = (histo.GetBinContent(xb+2, yb+2)+histo.GetBinContent(xb-2, yb-2))/2.
+                                histo.SetBinContent(xb, yb, round(binContent, 2))
+
+
+                        if iter==3 and massX%25!=0:
+                            binContent = (histo.GetBinContent(xb+1, yb+1)+histo.GetBinContent(xb-1, yb-1))/2.
+                            histo.SetBinContent(xb, yb, round(binContent, 2))
+
     else:
         print 'Warning: strategy for filling empty bins not available for model', model
 
