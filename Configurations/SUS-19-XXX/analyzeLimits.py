@@ -346,117 +346,49 @@ def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMake
         if reMakeHistos or not fileExist(outputFileName):
             fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName)
 
-def getMassScanContour(histo):
+def getMassScanContour(outputFileName, histo):
+    
+    histo.Smooth(1, "k3a");
 
     x, y, z = array( 'd' ), array( 'd' ), array( 'd' )
 
-    tt = 0
+    nPoints = 0
     for xb in range(1, histo.GetNbinsX()+1):
         massX = histo.GetXaxis().GetBinCenter(xb)
-        for yb in range(2, histo.GetNbinsY()+1):
+        for yb in range(1, histo.GetNbinsY()+1):
             massY = histo.GetYaxis().GetBinCenter(yb)
 
             x.append(massX)
             y.append(massY)
-            if histo.GetBinContent(xb, yb)==0:
+            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.):
                 z.append(3.)
             else: 
                 z.append(histo.GetBinContent(xb, yb))
+                
+            nPoints += 1
 
-            tt += 1
-    print 'ww'
-    graph = ROOT.TGraph2D(tt, x, y, z)
+    graph = ROOT.TGraph2D(nPoints, x, y, z)
 
-    graph.SetNpx(15)
-    graph.SetNpy(10)
+    graph.SetNpx(histo.GetNbinsX())
+    graph.SetNpy(histo.GetNbinsY()-1)
     graph.GetHistogram()
 
-    list = graph.GetContourList(1.);
-    ww = list.GetSize()
-    print ww
+    #graph.SetName(histo.GetName().replace('histo' , 'graph'))
+    #return graph
 
-    """ 
-      TIter liter_obs(list_obs);
-      max_points = 24;
-      for(int i = 0; i < list_obs->GetSize(); ++i){
-	TGraph *g = static_cast<TGraph*>(list_obs->At(i));
-	if(g == nullptr) continue;
-	int n_points = g->GetN();
-	cout<<"Obs:      Contour with "<<n_points<<" points "<<endl;
-	//for (int pp = 0; pp<n_points; pp++){
-	// double X,Y; g->GetPoint(pp, X, Y); 
-	// cout << pp << " " << X << " "<< Y<<endl;
-	//}
-	if(n_points > max_points && n_points >= min_points){
-	  //graph = g;
-	  g->SetName("gr_Obs");
-	  g->Write();
-	  max_points = n_points;
-	}
-      }
-    } else {
-      cout<<"Obs: no contour" << endl;
-      TGraph *g = new TGraph();
-      g->SetName("gr_Obs");
-      g->Write();
-    """
-    """
-    U1[0] = U1[1] = U1[2] = 0;
-    vector<double> tx, ty, tz, tzup, tzdo;
-    for(int binx=1; binx<=hR_obs->GetNbinsX(); ++binx){
-      double x = hR_obs->GetXaxis()->GetBinCenter(binx);
-      for(int biny=1; biny<=hR_obs->GetNbinsY(); ++biny){
-	double y = hR_obs->GetYaxis()->GetBinCenter(biny);
-	tx.push_back(x);
-	ty.push_back(y);
-	double z = hR_obs->GetBinContent(hR_obs->GetBin(binx,biny));
-	if (z==0.) z = 2.;
-	tz.push_back(z);
-	if (z<1.) U1[0]++;
-	z = hR_obs_up->GetBinContent(hR_obs_up->GetBin(binx,biny));
-	if (z==0.) z = 2.;
-	tzup.push_back(z);
-	if (z<1.) U1[1]++;
-	z = hR_obs_do->GetBinContent(hR_obs_do->GetBin(binx,biny));
-	if (z==0.) z = 2.;
-	tzdo.push_back(z);
-	if (z<1.) U1[2]++;
-      }
-    }
-    
-    TGraph2D gsmooth_obs("gsmooth_obs", "", tx.size(), &tx.at(0), &ty.at(0), &tz.at(0));
-    gsmooth_obs.SetNpx(15);
-    gsmooth_obs.SetNpy(10);
-    gsmooth_obs.GetHistogram();
-    if (U1[0]>0) { cout << U1[0]<<endl;
-      TList *list_obs = gsmooth_obs.GetContourList(1.); 
-      TIter liter_obs(list_obs);
-      max_points = 24;
-      for(int i = 0; i < list_obs->GetSize(); ++i){
-	TGraph *g = static_cast<TGraph*>(list_obs->At(i));
-	if(g == nullptr) continue;
-	int n_points = g->GetN();
-	cout<<"Obs:      Contour with "<<n_points<<" points "<<endl;
-	//for (int pp = 0; pp<n_points; pp++){
-	// double X,Y; g->GetPoint(pp, X, Y); 
-	// cout << pp << " " << X << " "<< Y<<endl;
-	//}
-	if(n_points > max_points && n_points >= min_points){
-	  //graph = g;
-	  g->SetName("gr_Obs");
-	  g->Write();
-	  max_points = n_points;
-	}
-      }
-    } else {
-      cout<<"Obs: no contour" << endl;
-      TGraph *g = new TGraph();
-      g->SetName("gr_Obs");
-      g->Write();
-    }
-    """
-    
-    return histo
+    outputContours = [ ] 
+ 
+    contourList = graph.GetContourList(1.);
+
+    minPoints, maxPoints = 20, -1	
+    for ic in range(contourList.GetSize()):
+        contour = contourList.At(ic)
+        if contour.GetN()>=minPoints and contour.GetN()>maxPoints:
+            contour.SetName(histo.GetName().replace('histo' , 'graph'))
+            outputContours.append(contour)
+            maxPoints =  contour.GetN() 
+
+    return outputContours		
 
 def getMassScanContours(outputFileName):
 
@@ -468,7 +400,7 @@ def getMassScanContours(outputFileName):
 
     inputFile = ROOT.TFile(inputFileName, 'READ')
 
-    inputHistos, outputHistos = [ ], [ ] 
+    inputHistos = [ ] 
 
     for key in inputFile.GetListOfKeys():
         histo = key.ReadObj()
@@ -476,25 +408,25 @@ def getMassScanContours(outputFileName):
             histo.SetDirectory(0)
             if '_r_' in histo.GetName():
                 inputHistos.append(histo)
-            elif '_X_' in histo.GetName():
-                outputHistos.append(histo)
 
     inputFile.Close()
 
-    outputContours = [ ] 
+    outputContours = [ ]
+ 
     for histo in inputHistos:
-        outputContours.append(getMassScanContour(histo))
+        #outputContours.append(getMassScanContour(outputFileName, histo))
+        outputContours.extend(getMassScanContour(outputFileName, histo))
 
     outputFile = ROOT.TFile(outputFileName, 'recreate')
 
-    for histo in outputHistos:
-        histo.Write()
-        if 'Observed' not in outputFileName:
-            histo.Write(histo.GetName().replace('blind', 'observed').replace('expected', 'observed'))
-
     for contour in outputContours:
         contour.Write()
-    
+        if 'Observed' not in outputFileName:
+            x, y = array( 'd' ), array( 'd' )
+            x.append(1.); y.append(1.)
+            emptyContour = ROOT.TGraph(1, x, y) 
+            emptyContour.Write(contour.GetName().replace('blind', 'observed').replace('expected', 'observed'))
+        
     outputFile.Close()
                 
 def makeMassScanContours(year, tag, sigset, limitOption, reMakeContours):
@@ -593,6 +525,43 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
 
     plotCanvas.Close()
 
+def makeExclusionPlot(year, tag, sigset, limitOptions):
+
+    inputFileNames = [ getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption),
+                       getFileName('./Limits/' + year + '/Contours',   'massScan_' + tag + '_' + sigset + '_' + limitOption) ]
+
+    for inputfilename in inputFileNames:
+        if not fileExist(inputfilename):
+            print 'makeExclusionPlot: input file', inputfilename, 'not found, exiting' 
+            exit() 
+
+    cfgFileName = sigset + '_' + tag + '_' + limitOptions[1]
+    cfgFile = open('Limits/' + year + '/' + cfgFileName + '.cfg', 'w')
+
+    limitType = 'blind' if (limitOption=='Blind') else 'expected' 
+    inputFileName = 'Limits/' + year + '//massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
+   
+    lumi = 0.
+    if '2016' in year:
+        lumi += 35.92
+    elif '2017' in year:
+        lumi += 41.53
+    elif '2018' in year:
+        lumi += 59.74
+
+    cfgFile.write('HISTOGRAM ' + inputFileName.replace('//', '/Histograms/') + ' histo_X_' + limitOptions[1].lower() + '\n')
+    cfgFile.write('EXPECTED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up graph_r_'+limitType+'_down kRed kOrange\n')
+    cfgFile.write('OBSERVED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_observed graph_r_observed_up graph_r_observed_down kBlack kGray\n')
+    cfgFile.write('PRELIMINARY\n')
+    cfgFile.write('LUMI ' + str(round(lumi, 1)) + '\n')
+    cfgFile.write('ENERGY 13\n\n')
+
+    cfgFile.close()
+
+    os.system('mkdir -p Plots/' + year + '/Limits')
+    os.system('python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + cfgFileName + '.cfg Plots/' + year + '/Limits/' + cfgFileName) 
+    os.system('rm Limits/' + year + '/' + cfgFileName + '.cfg')
+
 if __name__ == '__main__':
 
     # Input parameters
@@ -609,8 +578,8 @@ if __name__ == '__main__':
     parser.add_option('--nofillempties' , dest='noFillEmpties' , help='Do not fill empty bins'                      , default=False, action='store_true')
     parser.add_option('--makecontours'  , dest='makeContours'  , help='Make limit contours'                         , default=False, action='store_true')
     parser.add_option('--remakecontours', dest='reMakeContours', help='Remake limit contours'                       , default=False, action='store_true')
-    parser.add_option('--plotoption'    , dest='plotOption'    , help='No plot (-1), Histograms (0), Contours (1)'  , default='-1')
     parser.add_option('--compareto'     , dest='compareTo'     , help='Reference tag used for comparison'           , default='')
+    parser.add_option('--plotoption'    , dest='plotOption'    , help='-1 None, 0 Histograms, 1 Contours, 2 Final'  , default='-1')
     (opt, args) = parser.parse_args()
 
     if opt.years=='-1' or opt.years=='all' or opt.years=='All':
@@ -645,6 +614,8 @@ if __name__ == '__main__':
         plotOption = 'Histograms'
     elif opt.plotOption=='1':
         plotOption = 'Contours'
+    elif opt.plotOption=='2':
+        plotOption = 'Final'
     else:
         plotOption = opt.plotOption
     
@@ -659,6 +630,9 @@ if __name__ == '__main__':
 
     if plotOption=='Histograms' or plotOption=='Contours': 
         plotLimits(year, [ opt.tag, opt.compareTo ], opt.sigset, limitOptions, plotOption, fillEmpties) 
+
+    if plotOption=='Final':
+        makeExclusionPlot(year, opt.tag, opt.sigset, limitOptions)
 
 """
 #include "TCanvas.h"
