@@ -558,8 +558,11 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
 
     cfgFile.close()
 
-    os.system('mkdir -p Plots/' + year + '/Limits')
-    os.system('python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + cfgFileName + '.cfg Plots/' + year + '/Limits/' + cfgFileName) 
+    outputDirectory = 'Plots/' + year + '/ExclusionPlots/'
+    os.system('mkdir -p ' + outputDirectory)
+    os.system('cp Plots/index.php ' + outputDirectory)
+    workingDirectory = 'cd ../../../../../CMSSW_8_1_0/src; eval `scramv1 runtime -sh`; cd - ;'
+    os.system(workingDirectory + 'python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + cfgFileName + '.cfg ' + outputDirectory + cfgFileName) 
     os.system('rm Limits/' + year + '/' + cfgFileName + '.cfg')
 
 if __name__ == '__main__':
