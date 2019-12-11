@@ -84,10 +84,6 @@ EleWeightFS    = EleWeight.replace('IdIsoSF', 'FastSimSF')
 MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
 LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
 
-SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight 
-SFweight       = SFweightCommon + '*' + METFilters_MC
-SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
-
 # nonprompt lepton rate
 
 #nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.50', 'rateDown' : '0.50' } 
@@ -96,8 +92,14 @@ promptLeptons = 'Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]'
 nonpromptLepSF      = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rate']      + ')'
 nonpromptLepSF_Up   = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateUp']    + ')'
 nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateDown']  + ')'
-SFweight   += '*' + nonpromptLepSF
-SFweightFS += '*' + nonpromptLepSF
+
+# global SF weights 
+
+SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight + '*' + nonpromptLepSF
+if '2016' in opt.tag or '2017' in opt.tag: 
+    SFweightCommon += '*PrefireWeight'
+SFweight       = SFweightCommon + '*' + METFilters_MC
+SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
 
 ### Special weights
 

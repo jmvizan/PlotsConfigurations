@@ -2,8 +2,10 @@
 import os
 import sys
 import ROOT
+import math
 import optparse
 from array import *
+from LatinoAnalysis.NanoGardener.framework.samples.susyCrossSections import SUSYCrossSections
 
 def fileExist(fileName):
     return os.path.isfile(fileName)
@@ -12,49 +14,200 @@ def getFileName(outputDirectory, outputFileName, extension='.root'):
     os.system('mkdir -p ' + outputDirectory)
     return outputDirectory + '/' + outputFileName + extension
 
+def roundBin(bincontent):
+
+    if bincontent<1.:
+        return round(bincontent, 2)
+    elif bincontent<10.:
+        return round(bincontent, 1)
+    else:
+        return round(bincontent, 0)
+
+def takeBinsAverage(histo, xb, yb, stepX, stepY, checkEmpties):
+
+    if checkEmpties:
+        if histo.GetBinContent(xb+stepX, yb+stepY)==0. or histo.GetBinContent(xb-stepX, yb-stepY)==0.:
+            return 0.
+
+    return roundBin((histo.GetBinContent(xb+stepX, yb+stepY)+histo.GetBinContent(xb-stepX, yb-stepY))/2.)
+
+def scaleByNeighbour(histo, xb, yb, stepH, stepV, stepD):
+
+    xbD = xb+stepD
+    ybD = yb+stepD
+    xbN = xb+stepH
+    ybN = yb+stepV
+    xbND = xbN+stepD
+    ybND = ybN+stepD
+
+    if histo.GetBinContent(xbD, ybD)==0.: return 0.
+    if histo.GetBinContent(xbN, ybN)==0.: return 0.
+    if histo.GetBinContent(xbND, ybND)==0.: return 0.
+
+    scaledContent = histo.GetBinContent(xbD, ybD)*histo.GetBinContent(xbN, ybN)/histo.GetBinContent(xbND, ybND)
+    return roundBin(scaledContent)
+
 def fillEmptyBins(sigset, histo):
 
     if 'T2tt' in sigset:
 
-        for iter in range(4):
-            for xb in range(1, histo.GetNbinsX()+1):
-                #massX = histo.GetXaxis().GetBinLowEdge(xb)
+        # First deal with missing fits ...
+        for Bin in range(histo.GetNbinsX()+histo.GetNbinsY(), 1, -1):
+            if Bin-histo.GetNbinsX()>=1:
+                xb, yb = 1, Bin-histo.GetNbinsX() 
+            else:
+                xb, yb = histo.GetNbinsX()-Bin+2, 1
+            while xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
                 massX = histo.GetXaxis().GetBinCenter(xb)
-                for yb in range(1, histo.GetNbinsY()+1):
-                    massY = histo.GetYaxis().GetBinCenter(yb);
-                    if massX-massY>80.:
-                        if histo.GetBinContent(xb, yb)==0.:
+                massY = histo.GetYaxis().GetBinCenter(yb)
+                if massX-massY>80.:
 
-                            if iter==0 and histo.GetBinContent(xb, yb+1)>0.:
-                                if histo.GetYaxis().GetBinLowEdge(yb)<=0.:
-                                    histo.SetBinContent(xb, yb, histo.GetBinContent(xb, yb+1))
-                                elif histo.GetBinContent(xb, yb-1)>0.:
-                                    binContent = (histo.GetBinContent(xb, yb+1)+histo.GetBinContent(xb, yb-1))/2.
-                                    histo.SetBinContent(xb, yb, round(binContent, 2))
+                    massXStep = 25 if (massX-massY<=300.) else 50
+                    massYStep = massXStep if (massX-massY>=100.) else 12.5
+                    binStep = int(massXStep/12.5)
+                    
+                    if massX%massXStep==0 and massY%massYStep==0:
+                        
+                        if histo.GetBinContent(xb, yb)==0:
 
-                            if iter==1 and histo.GetBinContent(xb+1, yb)>0 and histo.GetBinContent(xb-1, yb)>0.:
-                                binContent = (histo.GetBinContent(xb+1, yb)+histo.GetBinContent(xb-1, yb))/2.
-                                histo.SetBinContent(xb, yb, round(binContent, 2))
+                            if xb<=binStep and massX-massY<90.:
 
-                            if iter==2 and massX-massY<90. and histo.GetBinContent(xb+1, yb+1)>0. and histo.GetBinContent(xb-1, yb-1)>0.:
-                                binContent = (histo.GetBinContent(xb+1, yb+1)+histo.GetBinContent(xb-1, yb-1))/2.
-                                histo.SetBinContent(xb, yb, round(binContent, 2))
+                                print 'fillEmptyBins: T2tt singularity to be studied at mS-',massX, 'mX-',massY
+                                while histo.GetBinContent(xb, yb)==0. and xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
+                                    xb += binStep; yb += binStep
 
-                            if iter==3 and massX-massY==175. and histo.GetBinContent(xb+1, yb+1)>0. and histo.GetBinContent(xb-1, yb-1)>0.:
-                                binContent = (histo.GetBinContent(xb+1, yb+1)+histo.GetBinContent(xb-1, yb-1))/2.
-                                histo.SetBinContent(xb, yb, round(binContent, 2))
+                            else:
+
+                                holeLenght = 1
+                                xbi, ybi, xbf, ybf = xb-binStep, yb-binStep, xb, yb
+                                while histo.GetBinContent(xbf, ybf)==0. and xbf<=histo.GetNbinsX() and ybf<=histo.GetNbinsY():
+                                    holeLenght += 1
+                                    xbf += binStep; ybf += binStep
+
+                                if xb>binStep and yb>binStep:
                                 
+                                    xbi, ybi  = xb-binStep, yb-binStep
+                                    if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
+                                        print 'fillEmptyBins: T2tt singularity to be better studied at mS-',massX, 'mX-',massY
+                                        xbf, ybf = xbi, ybi 
+
+                                    stepLimit = (histo.GetBinContent(xbf, ybf) - histo.GetBinContent(xbi, ybi))/holeLenght
+                                    for holeStep in range(1, holeLenght):
+                                        histo.SetBinContent(xb, yb, roundBin(histo.GetBinContent(xbi, ybi)+holeStep*stepLimit))
+                                        xb += binStep; yb += binStep
+
+                                else:
+
+                                    if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
+                                        print 'fillEmptyBins: T2tt singularity to be studied at mS-',massX, 'mX-',massY
+                                            
+                                    else:
+                                            
+                                        for holeStep in range(1, holeLenght):
+                                            xbc, ybc = xbf - holeStep*binStep, ybf - holeStep*binStep
+                                            histo.SetBinContent(xbc, ybc, roundBin(scaleByNeighbour(histo, xbc, ybc, 0, binStep, binStep)))
+
+                                    xb = xbf; yb = ybf
+                                                
+                        else:
+                            xb += binStep; yb += binStep
+
+                    else:
+                        xb += 1; yb += 1
+
+                else:
+                    xb += 1; yb += 1
+
+        # ... then fill grid holes 
+        for iter in range(6):
+            for xb in range(1, histo.GetNbinsX()+1):
+                massX = histo.GetXaxis().GetBinCenter(xb)
+                for yb in range(2, histo.GetNbinsY()+1):
+                    massY = histo.GetYaxis().GetBinCenter(yb);
+                    if massX-massY>80. and histo.GetBinContent(xb, yb)==0.:
+                        
+                        if massX%25==0:
+ 
+                            if massX-massY<=300.:
+                                
+                                if iter==1: 
+                                    histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 1, True))
+                        
+                            elif massX-massY>300.:
+
+                                if massX%50==0:
+
+                                    if iter==0 and massY%50==25:
+                                        histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 2, True))
+
+                                    elif iter==1 and massY%25!=0:
+                                        histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 1, True))
+                                        
+                                elif massX%50==25:
+
+                                    if iter==2:
+                                        histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 2, 2, True))
+
+                                    elif iter==3:
+                                        histo.SetBinContent(xb, yb, scaleByNeighbour(histo, xb, yb, 0, 3, 2))
+                                        
+                        elif massX%25!=0: 
+                            
+                            if iter==4:
+                                histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 1, 1, True))
+                            
+                            if iter==5:
+                                histo.SetBinContent(xb, yb, scaleByNeighbour(histo, xb, yb, 0, 3, 1))
+
     else:
         print 'Warning: strategy for filling empty bins not available for model', model
+
+def getCrossSectionUncertainty(susyProcess, isusyMass):
+        
+    xsUnc = SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['uncertainty']
+    if '%' not in xsUnc: 
+        return float(xsUnc)
+    else:
+        xsUnc = xsUnc.replace('%', '')
+        return float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['value'])*float(xsUnc)/100.
+
+def getCrossSection(susyProcess, susyMass):
+
+    isusyMass = int(susyMass)
+
+    if str(isusyMass) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
+        
+        return [float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['value']),
+                getCrossSectionUncertainty(susyProcess, isusyMass)]
+        
+    elif isusyMass%5!=0 :
+        
+        isusyMass1 = 5*(isusyMass/5)
+        isusyMass2 = 5*(isusyMass/5+1)
+                    
+        if str(isusyMass1) in SUSYCrossSections[susyProcess]['massPoints'].keys() and str(isusyMass2) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
+
+            susyXsec1 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass1)]['value'])
+            susyXsec2 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass2)]['value'])
+            
+            slope = -math.log(susyXsec2/susyXsec1)/(isusyMass2-isusyMass1)
+            susyXsec = susyXsec1*math.exp(-slope*(isusyMass-isusyMass1))
+
+            susyXsecRelUnc = (getCrossSectionUncertainty(susyProcess, isusyMass1)/susyXsec1 + 
+                              getCrossSectionUncertainty(susyProcess, isusyMass2)/susyXsec2)/2.
+                
+            return [susyXsec, susyXsec*susyXsecRelUnc]
+
+    print 'getCrossSection ERROR: cross section not available for', susyProcess, 'at mass =', susyMass, ', exiting'
+    exit()
 
 maxMassY = -1.
 
 def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName):
     
     # Get mass points and mass limits
-    modelHistogramSettings = { 'T2tt' : { #'X' : { 'binWidth' : 12.5, 'minCenter' : 1.0,  'maxCenter' :  1.0, 'label' : 'M_{#tilde t_{1}} [GeV]'        },
-                                          'X' : { 'binWidth' : 12.5, 'minCenter' : 0.5,  'maxCenter' :  0.5, 'label' : 'M_{#tilde t_{1}} [GeV]'        },
-                                          'Y' : { 'binWidth' : 12.5, 'minCenter' : 1.5,  'maxCenter' : 16.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]' } },
+    modelHistogramSettings = { 'T2tt' : { 'X' : { 'binWidth' : 12.5, 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde t_{1}} [GeV]'        },
+                                          'Y' : { 'binWidth' : 12.5, 'minCenter' : 1.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]' } },
                                # ...
     }
     
@@ -68,8 +221,11 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
         if model in sigset:
             if model in modelHistogramSettings.keys():
                 histogramSettings = modelHistogramSettings[model]
+                for process in SUSYCrossSections:
+                    if model in SUSYCrossSections[process]['susyModels']:
+                        susyProcess = process
             else:
-                print 'Error: histogram setting for model', model, 'not available'
+                print 'Error: histogram setting for model', model, 'not available, exiting'
                 exit()
             
             for massPoint in sorted(signalMassPoints[model]):
@@ -97,21 +253,22 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 
                         for event in inputTree :
 
-                            if inputTree.quantileExpected==-1.:
-                                massPointLimits['histo_r_observed'] = round(inputTree.limit, 2)
+                            if inputTree.quantileExpected==-1. and limitOption=='Observed':
+                                massPointLimits['histo_r_observed'] = roundBin(inputTree.limit)
                             elif inputTree.quantileExpected==0.5:
-                                massPointLimits['histo_r_'+limitType] = round(inputTree.limit, 2)
+                                massPointLimits['histo_r_'+limitType] = roundBin(inputTree.limit)
                             elif round(inputTree.quantileExpected, 2)==0.84:
-                                massPointLimits['histo_r_'+limitType+'_up'] = round(inputTree.limit, 2)
+                                massPointLimits['histo_r_'+limitType+'_up'] = roundBin(inputTree.limit)
                             elif round(inputTree.quantileExpected, 2)==0.16:
-                                massPointLimits['histo_r_'+limitType+'_down'] = round(inputTree.limit, 2)
+                                massPointLimits['histo_r_'+limitType+'_down'] = roundBin(inputTree.limit)
 
                         massPoints[massPoint]['limits'] = massPointLimits
                     
                     inputFile.Close()
 
     global maxMassY
-    maxMassY = massLimits['Y']['max']
+    maxMassY = massLimits['Y']['max']+20
+    massLimits['Y']['max'] *= 4./3.
 
     # Create and fill histograms
     histoMin, histoMax, histoBin = { }, { }, { } 
@@ -130,21 +287,51 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 
             if limit not in massScanHistos:
 
-                massScanHistos[limit] = ROOT.TH2F(limit, 'limit', histoBin['X'], histoMin['X'], histoMax['X'], 
-                                                                  histoBin['Y'], histoMin['Y'], histoMax['Y'])
+                massScanHistos[limit] = ROOT.TH2F(limit, '', histoBin['X'], histoMin['X'], histoMax['X'], 
+                                                             histoBin['Y'], histoMin['Y'], histoMax['Y'])
                 massScanHistos[limit].SetXTitle(histogramSettings['X']['label'])
                 massScanHistos[limit].SetYTitle(histogramSettings['Y']['label'])
 
             massPointBin = massScanHistos[limit].FindBin(massPoints[massPoint]['massX'], massPoints[massPoint]['massY'])
             massScanHistos[limit].SetBinContent(massPointBin, massPoints[massPoint]['limits'][limit])
+
+    crossSectionHistos = { } 
+
+    for xSection in ['histo_X_'+limitType, 'histo_X_observed', 'histo_r_observed_up', 'histo_r_observed_down']:
+        if limitOption=='Observed' or limitType in xSection:
+
+            crossSectionHistos[xSection] = ROOT.TH2F(xSection, '', histoBin['X'], histoMin['X'], histoMax['X'], 
+                                                                   histoBin['Y'], histoMin['Y'], histoMax['Y'])
+
+            for xb in range(1, crossSectionHistos[xSection].GetNbinsX()+1):
+
+                massX = crossSectionHistos[xSection].GetXaxis().GetBinCenter(xb)
+                massPointCrossSection, massPointCrossSectionUncertainty = getCrossSection(susyProcess, massX)
+
+                if '_up' in xSection:
+                    massPointCrossSection /= massPointCrossSection + massPointCrossSectionUncertainty
+                elif '_down' in xSection:
+                    massPointCrossSection /= massPointCrossSection - massPointCrossSectionUncertainty
+
+                for yb in range(1, crossSectionHistos[xSection].GetNbinsY()+1):
+                    massY = crossSectionHistos[xSection].GetYaxis().GetBinCenter(yb);
+                    if massY>=0. and massX-massY>0.:
+                        crossSectionHistos[xSection].SetBinContent(xb, yb, massPointCrossSection)
     
     # Save histogram file 
     outputFile = ROOT.TFile(outputFileName, 'recreate')
 
     for histo in massScanHistos:
+
         if fillemptybins:
             fillEmptyBins(sigset, massScanHistos[histo]) 
+
         massScanHistos[histo].Write()
+        
+    for histo in crossSectionHistos:
+
+        crossSectionHistos[histo].Multiply(massScanHistos[histo.replace('_X_', '_r_').replace('_up', '').replace('_down', '')])
+        crossSectionHistos[histo].Write()
 
     outputFile.Close()
 
@@ -158,6 +345,97 @@ def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMake
             
         if reMakeHistos or not fileExist(outputFileName):
             fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName)
+
+def getMassScanContour(outputFileName, histo):
+    
+    histo.Smooth(1, "k3a");
+
+    x, y, z = array( 'd' ), array( 'd' ), array( 'd' )
+
+    nPoints = 0
+    for xb in range(1, histo.GetNbinsX()+1):
+        massX = histo.GetXaxis().GetBinCenter(xb)
+        for yb in range(1, histo.GetNbinsY()+1):
+            massY = histo.GetYaxis().GetBinCenter(yb)
+
+            x.append(massX)
+            y.append(massY)
+            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.):
+                z.append(3.)
+            else: 
+                z.append(histo.GetBinContent(xb, yb))
+                
+            nPoints += 1
+
+    graph = ROOT.TGraph2D(nPoints, x, y, z)
+
+    graph.SetNpx(histo.GetNbinsX())
+    graph.SetNpy(histo.GetNbinsY()-1)
+    graph.GetHistogram()
+
+    #graph.SetName(histo.GetName().replace('histo' , 'graph'))
+    #return graph
+
+    outputContours = [ ] 
+ 
+    contourList = graph.GetContourList(1.);
+
+    minPoints, maxPoints = 20, -1	
+    for ic in range(contourList.GetSize()):
+        contour = contourList.At(ic)
+        if contour.GetN()>=minPoints and contour.GetN()>maxPoints:
+            contour.SetName(histo.GetName().replace('histo' , 'graph'))
+            outputContours.append(contour)
+            maxPoints =  contour.GetN() 
+
+    return outputContours		
+
+def getMassScanContours(outputFileName):
+
+    inputFileName = outputFileName.replace('Contours', 'Histograms')
+
+    if not fileExist(inputFileName):
+        print 'getMassScanContours: input file', inputFileName, 'not found, exiting'
+        exit()
+
+    inputFile = ROOT.TFile(inputFileName, 'READ')
+
+    inputHistos = [ ] 
+
+    for key in inputFile.GetListOfKeys():
+        histo = key.ReadObj()
+        if histo.ClassName()=='TH2F':
+            histo.SetDirectory(0)
+            if '_r_' in histo.GetName():
+                inputHistos.append(histo)
+
+    inputFile.Close()
+
+    outputContours = [ ]
+ 
+    for histo in inputHistos:
+        #outputContours.append(getMassScanContour(outputFileName, histo))
+        outputContours.extend(getMassScanContour(outputFileName, histo))
+
+    outputFile = ROOT.TFile(outputFileName, 'recreate')
+
+    for contour in outputContours:
+        contour.Write()
+        if 'Observed' not in outputFileName:
+            x, y = array( 'd' ), array( 'd' )
+            x.append(1.); y.append(1.)
+            emptyContour = ROOT.TGraph(1, x, y) 
+            emptyContour.Write(contour.GetName().replace('blind', 'observed').replace('expected', 'observed'))
+        
+    outputFile.Close()
+                
+def makeMassScanContours(year, tag, sigset, limitOption, reMakeContours):
+    if tag!='':
+      
+        outputFileName = getFileName('./Limits/' + year + '/Contours', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
+
+        if reMakeContours or not fileExist(outputFileName):
+            getMassScanContours(outputFileName)
 
 def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
                  
@@ -228,7 +506,8 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
     tagObj[0].SetMinimum(0)
     tagObj[0].SetMaximum(3)
 
-    tagObj[0].GetYaxis().SetRange(1, tagObj[0].GetYaxis().FindBin(maxMassY)+1);
+    if maxMassY>0.:
+        tagObj[0].GetYaxis().SetRange(1, tagObj[0].GetYaxis().FindBin(maxMassY)+1);
 
     NRGBs = 5
     NCont = 255
@@ -246,22 +525,64 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
 
     plotCanvas.Close()
 
+def makeExclusionPlot(year, tag, sigset, limitOptions):
+
+    inputFileNames = [ getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption),
+                       getFileName('./Limits/' + year + '/Contours',   'massScan_' + tag + '_' + sigset + '_' + limitOption) ]
+
+    for inputfilename in inputFileNames:
+        if not fileExist(inputfilename):
+            print 'makeExclusionPlot: input file', inputfilename, 'not found, exiting' 
+            exit() 
+
+    cfgFileName = sigset + '_' + tag + '_' + limitOptions[1]
+    cfgFile = open('Limits/' + year + '/' + cfgFileName + '.cfg', 'w')
+
+    limitType = 'blind' if (limitOption=='Blind') else 'expected' 
+    inputFileName = 'Limits/' + year + '//massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
+   
+    lumi = 0.
+    if '2016' in year:
+        lumi += 35.92
+    elif '2017' in year:
+        lumi += 41.53
+    elif '2018' in year:
+        lumi += 59.74
+
+    cfgFile.write('HISTOGRAM ' + inputFileName.replace('//', '/Histograms/') + ' histo_X_' + limitOptions[1].lower() + '\n')
+    cfgFile.write('EXPECTED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up graph_r_'+limitType+'_down kRed kOrange\n')
+    cfgFile.write('OBSERVED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_observed graph_r_observed_up graph_r_observed_down kBlack kGray\n')
+    cfgFile.write('PRELIMINARY\n')
+    cfgFile.write('LUMI ' + str(round(lumi, 1)) + '\n')
+    cfgFile.write('ENERGY 13\n\n')
+
+    cfgFile.close()
+
+    outputDirectory = 'Plots/' + year + '/ExclusionPlots/'
+    os.system('mkdir -p ' + outputDirectory)
+    os.system('cp Plots/index.php ' + outputDirectory)
+    workingDirectory = 'cd ../../../../../CMSSW_8_1_0/src; eval `scramv1 runtime -sh`; cd - ;'
+    os.system(workingDirectory + 'python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + cfgFileName + '.cfg ' + outputDirectory + cfgFileName) 
+    os.system('rm Limits/' + year + '/' + cfgFileName + '.cfg')
+
 if __name__ == '__main__':
 
     # Input parameters
     usage = 'usage: %prog [options]'
     parser = optparse.OptionParser(usage)
     
-    parser.add_option('--years'        , dest='years'        , help='Year(s) to be processed'                     , default='all')
-    parser.add_option('--tag'          , dest='tag'          , help='Tag used for the tag file name'              , default='Test')
-    parser.add_option('--sigset'       , dest='sigset'       , help='Model and mass point range'                  , default='')
-    parser.add_option('--limitoption'  , dest='limitOption'  , help='Observed (0), Expected (1), Blind (2) limit' , default='Blind')
-    parser.add_option('--sigmp'        , dest='signalMPcfg'  , help='Signal mass point cfg file'                  , default='./signalMassPoints.py') 
-    parser.add_option('--nomakehistos' , dest='noMakeHistos' , help='Do not make the mass scan histograms'        , default=False, action='store_true')
-    parser.add_option('--remakehistos' , dest='reMakeHistos' , help='Redo the mass scan histograms'               , default=False, action='store_true')
-    parser.add_option('--nofillempties', dest='noFillEmpties', help='Do not fill empty bins'                      , default=False, action='store_true')
-    parser.add_option('--plotoption'   , dest='plotOption'   , help='No plot (-1), Histograms (0), Contours (1)'  , default='-1')
-    parser.add_option('--compareto'    , dest='compareTo'    , help='Reference tag used for comparison'           , default='')
+    parser.add_option('--years'         , dest='years'         , help='Year(s) to be processed'                     , default='all')
+    parser.add_option('--tag'           , dest='tag'           , help='Tag used for the tag file name'              , default='Test')
+    parser.add_option('--sigset'        , dest='sigset'        , help='Model and mass point range'                  , default='')
+    parser.add_option('--limitoption'   , dest='limitOption'   , help='Observed (0), Expected (1), Blind (2) limit' , default='Blind')
+    parser.add_option('--sigmp'         , dest='signalMPcfg'   , help='Signal mass point cfg file'                  , default='./signalMassPoints.py') 
+    parser.add_option('--nomakehistos'  , dest='noMakeHistos'  , help='Do not make the mass scan histograms'        , default=False, action='store_true')
+    parser.add_option('--remakehistos'  , dest='reMakeHistos'  , help='Redo the mass scan histograms'               , default=False, action='store_true')
+    parser.add_option('--nofillempties' , dest='noFillEmpties' , help='Do not fill empty bins'                      , default=False, action='store_true')
+    parser.add_option('--makecontours'  , dest='makeContours'  , help='Make limit contours'                         , default=False, action='store_true')
+    parser.add_option('--remakecontours', dest='reMakeContours', help='Remake limit contours'                       , default=False, action='store_true')
+    parser.add_option('--compareto'     , dest='compareTo'     , help='Reference tag used for comparison'           , default='')
+    parser.add_option('--plotoption'    , dest='plotOption'    , help='-1 None, 0 Histograms, 1 Contours, 2 Final'  , default='-1')
     (opt, args) = parser.parse_args()
 
     if opt.years=='-1' or opt.years=='all' or opt.years=='All':
@@ -296,6 +617,8 @@ if __name__ == '__main__':
         plotOption = 'Histograms'
     elif opt.plotOption=='1':
         plotOption = 'Contours'
+    elif opt.plotOption=='2':
+        plotOption = 'Final'
     else:
         plotOption = opt.plotOption
     
@@ -304,8 +627,15 @@ if __name__ == '__main__':
         makeMassScanHistograms(year, opt.tag,       opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
         makeMassScanHistograms(year, opt.compareTo, opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
 
+    if opt.makeContours or opt.reMakeContours:
+        makeMassScanContours(year, opt.tag,       opt.sigset, limitOptions[1], opt.reMakeContours)
+        makeMassScanContours(year, opt.compareTo, opt.sigset, limitOptions[1], opt.reMakeContours)
+
     if plotOption=='Histograms' or plotOption=='Contours': 
         plotLimits(year, [ opt.tag, opt.compareTo ], opt.sigset, limitOptions, plotOption, fillEmpties) 
+
+    if plotOption=='Final':
+        makeExclusionPlot(year, opt.tag, opt.sigset, limitOptions)
 
 """
 #include "TCanvas.h"
