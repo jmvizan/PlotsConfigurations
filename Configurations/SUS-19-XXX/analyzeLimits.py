@@ -439,11 +439,8 @@ def makeMassScanContours(year, tag, sigset, limitOption, reMakeContours):
 
 def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
                  
-    if plotOption!='Histograms':
-        if plotOption=='Contours':
-            print 'Error: option Contours for limit comparison not yet implemented'
-        else:
-            print 'Error: unkown option', plotOption, 'for limit comparison'
+    if plotOption!='Histograms' and plotOption!='Contours':
+        print 'plotLimits error: unkown option', plotOption, 'for limit comparison'
         exit()
 
     emptyBinsOption = ''			
@@ -466,12 +463,17 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
             
         tagFile = ROOT.TFile(tagFileName, 'READ')
 
-        if plotOption=='Histograms':
-            objectName = 'histo_r_'+limitOptions[0].lower()
-
-        obj = tagFile.Get(objectName)
-        obj.SetDirectory(0)
-        tagObj.append(obj)
+        for key in tagFile.GetListOfKeys():
+            obj = key.ReadObj()
+            if limitOptions[0].lower() in obj.GetName():
+                if obj.ClassName()=='TH2F':
+                    obj.SetDirectory(0)
+                    if '_up' not in obj.GetName() and '_down' not in obj.GetName():
+                        continue
+                else:
+                    if '_up' in obj.GetName() or '_down' in obj.GetName():
+                        obj.SetLineStyle(2)
+                tagObj.append(obj)
 
     # Draw comparison
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
@@ -479,14 +481,9 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
 
     plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 900, 600)
     
-    plotTitle = tags[0]
-    
+    plotTitle = tags[0] + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption + emptyBinsOption
     if tags[1]!='':
-        plotTitle += '_to_' + tags[1] 
-        if plotOption=='Histograms':
-            tagObj[0].Divide(tagObj[1])
-
-    plotTitle += '_' + sigset + '_' + limitOptions[0] + '_' + plotOption + emptyBinsOption
+        plotTitle.replace(tags[0], tags[0] + '_to_' + tags[1]) 
     tagObj[0].SetTitle(plotTitle)   
    
     tagObj[0].GetXaxis().SetLabelFont(42)
@@ -497,28 +494,46 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
     tagObj[0].GetYaxis().SetLabelFont(42)
     tagObj[0].GetYaxis().SetTitleFont(42)
     tagObj[0].GetYaxis().SetLabelSize(0.035)
-    tagObj[0].GetZaxis().SetTitleSize(0.035)
-    tagObj[0].GetZaxis().SetLabelFont(42)
-    tagObj[0].GetZaxis().SetTitleFont(42)
-    tagObj[0].GetZaxis().SetLabelSize(0.035)
-    tagObj[0].GetZaxis().SetTitleSize(0.035)
 
-    tagObj[0].SetMinimum(0)
-    tagObj[0].SetMaximum(3)
+    if plotOption=='Histograms':
 
-    if maxMassY>0.:
-        tagObj[0].GetYaxis().SetRange(1, tagObj[0].GetYaxis().FindBin(maxMassY)+1);
+        if tags[1]!='':
+            tagObj[0].Divide(tagObj[1])
 
-    NRGBs = 5
-    NCont = 255
-    stops = array("d",[0.00, 0.34, 0.61, 0.84, 1.00])
-    red = array("d",[0.50, 0.50, 1.00, 1.00, 1.00])
-    green = array("d",[ 0.50, 1.00, 1.00, 0.60, 0.50])
-    blue = array("d",[1.00, 1.00, 0.50, 0.40, 0.50])
-    ROOT.TColor.CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont)
-    ROOT.gStyle.SetNumberContours(NCont)
+        tagObj[0].GetZaxis().SetTitleSize(0.035)
+        tagObj[0].GetZaxis().SetLabelFont(42)
+        tagObj[0].GetZaxis().SetTitleFont(42)
+        tagObj[0].GetZaxis().SetLabelSize(0.035)
+        tagObj[0].GetZaxis().SetTitleSize(0.035)
 
-    tagObj[0].Draw('textcolz')
+        tagObj[0].SetMinimum(0)
+        tagObj[0].SetMaximum(3)
+
+        if maxMassY>0.:
+            tagObj[0].GetYaxis().SetRange(1, tagObj[0].GetYaxis().FindBin(maxMassY)+1);
+
+        NRGBs = 5
+        NCont = 255
+        stops = array("d",[0.00, 0.34, 0.61, 0.84, 1.00])
+        red = array("d",[0.50, 0.50, 1.00, 1.00, 1.00])
+        green = array("d",[ 0.50, 1.00, 1.00, 0.60, 0.50])
+        blue = array("d",[1.00, 1.00, 0.50, 0.40, 0.50])
+        ROOT.TColor.CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont)
+        ROOT.gStyle.SetNumberContours(NCont)
+
+        tagObj[0].Draw('textcolz')
+
+    else:
+
+        same = ''
+        for iobj in range(len(tagObj)):
+
+            if iobj>=3:
+                tagObj[iobj].SetLineColor(2)
+
+            tagObj[iobj].Draw(same)
+
+            same = 'same'
 
     outputFileName = getFileName('./Plots/' + year + '/Limits', plotTitle, '.png')
     plotCanvas.Print(outputFileName)
