@@ -46,6 +46,8 @@ if 'SameSign' in opt.tag :
     regionName = '__susyMT2SameSign'
 elif 'WZ' in opt.tag :
     regionName = '__susyMT2WZ'
+elif 'WZtoWW' in opt.tag :
+    regionName = '__susyMT2WZtoWW'
 elif 'ZZ' in opt.tag :
     regionName = '__susyMT2ZZ'
 
@@ -397,6 +399,17 @@ for model in signalMassPoints:
     if model in opt.sigset:
         for massPoint in signalMassPoints[model]:
             if massPointInSignalSet(massPoint, opt.sigset):
+
+                XSWeight       = 'baseW*genWeight'
+                if '2017' in opt.tag or '2018' in opt.tag : 
+                    if 'T2tt__mStop-400to1200' in signalMassPoints[model][massPoint]['massPointDataset'] :
+
+                        stopTerm = massPoint.split('_')[1]
+                        stopMass = int(stopTerm.replace('mS-', ''))
+                        if stopMass<735:
+                            XSWeight = '0.00192*genWeight'
+                        else:
+                            XSWeight = '1000.*Xsec*genWeight/30000.'
 
                 samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,'nanoLatino_'),
                                        'weight' : XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut'] ,
