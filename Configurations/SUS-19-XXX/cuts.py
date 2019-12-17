@@ -4,6 +4,7 @@
 
 massZ = '91.1876'
 vetoZ = 'fabs(mll-'+massZ+')>15.'
+Zcut  = 'fabs(mZ-'+massZ+')<ZCUT'
 
 LepId = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])==2'
 OC = LepId + ' && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
@@ -50,7 +51,6 @@ if 'Test' in opt.tag:
     cuts['TwoLep_em'] = OC+' && '+DF+' && ptmiss>=80'
     cuts['TwoLep_em_Tag'] = '(' + OC+' && '+DF+' && ptmiss>=80)*btagWeight_1tag'
     cuts['TwoLep_em_Veto'] = '(' + OC+' && '+DF+' && ptmiss>=80)*(1.-btagWeight_1tag)'
-
 
 if 'Preselection' in opt.tag:
 
@@ -120,6 +120,97 @@ if 'WWValidationRegion' in opt.tag:
     else:
         cuts['VR1_Veto_em']   = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*(1.-btagWeight_1tag)'
         cuts['VR1_Veto_0jet'] = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
+
+if 'SameSignValidationRegion' in opt.tag:
+
+    SS = LepId + ' && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]>0)'
+
+    if 'Data' in opt.sigset:
+        cuts['SS_ptmiss-100to140']  = SS+' && ptmiss>=100 && ptmiss<140 && '       +BTAG
+        cuts['SS_ptmiss-140']       = SS+' && ptmiss>=140 && '                     +BTAG
+        cuts['SS_ptmiss-140_plus']  = SS+' && ptmiss>=140 && Lepton_pdgId[0]<0 && '+BTAG
+        cuts['SS_ptmiss-140_minus'] = SS+' && ptmiss>=140 && Lepton_pdgId[0]>0 && '+BTAG
+
+    else:
+        cuts['SS_ptmiss-100to140']   = '('+SS+' && ptmiss>=100 && ptmiss<140)*(btagWeight_1tag)'
+        cuts['SS_ptmiss-140']        = '('+SS+' && ptmiss>=140)*(btagWeight_1tag)'
+        cuts['SS_ptmiss-140_plus']   = '('+SS+' && ptmiss>=140 && Lepton_pdgId[0]<0)*(btagWeight_1tag)'
+        cuts['SS_ptmiss-140_minus']  = '('+SS+' && ptmiss>=140 && Lepton_pdgId[0]>0)*(btagWeight_1tag)'
+
+if 'FakeValidationRegion' in opt.tag:
+
+    T0 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0])'
+    T1 = '(Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])'
+    T2 = '(Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])'
+    LepId2of3 = '('+T0+'+'+T1+'+'+T2+')==2'
+
+    C01 = '(Lepton_pdgId[0]*Lepton_pdgId[1])'
+    C02 = '(Lepton_pdgId[0]*Lepton_pdgId[2])'
+    C12 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
+    OCT = '('+C01+'*'+T0+'*'+T1+'+'C02+'*'+T0+'*'+T2+'+'C12+'*'+T1+'*'+T2+')<0'
+    
+    Fake = 'nLeptons==3 && ' + LepId2of3 + ' && ' + OCT + ' && Lepton_pt[2]>=20.'
+
+    if 'Data' in opt.sigset:
+        cuts['Fake_ptmiss-100to140']  = Fake+' && ptmiss>=100 && ptmiss<140 && '       +BTAG
+        cuts['Fake_ptmiss-140']       = Fake+' && ptmiss>=140 && '                     +BTAG
+
+    else:
+        cuts['Fake_ptmiss-100to140']   = '('+Fake+' && ptmiss>=100 && ptmiss<140)*(btagWeight_1tag)'
+        cuts['Fake_ptmiss-140']        = '('+Fake+' && ptmiss>=140)*(btagWeight_1tag)'
+
+if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
+
+    LepId3 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1]+Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])==3'
+    Zcut = 'fabs(mZ-'+massZ+')<ZCUT'
+
+    WZselection = 'nLepton==3 && Lepton_pt[2]>=20. && ' + LepId3 + ' && ' + Zcut + ' && ptmiss>=140'
+
+    if 'WZValidationRegion' in opt.tag:
+
+        if 'Data' in opt.sigset:
+            cuts['WZ_3Lep']  = WZselection.replace('ZCUT', '999.') + ' && ' + VETO
+            cuts['WZ_3LepZ'] = WZselection.replace('ZCUT',  '15.') + ' && ' + VETO
+
+        else:
+            cuts['WZ_3Lep']  = '(' + WZselection.replace('ZCUT', '999.') + ')*(1.-btagWeight_1tag)'
+            cuts['WZ_3LepZ'] = '(' + WZselection.replace('ZCUT',  '15.') + ')*(1.-btagWeight_1tag)'
+
+    elif 'WZtoWWValidationRegion' in opt.tag:
+
+        if 'Data' in opt.sigset:
+            cuts['WZtoWW'] = WZselection.replace('ZCUT', '10.') + ' && ' + VETO
+
+        else:
+            cuts['WZtoWW'] = '(' + WZselection.replace('ZCUT',  '10.') + ')*(1.-btagWeight_1tag)'
+
+if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
+
+    LepId3of4 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1]+Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2]+Lepton_isTightElectron_cutBasedMediumPOG[3]+Lepton_isTightMuon_mediumRelIsoTight[3])==3'
+
+    sel4Lep = 'nLepton==4 && Lepton_pt[3]>=20. && ' + LepId3of4
+
+    if 'ttZValidationRegion' in opt.tag:
+
+        ttZselection = sel4Lep + ' && ' + Zcut.replace('ZCUT',  '10.') + ' && nCleanJet>=2 && CleanJet_pt[1]>=20.'
+
+        if 'Data' in opt.sigset:
+            cuts['ttZ']           = ttZselection + ' && '                + BTAG
+            cuts['ttZ_ptmiss-140'] = ttZselection + ' && ptmiss>=140 && ' + BTAG
+
+        else:
+            cuts['ttZ']            = '(' + ttZselection +                ')*(btagWeight_1tag)'
+            cuts['ttZ_ptmiss-140'] = '(' + ttZselection + ' && ptmiss>=140)*(btagWeight_1tag)'
+
+    elif 'ZZValidationRegion' in opt.tag:
+
+        if 'Data' in opt.sigset:
+            cuts['ZZ']           = sel4Lep + ' && '                + VETO
+            cuts['ZZ_ptmiss-140'] = sel4Lep + ' && ptmiss>=140 && ' + VETO
+
+        else:
+            cuts['ZZ']            = '(' + sel4Lep +                ')*(1.-btagWeight_1tag)'
+            cuts['ZZ_ptmiss-140'] = '(' + sel4Lep + ' && ptmiss>=140)*(1.-btagWeight_1tag)'
 
 if 'StopSignalRegions' in opt.tag:
     
