@@ -109,7 +109,7 @@ for mStop in range( 150,  2001, 25):
         if mStop-mLSP==75: mLSP = mStop - 87 
             
         massPointName = 'T2tt' + '_mS-' + str(mStop) + '_mX-' + str(mLSP)
-        massPointCut = 'susyMstop>=' + str(mStop) + '-4 && susyMstop<=' + str(mStop) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
+        massPointCut = '(susyMstop>=' + str(mStop) + '-4 && susyMstop<=' + str(mStop) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
 
         massPoint = {}
         massPoint['massPointDataset'] = datasetName
