@@ -86,12 +86,40 @@ if 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.
                                  }
 
 if 'Validation' in opt.tag or 'Signal' in opt.tag:
-    
-    variables['mt2ll']         = {   'name'  : 'mt2ll',                #   variable name    
+
+    mt2ll = 'mt2ll'
+
+    if 'FakeValidationRegion' in opt.tag:
+
+        T0 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0])'
+        T1 = '(Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])'
+        T2 = '(Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])'
+        mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'
+ 
+    variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
                                      'range' : (   7,    0.,  140.),   #   variable range
                                      'xaxis' : mt2 + pll + gv,         #   x axis name
                                      'fold'  : 1                       #   fold overflow
                                  }
 
+    if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag: 
 
+        variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
+                                        'range' : (  20,    0.,  400.),    #   variable range
+                                        'xaxis' : met + gv,                #   x axis name
+                                        'fold'  : 1                        #   fold overflow
+                                     }
 
+        if 'ZZValidationRegion' in opt.tag: 
+    
+            variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name    
+                                            'range' : (  6,    0.,     6.),    #   variable range
+                                            'xaxis' : 'number of jets',        #   x axis name
+                                            'fold'  : 1                        #   fold overflow
+                                         } 
+    
+            variables['jets']          = {  'name'  : 'nCleanJet>0',           #   variable name    
+                                            'range' : (  2,    0.,     2.),    #   variable range
+                                            'xaxis' : 'number of jets',        #   x axis name
+                                            'fold'  : 1                        #   fold overflow
+                                         }

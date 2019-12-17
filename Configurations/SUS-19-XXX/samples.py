@@ -44,16 +44,21 @@ regionName = '__susyMT2'
 
 if 'SameSign' in opt.tag :
     regionName = '__susyMT2SameSign'
+elif 'Fake' in opt.tag :
+    regionName = '__susyMT2Fake'
 elif 'WZ' in opt.tag :
     regionName = '__susyMT2WZ'
 elif 'WZtoWW' in opt.tag :
     regionName = '__susyMT2WZtoWW'
 elif 'ZZ' in opt.tag :
     regionName = '__susyMT2ZZ'
+elif 'ttZ' in opt.tag :
+    regionName = '__susyMT2ttZ'
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName + '/'
-directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/'
-directoryData = treeBaseDirData + ProductionData + regionName + 'data/'
+directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/' 
+directoryData = treeBaseDirData + ProductionData + regionName + '/'
+directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 
 ### MET Filters
 
@@ -68,7 +73,7 @@ METFilters_FS     = METFilters_Common
 
 TriggerEff = 'TriggerEffWeight_2l'
 
-if 'WZ' in opt.tag or 'ZZ' in opt.tag :
+if 'WZ' in opt.tag or 'ZZ' in opt.tag or 'ttZ' in opt.tag :
     TriggerEff = 'TriggerEffWeight_3l'
 
 ### MC weights
@@ -346,7 +351,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'FilesPerJob' : 2 ,
                                 }
         
-        if 'ControlRegion-ZZ' in opt.tag:
+        if 'ZZ' in opt.tag or 'ttZ' in opt.tag :
             
             ZZ4Lext = ''
             if '2017' in opt.tag : 
@@ -370,6 +375,17 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             if '2016' in opt.tag : 
                 samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'qqHToZZTo4L_M125',False,'nanoLatino_')
                 samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,'nanoLatino_')
+
+if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds':
+
+    sampleToRemove = [ ] 
+
+    for sample in samples:
+        if sample not in opt.sigset:
+            sampleToRemove.append(sample)
+
+    for sample in sampleToRemove:
+        del samples[sample]
 
 ### Data
 
