@@ -144,10 +144,10 @@ if 'FakeValidationRegion' in opt.tag:
     T2 = '(Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])'
     LepId2of3 = '('+T0+'+'+T1+'+'+T2+')==2'
 
-    C01 = '(Lepton_pdgId[0]*Lepton_pdgId[1])'
-    C02 = '(Lepton_pdgId[0]*Lepton_pdgId[2])'
-    C12 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
-    OCT = '('+C01+'*'+T0+'*'+T1+'+'C02+'*'+T0+'*'+T2+'+'C12+'*'+T1+'*'+T2+')<0'
+    C2 = '(Lepton_pdgId[0]*Lepton_pdgId[1])'
+    C1 = '(Lepton_pdgId[0]*Lepton_pdgId[2])'
+    C0 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
+    OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
     
     Fake = 'nLeptons==3 && ' + LepId2of3 + ' && ' + OCT + ' && Lepton_pt[2]>=20.'
 
