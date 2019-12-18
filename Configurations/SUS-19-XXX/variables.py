@@ -1,12 +1,14 @@
 # variables
     
 # Flags  
-gv  = ' [GeV]'
-pt  = '#font[50]{p}_{T}'
-met = pt+'^{miss}'
-sll = '#font[12]{ll}'
-pll = '('+sll+')'
-mt2 = '#font[50]{m}_{T2}'
+gv   = ' [GeV]'
+pt   = '#font[50]{p}_{T}'
+met  = pt+'^{miss}'
+sll  = '#font[12]{ll}'
+pll  = '('+sll+')'
+mt2  = '#font[50]{m}_{T2}'
+ptll = pt+'^{'+sll+'}'
+dphill = '#Delta#phi(lep1,lep2)'
 
 # Complex variables
 
@@ -102,13 +104,31 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                      'fold'  : 1                       #   fold overflow
                                  }
 
-    if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag: 
+    if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
 
         variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
                                         'range' : (  20,    0.,  400.),    #   variable range
                                         'xaxis' : met + gv,                #   x axis name
                                         'fold'  : 1                        #   fold overflow
                                      }
+
+        if 'DYValidationRegion' in opt.tag:   
+
+            variables['deltaPhiLep']   = {  'name'  : 'acos(cos(Lepton_phi[1]-Lepton_phi[0]))', #   variable name    
+                                            'range' : (  10,    0.,  3.2),     #   variable range
+                                            'xaxis' : dphill,                  #   x axis name
+                                            'fold'  : 1                        #   fold overflow
+                                         }
+
+            pxll = '(Lepton_pt[0]*cos(Lepton_phi[0])+Lepton_pt[1]*cos(Lepton_phi[1]))'
+            pyll = '(Lepton_pt[0]*sin(Lepton_phi[0])+Lepton_pt[1]*sin(Lepton_phi[1]))'
+            pTll = 'sqrt('+pxll+'*'+pxll+'+'+pyll+'*'+pyll+')'
+
+            variables['ptll']          = {  'name'  : pTll,                    #   variable name    
+                                            'range' : ([20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 300, 400, 500, 1000],[1]), #   variable range
+                                            'xaxis' : ptll + gv,               #   x axis name
+                                            'fold'  : 1                        #   fold overflow
+                                         } 
 
         if 'ZZValidationRegion' in opt.tag: 
     
