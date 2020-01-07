@@ -74,7 +74,7 @@ print len(sys.argv), sys.argv
 doDC    = ' '
 if(len(sys.argv)>4):
     if(sys.argv[4].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
-        doDC=True
+        doDC=sys.argv[4]
         fileset=sigset
     else:
         fileset=sys.argv[4]

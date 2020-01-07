@@ -123,7 +123,7 @@ if __name__ == '__main__':
                         thisDC=cutLoc+'/'+variable+"/datacard.txt"
                         tagDC =cut #Could be changed to more complex in the future
                         dirDC+=tagDC+year+'='+thisDC+' '
-                        dirDClocal+=tagDC+year+'='+thisDC.split('/Datacards/')[1]+'\t'
+                        dirDClocal+=tagDC+year+'='+thisDC.split('/Datacards/')[1]+' '
                         
                         if(os.path.exists(thisDC) is True):
                             thereIsDC=True
