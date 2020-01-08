@@ -41,9 +41,11 @@ if __name__ == '__main__':
         years=["2016"]
     elif opt.years == '2017':
         years=["2017"]
-    else:
+    elif opt.years == '-1':
         years=["2016","2017","2018"]
-
+        opt.years="2016-2017-2018"
+    else:
+        years=opt.years.split('-')
 
     doTest = opt.test
     doMerge = opt.nomerge
@@ -99,17 +101,18 @@ if __name__ == '__main__':
     for model in signalMassPoints:
         print "Model:", model,"\tSignal set", opt.sigset
         if model not in opt.sigset:  continue
-        for year in years:
-            for massPoint in signalMassPoints[model]:
-                dirDC=''
-                #print opt.sigset, "<-sigset, masspoint->", massPoint
-                if not massPointInSignalSet(massPoint, opt.sigset): continue
+        for massPoint in signalMassPoints[model]:
+            dirDC=''
+            dirDClocal=''
+            #print opt.sigset, "<-sigset, masspoint->", massPoint
+            if not massPointInSignalSet(massPoint, opt.sigset): continue
+            for year in years:
                 mpLoc=PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+massPoint
                 if(os.path.exists(mpLoc) is not True):
                     print mpLoc
                     if(doTest is True): print "\n Folder for MassPoint", massPoint," does not exist:"
                     continue
-                print "Mass Point:", massPoint, mpLoc
+                print "Mass Point:", massPoint,"\t Year:",  year
                 for cut in cuts:
                     cutLoc=mpLoc+'/'+cut
                     #print os.path.exists(mpLoc), mpLoc, "cuts", cuts, variables
@@ -119,42 +122,49 @@ if __name__ == '__main__':
                     for variable in variables:
                         thisDC=cutLoc+'/'+variable+"/datacard.txt"
                         tagDC =cut #Could be changed to more complex in the future
-                        dirDC+=tagDC+'='+thisDC+' '
+                        dirDC+=tagDC+year+'='+thisDC+' '
+                        dirDClocal+=tagDC+year+'='+thisDC.split('/Datacards/')[1]+' '
+                        
                         if(os.path.exists(thisDC) is True):
                             thereIsDC=True
-                            print "Datacard: ", thisDC, "dirDC="
+#                            print "Datacard: ", thisDC, "dirDC="
                         else:
                             if(doTest):print "DC", thisDC, "does not exist"
-                #Do not combine DC nor calculate limits if no DC is found
-                mergeCommand=''
-                combCommand =''
-                if(thereIsDC is False):
-                    print "there are no Datacards in the folder under the input parameters"
+            #Do not combine DC nor calculate limits if no DC is found
+            mergeCommand=''
+            combCommand =''
+            if(thereIsDC is False):
+                print "there are no Datacards in the folder under the input parameters"
+            else:
+                #Actually merge the DC
+                dcLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+massPoint
+                os.system('mkdir -p '+dcLoc)
+                finalDC=dcLoc+'/'+opt.tag+'.txt'
+
+                print "FINAL DC:", finalDC
+                doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
+                if(doMerge is True and thereIsDC is True):
+                    mergeCommand=opt.combcfg+' '+dirDC+">"+finalDC+";"
+                    mergePrint=''
+                    if(doTest): 
+                        mergePrint=mergeCommand
+                    else: mergePrint= opt.combcfg+' '+dirDClocal+">"+finalDC+";"
+                    print "Combining Datacards:", mergePrint, "\t<---"
+                    os.system(doCombcmsenv+mergeCommand)
+                    print "Final Datacard:", finalDC
                 else:
-                    #Actually merge the DC
-                    finalDC=mpLoc+'/'+opt.tag+'.txt'
-                    print "FINAL DC:", finalDC
-                    doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
-                    if(doMerge is True and thereIsDC is True):
-                        mergeCommand=opt.combcfg+' '+dirDC+">"+finalDC+";"
-                        mergePrint=''
-                        if(doTest): mergePrint=mergeCommand
-                        print "Combining Datacards:", mergeCommand, "\t<---"
-                        #os.system(doCombcmsenv+mergeCommand)
-                        print "Final Datacard:", finalDC
-                    else:
-                        print "\n Data card merging option set to false: no DC combination is done"
+                    print "\n Data card merging option set to false: no DC combination is done"
 
-                    #Calculate the limits
-                    if(doLimits is True and thereIsDC is True):
-                        outLoc=PWD+'/'+opt.outputDirLimit+'/'+year+'/'+massPoint
-                        os.system('mkdir -p '+outLoc)
-                        combCommand='cd '+outLoc+'; combine -M AsymptoticLimits --run '+opt.limrun.lower() +' ' +finalDC+' -n _'+opt.tag+'_'+opt.limrun
-                        print "Sending combination", combCommand
-                        #os.system(doCombcmsenv+combCommand)
-                    else:
-                        print "Limit option set to false: no limits were calculated"
+                #Calculate the limits
+                if(doLimits is True and thereIsDC is True):
+                    outLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+massPoint
+                    os.system('mkdir -p '+outLoc)
+                    combCommand='cd '+outLoc+'; combine -M AsymptoticLimits --run '+opt.limrun.lower() +' ' +finalDC+' -n _'+opt.tag+'_'+opt.limrun
+                    print "Sending combination", combCommand
+                    os.system(doCombcmsenv+combCommand)
+                else:
+                    print "Limit option set to false: no limits were calculated"
 
-                    os.system(doCombcmsenv+mergeCommand+combCommand)
+                #os.system(doCombcmsenv+mergeCommand+combCommand)
 
-    os.system('cd '+PWD+'; '+cmsenv)
+        os.system('cd '+PWD+'; '+cmsenv)

@@ -18,7 +18,14 @@ elif sys.argv[1]=='2':
 else:
     yearset=sys.argv[1]
 
-tag=sys.argv[2]
+if   sys.argv[2]== '0':
+    tag='Preselection'                                                                         
+elif sys.argv[2]== '1':
+    tag='ValidationRegions'                                                                    
+elif sys.argv[2]=='2':
+    tag='StopSignalRegions'                                                                    
+else: 
+    tag=sys.argv[2]
 
 sigset=sys.argv[3]
 

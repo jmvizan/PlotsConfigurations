@@ -13,7 +13,7 @@ os.chdir(dname)
 
 
 if __name__ == '__main__':
-
+    doDC=False
     if len(sys.argv)<4:
         print 'Please, specify year, tag and sigset values, in that order'
         sys.exit()
@@ -29,22 +29,44 @@ if __name__ == '__main__':
     else:
         yearset=sys.argv[1]
 
-    tag=sys.argv[2]
+    if   sys.argv[2]== '0':
+        tag='Preselection'
+    elif sys.argv[2]== '1':
+        tag='ValidationRegions'
+    elif sys.argv[2]=='2':
+        tag='StopSignalRegions'
+    else:
+        tag=sys.argv[2]
+
+    #    tag=sys.argv[2]
 
     sigset=sys.argv[3]
 
     if len(sys.argv)==5:
-        fileset=sys.argv[4]
+        if(sys.argv[4].lower()in ["dodatacards","dodc","mkdc","makedatacards"]):
+            doDC=True
+            fileset=sigset
+        else:
+            fileset=sys.argv[4]
+    elif len(sys.argv)==6:
+        fileset=sys.argv[4] 
+        if(sys.argv[5].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
+            doDC=True
     else:
         fileset=sigset
+
     if 'SM-' not in fileset:
         fileset = 'SM-' + fileset
-    
+    #print sys.argv[4].lower()
     opts= "--years="+yearset+" --tag="+tag+" --sigset="+sigset 
+    cmdDatacards =' '
+    if(doDC is True):    cmdDatacards += './run_mkDatacards.py '+yearset+' '+tag+ ' '+ sigset+' '+ fileset + ' ;'
     name='python run_CombineTools.py'
     command= ' '+name+' '+opts
     print "Command sent:\t", command,'\n','CWD:', os.getcwd()
     print "ABSPATH", abspath, "\tOSCWD", os.getcwd(), "\tLONGER OPTION", os.path.dirname(os.path.realpath(__file__))
-    os.system('cd '+ SUS19+ '; '+cmsenv+';'+command)
+    if doDC: print " datacards:\n", cmdDatacards
+    else: print "datacards are not made"
+    os.system('cd '+ SUS19+ '; '+cmsenv+';'+ cmdDatacards +command)
 
     years = yearset.split('-')
