@@ -563,12 +563,14 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
    
     lumi = 0.
     if '2016' in year:
+        print "--2016"
         lumi += 35.92
-    elif '2017' in year:
+    if '2017' in year:
+        print "2017-->"
         lumi += 41.53
-    elif '2018' in year:
+    if '2018' in year:
+        print "2018-->"
         lumi += 59.74
-
     cfgFile.write('HISTOGRAM ' + inputFileName.replace('//', '/Histograms/') + ' histo_X_' + limitOptions[1].lower() + '\n')
     cfgFile.write('EXPECTED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up graph_r_'+limitType+'_down kRed kOrange\n')
     cfgFile.write('OBSERVED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_observed graph_r_observed_up graph_r_observed_down kBlack kGray\n')
