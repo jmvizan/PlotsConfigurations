@@ -2,16 +2,21 @@ import os,sys
 from datetime import datetime
 import numpy as np
 
+
+
 #Function to create sub file
-def makeSubFile(filename,year,tag,sigset):
+def makeSubFile(filename,year,tag,sigset,fileset, doDC,writesigset):
+    PWD = os.getenv('PWD')+'/'
     f = open(filename,"w+")
-    arguments = year+' '+tag+' '+sigset
+    logfolder="./Condor/"+tag+'/'+year+'/'+writesigset
+    os.system("mkdir -p "+logfolder)
+    arguments = year+' '+tag+' '+sigset+' '+fileset+' '+str(doDC)
     print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"
-    f.write("executable            = run_AnalysisMP.py \n")
+    f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
-    f.write("output                = Condor/test/hello.$(ClusterId).$(ProcId).out\n")
-    f.write("error                 = Condor/test/hello.$(ClusterId).$(ProcId).err\n")
-    f.write("log                   = Condor/test/hello.$(ClusterId).log\n")
+    f.write("output                = "+logfolder+".$(ClusterId).$(ProcId).out\n")
+    f.write("error                 = "+logfolder+".$(ClusterId).$(ProcId).err\n")
+    f.write("log                   = "+logfolder+".$(ClusterId).log\n")
     f.write("+JobFlavour           = tomorrow\n")
     f.write("queue\n")
     f.close() 
@@ -44,10 +49,40 @@ if len(sys.argv)<4:
     sys.exit() 
 
 #Take args
-year   = sys.argv[1]
-tag    = sys.argv[2]
-sigset = sys.argv[3]
-
+if sys.argv[1]=='-1':
+    year='2016-2017-2018'
+elif sys.argv[1]=='0':
+    year='2016'
+elif sys.argv[1]=='1':
+    year='2017'
+elif sys.argv[1]=='2':
+    year='2018'
+else:
+    year=sys.argv[1]
+if   sys.argv[2]== '0':                                                             
+    tag='Preselection'                                                             
+elif sys.argv[2]== '1':                                                            
+    tag='ValidationRegions'                                                        
+elif sys.argv[2]=='2':                                                             
+    tag='StopSignalRegions'                                                        
+else:                                                                              
+    tag=sys.argv[2] 
+#year    = sys.argv[1]
+#tag     = sys.argv[2]
+sigset  = sys.argv[3]
+print len(sys.argv), sys.argv
+doDC    = ' '
+if(len(sys.argv)>4):
+    if(sys.argv[4].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
+        doDC=sys.argv[4]
+        fileset=sigset
+    else:
+        fileset=sys.argv[4]
+        
+    if(len(sys.argv)>5): 
+        doDC    = sys.argv[5]
+else: fileset=sigset
+#fileset = "Shapes/"+y
 exec(open("signalMassPoints.py").read())
 
 
@@ -79,14 +114,19 @@ for i in range(0,len(sigsets)):
             writesigset[j]+=diffmp+'-'+thissigset[j]
 
 #remove duplicate mS and similars            
-nmS = writesigset[1].count('mS')
-nmX = writesigset[2].count('mX')
-if(nmS>1):   writesigset[1] = rreplace(writesigset[1] , 'mS', '', nmS - 1)
-elif(nmX>1): writesigset[2] = rreplace(writesigset[2] , 'mX', '', nmX - 1)
-    
-print writesigset
+try:
+    nmS = writesigset[1].count('mS')
+    nmX = writesigset[2].count('mX')
+except IndexError:
+    nmS=0
+    nmX=0
+    print "not mS or mX"
+
+    if(nmS>1):   writesigset[1] = rreplace(writesigset[1] , 'mS', '', nmS - 1)
+    elif(nmX>1): writesigset[2] = rreplace(writesigset[2] , 'mX', '', nmX - 1)
+print "writesigset", writesigset
 lognm   = '_'.join(writesigset)
-logfile = "Condor/"+lognm+".log"
+logfile = "Condor/"+tag+'/'+lognm+".log"
 
 
 
@@ -100,12 +140,11 @@ for i in chunks:
     argsigset = ",".join(i)
     line      = "\nMPs: "+argsigset
     writetolog(logfile, line,doheader)
-    makeSubFile(subfilename, year, tag, argsigset)
+    makeSubFile(subfilename, year, tag, argsigset, fileset,doDC,lognm)
     submit="condor_submit "+subfilename+" >>"+logfile
-    print submit
+    print "submit", submit
     os.system(submit)
 
 writetolog(logfile,"----------------------------------" ,doheader)
 
 print "\nCODE SHOULD BE SENT, MORE INFO IN LOG FILE:\n--> ", logfile
-    

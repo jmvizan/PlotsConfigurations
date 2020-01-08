@@ -479,9 +479,9 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
-    plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 900, 600)
+    plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 1200, 900)
     
-    plotTitle = tags[0] + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption + emptyBinsOption
+    plotTitle = tags[0] + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
     if tags[1]!='':
         plotTitle.replace(tags[0], tags[0] + '_to_' + tags[1]) 
     tagObj[0].SetTitle(plotTitle)   
@@ -521,7 +521,12 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         ROOT.TColor.CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont)
         ROOT.gStyle.SetNumberContours(NCont)
 
-        tagObj[0].Draw('textcolz')
+        drawPlotOption = 'colz'			
+        if fillemptybins==False:		
+            drawPlotOption = 'textcolz'
+
+
+        tagObj[0].Draw(drawPlotOption)
 
     else:
 

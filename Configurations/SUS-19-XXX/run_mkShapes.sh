@@ -13,7 +13,7 @@ elif [ $# == 1 ]; then
     echo 'Please provide tag value:'; 
     echo '  0. Preselection: shapes for data/MC comparison of various kinematic observables '
     echo '  1. ValidationRegions'
-    echo '  2. SignalRegions'
+    echo '  2. StopSignalRegions'
     echo ''
     exit
 else
