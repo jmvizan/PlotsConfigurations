@@ -126,17 +126,16 @@ except IndexError:
     elif(nmX>1): writesigset[2] = rreplace(writesigset[2] , 'mX', '', nmX - 1)
 print "writesigset", writesigset
 lognm   = '_'.join(writesigset)
-logfile = "Condor/"+tag+'/'+lognm+".log"
+logfile = "Condor/"+tag+'/'+lognm+'.'+year+".log"
 
 
 
 #divide masspoints in sets of four and send jobs
-nchunk      = 4
+nchunk      = 2
 chunks      = [sorted(mpInSigset)[x:x+nchunk] for x in xrange(0, len(mpInSigset), nchunk)]
 doheader    = True
 subfilename ="Condor/submitMPtemp.sub"
 for i in chunks:
-    doheader  = False
     argsigset = ",".join(i)
     line      = "\nMPs: "+argsigset
     writetolog(logfile, line,doheader)
@@ -144,6 +143,7 @@ for i in chunks:
     submit="condor_submit "+subfilename+" >>"+logfile
     print "submit", submit
     os.system(submit)
+    doheader  = False
 
 writetolog(logfile,"----------------------------------" ,doheader)
 
