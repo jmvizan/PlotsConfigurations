@@ -14,9 +14,9 @@ def makeSubFile(filename,year,tag,sigset,fileset, doDC,writesigset):
     print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
-    f.write("output                = "+logfolder+".$(ClusterId).$(ProcId).out\n")
-    f.write("error                 = "+logfolder+".$(ClusterId).$(ProcId).err\n")
-    f.write("log                   = "+logfolder+".$(ClusterId).log\n")
+    f.write("output                = "+logfolder+"/$(ClusterId).$(ProcId).out\n")
+    f.write("error                 = "+logfolder+"/$(ClusterId).$(ProcId).err\n")
+    f.write("log                   = "+logfolder+"/$(ClusterId).log\n")
     f.write("+JobFlavour           = tomorrow\n")
     f.write("queue\n")
     f.close() 
@@ -39,7 +39,7 @@ def writetolog(filename,line,doheader):
     f.close()
     print "line", line
 
-#Remove specifical events
+#Remove duplicated substrings in a string
 def rreplace(s, old, new, occurrence):
     li = s.rsplit(old, occurrence)
     return new.join(li)
@@ -67,10 +67,8 @@ elif sys.argv[2]=='2':
     tag='StopSignalRegions'                                                        
 else:                                                                              
     tag=sys.argv[2] 
-#year    = sys.argv[1]
-#tag     = sys.argv[2]
 sigset  = sys.argv[3]
-print len(sys.argv), sys.argv
+
 doDC    = ' '
 if(len(sys.argv)>4):
     if(sys.argv[4].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
@@ -82,7 +80,6 @@ if(len(sys.argv)>4):
     if(len(sys.argv)>5): 
         doDC    = sys.argv[5]
 else: fileset=sigset
-#fileset = "Shapes/"+y
 exec(open("signalMassPoints.py").read())
 
 
@@ -120,31 +117,30 @@ try:
 except IndexError:
     nmS=0
     nmX=0
-    print "not mS or mX"
+    print "either no mS or mX specified"
 
     if(nmS>1):   writesigset[1] = rreplace(writesigset[1] , 'mS', '', nmS - 1)
     elif(nmX>1): writesigset[2] = rreplace(writesigset[2] , 'mX', '', nmX - 1)
-print "writesigset", writesigset
+
 lognm   = '_'.join(writesigset)
-logfile = "Condor/"+tag+'/'+lognm+'.'+year+".log"
+logfile = "Condor/"+tag+'/'+year+'/log/'+lognm+".log"
 
 
 
 #divide masspoints in sets of four and send jobs
-nchunk      = 2
-chunks      = [sorted(mpInSigset)[x:x+nchunk] for x in xrange(0, len(mpInSigset), nchunk)]
+nMPs        = 2
+jobs        = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
 doheader    = True
 subfilename ="Condor/submitMPtemp.sub"
-for i in chunks:
-    argsigset = ",".join(i)
-    line      = "\nMPs: "+argsigset
+for job in jobs:
+    argsigset = ",".join(job)
+    line      = "\njob MPs: "+argsigset
     writetolog(logfile, line,doheader)
     makeSubFile(subfilename, year, tag, argsigset, fileset,doDC,lognm)
     submit="condor_submit "+subfilename+" >>"+logfile
-    print "submit", submit
     os.system(submit)
     doheader  = False
 
 writetolog(logfile,"----------------------------------" ,doheader)
 
-print "\nCODE SHOULD BE SENT, MORE INFO IN LOG FILE:\n--> ", logfile
+print "\nCODE SHOULD BE SENT, MORE INFO IN LOG FILE:\n ", logfile
