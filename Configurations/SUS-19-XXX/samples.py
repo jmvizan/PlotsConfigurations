@@ -113,22 +113,22 @@ SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*is
 # background cross section uncertainties and normalization scale factors
 
 normBackgrounds = {
-    #'ttbar' : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
-    'tW'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
-    #'WW'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selections' : { '_All'   : '1.' } } },
-    'ttW'   : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selections' : { '_All'   : '1.' } } },
-    'VZ'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selections' : { '_All'   : '1.' } } },
-    'VVV'   : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selections' : { '_All'   : '1.' } } },
-    'WZ'    : { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selections' : { '_All'   : '1.' } } },
-    'ttZ'   : { 'all'   : { 'scalefactor' : { '1.44' : '0.36' }, 'selections' : { '_All'   : '1.' } } },
-    'ZZ'    : { 'nojet' : { 'scalefactor' : { '0.74' : '0.19' }, 'selections' : { '_NoJet' : '(nCleanJet==0)' } },  
-                'notag' : { 'scalefactor' : { '1.21' : '0.17' }, 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
-                                                                                  '_Tag'   : '(leadingPtTagged>=20.)'  } },   
-                'veto'  : { 'scalefactor' : { '1.06' : '0.12' }, 'selections' : { '_Veto'  : '(leadingPtTagged<20.)' } }, }, 
-    'DY'    : { 'nojet' : { 'scalefactor' : { '1.00' : '1.00' }, 'selections' : { '_NoJet' : '(nCleanJet==0)' } },
-                'notag' : { 'scalefactor' : { '1.00' : '0.32' }, 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
-                                                                                  '_Tag'   : '(leadingPtTagged>=20.)',
-                                                                                  '_Veto'  : '(leadingPtTagged<20.)' } }, },
+    #'ttbar' : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+    'tW'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+    #'WW'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+    'ttW'   : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+    'VZ'    : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+    'VVV'   : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+    'WZ'    : { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+    'ttZ'   : { 'all'   : { 'scalefactor' : { '1.44' : '0.36' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+    'ZZ'    : { 'nojet' : { 'scalefactor' : { '0.74' : '0.19' }, 'cuts' : [], 'selections' : { '_NoJet' : '(nCleanJet==0)' } },  
+                'notag' : { 'scalefactor' : { '1.21' : '0.17' }, 'cuts' : [], 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
+                                                                                               '_Tag'   : '(leadingPtTagged>=20.)'  } },   
+                'veto'  : { 'scalefactor' : { '1.06' : '0.12' }, 'cuts' : [], 'selections' : { '_Veto'  : '(leadingPtTagged<20.)' } }, }, 
+    'DY'    : { 'nojet' : { 'scalefactor' : { '1.00' : '1.00' }, 'cuts' : [], 'selections' : { '_NoJet' : '(nCleanJet==0)' } },
+                'notag' : { 'scalefactor' : { '1.00' : '0.32' }, 'cuts' : [], 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
+                                                                                               '_Tag'   : '(leadingPtTagged>=20.)',
+                                                                                               '_Veto'  : '(leadingPtTagged<20.)' } }, },
 }
 
 # top pt reweighting

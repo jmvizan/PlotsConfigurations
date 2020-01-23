@@ -138,7 +138,7 @@ for mStop in range( 200,  1501, 25):
         if mLSP==0: mLSP = 1
             
         massPointName = 'T2bW' + '_mS-' + str(mStop) + '_mX-' + str(mLSP)
-        massPointCut = '(susyMstop==' + str(mStop) + ' && susyMLSP==' + str(mLSP) + ')'
+        massPointCut = '(susyMstop>=' + str(mStop) + '-4 && susyMstop<=' + str(mStop) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
 
         massPoint = {}
         massPoint['massPointDataset'] = datasetName
@@ -151,14 +151,14 @@ signalMassPoints['TChipmSlepSnu'] = {}
 for mChipm in range( 100,  1501, 25):
     datasetName = 'TChipmSlepSnu'
     if mChipm>800:
-        datasetName += '__mC1_825_1500'
+        datasetName += '_mC1_825_1500'
     for mNeutralino in range( 0,  min(mChipm-49, 901), 25):
             
         mLSP = mNeutralino
         if mLSP==0: mLSP = 1
             
         massPointName = 'TChipmSlepSnu' + '_mC-' + str(mChipm) + '_mX-' + str(mLSP)
-        massPointCut = '(susyMstop==' + str(mChipm) + ' && susyMLSP==' + str(mLSP) + ')'
+        massPointCut = '(susyMChargino>=' + str(mStop) + '-4 && susyMChargino<=' + str(mStop) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
 
         massPoint = {}
         massPoint['massPointDataset'] = datasetName
@@ -179,7 +179,7 @@ for mChipm in range( 100,  851, 25):
             if mLSP==0: mLSP = 1
             
             massPointName = 'TChipmWW' + '_mC-' + str(mChipm) + '_mX-' + str(mLSP)
-            massPointCut = '(susyMstop==' + str(mChipm) + ' && susyMLSP==' + str(mLSP) + ')'
+            massPointCut = '(susyMChargino>=' + str(mStop) + '-4 && susyMChargino<=' + str(mStop) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
 
             massPoint = {}
             massPoint['massPointDataset'] = datasetName

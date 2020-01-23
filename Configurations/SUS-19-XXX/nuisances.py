@@ -35,7 +35,7 @@ nuisances['lumi']  = {
                'type'  : 'lnN',
 }
 for sample in samples.keys():
-    if sample!='DATA' and sample!='ZZ'  and sample!='ttZ' and sample!='WZ'  and sample!='DY':
+    if sample!='DATA':
         nuisances['lumi']  ['samples'][sample] = lumi_uncertainty 
 
 # trigger
@@ -46,7 +46,7 @@ nuisances['trigger']  = {
                'type'  : 'lnN',
 }
 for sample in samples.keys():
-    if sample!='DATA' and sample!='ZZ'  and sample!='ttZ' and sample!='WZ'  and sample!='DY':
+    if sample!='DATA':
         nuisances['trigger']  ['samples'][sample] = trigger_uncertainty
 
 # background cross section and scale factor uncertainties
@@ -54,6 +54,9 @@ for sample in samples.keys():
 if 'SignalRegions' in opt.tag:
     for background in normBackgrounds:
         if background in samples:
+
+            scalefactorFromData = True
+
             for region in normBackgrounds[background]:
                 nuisancename = 'norm'+background+region
                 scalefactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
@@ -64,6 +67,16 @@ if 'SignalRegions' in opt.tag:
                     'cuts'    : normBackgrounds[background][region]['cuts'], 
                     'type'    : 'lnN',
                 }
+                if region=='all' and scalefactor=='1.00':
+                    scalefactorFromData = False
+
+            if scalefactorFromData:
+            
+                if background in nuisances['lumi']['samples']:
+                    del nuisances['lumi']['samples'][background]
+            
+                if background in nuisances['trigger']['samples']:
+                    del nuisances['trigger']['samples'][background]
 
 ### shapes
 

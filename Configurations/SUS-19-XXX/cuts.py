@@ -268,6 +268,54 @@ if 'StopSignalRegions' in opt.tag:
         cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300)*btagWeight_1tag'
         cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300)*(1.-btagWeight_1tag)'
 
+if 'CharginoSignalRegions' in opt.tag:
+    
+    if 'Data' in opt.sigset:
+        cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+BTAG
+        cuts['SR1_NoTag_em'] = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && nCleanJet>0 && '+VETO
+        cuts['SR1_NoJet_em'] = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && nCleanJet==0'
+    
+        cuts['SR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && '+BTAG
+        cuts['SR1_NoTag_sf'] = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && nCleanJet>0 && '+VETO
+        cuts['SR1_NoJet_sf'] = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && nCleanJet==0'
+    
+        cuts['SR2_Tag_em']   = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+BTAG
+        cuts['SR2_NoTag_em'] = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && nCleanJet>0 && '+VETO
+        cuts['SR2_NoJet_em'] = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && nCleanJet==0'
+    
+        cuts['SR2_Tag_sf']   = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+BTAG
+        cuts['SR2_NoTag_sf'] = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && nCleanJet>0 && '+VETO
+        cuts['SR2_NoJet_sf'] = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && nCleanJet==0'
+    
+        cuts['SR3_Tag_em']   = OC+' && '+DF+' && ptmiss>=300 && '+BTAG
+        cuts['SR3_Veto_em']  = OC+' && '+DF+' && ptmiss>=300 && '+VETO
+    
+        cuts['SR3_Tag_sf']   = OC+' && '+SF+' && ptmiss>=300 && '+BTAG
+        cuts['SR3_Veto_sf']  = OC+' && '+SF+' && ptmiss>=300 && '+VETO
+
+    else:
+        cuts['SR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200)*btagWeight_1tag'
+        cuts['SR1_NoTag_em'] = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && nCleanJet>0)*(1.-btagWeight_1tag)'
+        cuts['SR1_NoJet_em'] = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && nCleanJet==0)'
+
+        cuts['SR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200)*btagWeight_1tag'
+        cuts['SR1_NoTag_sf'] = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && nCleanJet>0)*(1.-btagWeight_1tag)'
+        cuts['SR1_NoJet_sf'] = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && nCleanJet==0)'
+
+        cuts['SR2_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300)*btagWeight_1tag'
+        cuts['SR2_NoTag_em'] = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && nCleanJet>0)*(1.-btagWeight_1tag)'
+        cuts['SR2_NoJet_em'] = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && nCleanJet==0)'
+
+        cuts['SR2_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300)*btagWeight_1tag'
+        cuts['SR2_NoTag_sf'] = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && nCleanJet>0)*(1.-btagWeight_1tag)'
+        cuts['SR2_NoJet_sf'] = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && nCleanJet==0)'
+
+        cuts['SR3_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=300)*btagWeight_1tag'
+        cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=300)*(1.-btagWeight_1tag)'
+
+        cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300)*btagWeight_1tag'
+        cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300)*(1.-btagWeight_1tag)'
+
 # apply background scale factors
  
 try:
@@ -282,7 +330,6 @@ if 'SignalRegions' in opt.tag and normBackgrounds is not None:
             for region in normBackgrounds[background]:
                 
                 selections = [ ] 
-                normBackgrounds[background][region]['cuts'] = [ ]
 
                 regionScaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
 
