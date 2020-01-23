@@ -197,7 +197,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                             'FilesPerJob' : 2 ,
                         }
 
-    if opt.tag=='btagefficiencies':
+    if 'btagefficiencies' in opt.tag:
 
         samples['T2tt'] = { 'name'   : getSampleFiles(directorySig,'T2tt__mStop-400to1200',False,'nanoLatino_'),
                             'weight' : XSWeight+'*'+SFweight ,
