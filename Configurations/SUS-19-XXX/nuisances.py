@@ -131,7 +131,7 @@ btagSF = {
 
 for scalefactor in btagSF:
     nuisances[scalefactor]  = {
-        'name'  : scalefactor+year,
+        'name'  : scalefactor.replace('0', '').replace('1', '') +year,
         'samples'  : { },
         'kind'  : 'weight',
         'type'  : 'shape',
