@@ -33,6 +33,9 @@ BTAG = '((CleanJet_pt[0]>=20. && fabs(CleanJet_eta[0])<2.4 && Jet_'+btagAlgo+'[C
 BTAG = '(leadingPtTagged>=20.)' 
 VETO = '!'+BTAG
 
+BTAG30= '(leadingPtTagged>=30.)'
+VETO30 = '!'+BTAG30
+
 #cuts = {}
 
 if opt.tag=='btagefficiencies':
@@ -213,44 +216,64 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
             cuts['ZZ_ptmiss-140'] = '(' + sel4Lep + ' && ptmiss>=140)*(1.-btagWeight_1tag)'
 
 if 'StopSignalRegions' in opt.tag:
-    
     if 'Data' in opt.sigset:
-        cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+BTAG
-        cuts['SR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+VETO
+        isrcut=''
+        btagcut=BTAG
+        vetocut=VETO
+        if 'ISR' in opt.tag:
+            isrcut= ' CleanJet_pt[1]>150. && fabs(MET_phi-CleanJet_phi)>2.5 && '
+        if 'pt30' in opt.tag:
+            btagcut=BTAG30
+            vetocut=VETO30
+        cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+isrcut+btagcut
+        cuts['SR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+isrcut+vetocut
     
-        cuts['SR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && '+BTAG
-        cuts['SR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && '+VETO
+        cuts['SR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && '+isrcut+btagcut
+        cuts['SR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && '+isrcut+vetocut
     
-        cuts['SR2_Tag_em']   = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+BTAG
-        cuts['SR2_Veto_em']  = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+VETO
+        cuts['SR2_Tag_em']   = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+isrcut+btagcut
+        cuts['SR2_Veto_em']  = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+isrcut+vetocut
     
-        cuts['SR2_Tag_sf']   = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+BTAG
-        cuts['SR2_Veto_sf']  = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+VETO
+        cuts['SR2_Tag_sf']   = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+isrcut+btagcut
+        cuts['SR2_Veto_sf']  = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+isrcut+vetocut
     
-        cuts['SR3_Tag_em']   = OC+' && '+DF+' && ptmiss>=300 && '+BTAG
-        cuts['SR3_Veto_em']  = OC+' && '+DF+' && ptmiss>=300 && '+VETO
+        cuts['SR3_Tag_em']   = OC+' && '+DF+' && ptmiss>=300 && '+isrcut+btagcut
+        cuts['SR3_Veto_em']  = OC+' && '+DF+' && ptmiss>=300 && '+isrcut+vetocut
     
-        cuts['SR3_Tag_sf']   = OC+' && '+SF+' && ptmiss>=300 && '+BTAG
-        cuts['SR3_Veto_sf']  = OC+' && '+SF+' && ptmiss>=300 && '+VETO
+        cuts['SR3_Tag_sf']   = OC+' && '+SF+' && ptmiss>=300 && '+isrcut+btagcut
+        cuts['SR3_Veto_sf']  = OC+' && '+SF+' && ptmiss>=300 && '+isrcut+vetocut   
 
     else:
-        cuts['SR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200)*btagWeight_1tag'
-        cuts['SR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200)*(1.-btagWeight_1tag)'
+        isrcut= ' '
+        btagcut=' '
+        vetocut=' '
+        if "ISR" in opt.tag:
+            isrcut='&& CleanJet_pt[1]>150. && fabs(MET_phi-CleanJet_phi)>2.5'
+        if "pt30" in opt.tag:
+            btagcut=' && '+BTAG30
+            vetocut=' && '+VETO30
+        
+        cuts['SR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200'+isrcut+btagcut+')*btagWeight_1tag'
+        cuts['SR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200'+isrcut+vetocut+')*(1.-btagWeight_1tag)'
 
-        cuts['SR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200)*btagWeight_1tag'
-        cuts['SR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200)*(1.-btagWeight_1tag)'
+        cuts['SR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200'+isrcut+btagcut+')*btagWeight_1tag'
+        cuts['SR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200'+isrcut+vetocut+')*(1.-btagWeight_1tag)'
 
-        cuts['SR2_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300)*btagWeight_1tag'
-        cuts['SR2_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300)*(1.-btagWeight_1tag)'
+        cuts['SR2_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300'+isrcut+btagcut+')*btagWeight_1tag'
+        cuts['SR2_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300'+isrcut+vetocut+')*(1.-btagWeight_1tag)'
 
-        cuts['SR2_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300)*btagWeight_1tag'
-        cuts['SR2_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300)*(1.-btagWeight_1tag)'
+        cuts['SR2_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300'+isrcut+btagcut+')*btagWeight_1tag'
+        cuts['SR2_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300'+isrcut+vetocut+')*(1.-btagWeight_1tag)'
 
-        cuts['SR3_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=300)*btagWeight_1tag'
-        cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=300)*(1.-btagWeight_1tag)'
+        cuts['SR3_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+btagcut+')*btagWeight_1tag'
+        cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+btagcut+')*(1.-btagWeight_1tag)'
 
-        cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300)*btagWeight_1tag'
-        cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300)*(1.-btagWeight_1tag)'
+        cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+btagcut+')*btagWeight_1tag'
+        cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+btagcut+')*(1.-btagWeight_1tag)'
+        
+            
+                
+
 
 # apply background scale factors
  
