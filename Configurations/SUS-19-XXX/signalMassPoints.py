@@ -158,7 +158,7 @@ for mChipm in range( 100,  1501, 25):
         if mLSP==0: mLSP = 1
             
         massPointName = 'TChipmSlepSnu' + '_mC-' + str(mChipm) + '_mX-' + str(mLSP)
-        massPointCut = '(susyMChargino>=' + str(mStop) + '-4 && susyMChargino<=' + str(mStop) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
+        massPointCut = '(susyMChargino>=' + str(mChipm) + '-4 && susyMChargino<=' + str(mChipm) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
 
         massPoint = {}
         massPoint['massPointDataset'] = datasetName
@@ -179,7 +179,7 @@ for mChipm in range( 100,  851, 25):
             if mLSP==0: mLSP = 1
             
             massPointName = 'TChipmWW' + '_mC-' + str(mChipm) + '_mX-' + str(mLSP)
-            massPointCut = '(susyMChargino>=' + str(mStop) + '-4 && susyMChargino<=' + str(mStop) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
+            massPointCut = '(susyMChargino>=' + str(mChipm) + '-4 && susyMChargino<=' + str(mChipm) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
 
             massPoint = {}
             massPoint['massPointDataset'] = datasetName

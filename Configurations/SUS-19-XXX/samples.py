@@ -413,6 +413,7 @@ exec(open('./signalMassPoints.py').read())
 
 for model in signalMassPoints:
     if model in opt.sigset:
+        BranchingRatio = '0.10497000068426132' if (model=='TChipmWW') else '1.'
         for massPoint in signalMassPoints[model]:
             if massPointInSignalSet(massPoint, opt.sigset):
 
@@ -428,7 +429,7 @@ for model in signalMassPoints:
                             XSWeight = '1000.*Xsec*genWeight/30000.'
 
                 samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,'nanoLatino_'),
-                                       'weight' : XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut'] ,
+                                       'weight' : BranchingRatio+'*'+XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut'] ,
                                        'FilesPerJob' : 2 ,
                                        'fastsim' : 1.
                                    }
