@@ -267,9 +267,12 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                     inputFile.Close()
 
     global maxMassY
+    print "MAX MASS--->\N", maxMassY
     maxMassY = massLimits['Y']['max']+20
     massLimits['Y']['max'] *= 4./3.
 
+    print "MAX MASS--->\N", maxMassY
+    print massLimits['Y']['max']
     # Create and fill histograms
     histoMin, histoMax, histoBin = { }, { }, { } 
     for axis in [ 'X', 'Y' ]:
@@ -279,7 +282,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
         histoMin[axis] = minEdge - histogramSettings[axis]['minCenter']*binWidth
         histoMax[axis] = maxEdge + histogramSettings[axis]['maxCenter']*binWidth
         histoBin[axis] = int((histoMax[axis] - histoMin[axis])/binWidth)
-
+        print "MAX EDGE", maxEdge, histoMin[axis],  histoMax[axis]
     massScanHistos = { } 
 
     for massPoint in massPoints:
@@ -298,7 +301,9 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     crossSectionHistos = { } 
 
     for xSection in ['histo_X_'+limitType, 'histo_X_observed', 'histo_r_observed_up', 'histo_r_observed_down']:
+        print "inside xsec"
         if limitOption=='Observed' or limitType in xSection:
+            print "x", histoMax['X']
 
             crossSectionHistos[xSection] = ROOT.TH2F(xSection, '', histoBin['X'], histoMin['X'], histoMax['X'], 
                                                                    histoBin['Y'], histoMin['Y'], histoMax['Y'])
@@ -320,7 +325,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     
     # Save histogram file 
     outputFile = ROOT.TFile(outputFileName, 'recreate')
-
+    print "OUTPUT FILE NAME", outputFileName
     for histo in massScanHistos:
 
         if fillemptybins:
@@ -468,7 +473,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
             if limitOptions[0].lower() in obj.GetName():
                 if obj.ClassName()=='TH2F':
                     obj.SetDirectory(0)
-                    if '_up' not in obj.GetName() and '_down' not in obj.GetName():
+                    if '_up' in obj.GetName() and '_down' in obj.GetName():
                         continue
                 else:
                     if '_up' in obj.GetName() or '_down' in obj.GetName():
@@ -480,8 +485,10 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
     plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 1200, 900)
-    
-    plotTitle = tags[0] + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
+    print "TAG 1------------->", tags[1]
+    tagnm=tags[0]
+    if len(tags[1])>0: tagnm+='_vs_'+tags[1]  
+    plotTitle = tagnm + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
     if tags[1]!='':
         plotTitle.replace(tags[0], tags[0] + '_to_' + tags[1]) 
     tagObj[0].SetTitle(plotTitle)   
@@ -560,7 +567,7 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
 
     limitType = 'blind' if (limitOption=='Blind') else 'expected' 
     inputFileName = 'Limits/' + year + '//massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
-   
+    print "input file name", inputFileName
     lumi = 0.
     if '2016' in year:
         lumi += 35.92
@@ -650,7 +657,7 @@ if __name__ == '__main__':
         makeMassScanContours(year, opt.tag,       opt.sigset, limitOptions[1], opt.reMakeContours)
         makeMassScanContours(year, opt.compareTo, opt.sigset, limitOptions[1], opt.reMakeContours)
 
-    if plotOption=='Histograms' or plotOption=='Contours': 
+    if plotOption=='Histograms' or plotOption=='Contours':
         plotLimits(year, [ opt.tag, opt.compareTo ], opt.sigset, limitOptions, plotOption, fillEmpties) 
 
     if plotOption=='Final':
