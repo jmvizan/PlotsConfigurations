@@ -221,7 +221,7 @@ if 'StopSignalRegions' in opt.tag:
         btagcut=BTAG
         vetocut=VETO
         if 'ISR' in opt.tag:
-            isrcut= ' CleanJet_pt[1]>150. && fabs(MET_phi-CleanJet_phi)>2.5 && '
+            isrcut= ' CleanJet_pt[1]>150. && CleanJet_pt[0]!=leadingPtTagged && && acos(cos(MET_phi-CleanJet_phi[0]))>2.5 && '
         if 'pt30' in opt.tag:
             btagcut=BTAG30
             vetocut=VETO30
@@ -266,10 +266,10 @@ if 'StopSignalRegions' in opt.tag:
         cuts['SR2_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300'+vetocut+')*(1.-btagWeight_1tag)'
 
         cuts['SR3_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+btagcut+')*btagWeight_1tag'
-        cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+btagcut+')*(1.-btagWeight_1tag)'
+        cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+vetocut+')*(1.-btagWeight_1tag)'
 
         cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+btagcut+')*btagWeight_1tag'
-        cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+btagcut+')*(1.-btagWeight_1tag)'
+        cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+vetocut+')*(1.-btagWeight_1tag)'
         
             
                 

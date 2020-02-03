@@ -340,6 +340,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             samples['VZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo2L2Q',False,'nanoLatino_') + 
                                     getSampleFiles(directoryBkg,'ZZTo2L2Q',False,'nanoLatino_'),
                                     'weight' : XSWeight+'*'+SFweight ,
+                                    'suppressNegative':['all'],
+                                    'suppressNegativeNuisances' :['all'],
                                     'FilesPerJob' : 2 ,
                                     }
         
