@@ -413,10 +413,13 @@ exec(open('./signalMassPoints.py').read())
 
 for model in signalMassPoints:
     if model in opt.sigset:
-        BranchingRatio = '0.10497000068426132' if (model=='TChipmWW') else '1.'
+        # v4 patch... 
+        BranchingRatio = '(0.10497000068426132)' if (model=='TChipmWW') else '(1.)'
+        if ('TChipm' in model): BranchingRatio = BranchingRatio.replace(')', '/1000.)')
         for massPoint in signalMassPoints[model]:
             if massPointInSignalSet(massPoint, opt.sigset):
 
+                # v4 patch... 
                 XSWeight       = 'baseW*genWeight'
                 if '2017' in opt.tag or '2018' in opt.tag : 
                     if 'T2tt__mStop-400to1200' in signalMassPoints[model][massPoint]['massPointDataset'] :

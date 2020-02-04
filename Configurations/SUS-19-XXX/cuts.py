@@ -269,7 +269,7 @@ if 'StopSignalRegions' in opt.tag:
         cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300)*(1.-btagWeight_1tag)'
 
 if 'CharginoSignalRegions' in opt.tag:
-    
+
     if 'Data' in opt.sigset:
         cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+BTAG
         cuts['SR1_NoTag_em'] = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && nCleanJet>0 && '+VETO

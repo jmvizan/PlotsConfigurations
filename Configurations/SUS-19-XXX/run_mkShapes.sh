@@ -67,7 +67,9 @@ mkdir -p ./Shapes/$YEAR/$SPLIT
 if [ $BATCH == True ]; then
     mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$SPLIT --doBatch=True --batchQueue=testmatch --batchSplit=$SPLIT
 else 
+    rm ./Shapes/$YEAR/$SPLIT/*_temp*.root
     mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$SPLIT --batchSplit=$SPLIT --doHadd=True --doNotCleanup 
+    rm ./Shapes/$YEAR/$SPLIT/*_temp*.root
     mv ./Shapes/$YEAR/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/plots_${TAG}_${SIGSET}.root    
 fi
 

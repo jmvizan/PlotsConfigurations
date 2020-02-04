@@ -354,28 +354,31 @@ if hasattr(opt, 'inputFile'):
 
                         nuisances[sample+rateparamname]['cuts'].append(cut)
                         
-                        if 'bondrate' in rateparameters[rateparam].keys():
-
-                            bond_formula = '1+@0/@1*(1.-@2)' 
+                if 'bondrate' in rateparameters[rateparam].keys():
                                 
-                            fileIn = ROOT.TFile(opt.inputFile, "READ")
+                    fileIn = ROOT.TFile(opt.inputFile, "READ")
 
-                            nuisances[sample+rateparamname]['bond'] = {}
+                    nuisances[sample+rateparamname]['bond'] = {}
 
-                            for variable in variables.keys():
+                    for cut in nuisances[sample+rateparamname]['cuts']:
 
-                                histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
-                                cutB = rateparameters[rateparam]['subcut']
-                                cutA = rateparameters[rateparameters[rateparam]['bondrate']]['subcut']
-                                histoA = fileIn.Get(cut.replace(cutB, cutA)+'/'+variable+'/histo_'+sample)
-                                yieldB = '%-.4f' % histoB.Integral()
-                                yieldA = '%-.4f' % histoA.Integral()
+                        nuisances[sample+rateparamname]['bond'][cut] = {}
+
+                        for variable in variables.keys():
+
+                            histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
+                            cutB = rateparameters[rateparam]['subcut']
+                            cutA = rateparameters[rateparameters[rateparam]['bondrate']]['subcut']
+                            histoA = fileIn.Get(cut.replace(cutB, cutA)+'/'+variable+'/histo_'+sample)
+                            yieldB = '%-.4f' % histoB.Integral()
+                            yieldA = '%-.4f' % histoA.Integral()
             
-                                bond_parameters = yieldA+','+yieldB+','+rateparameters[rateparam]['bondrate']+'_'+mt2llregion+year
+                            bond_formula = '1+'+yieldA+'/'+yieldB+'*(1.-@0)' 
+                            bond_parameters = rateparameters[rateparam]['bondrate']+'_'+mt2llregion+year
+                            
+                            nuisances[sample+rateparamname]['bond'][cut][variable] =  { bond_formula : bond_parameters }
 
-                                nuisances[sample+rateparamname]['bond'][variable] =  { bond_formula : bond_parameters }
-
-                            fileIn.Close()
+                    fileIn.Close()
 
 ### Nasty tricks ...
 
