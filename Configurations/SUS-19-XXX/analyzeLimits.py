@@ -468,12 +468,13 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
             if limitOptions[0].lower() in obj.GetName():
                 if obj.ClassName()=='TH2F':
                     obj.SetDirectory(0)
-                    if '_up' not in obj.GetName() and '_down' not in obj.GetName():
+                    if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
                         continue
                 else:
                     if '_up' in obj.GetName() or '_down' in obj.GetName():
                         obj.SetLineStyle(2)
-                tagObj.append(obj)
+                if limitOptions[0].lower() in obj.GetName():
+                    tagObj.append(obj)
 
     # Draw comparison
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
