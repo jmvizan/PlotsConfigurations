@@ -133,9 +133,9 @@ subfilename = jobfolder + "/submitMPtemp.sub"
 flistname   = jobfolder+'/joblist.txt'
 
 jobs        = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
+os.system("mkdir -p "+jobfolder)
 flist       = open(flistname,"w+")
 doheader    = True
-os.system("mkdir -p "+jobfolder)
 for job in jobs:
     argsigset = ",".join(job)
     #line      = "\njob MPs: "+argsigset
@@ -152,6 +152,7 @@ logline = "For arguments:\n"+ year + ' ' + tag + ' ' + fileset + ' ' + doDC
 logline+= "\nList of samples sent in " + flistname
 writetolog(logfile, logline,doheader)
 makeSubFile2(subfilename,jobfolder, year, tag, 'MPs' , fileset,doDC,lognm)
+os.system("condor_submit "+subfilename+">>"+logfile)
 writetolog(logfile,"----------------------------------" ,doheader)
 
 print "\nCODE SHOULD BE SENT, MORE INFO IN LOG FILE:\n ", logfile
