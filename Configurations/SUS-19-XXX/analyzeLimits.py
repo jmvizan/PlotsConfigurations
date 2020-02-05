@@ -214,7 +214,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     massPoints = { }
     massLimits = { 'X' : { 'min' : 999999., 'max' : -1. }, 'Y' : { 'min' : 999999., 'max' : -1. } }
 
-    inputDirectory = './Limits/'+year+'/' 
+    inputDirectory = './Limits/'+year+'/'+tag+'/' 
     
     limitType = 'blind' if (limitOption=='Blind') else 'expected'
     for model in signalMassPoints:
@@ -267,12 +267,9 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                     inputFile.Close()
 
     global maxMassY
-    print "MAX MASS--->\N", maxMassY
     maxMassY = massLimits['Y']['max']+20
     massLimits['Y']['max'] *= 4./3.
 
-    print "MAX MASS--->\N", maxMassY
-    print massLimits['Y']['max']
     # Create and fill histograms
     histoMin, histoMax, histoBin = { }, { }, { } 
     for axis in [ 'X', 'Y' ]:
@@ -282,7 +279,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
         histoMin[axis] = minEdge - histogramSettings[axis]['minCenter']*binWidth
         histoMax[axis] = maxEdge + histogramSettings[axis]['maxCenter']*binWidth
         histoBin[axis] = int((histoMax[axis] - histoMin[axis])/binWidth)
-        print "MAX EDGE", maxEdge, histoMin[axis],  histoMax[axis]
+        
     massScanHistos = { } 
 
     for massPoint in massPoints:
@@ -301,10 +298,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     crossSectionHistos = { } 
 
     for xSection in ['histo_X_'+limitType, 'histo_X_observed', 'histo_r_observed_up', 'histo_r_observed_down']:
-        print "inside xsec"
         if limitOption=='Observed' or limitType in xSection:
-            print "x", histoMax['X']
-
             crossSectionHistos[xSection] = ROOT.TH2F(xSection, '', histoBin['X'], histoMin['X'], histoMax['X'], 
                                                                    histoBin['Y'], histoMin['Y'], histoMax['Y'])
 
@@ -325,7 +319,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     
     # Save histogram file 
     outputFile = ROOT.TFile(outputFileName, 'recreate')
-    print "OUTPUT FILE NAME", outputFileName
     for histo in massScanHistos:
 
         if fillemptybins:
@@ -343,7 +336,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMakeHistos):
     if tag!='':
       
-        outputFileName = getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
+        outputFileName = getFileName('./Limits/' + year + '/' + tag + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
 
         if fillemptybins==False:
             outputFileName = outputFileName.replace('.root', '_noFillEmptyBins' + '.root')
@@ -437,7 +430,7 @@ def getMassScanContours(outputFileName):
 def makeMassScanContours(year, tag, sigset, limitOption, reMakeContours):
     if tag!='':
       
-        outputFileName = getFileName('./Limits/' + year + '/Contours', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
+        outputFileName = getFileName('./Limits/' + year + '/' + tag +  '/Contours', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
 
         if reMakeContours or not fileExist(outputFileName):
             getMassScanContours(outputFileName)
@@ -460,7 +453,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         if tag=='':
             continue
             
-        tagFileName = getFileName('./Limits/' + year + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + emptyBinsOption)
+        tagFileName = getFileName('./Limits/' + year + '/' + tag + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + emptyBinsOption)
 
         if not fileExist(tagFileName):
             print 'Error: input file', tagFileName, 'not found'
@@ -486,7 +479,6 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
     plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 1200, 900)
-    print "TAG 1------------->", tags[1]
     tagnm=tags[0]
     if len(tags[1])>0: tagnm+='_vs_'+tags[1]  
     plotTitle = tagnm + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
@@ -555,8 +547,8 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
 
 def makeExclusionPlot(year, tag, sigset, limitOptions):
 
-    inputFileNames = [ getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption),
-                       getFileName('./Limits/' + year + '/Contours',   'massScan_' + tag + '_' + sigset + '_' + limitOption) ]
+    inputFileNames = [ getFileName('./Limits/' + year + '/' + tag + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption),
+                       getFileName('./Limits/' + year + '/' + tag + '/Contours',   'massScan_' + tag + '_' + sigset + '_' + limitOption) ]
 
     for inputfilename in inputFileNames:
         if not fileExist(inputfilename):
@@ -564,10 +556,10 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
             exit() 
 
     cfgFileName = sigset + '_' + tag + '_' + limitOptions[1]
-    cfgFile = open('Limits/' + year + '/' + cfgFileName + '.cfg', 'w')
+    cfgFile = open('Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg', 'w')
 
     limitType = 'blind' if (limitOption=='Blind') else 'expected' 
-    inputFileName = 'Limits/' + year + '//massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
+    inputFileName = 'Limits/' + year + '/' + tag + '/massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
     print "input file name", inputFileName
     lumi = 0.
     if '2016' in year:
@@ -589,8 +581,8 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
     os.system('mkdir -p ' + outputDirectory)
     os.system('cp Plots/index.php ' + outputDirectory)
     workingDirectory = 'cd ../../../../../CMSSW_8_1_0/src; eval `scramv1 runtime -sh`; cd - ;'
-    os.system(workingDirectory + 'python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + cfgFileName + '.cfg ' + outputDirectory + cfgFileName) 
-    os.system('rm Limits/' + year + '/' + cfgFileName + '.cfg')
+    os.system(workingDirectory + 'python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg ' + outputDirectory + cfgFileName) 
+    os.system('rm Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg')
 
 if __name__ == '__main__':
 
