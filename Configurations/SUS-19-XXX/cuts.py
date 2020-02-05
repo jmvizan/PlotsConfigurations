@@ -221,7 +221,7 @@ if 'StopSignalRegions' in opt.tag:
         btagcut=BTAG
         vetocut=VETO
         if 'ISR' in opt.tag:
-            isrcut= ' CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged && && acos(cos(MET_phi-CleanJet_phi[0]))>2.5 && '
+            isrcut= ' CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged && acos(cos(MET_phi-CleanJet_phi[0]))>2.5 && '
         if 'pt30' in opt.tag:
             btagcut=BTAG30
             vetocut=VETO30
@@ -248,7 +248,7 @@ if 'StopSignalRegions' in opt.tag:
         btagcut=' '
         vetocut=' '
         if "ISR" in opt.tag:
-            isrcut='&& CleanJet_pt[1]>150. && fabs(MET_phi-CleanJet_phi)>2.5'
+            isrcut='&& CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged && acos(cos(MET_phi-CleanJet_phi[0]))>2.5 '
         if "pt30" in opt.tag:
             btagcut=' && '+BTAG30
             vetocut=' && '+VETO30
