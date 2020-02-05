@@ -42,7 +42,6 @@ years = yearset.split('-')
 
 for year in years:
     
-    os.system('mkdir -p ./Datacards/'+year)
     os.system('mkdir -p ./Datacards/'+year+'/'+tag)
                     
     for model in signalMassPoints:
