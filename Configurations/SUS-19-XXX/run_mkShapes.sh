@@ -57,18 +57,33 @@ else
 	if [ $# -lt 5 ]; then
 	    SPLIT='Samples'
 	else
-	    SPLIT=$5
+	    if [ $5 == 'tomorrow' ] || [ $5 == 'workday' ]; then
+		QUEUE=$5
+		if [ $# -lt 6 ]; then
+		    SPLIT='Samples'
+		else
+		    SPLIT=$6
+		fi
+	    else
+		SPLIT=$5
+	    fi
 	fi
     fi
 fi
 
 mkdir -p ./Shapes/$YEAR/$SPLIT
+mkdir -p ./Shapes/$YEAR/$TAG
+mkdir -p ./Shapes/$YEAR/$TAG/$SPLIT
 
 if [ $BATCH == True ]; then
-    mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$SPLIT --doBatch=True --batchQueue=testmatch --batchSplit=$SPLIT
+    mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$TAG/$SPLIT --doBatch=True --batchQueue=$QUEUE --batchSplit=$SPLIT
+
+#mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$SPLIT --doBatch=True --batchQueue=testmatch --batchSplit=$SPLIT
 else 
-    mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$SPLIT --batchSplit=$SPLIT --doHadd=True --doNotCleanup 
-    mv ./Shapes/$YEAR/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/plots_${TAG}_${SIGSET}.root    
+    rm ./Shapes/$YEAR/$TAG/$SPLIT/*_temp*.root
+    mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$TAG/$SPLIT --batchSplit=$SPLIT --doHadd=True --doNotCleanup 
+    rm ./Shapes/$YEAR/$TAG/$SPLIT/*_temp*.root
+    mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/$TAG/plots_${TAG}_${SIGSET}.root    
 fi
 
 #mkShapes.py --pycfg=configuration.py --tag=$TAG --treeName=Events --outputDir=./Shapes --doBatch=$BATCH --batchQueue=$QUEUE --batchSplit=Samples --doHadd=$DOHADD --doNotCleanup]==$KEEPINPUT
