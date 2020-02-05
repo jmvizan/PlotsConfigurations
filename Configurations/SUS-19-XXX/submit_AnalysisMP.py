@@ -152,7 +152,10 @@ logline = "For arguments:\n"+ year + ' ' + tag + ' ' + fileset + ' ' + doDC
 logline+= "\nList of samples sent in " + flistname
 writetolog(logfile, logline,doheader)
 makeSubFile2(subfilename,jobfolder, year, tag, 'MPs' , fileset,doDC,lognm)
-os.system("condor_submit "+subfilename+">>"+logfile)
+commandtorun="condor_submit "+subfilename
+print "command sent", commandtorun+">>"+logfile
+os.system(commandtorun+">>"+logfile)
+
 writetolog(logfile,"----------------------------------" ,doheader)
 
 print "\nCODE SHOULD BE SENT, MORE INFO IN LOG FILE:\n ", logfile
