@@ -35,7 +35,7 @@ nuisances['lumi']  = {
                'type'  : 'lnN',
 }
 for sample in samples.keys():
-    if sample!='DATA' and sample!='ZZ'  and sample!='ttZ' and sample!='WZ'  and sample!='DY':
+    if sample!='DATA':
         nuisances['lumi']  ['samples'][sample] = lumi_uncertainty 
 
 # trigger
@@ -46,7 +46,7 @@ nuisances['trigger']  = {
                'type'  : 'lnN',
 }
 for sample in samples.keys():
-    if sample!='DATA' and sample!='ZZ'  and sample!='ttZ' and sample!='WZ'  and sample!='DY':
+    if sample!='DATA':
         nuisances['trigger']  ['samples'][sample] = trigger_uncertainty
 
 # background cross section and scale factor uncertainties
@@ -54,6 +54,9 @@ for sample in samples.keys():
 if 'SignalRegions' in opt.tag:
     for background in normBackgrounds:
         if background in samples:
+
+            scalefactorFromData = True
+
             for region in normBackgrounds[background]:
                 nuisancename = 'norm'+background+region
                 scalefactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
@@ -64,6 +67,16 @@ if 'SignalRegions' in opt.tag:
                     'cuts'    : normBackgrounds[background][region]['cuts'], 
                     'type'    : 'lnN',
                 }
+                if region=='all' and scalefactor=='1.00':
+                    scalefactorFromData = False
+
+            if scalefactorFromData:
+            
+                if background in nuisances['lumi']['samples']:
+                    del nuisances['lumi']['samples'][background]
+            
+                if background in nuisances['trigger']['samples']:
+                    del nuisances['trigger']['samples'][background]
 
 ### shapes
 
@@ -118,7 +131,7 @@ btagSF = {
 
 for scalefactor in btagSF:
     nuisances[scalefactor]  = {
-        'name'  : scalefactor+year,
+        'name'  : scalefactor.replace('0', '').replace('1', '') +year,
         'samples'  : { },
         'kind'  : 'weight',
         'type'  : 'shape',
@@ -341,28 +354,31 @@ if hasattr(opt, 'inputFile'):
 
                         nuisances[sample+rateparamname]['cuts'].append(cut)
                         
-                        if 'bondrate' in rateparameters[rateparam].keys():
-
-                            bond_formula = '1+@0/@1*(1.-@2)' 
+                if 'bondrate' in rateparameters[rateparam].keys():
                                 
-                            fileIn = ROOT.TFile(opt.inputFile, "READ")
+                    fileIn = ROOT.TFile(opt.inputFile, "READ")
 
-                            nuisances[sample+rateparamname]['bond'] = {}
+                    nuisances[sample+rateparamname]['bond'] = {}
 
-                            for variable in variables.keys():
+                    for cut in nuisances[sample+rateparamname]['cuts']:
 
-                                histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
-                                cutB = rateparameters[rateparam]['subcut']
-                                cutA = rateparameters[rateparameters[rateparam]['bondrate']]['subcut']
-                                histoA = fileIn.Get(cut.replace(cutB, cutA)+'/'+variable+'/histo_'+sample)
-                                yieldB = '%-.4f' % histoB.Integral()
-                                yieldA = '%-.4f' % histoA.Integral()
+                        nuisances[sample+rateparamname]['bond'][cut] = {}
+
+                        for variable in variables.keys():
+
+                            histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
+                            cutB = rateparameters[rateparam]['subcut']
+                            cutA = rateparameters[rateparameters[rateparam]['bondrate']]['subcut']
+                            histoA = fileIn.Get(cut.replace(cutB, cutA)+'/'+variable+'/histo_'+sample)
+                            yieldB = '%-.4f' % histoB.Integral()
+                            yieldA = '%-.4f' % histoA.Integral()
             
-                                bond_parameters = yieldA+','+yieldB+','+rateparameters[rateparam]['bondrate']+'_'+mt2llregion+year
+                            bond_formula = '1+'+yieldA+'/'+yieldB+'*(1.-@0)' 
+                            bond_parameters = rateparameters[rateparam]['bondrate']+'_'+mt2llregion+year
+                            
+                            nuisances[sample+rateparamname]['bond'][cut][variable] =  { bond_formula : bond_parameters }
 
-                                nuisances[sample+rateparamname]['bond'][variable] =  { bond_formula : bond_parameters }
-
-                            fileIn.Close()
+                    fileIn.Close()
 
 ### Nasty tricks ...
 
