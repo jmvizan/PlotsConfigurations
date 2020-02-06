@@ -34,18 +34,32 @@ else
     else
 	SIGSET=$3
     fi
+    if [ $# -lt 4 ]; then
+	FILESET=$SIGSET
+    else
+	FILESET=$4
+    fi
 fi
 
 mkdir -p ./Plots/$YEAR/$TAG
 
-mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/plots_${TAG}_$SIGSET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2
+if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
+    mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2
+else
+    mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None
+fi
 
 cp ./Plots/index.php ./Plots/$YEAR/
 cp ./Plots/index.php ./Plots/$YEAR/$TAG/
 
-if [ $# -lt 4 ]; then
-    rm ./Plots/$YEAR/$TAG/c_*
-    rm ./Plots/$YEAR/$TAG/log_c_*
+if [ $# -lt 5 ]; then
+    if [[ $SIGSET == 'SM'* ]]; then  
+	rm ./Plots/$YEAR/$TAG/c_*
+	rm ./Plots/$YEAR/$TAG/log_c_*
+    else
+	rm ./Plots/$YEAR/$TAG/cratio_*
+	rm ./Plots/$YEAR/$TAG/log_cratio_*
+    fi
     rm ./Plots/$YEAR/$TAG/cdifference*
     rm ./Plots/$YEAR/$TAG/log_cdifference_*
 fi

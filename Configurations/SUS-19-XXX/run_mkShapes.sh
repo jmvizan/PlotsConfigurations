@@ -69,8 +69,13 @@ if [ $BATCH == True ]; then
 else 
     rm ./Shapes/$YEAR/$SPLIT/*_temp*.root
     mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$SPLIT --batchSplit=$SPLIT --doHadd=True --doNotCleanup 
-    rm ./Shapes/$YEAR/$SPLIT/*_temp*.root
-    mv ./Shapes/$YEAR/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/plots_${TAG}_${SIGSET}.root    
+    if [[ "$SIGSET" == "Backgrounds"* ]] && [[ "$SIGSET" != "Backgrounds-"* ]] && [[ "$SIGSET" != "Backgrounds" ]]; then
+	ONLYSAMPLE=${SIGSET#Backgrounds}
+	mv ./Shapes/$YEAR/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/Samples/plots_${TAG}_ALL_${ONLYSAMPLE}.root
+    else
+	mv ./Shapes/$YEAR/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/plots_${TAG}_${SIGSET}.root 
+    fi
+    rm ./Shapes/$YEAR/$SPLIT/*_temp*.root   
 fi
 
 #mkShapes.py --pycfg=configuration.py --tag=$TAG --treeName=Events --outputDir=./Shapes --doBatch=$BATCH --batchQueue=$QUEUE --batchSplit=Samples --doHadd=$DOHADD --doNotCleanup]==$KEEPINPUT
