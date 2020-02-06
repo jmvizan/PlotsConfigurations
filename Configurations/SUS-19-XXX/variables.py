@@ -97,8 +97,8 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
         mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'
  
     variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-#                                     'range' : (   7,    0.,  140.),   #   variable range
-                                     'range' : (   8,    0.,  160.),   #   variable range
+                                     'range' : (   7,    0.,  140.),   #   variable range
+#                                     'range' : (   8,    0.,  160.),   #   variable range
                                      'xaxis' : mt2 + pll + gv,         #   x axis name
                                      'fold'  : 1                       #   fold overflow
                                  }
@@ -106,8 +106,8 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
     if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag: 
 
         variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
-#                                        'range' : (  20,    0.,  400.),    #   variable range                               
-                                        'range' : (  30,    0.,  600.),    #   variable range
+                                        'range' : (  20,    0.,  400.),    #   variable range                               
+#                                        'range' : (  30,    0.,  600.),    #   variable range
                                         'xaxis' : met + gv,                #   x axis name
                                         'fold'  : 1                        #   fold overflow
                                      }
