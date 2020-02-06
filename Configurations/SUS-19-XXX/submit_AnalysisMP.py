@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import os,sys
 from datetime import datetime
 import numpy as np
@@ -29,7 +30,7 @@ def makeSubFile2(filename,folder,year,tag,sigset,fileset, doDC,writesigset):
     PWD = os.getenv('PWD')+'/'
     f = open(filename,"w+")
     jobsent= '$(' +sigset + ')'
-    arguments = year+' '+tag+' '+jobsent+ ' ' +fileset+' '+str(doDC)
+    arguments = year+' '+tag+' '+jobsent+ ' ' +PWD+' '+fileset+' '+str(doDC)
     #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
@@ -37,7 +38,7 @@ def makeSubFile2(filename,folder,year,tag,sigset,fileset, doDC,writesigset):
     f.write("error                 = "+folder+"/"+jobsent+"$(ClusterId).$(ProcId).err\n")
     f.write("log                   = "+folder+"/"+jobsent+"$(ClusterId).log\n")
     f.write("+JobFlavour           = tomorrow\n")
-    f.write("queue "+sigset+' from joblist.txt \n')
+    f.write("queue "+sigset+' from '+folder+'/joblist.txt \n')
     f.close()
 
 

@@ -42,15 +42,21 @@ if __name__ == '__main__':
 
     sigset=sys.argv[3]
 
-    if len(sys.argv)==5:
-        if(sys.argv[4].lower()in ["dodatacards","dodc","mkdc","makedatacards"]):
+    dcIdx = 4
+    if len(sys.argv)>=5:
+        if os.getenv('USER') in sys.argv[4]:
+            SUS19 = sys.argv[4]
+            dcIdx = 5
+                                         
+    if len(sys.argv)==dcIdx+1:
+        if(sys.argv[dcIdx].lower()in ["dodatacards","dodc","mkdc","makedatacards"]):
             doDC=True
             fileset=sigset
         else:
-            fileset=sys.argv[4]
-    elif len(sys.argv)==6:
-        fileset=sys.argv[4] 
-        if(sys.argv[5].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
+            fileset=sys.argv[dcIdx]
+    elif len(sys.argv)==dcIdx+2:
+        fileset=sys.argv[dcIdx] 
+        if(sys.argv[dcIdx+1].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
             doDC=True
     else:
         fileset=sigset
