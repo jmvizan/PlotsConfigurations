@@ -214,7 +214,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     massPoints = { }
     massLimits = { 'X' : { 'min' : 999999., 'max' : -1. }, 'Y' : { 'min' : 999999., 'max' : -1. } }
 
-    inputDirectory = './Limits/'+year+'/' 
+    inputDirectory = './Limits/'+year+'/'+tag+'/' 
     
     limitType = 'blind' if (limitOption=='Blind') else 'expected'
     for model in signalMassPoints:
@@ -279,7 +279,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
         histoMin[axis] = minEdge - histogramSettings[axis]['minCenter']*binWidth
         histoMax[axis] = maxEdge + histogramSettings[axis]['maxCenter']*binWidth
         histoBin[axis] = int((histoMax[axis] - histoMin[axis])/binWidth)
-
+        
     massScanHistos = { } 
 
     for massPoint in massPoints:
@@ -299,7 +299,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 
     for xSection in ['histo_X_'+limitType, 'histo_X_observed', 'histo_r_observed_up', 'histo_r_observed_down']:
         if limitOption=='Observed' or limitType in xSection:
-
             crossSectionHistos[xSection] = ROOT.TH2F(xSection, '', histoBin['X'], histoMin['X'], histoMax['X'], 
                                                                    histoBin['Y'], histoMin['Y'], histoMax['Y'])
 
@@ -320,7 +319,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     
     # Save histogram file 
     outputFile = ROOT.TFile(outputFileName, 'recreate')
-
     for histo in massScanHistos:
 
         if fillemptybins:
@@ -338,7 +336,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMakeHistos):
     if tag!='':
       
-        outputFileName = getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
+        outputFileName = getFileName('./Limits/' + year + '/' + tag + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
 
         if fillemptybins==False:
             outputFileName = outputFileName.replace('.root', '_noFillEmptyBins' + '.root')
@@ -432,7 +430,7 @@ def getMassScanContours(outputFileName):
 def makeMassScanContours(year, tag, sigset, limitOption, reMakeContours):
     if tag!='':
       
-        outputFileName = getFileName('./Limits/' + year + '/Contours', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
+        outputFileName = getFileName('./Limits/' + year + '/' + tag +  '/Contours', 'massScan_' + tag + '_' + sigset + '_' + limitOption)
 
         if reMakeContours or not fileExist(outputFileName):
             getMassScanContours(outputFileName)
@@ -455,7 +453,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         if tag=='':
             continue
             
-        tagFileName = getFileName('./Limits/' + year + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + emptyBinsOption)
+        tagFileName = getFileName('./Limits/' + year + '/' + tag + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + emptyBinsOption)
 
         if not fileExist(tagFileName):
             print 'Error: input file', tagFileName, 'not found'
@@ -471,7 +469,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
                     if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
                         continue
                 else:
-                    if '_up' in obj.GetName() or '_down' in obj.GetName():
+                    if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
                         obj.SetLineStyle(2)
                 if limitOptions[0].lower() in obj.GetName():
                     tagObj.append(obj)
@@ -481,8 +479,9 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
     plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 1200, 900)
-    
-    plotTitle = tags[0] + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
+    tagnm=tags[0]
+    if len(tags[1])>0: tagnm+='_vs_'+tags[1]  
+    plotTitle = tagnm + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
     if tags[1]!='':
         plotTitle.replace(tags[0], tags[0] + '_to_' + tags[1]) 
     tagObj[0].SetTitle(plotTitle)   
@@ -525,7 +524,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         drawPlotOption = 'colz'			
         if fillemptybins==False:		
             drawPlotOption = 'textcolz'
-
+            ROOT.gStyle.SetPaintTextFormat("4.2f")
 
         tagObj[0].Draw(drawPlotOption)
 
@@ -548,8 +547,8 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
 
 def makeExclusionPlot(year, tag, sigset, limitOptions):
 
-    inputFileNames = [ getFileName('./Limits/' + year + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption),
-                       getFileName('./Limits/' + year + '/Contours',   'massScan_' + tag + '_' + sigset + '_' + limitOption) ]
+    inputFileNames = [ getFileName('./Limits/' + year + '/' + tag + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption),
+                       getFileName('./Limits/' + year + '/' + tag + '/Contours',   'massScan_' + tag + '_' + sigset + '_' + limitOption) ]
 
     for inputfilename in inputFileNames:
         if not fileExist(inputfilename):
@@ -557,19 +556,18 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
             exit() 
 
     cfgFileName = sigset + '_' + tag + '_' + limitOptions[1]
-    cfgFile = open('Limits/' + year + '/' + cfgFileName + '.cfg', 'w')
+    cfgFile = open('Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg', 'w')
 
     limitType = 'blind' if (limitOption=='Blind') else 'expected' 
-    inputFileName = 'Limits/' + year + '//massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
-   
+    inputFileName = 'Limits/' + year + '/' + tag + '/massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
+    print "input file name", inputFileName
     lumi = 0.
     if '2016' in year:
         lumi += 35.92
-    elif '2017' in year:
+    if '2017' in year:
         lumi += 41.53
-    elif '2018' in year:
+    if '2018' in year:
         lumi += 59.74
-
     cfgFile.write('HISTOGRAM ' + inputFileName.replace('//', '/Histograms/') + ' histo_X_' + limitOptions[1].lower() + '\n')
     cfgFile.write('EXPECTED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up graph_r_'+limitType+'_down kRed kOrange\n')
     cfgFile.write('OBSERVED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_observed graph_r_observed_up graph_r_observed_down kBlack kGray\n')
@@ -583,8 +581,8 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
     os.system('mkdir -p ' + outputDirectory)
     os.system('cp Plots/index.php ' + outputDirectory)
     workingDirectory = 'cd ../../../../../CMSSW_8_1_0/src; eval `scramv1 runtime -sh`; cd - ;'
-    os.system(workingDirectory + 'python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + cfgFileName + '.cfg ' + outputDirectory + cfgFileName) 
-    os.system('rm Limits/' + year + '/' + cfgFileName + '.cfg')
+    os.system(workingDirectory + 'python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg ' + outputDirectory + cfgFileName) 
+    os.system('rm Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg')
 
 if __name__ == '__main__':
 
@@ -652,7 +650,7 @@ if __name__ == '__main__':
         makeMassScanContours(year, opt.tag,       opt.sigset, limitOptions[1], opt.reMakeContours)
         makeMassScanContours(year, opt.compareTo, opt.sigset, limitOptions[1], opt.reMakeContours)
 
-    if plotOption=='Histograms' or plotOption=='Contours': 
+    if plotOption=='Histograms' or plotOption=='Contours':
         plotLimits(year, [ opt.tag, opt.compareTo ], opt.sigset, limitOptions, plotOption, fillEmpties) 
 
     if plotOption=='Final':
