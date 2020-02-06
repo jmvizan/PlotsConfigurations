@@ -80,7 +80,7 @@ else
     mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$TAG/$SPLIT --batchSplit=$SPLIT --doHadd=True --doNotCleanup 
     if [[ "$SIGSET" == "Backgrounds"* ]] && [[ "$SIGSET" != "Backgrounds-"* ]] && [[ "$SIGSET" != "Backgrounds" ]]; then
 	ONLYSAMPLE=${SIGSET#Backgrounds}
-	mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/$TAG/Samples/plots_${TAG}_ALL_${ONLYSAMPLE}.root
+	mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/$TAG/Samples/plots_$YEAR${TAG}_ALL_${ONLYSAMPLE}.root
     else
 	mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/$TAG/plots_${TAG}_${SIGSET}.root 
     fi
