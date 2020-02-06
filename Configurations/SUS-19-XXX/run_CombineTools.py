@@ -107,7 +107,7 @@ if __name__ == '__main__':
             #print opt.sigset, "<-sigset, masspoint->", massPoint
             if not massPointInSignalSet(massPoint, opt.sigset): continue
             for year in years:
-                mpLoc=PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+massPoint
+                mpLoc=PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+opt.tag+'/'+massPoint
                 if(os.path.exists(mpLoc) is not True):
                     print mpLoc
                     if(doTest is True): print "\n Folder for MassPoint", massPoint," does not exist:"
@@ -137,7 +137,7 @@ if __name__ == '__main__':
                 print "there are no Datacards in the folder under the input parameters"
             else:
                 #Actually merge the DC
-                dcLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+massPoint
+                dcLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+opt.tag+'/'+massPoint
                 os.system('mkdir -p '+dcLoc)
                 finalDC=dcLoc+'/'+opt.tag+'.txt'
 
@@ -157,8 +157,11 @@ if __name__ == '__main__':
 
                 #Calculate the limits
                 if(doLimits is True and thereIsDC is True):
-                    outLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+massPoint
+                    outLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+opt.tag+'/'
                     os.system('mkdir -p '+outLoc)
+                    outLoc+=massPoint
+                    os.system('mkdir -p '+outLoc)
+                    
                     combCommand='cd '+outLoc+'; combine -M AsymptoticLimits --run '+opt.limrun.lower() +' ' +finalDC+' -n _'+opt.tag+'_'+opt.limrun
                     print "Sending combination", combCommand
                     os.system(doCombcmsenv+combCommand)
