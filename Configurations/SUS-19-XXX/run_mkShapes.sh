@@ -82,7 +82,7 @@ else
 	ONLYSAMPLE=${SIGSET#Backgrounds}
 	mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/$TAG/Samples/plots_${TAG}_ALL_${ONLYSAMPLE}.root
     else
-      	mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/$TAG/plots_${TAG}_${SIGSET}.root 
+	mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR$TAG.root ./Shapes/$YEAR/$TAG/plots_${TAG}_${SIGSET}.root 
     fi
     rm ./Shapes/$YEAR/$TAG/$SPLIT/*_temp*.root
 fi
