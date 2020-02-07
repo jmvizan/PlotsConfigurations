@@ -439,6 +439,9 @@ for model in signalMassPoints:
                 samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,'nanoLatino_'),
                                        'weight' : BranchingRatio+'*'+XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut'] ,
                                        'FilesPerJob' : 2 ,
+                                       'suppressNegative':['all'],
+                                       'suppressNegativeNuisances' :['all'],
+                                       'suppressZeroTreeNuisances' : ['all'],
                                        'fastsim' : 1.
                                    }
                 
