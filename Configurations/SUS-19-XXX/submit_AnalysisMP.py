@@ -82,9 +82,9 @@ if(len(sys.argv)>4):
 else: fileset=sigset
 exec(open("signalMassPoints.py").read())
 
-inputfile='./Shapes/'+year+'/'+tag+'/plots_'+tag+'_'+fileset+'.root'
+inputfile='./Shapes/'+year+'/'+tag+'/plots_'+tag+'_SM-'+fileset+'.root'
 if os.path.exists(inputfile) is False:
-    print "ROOT File doesn't exist, exiting"
+    print "ROOT File",inputfile," doesn't exist, exiting"
     exit()
 #Look for masspoints in the sigset
 mpInSigset=[]
