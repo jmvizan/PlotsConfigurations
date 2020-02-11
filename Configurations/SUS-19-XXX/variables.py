@@ -120,7 +120,7 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          'fold'  : 1                       #   fold overflow
                                      }
         
-        variables['sumLepPt']      = {   'name'  : Lepton_pt[0]+Lepton_pt[1], #   variable name    
+        variables['sumLepPt']      = {   'name'  : 'Lepton_pt[0]+Lepton_pt[1]', #   variable name    
                                          'range' : ( 120,    0., 3000.),   #   variable range
                                          'xaxis' : 'sumleppt' + gv,        #   x axis name
                                          'fold'  : 1                       #   fold overflow
