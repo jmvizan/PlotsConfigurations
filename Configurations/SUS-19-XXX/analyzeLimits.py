@@ -304,7 +304,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
             for massPoint in sorted(signalMassPoints[model]):
 
                 if massPointInSignalSet(massPoint, sigset): 
-                  
                     inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
                     inputFile = ROOT.TFile(inputFileName, 'READ')
                 
@@ -623,6 +622,7 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
     inputFileNames = [ getFileName('./Limits/' + year + '/' + tag + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + limitOption),
                        getFileName('./Limits/' + year + '/' + tag + '/Contours',   'massScan_' + tag + '_' + sigset + '_' + limitOption) ]
 
+    inputFileName=''
     for inputfilename in inputFileNames:
         if not fileExist(inputfilename):
             print 'makeExclusionPlot: input file', inputfilename, 'not found, exiting' 
