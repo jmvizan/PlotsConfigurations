@@ -3,24 +3,20 @@ import os,sys
 from datetime import datetime
 import numpy as np
 
+#write header to logfile
+def logtitle(filename,sigset):
+    if(os.path.exists(filename) is False):  print "creating log file"
+    f = open(filename,"a")
+    # Textual month, day and year
+    now = datetime.now()
+    d2  = now.strftime("%d %B, %Y, at %H:%M:%S")
+    f.write(d2+"\nCALCULATING LIMITS FOR:\t "+ sigset+"\n")
+    f.close()
 
 
 #Create log file
-def writetolog(filename,line,doheader):
-    #print filename.split('/')[1].split('.')[0].split(',')
-    folnm=filename.split('/')
-    #for i in folnm:
-        #print "fo", folnm
-    if(os.path.exists(filename) is False):
-        print "creating file",filename
-        f = open(filename,"w+")
-    else:
-        f = open(filename,"a+")
-    # Textual month, day and year
-    if(doheader is True):
-        now = datetime.now()
-        d2  = now.strftime("%d %B, %Y, at %H:%M:%S")
-        f.write(d2+"\nSUBMITTING FILES\n\n")
+def writetolog(filename,line):
+    f = open(filename,"a")
     f.write(line+'\n')
     f.close()
     #print "line", line
@@ -34,9 +30,9 @@ def makeSubFile2(filename,folder,year,tag,sigset,fileset, doDC,writesigset):
     #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
-    f.write("output                = "+folder+"/"+jobsent+"$(ClusterId).$(ProcId).out\n")
-    f.write("error                 = "+folder+"/"+jobsent+"$(ClusterId).$(ProcId).err\n")
-    f.write("log                   = "+folder+"/"+jobsent+"$(ClusterId).log\n")
+    f.write("output                = "+folder+"/"+jobsent+".$(ClusterId).out\n")
+    f.write("error                 = "+folder+"/"+jobsent+".$(ClusterId).err\n")
+    f.write("log                   = "+folder+"/"+jobsent+".$(ClusterId).log\n")
     f.write("+JobFlavour           = tomorrow\n")
     f.write("queue "+sigset+' from '+folder+'/joblist.txt \n')
     f.close()
@@ -130,58 +126,31 @@ nMPs        = 2
 lognm       = '_'.join(writesigset)
 jobfolder   = "./Condor/"+year+'/'+tag
 logfile     = jobfolder + '/'+lognm+".log"
-subfilename = jobfolder + "/submitMPtemp.sub"
+subfilename = jobfolder + '/'+lognm+".sub"
 flistname   = jobfolder+'/joblist.txt'
 
-jobs        = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
 os.system("mkdir -p "+jobfolder)
-flist       = open(flistname,"w+")
-doheader    = True
-for job in jobs:
+logtitle(logfile,fileset)
+logline =   "Input arguments:\t"+ year + ' ' + tag + ' ' + fileset + ' ' + doDC
+logline+= "\nSample list    :\t" + flistname
+logline+= "\nSubmission file:\t"+ subfilename
+writetolog(logfile, logline)
+
+jobs     = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
+flist    = open(flistname,"w+")
+for ijob,job in enumerate(jobs):
     argsigset = ",".join(job)
-    #line      = "\njob MPs: "+argsigset
     flist.write(argsigset+'\n')
-    #writetolog(logfile, line,doheader)
-    #makeSubFile(subfilename, year, tag, argsigset, fileset,doDC,lognm)
     submit="condor_submit "+subfilename+" >>"+logfile
-    #os.system(submit)
-    #doheader  = False
+    print "sending job",str(ijob)+":", argsigset 
 flist.close()
 #Function to create sub file                                                         
 
-logline = "For arguments:\n"+ year + ' ' + tag + ' ' + fileset + ' ' + doDC
-logline+= "\nList of samples sent in " + flistname
-writetolog(logfile, logline,doheader)
 makeSubFile2(subfilename,jobfolder, year, tag, 'MPs' , fileset,doDC,lognm)
-commandtorun="condor_submit "+subfilename
-print "command sent", commandtorun+">>"+logfile
-os.system(commandtorun+">>"+logfile)
+commandtorun="condor_submit "+subfilename+">>"+logfile
+os.system(commandtorun)
+print "jobs sent:\n", commandtorun
+writetolog(logfile,"----------------------------------")
 
-writetolog(logfile,"----------------------------------" ,doheader)
+print "LIMITS SENT\nlog file:\t"+logfile,"\nsub file:\t"+subfilename,"\njob list:\t"+flistname 
 
-print "\nCODE SHOULD BE SENT, MORE INFO IN LOG FILE:\n ", logfile
-print subfilename
-
-
-'''
-#Function to create sub file
-def makeSubFile(filename,year,tag,sigset,fileset, doDC,writesigset):
-    PWD = os.getenv('PWD')+'/'
-    f = open(filename,"w+")
-    logfolder="./Condor/"+tag  
-    os.system("mkdir -p "+logfolder)
-    logfolder+='/'+year
-    os.system("mkdir -p "+logfolder)
-    logfolder+='/'+writesigset
-    os.system("mkdir -p "+logfolder)
-    arguments = year+' '+tag+' '+sigset+' '+fileset+' '+str(doDC)
-    #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"
-    f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
-    f.write("arguments             = "+arguments+"\n")
-    f.write("output                = "+logfolder+"/$(ClusterId).$(ProcId).out\n")
-    f.write("error                 = "+logfolder+"/$(ClusterId).$(ProcId).err\n")
-    f.write("log                   = "+logfolder+"/$(ClusterId).log\n")
-    f.write("+JobFlavour           = tomorrow\n")
-    f.write("queue\n")
-    f.close() 
-'''

@@ -157,9 +157,7 @@ if __name__ == '__main__':
 
                 #Calculate the limits
                 if(doLimits is True and thereIsDC is True):
-                    outLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+opt.tag+'/'
-                    os.system('mkdir -p '+outLoc)
-                    outLoc+=massPoint
+                    outLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+opt.tag+'/'+massPoint
                     os.system('mkdir -p '+outLoc)
                     
                     combCommand='cd '+outLoc+'; combine -M AsymptoticLimits --run '+opt.limrun.lower() +' ' +finalDC+' -n _'+opt.tag+'_'+opt.limrun

@@ -559,7 +559,7 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
     cfgFile = open('Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg', 'w')
 
     limitType = 'blind' if (limitOption=='Blind') else 'expected' 
-    inputFileName = 'Limits/' + year + '/' + tag + '/massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
+    inputFileName = 'Limits/' + year + '/' + tag + '//massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
     print "input file name", inputFileName
     lumi = 0.
     if '2016' in year:
