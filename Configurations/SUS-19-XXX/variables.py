@@ -104,6 +104,34 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                      'fold'  : 1                       #   fold overflow
                                  }
 
+    if 'StudyVisHT' in opt.tag:
+ 
+        visht = 'Lepton_pt[0]+Lepton_pt[1]+Sum$(CleanJet_pt)'
+        
+        variables['visht']         = {   'name'  : visht,                  #   variable name    
+                                         'range' : ( 120,    0., 3000.),   #   variable range
+                                         'xaxis' : 'visht' + gv,           #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+                                     }
+        
+        variables['ht']            = {   'name'  : 'Sum$(CleanJet_pt)',    #   variable name    
+                                         'range' : ( 120,    0., 3000.),   #   variable range
+                                         'xaxis' : 'ht' + gv,              #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+                                     }
+        
+        variables['sumLepPt']      = {   'name'  : Lepton_pt[0]+Lepton_pt[1], #   variable name    
+                                         'range' : ( 120,    0., 3000.),   #   variable range
+                                         'xaxis' : 'sumleppt' + gv,        #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+                                     }
+    
+        variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name    
+                                        'range' : (  6,    0.,     6.),    #   variable range
+                                        'xaxis' : 'number of jets',        #   x axis name
+                                        'fold'  : 1                        #   fold overflow
+                                    }
+
     if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
 
         variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    

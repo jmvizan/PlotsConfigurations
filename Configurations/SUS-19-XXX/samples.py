@@ -213,7 +213,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'ST_tW_top'+tWext,    False,'nanoLatino_'),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
-                                }
+                            }
 
         ttZext = ''
         if '2016' in opt.tag : 
@@ -228,6 +228,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 getSampleFiles(directoryBkg,'TTWJetsToQQ',False,'nanoLatino_'), 
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
+                                'suppressNegative':['all'],
+                                'suppressNegativeNuisances' :['all'],
                                 }
 
         if '2018' not in opt.tag : 
@@ -378,7 +380,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'qqHToZZTo4L_M125',False,'nanoLatino_')
                 samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,'nanoLatino_')
 
-if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds':
+if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
 
     sampleToRemove = [ ] 
 
