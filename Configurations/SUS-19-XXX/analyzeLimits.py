@@ -571,6 +571,11 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
 
         if tags[1]!='':
             tagObj[0].Divide(tagObj[1])
+            tagObj[0].SetMinimum(0.5)
+            tagObj[0].SetMaximum(1.5)
+        else:            
+            tagObj[0].SetMinimum(0)
+            tagObj[0].SetMaximum(3)
 
         tagObj[0].GetZaxis().SetTitleSize(0.035)
         tagObj[0].GetZaxis().SetLabelFont(42)
@@ -578,8 +583,6 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         tagObj[0].GetZaxis().SetLabelSize(0.035)
         tagObj[0].GetZaxis().SetTitleSize(0.035)
 
-        tagObj[0].SetMinimum(0)
-        tagObj[0].SetMaximum(3)
 
         if maxMassY>0.:
             tagObj[0].GetYaxis().SetRange(1, tagObj[0].GetYaxis().FindBin(maxMassY)+1);

@@ -269,12 +269,6 @@ nuisances['ptmissfastsim']  = {
 for sample in samples.keys():
     if 'fastsim' in samples[sample].keys():
         nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
-# This is kind of a patch ...
-if 'TChipm' in opt.sigset:
-    nuisances['ptmissfastsim']['cuts'] = [ ]
-    for cut in cuts.keys():
-        if '_Tag_' not in cut:
-            nuisances['ptmissfastsim']['cuts'].append(cut)
 
 ### LHE weights
 
