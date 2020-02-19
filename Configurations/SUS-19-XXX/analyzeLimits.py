@@ -159,6 +159,74 @@ def fillEmptyBins(sigset, histo):
                             if iter==5:
                                 histo.SetBinContent(xb, yb, scaleByNeighbour(histo, xb, yb, 0, 3, 1))
 
+    elif 'TChipmSlepSnu' in sigset:
+
+        # First deal with missing fits ...
+        for Bin in range(histo.GetNbinsX()+histo.GetNbinsY(), 1, -1):
+            if Bin-histo.GetNbinsX()>=1:
+                xb, yb = 1, Bin-histo.GetNbinsX() 
+            else:
+                xb, yb = histo.GetNbinsX()-Bin+2, 1
+            while xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
+                massX = histo.GetXaxis().GetBinCenter(xb)
+                massY = histo.GetYaxis().GetBinCenter(yb)
+                if massX-massY>50.:
+
+                    massXStep, massYStep = 25, 25
+                    binStep = int(massXStep/25.)
+                    
+                    if massX%massXStep==0 and massY%massYStep==0:
+                        
+                        if histo.GetBinContent(xb, yb)==0:
+
+                            if xb<=binStep:
+
+                                print 'fillEmptyBins: TChipmSlepSnu type-1 singularity to be studied at mC-',massX, 'mX-',massY
+                                while histo.GetBinContent(xb, yb)==0. and xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
+                                    xb += binStep; yb += binStep
+
+                            else:
+
+                                holeLenght = 1
+                                xbi, ybi, xbf, ybf = xb-binStep, yb-binStep, xb, yb
+                                while histo.GetBinContent(xbf, ybf)==0. and xbf<=histo.GetNbinsX() and ybf<=histo.GetNbinsY():
+                                    holeLenght += 1
+                                    xbf += binStep; ybf += binStep
+
+                                if xb>binStep and yb>binStep:
+                                
+                                    xbi, ybi  = xb-binStep, yb-binStep
+                                    if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
+                                        print 'fillEmptyBins: TChipmSlepSnu type-2 singularity to be better studied at mC-',massX, 'mX-',massY
+                                        xbf, ybf = xbi, ybi 
+
+                                    stepLimit = (histo.GetBinContent(xbf, ybf) - histo.GetBinContent(xbi, ybi))/holeLenght
+                                    for holeStep in range(1, holeLenght):
+                                        histo.SetBinContent(xb, yb, roundBin(histo.GetBinContent(xbi, ybi)+holeStep*stepLimit))
+                                        xb += binStep; yb += binStep
+
+                                else:
+
+                                    if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
+                                        print 'fillEmptyBins: TChipmSlepSnu type-3 singularity to be studied at mC-',massX, 'mX-',massY
+                                            
+                                    else:
+                                            
+                                        for holeStep in range(1, holeLenght):
+                                            xbc, ybc = xbf - holeStep*binStep, ybf - holeStep*binStep
+                                            histo.SetBinContent(xbc, ybc, roundBin(scaleByNeighbour(histo, xbc, ybc, 0, binStep, binStep)))
+
+                                    xb = xbf; yb = ybf
+                                                
+                        else:
+                            xb += binStep; yb += binStep
+
+                    else:
+                        xb += 1; yb += 1
+
+                else:
+                    xb += 1; yb += 1
+
     else:
         print 'Warning: strategy for filling empty bins not available for model', model
 
@@ -171,14 +239,16 @@ def getCrossSectionUncertainty(susyProcess, isusyMass):
         xsUnc = xsUnc.replace('%', '')
         return float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['value'])*float(xsUnc)/100.
 
-def getCrossSection(susyProcess, susyMass):
+def getCrossSection(susyProcess, susyModel, susyMass):
+
+    convBR = float(SUSYCrossSections[susyProcess]['susyModels'][susyModel])
 
     isusyMass = int(susyMass)
 
     if str(isusyMass) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
         
-        return [float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['value']),
-                getCrossSectionUncertainty(susyProcess, isusyMass)]
+        return [convBR*float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['value']),
+                convBR*getCrossSectionUncertainty(susyProcess, isusyMass)]
         
     elif isusyMass%5!=0 :
         
@@ -196,7 +266,7 @@ def getCrossSection(susyProcess, susyMass):
             susyXsecRelUnc = (getCrossSectionUncertainty(susyProcess, isusyMass1)/susyXsec1 + 
                               getCrossSectionUncertainty(susyProcess, isusyMass2)/susyXsec2)/2.
                 
-            return [susyXsec, susyXsec*susyXsecRelUnc]
+            return [convBR*susyXsec, convBR*susyXsec*susyXsecRelUnc]
 
     print 'getCrossSection ERROR: cross section not available for', susyProcess, 'at mass =', susyMass, ', exiting'
     exit()
@@ -208,6 +278,8 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     # Get mass points and mass limits
     modelHistogramSettings = { 'T2tt' : { 'X' : { 'binWidth' : 12.5, 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde t_{1}} [GeV]'        },
                                           'Y' : { 'binWidth' : 12.5, 'minCenter' : 1.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]' } },
+                               'TChipmSlepSnu' : { 'X' : { 'binWidth' : 25., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{#pm}_{1}} [GeV]' },
+                                                   'Y' : { 'binWidth' : 25., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'   } },
                                # ...
     }
     
@@ -223,6 +295,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                 histogramSettings = modelHistogramSettings[model]
                 for process in SUSYCrossSections:
                     if model in SUSYCrossSections[process]['susyModels']:
+                        susyModel = model
                         susyProcess = process
             else:
                 print 'Error: histogram setting for model', model, 'not available, exiting'
@@ -304,7 +377,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
             for xb in range(1, crossSectionHistos[xSection].GetNbinsX()+1):
 
                 massX = crossSectionHistos[xSection].GetXaxis().GetBinCenter(xb)
-                massPointCrossSection, massPointCrossSectionUncertainty = getCrossSection(susyProcess, massX)
+                massPointCrossSection, massPointCrossSectionUncertainty = getCrossSection(susyProcess, susyModel, massX)
 
                 if '_up' in xSection:
                     massPointCrossSection /= massPointCrossSection + massPointCrossSectionUncertainty
@@ -357,7 +430,7 @@ def getMassScanContour(outputFileName, histo):
 
             x.append(massX)
             y.append(massY)
-            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.):
+            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.) or ('TChipmSlepSnu' in outputFileName and massX-massY<50.):
                 z.append(3.)
             else: 
                 z.append(histo.GetBinContent(xb, yb))
@@ -498,6 +571,11 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
 
         if tags[1]!='':
             tagObj[0].Divide(tagObj[1])
+            tagObj[0].SetMinimum(0.5)
+            tagObj[0].SetMaximum(1.5)
+        else:            
+            tagObj[0].SetMinimum(0)
+            tagObj[0].SetMaximum(3)
 
         tagObj[0].GetZaxis().SetTitleSize(0.035)
         tagObj[0].GetZaxis().SetLabelFont(42)
@@ -505,8 +583,6 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         tagObj[0].GetZaxis().SetLabelSize(0.035)
         tagObj[0].GetZaxis().SetTitleSize(0.035)
 
-        tagObj[0].SetMinimum(0)
-        tagObj[0].SetMaximum(3)
 
         if maxMassY>0.:
             tagObj[0].GetYaxis().SetRange(1, tagObj[0].GetYaxis().FindBin(maxMassY)+1);

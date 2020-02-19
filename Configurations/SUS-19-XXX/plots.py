@@ -183,6 +183,27 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 'scale'    : 1.0
             }
 
+sampleToRemoveFromPlot = [ ] 
+
+for sample in plot:
+    if sample not in samples:
+        sampleToRemoveFromPlot.append(sample)
+
+for sample in sampleToRemoveFromPlot:
+    del plot[sample]
+
+groupToRemoveFromPlot = [ ] 
+
+for group in groupPlot:
+    for sample in sampleToRemoveFromPlot:
+        if sample in groupPlot[group]['samples']:
+            groupPlot[group]['samples'].remove(sample)
+    if len(groupPlot[group]['samples'])==0:
+        groupToRemoveFromPlot.append(group)
+    
+for group in groupToRemoveFromPlot:
+    del groupPlot[group]
+
 # data
 
 if 'SM' in opt.sigset or 'Data' in opt.sigset:

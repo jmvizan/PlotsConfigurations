@@ -16,12 +16,15 @@ print 'Value of lumi set to', opt.lumi
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirSig  = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-    if '2018' in opt.tag :
-        treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-    else :
-        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
+    treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
+    treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/'
+    treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
+    #treeBaseDirSig  = '/eos/cms/store/user/scodella/SUSY/Nano/'
+    #treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+    #if '2018' in opt.tag :
+    #    treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+    #else :
+    #    treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
 elif 'ifca' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -213,7 +216,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'ST_tW_top'+tWext,    False,'nanoLatino_'),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
-                                }
+                            }
 
         ttZext = ''
         if '2016' in opt.tag : 
@@ -228,6 +231,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 getSampleFiles(directoryBkg,'TTWJetsToQQ',False,'nanoLatino_'), 
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
+                                'suppressNegative':['all'],
+                                'suppressNegativeNuisances' :['all'],
                                 }
 
         if '2018' not in opt.tag : 
@@ -378,7 +383,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'qqHToZZTo4L_M125',False,'nanoLatino_')
                 samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,'nanoLatino_')
 
-if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds':
+if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
 
     sampleToRemove = [ ] 
 
