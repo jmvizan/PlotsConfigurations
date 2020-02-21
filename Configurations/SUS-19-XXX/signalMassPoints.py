@@ -2,7 +2,7 @@ signalMassPoints = {}
 
 def massPointPass(massPoint, sigSetItem):
 
-    if sigSetItem.count('_')<2:
+    if sigSetItem.count('_')==0:
         if sigSetItem in massPoint:
             return True
 
