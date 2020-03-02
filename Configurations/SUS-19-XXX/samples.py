@@ -3,6 +3,8 @@ import subprocess
 import string
 from LatinoAnalysis.Tools.commonTools import *
 
+### Generals
+
 if '2016' in opt.tag : 
     opt.lumi = 35.9 # 35.92
 elif '2017' in opt.tag : 
@@ -10,6 +12,8 @@ elif '2017' in opt.tag :
 elif '2018' in opt.tag : 
     opt.lumi = 59.7 # 59.74
 print 'Value of lumi set to', opt.lumi
+
+treePrefix= 'nanoLatino_'
 
 ### Directories
   
@@ -19,12 +23,6 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
     treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/'
     treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
-    #treeBaseDirSig  = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    #treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-    #if '2018' in opt.tag :
-    #    treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-    #else :
-    #    treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
 elif 'ifca' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -62,6 +60,31 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName + '/'
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/' 
 directoryData = treeBaseDirData + ProductionData + regionName + '/'
 directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
+
+# Complex cut variables
+
+LepId = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])==2'
+
+LepId3 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1]+Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])==3'
+
+LepId3of4 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1]+Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2]+Lepton_isTightElectron_cutBasedMediumPOG[3]+Lepton_isTightMuon_mediumRelIsoTight[3])==3'
+
+T0 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0])'
+T1 = '(Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])'
+T2 = '(Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])'
+
+BTAG = '(leadingPtTagged>=20.)' 
+VETO = '!'+BTAG
+
+BTAG30= '(leadingPtTagged>=30.)'
+VETO30 = '!'+BTAG30
+
+btagWeight1tag = 'btagWeight_1tag'
+btagWeight0tag = '(1.-'+btagWeight1tag+')'
+
+ISRcut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged && acos(cos(MET_phi-CleanJet_phi[0]))>2.5'
+ISRCutData =  ' '+ISRCut+' && '
+ISRCutMC   = '&& '+ISRCut
 
 ### MET Filters
 
@@ -191,18 +214,20 @@ elif '2018' in opt.tag :
         'EGamma'         : '!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)' ,
     }
 
+
+
 ### Backgrounds
 
 if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
-    samples['ttbar'] = {    'name'   : getSampleFiles(directoryBkg,'TTTo2L2Nu',False,'nanoLatino_'),
+    samples['ttbar'] = {    'name'   : getSampleFiles(directoryBkg,'TTTo2L2Nu',False,treePrefix),
                             'weight' : XSWeight+'*'+SFweight+'*'+centralTopPt ,
                             'FilesPerJob' : 2 ,
                         }
 
     if 'btagefficiencies' in opt.tag:
 
-        samples['T2tt'] = { 'name'   : getSampleFiles(directorySig,'T2tt__mStop-400to1200',False,'nanoLatino_'),
+        samples['T2tt'] = { 'name'   : getSampleFiles(directorySig,'T2tt__mStop-400to1200',False,treePrefix),
                             'weight' : XSWeight+'*'+SFweight ,
                             'FilesPerJob' : 2 ,
                             }
@@ -212,8 +237,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         tWext = ''
         if '2018' in opt.tag : 
             tWext = '_ext1'
-        samples['tW']    = {    'name'   :   getSampleFiles(directoryBkg,'ST_tW_antitop'+tWext,False,'nanoLatino_') +
-                                             getSampleFiles(directoryBkg,'ST_tW_top'+tWext,    False,'nanoLatino_'),
+        samples['tW']    = {    'name'   :   getSampleFiles(directoryBkg,'ST_tW_antitop'+tWext,False,treePrefix) +
+                                             getSampleFiles(directoryBkg,'ST_tW_top'+tWext,    False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                             }
@@ -221,14 +246,14 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         ttZext = ''
         if '2016' in opt.tag : 
             ttZext = '_ext2'
-        samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZext,False,'nanoLatino_') + 
-                                             getSampleFiles(directoryBkg,'TTZToQQ',                False,'nanoLatino_'),
+        samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZext,False,treePrefix) + 
+                                             getSampleFiles(directoryBkg,'TTZToQQ',                False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 }
         
-        samples['ttW']   = {    'name'   :   getSampleFiles(directoryBkg,'TTWJetsToLNu',False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'TTWJetsToQQ',False,'nanoLatino_'), 
+        samples['ttW']   = {    'name'   :   getSampleFiles(directoryBkg,'TTWJetsToLNu',False,treePrefix) +
+                                getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix), 
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 'suppressNegative':['all'],
@@ -236,27 +261,27 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 }
 
         if '2018' not in opt.tag : 
-            samples['WW']    = {    'name'   :   getSampleFiles(directoryBkg,'WWTo2L2Nu',           False,'nanoLatino_'),
+            samples['WW']    = {    'name'   :   getSampleFiles(directoryBkg,'WWTo2L2Nu',           False,treePrefix),
                                     'weight' : XSWeight+'*'+SFweight ,
                                     'FilesPerJob' : 2 ,
                                 }
             if '2016' in opt.tag : 
-                samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluWWTo2L2Nu_MCFM',False,'nanoLatino_') 
+                samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluWWTo2L2Nu_MCFM',False,treePrefix) 
             elif '2017' in opt.tag : 
-                samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToENEN',False,'nanoLatino_') \
-                                         + getSampleFiles(directoryBkg,'GluGluToWWToENTN',False,'nanoLatino_') \
-                                         + getSampleFiles(directoryBkg,'GluGluToWWToMNEN',False,'nanoLatino_') \
-                                         + getSampleFiles(directoryBkg,'GluGluToWWToMNMN',False,'nanoLatino_') \
-                                         + getSampleFiles(directoryBkg,'GluGluToWWToMNTN',False,'nanoLatino_') \
-                                         + getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,'nanoLatino_') \
-                                         + getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,'nanoLatino_') 
+                samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToENEN',False,treePrefix) \
+                                         + getSampleFiles(directoryBkg,'GluGluToWWToENTN',False,treePrefix) \
+                                         + getSampleFiles(directoryBkg,'GluGluToWWToMNEN',False,treePrefix) \
+                                         + getSampleFiles(directoryBkg,'GluGluToWWToMNMN',False,treePrefix) \
+                                         + getSampleFiles(directoryBkg,'GluGluToWWToMNTN',False,treePrefix) \
+                                         + getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,treePrefix) \
+                                         + getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix) 
         elif '2018' in opt.tag : 
-            samples['WW']    = {    'name'   :   getSampleFiles(directoryBkg,'GluGluToWWToENMN',False,'nanoLatino_') +
-                                                 getSampleFiles(directoryBkg,'GluGluToWWToENTN',False,'nanoLatino_') +
-                                                 getSampleFiles(directoryBkg,'GluGluToWWToMNMN',False,'nanoLatino_') +
-                                                 getSampleFiles(directoryBkg,'GluGluToWWToMNTN',False,'nanoLatino_') +
-                                                 getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,'nanoLatino_') +
-                                                 getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,'nanoLatino_'),
+            samples['WW']    = {    'name'   :   getSampleFiles(directoryBkg,'GluGluToWWToENMN',False,treePrefix) +
+                                                 getSampleFiles(directoryBkg,'GluGluToWWToENTN',False,treePrefix) +
+                                                 getSampleFiles(directoryBkg,'GluGluToWWToMNMN',False,treePrefix) +
+                                                 getSampleFiles(directoryBkg,'GluGluToWWToMNTN',False,treePrefix) +
+                                                 getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,treePrefix) +
+                                                 getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix),
                                     'weight' : XSWeight+'*'+SFweight ,
                                     'FilesPerJob' : 2 ,
                                 }
@@ -264,7 +289,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         WZext = ''
         if '2016' in opt.tag : 
             WZext = '_ext1'
-        samples['WZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,'nanoLatino_'),
+        samples['WZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 }
@@ -274,9 +299,9 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             ZZext = '_ext1'
         elif '2018' in opt.tag : 
             ZZext = '_ext2'
-        samples['ZZ']    = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo2L2Nu'+ZZext,False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'ggZZ2e2n',False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'ggZZ2m2n',False,'nanoLatino_'),
+        samples['ZZ']    = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo2L2Nu'+ZZext,False,treePrefix) +
+                                getSampleFiles(directoryBkg,'ggZZ2e2n',False,treePrefix) +
+                                getSampleFiles(directoryBkg,'ggZZ2m2n',False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 }
@@ -286,35 +311,35 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         if '2016' in opt.tag : 
             DYM50ext = '_ext1'
             DYMlow = 'M-5to50'   
-        samples['DY']    = {    'name'   :   getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO',        False,'nanoLatino_') +
-                                #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100', False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-100to200',False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-200to400',False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-400to600',False,'nanoLatino_') +
-                                #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toinf',False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'+DYM50ext,   False,'nanoLatino_') +
-                                #getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-70to100',    False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-100to200',   False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-200to400',   False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-400to600',   False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-600to800',   False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-800to1200',  False,'nanoLatino_'), # +
-                                #getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500', False,'nanoLatino_') +
-                                #getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toinf',  False,'nanoLatino_') ,
+        samples['DY']    = {    'name'   :   getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO',        False,treePrefix) +
+                                #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100', False,treePrefix) +
+                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-100to200',False,treePrefix) +
+                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-200to400',False,treePrefix) +
+                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-400to600',False,treePrefix) +
+                                #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toinf',False,treePrefix) +
+                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'+DYM50ext,   False,treePrefix) +
+                                #getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-70to100',    False,treePrefix) +
+                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-100to200',   False,treePrefix) +
+                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-200to400',   False,treePrefix) +
+                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-400to600',   False,treePrefix) +
+                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-600to800',   False,treePrefix) +
+                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-800to1200',  False,treePrefix), # +
+                                #getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500', False,treePrefix) +
+                                #getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toinf',  False,treePrefix) ,
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 } 
         if '2016' in opt.tag : 
-            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100',False,'nanoLatino_') 
-            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-70to100',False,'nanoLatino_')
-            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toinf',False,'nanoLatino_') 
-            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toinf',False,'nanoLatino_') 
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100',False,treePrefix) 
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-70to100',False,treePrefix)
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toinf',False,treePrefix) 
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toinf',False,treePrefix) 
         else :
             if '2017' in opt.tag : 
-                samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toInf',False,'nanoLatino_') 
-            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toInf',False,'nanoLatino_')
+                samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toInf',False,treePrefix) 
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toInf',False,treePrefix)
         if '2018' not in opt.tag : 
-            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500',False,'nanoLatino_') 
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500',False,treePrefix) 
         if '2016' in opt.tag : 
             addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO',  'LHE_HT<70.0')
             addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO_ext1', 'LHE_HT<70.0')
@@ -328,32 +353,32 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         ggHTText = ''
         if '2017' in opt.tag : 
             ggHTText = '_ext1'
-        samples['HWW']   = {    'name'   :   getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,'nanoLatino_') + 
-                                #getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'+ggHTText,                  False,'nanoLatino_') + 
-                                getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125',                            False,'nanoLatino_') + 
-                                #getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',                              False,'nanoLatino_') + 
-                                getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125',                             False,'nanoLatino_') ,
+        samples['HWW']   = {    'name'   :   getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix) + 
+                                #getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'+ggHTText,                  False,treePrefix) + 
+                                getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125',                            False,treePrefix) + 
+                                #getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',                              False,treePrefix) + 
+                                getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125',                             False,treePrefix) ,
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 }
         if '2018' not in opt.tag : 
-            samples['HWW']['name'] += getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'+ggHTText,False,'nanoLatino_')
+            samples['HWW']['name'] += getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'+ggHTText,False,treePrefix)
         if '2017' not in opt.tag : 
-            samples['HWW']['name'] += getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',False,'nanoLatino_') 
+            samples['HWW']['name'] += getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',False,treePrefix) 
 
         if '2018' not in opt.tag : 
-            samples['VZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo2L2Q',False,'nanoLatino_') + 
-                                    getSampleFiles(directoryBkg,'ZZTo2L2Q',False,'nanoLatino_'),
+            samples['VZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo2L2Q',False,treePrefix) + 
+                                    getSampleFiles(directoryBkg,'ZZTo2L2Q',False,treePrefix),
                                     'weight' : XSWeight+'*'+SFweight ,
                                     'suppressNegative':['all'],
                                     'suppressNegativeNuisances' :['all'],
                                     'FilesPerJob' : 2 ,
                                     }
         
-        samples['VVV']   = {    'name'   :   getSampleFiles(directoryBkg,'WWW',False,'nanoLatino_') + 
-                                getSampleFiles(directoryBkg,'WWZ',False,'nanoLatino_') + 
-                                getSampleFiles(directoryBkg,'WZZ',False,'nanoLatino_') +
-                                getSampleFiles(directoryBkg,'ZZZ',False,'nanoLatino_'),
+        samples['VVV']   = {    'name'   :   getSampleFiles(directoryBkg,'WWW',False,treePrefix) + 
+                                getSampleFiles(directoryBkg,'WWZ',False,treePrefix) + 
+                                getSampleFiles(directoryBkg,'WZZ',False,treePrefix) +
+                                getSampleFiles(directoryBkg,'ZZZ',False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 }
@@ -365,23 +390,23 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 ZZ4Lext = '_ext1'
             elif '2018' in opt.tag : 
                 ZZ4Lext = '_ext2'
-            samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo4L'+ZZ4Lext, False,'nanoLatino_') + 
-                                       getSampleFiles(directoryBkg,'ggZZ4e',              False,'nanoLatino_') +
-                                       #getSampleFiles(directoryBkg,'ggZZ4m',              False,'nanoLatino_') +
-                                       getSampleFiles(directoryBkg,'ggZZ4t',              False,'nanoLatino_') +
-                                       getSampleFiles(directoryBkg,'ggZZ2e2m',            False,'nanoLatino_') +
-                                       getSampleFiles(directoryBkg,'ggZZ2e2t',            False,'nanoLatino_') +
-                                       getSampleFiles(directoryBkg,'ggZZ2m2t',            False,'nanoLatino_'), # +
-                                       #getSampleFiles(directoryBkg,'qqHToZZTo4L_M125',    False,'nanoLatino_') +
-                                       #getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,'nanoLatino_'),
+            samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo4L'+ZZ4Lext, False,treePrefix) + 
+                                       getSampleFiles(directoryBkg,'ggZZ4e',              False,treePrefix) +
+                                       #getSampleFiles(directoryBkg,'ggZZ4m',              False,treePrefix) +
+                                       getSampleFiles(directoryBkg,'ggZZ4t',              False,treePrefix) +
+                                       getSampleFiles(directoryBkg,'ggZZ2e2m',            False,treePrefix) +
+                                       getSampleFiles(directoryBkg,'ggZZ2e2t',            False,treePrefix) +
+                                       getSampleFiles(directoryBkg,'ggZZ2m2t',            False,treePrefix), # +
+                                       #getSampleFiles(directoryBkg,'qqHToZZTo4L_M125',    False,treePrefix) +
+                                       #getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,treePrefix),
                                        'weight' : XSWeight+'*'+SFweight ,
                                        'FilesPerJob' : 2 ,
                                        }
             if '2017' not in opt.tag : 
-                samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'ggZZ4m',False,'nanoLatino_')
+                samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'ggZZ4m',False,treePrefix)
             if '2016' in opt.tag : 
-                samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'qqHToZZTo4L_M125',False,'nanoLatino_')
-                samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,'nanoLatino_')
+                samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'qqHToZZTo4L_M125',False,treePrefix)
+                samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,treePrefix)
 
 if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
 
@@ -397,6 +422,11 @@ if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrou
     for sample in sampleToRemove:
         del samples[sample]
 
+for sample in samples:
+    samples[sample]['isSignal']  = 0
+    samples[sample]['isDATA']    = 0
+    samples[sample]['isFastsim'] = 0
+
 ### Data
 
 if 'SM' in opt.sigset or 'Data' in opt.sigset:
@@ -406,11 +436,14 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'weights' : [ ],
                            'isData': ['all'],                            
                            'FilesPerJob' : 20 ,
+                           'isSignal'  : 0,
+                           'isDATA'    : 1, 
+                           'isFastsim' : 0
                        }
 
     for Run in DataRun :
         for DataSet in DataSets :
-            FileTarget = getSampleFiles(directoryData,DataSet+'_'+Run[1],True,'nanoLatino_')
+            FileTarget = getSampleFiles(directoryData,DataSet+'_'+Run[1],True,treePrefix)
             for iFile in FileTarget:
                 #print(iFile)
                 samples['DATA']['name'].append(iFile)
@@ -418,7 +451,6 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
 ### Signals
 
-#exec(open(opt.signalMassPointsFile).read())
 exec(open('./signalMassPoints.py').read())
 
 for model in signalMassPoints:
@@ -441,12 +473,14 @@ for model in signalMassPoints:
                         else:
                             XSWeight = '1000.*Xsec*genWeight/30000.'
 
-                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,'nanoLatino_'),
+                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix),
                                        'weight' : BranchingRatio+'*'+XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut'] ,
                                        'FilesPerJob' : 2 ,
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
                                        'suppressZeroTreeNuisances' : ['all'],
-                                       'fastsim' : 1.
+                                       'isSignal'  : 0,
+                                       'isDATA'    : 0, 
+                                       'isFastsim' : 1
                                    }
                 
