@@ -82,7 +82,7 @@ VETO30 = '!'+BTAG30
 btagWeight1tag = 'btagWeight_1tag'
 btagWeight0tag = '(1.-'+btagWeight1tag+')'
 
-ISRcut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged && acos(cos(MET_phi-CleanJet_phi[0]))>2.5'
+ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged && acos(cos(MET_phi-CleanJet_phi[0]))>2.5'
 ISRCutData =  ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
 
