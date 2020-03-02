@@ -35,7 +35,8 @@ nuisances['lumi']  = {
                'type'  : 'lnN',
 }
 for sample in samples.keys():
-    if sample!='DATA':
+    if not samples[sample]['isDATA']:
+        print 'lumi', sample
         nuisances['lumi']  ['samples'][sample] = lumi_uncertainty 
 
 # trigger
@@ -46,7 +47,7 @@ nuisances['trigger']  = {
                'type'  : 'lnN',
 }
 for sample in samples.keys():
-    if sample!='DATA':
+    if not samples[sample]['isDATA']:
         nuisances['trigger']  ['samples'][sample] = trigger_uncertainty
 
 # background cross section and scale factor uncertainties
@@ -107,8 +108,9 @@ for scalefactor in leptonSF:
         'type'  : 'shape',
     }
     for sample in samples.keys():
-        if sample!='DATA':
-            if 'FS' not in scalefactor or 'fastsim' in samples[sample].keys():
+        if not samples[sample]['isDATA']:
+            if 'FS' not in scalefactor or samples[sample]['isFastsim']:
+                print 'lepSF', sample
                 nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
 
 # b-tagging scale factors
@@ -138,8 +140,8 @@ for scalefactor in btagSF:
         'cuts'  : [ ]           
     }
     for sample in samples.keys():
-        if sample!='DATA':
-            if 'FS' not in scalefactor or 'fastsim' in samples[sample].keys():
+        if not samples[sample]['isDATA']:
+            if 'FS' not in scalefactor or samples[sample]['isFastsim']:
                 nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
     for cut in cuts.keys():
         if ('1b' in scalefactor and '_Tag' in cut) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut)):
@@ -154,7 +156,7 @@ nuisances['pileup']  = {
     'type'  : 'shape',
 }
 for sample in samples.keys():
-    if sample!='DATA':
+    if not samples[sample]['isDATA']:
         nuisances['pileup']['samples'][sample] = [ 'puWeightUp/puWeight', 'puWeightDown/puWeight' ] 
 
 # ECAL prefiring
@@ -167,7 +169,7 @@ if '2016' in opt.tag or '2017' in opt.tag:
         'type'  : 'shape',
     }
     for sample in samples.keys():
-        if sample!='DATA':
+        if not samples[sample]['isDATA']:
             nuisances['pileup']['samples'][sample] = [ 'PrefireWeight_Up/PrefireWeight', 'PrefireWeight_Down/PrefireWeight' ] 
 """
 # nonprompt lepton rate
@@ -179,7 +181,7 @@ nuisances['nonpromptLep']  = {
     'type'  : 'shape',
 }
 for sample in samples.keys():
-    if sample!='DATA':
+    if not samples[sample]['isDATA']:
         nuisances['nonpromptLep']['samples'][sample] = [ nonpromptLepSF_Up+'/'+nonpromptLepSF, nonpromptLepSF_Down+'/'+nonpromptLepSF ] 
 
 # top pt reweighting
@@ -267,7 +269,7 @@ nuisances['ptmissfastsim']  = {
     'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
 }
 for sample in samples.keys():
-    if 'fastsim' in samples[sample].keys():
+    if samples[sample]['isFastsim']:
         nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
 ### LHE weights
@@ -293,7 +295,7 @@ nuisances['QCDscale'] = {
     'samples': { },
 }
 for sample in samples.keys():
-    if sample!='DATA':
+    if not samples[sample]['isDATA']:
         nuisances['QCDscale']['samples'][sample] = [ 'LHEScaleWeight[8]', 'LHEScaleWeight[0]' ] 
 """
 ### JES and MET

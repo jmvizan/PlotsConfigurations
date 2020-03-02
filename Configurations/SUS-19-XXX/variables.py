@@ -12,7 +12,19 @@ dphill = '#Delta#phi(lep1,lep2)'
 
 # Complex variables
 
-nbjets = '2*(trailingPtTagged>=20.)+(leadingPtTagged>=20. && trailingPtTagged<20.)'
+btagAlgo = 'btagDeepB'
+bTagPtCut  = '20.'
+bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
+bTagCut = '0.6321'
+btagWP  = '2016M'
+if '2017' in opt.tag: 
+    bTagCut = '0.4941'
+    btagWP  = '2017M'
+if '2018' in opt.tag: 
+    bTagCut = '0.4184'
+    btagWP  = '2018M'
+#nbjets = '2*(trailingPtTagged>=20.)+(leadingPtTagged>=20. && trailingPtTagged<20.)'
+nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+'. && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+')'
 
 # variables = {}
 
@@ -97,12 +109,22 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
         T1 = '(Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])'
         T2 = '(Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])'
         mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'
+
+    if 'HighMT2' in opt.tag:
  
-    variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                     'range' : (   7,    0.,  140.),   #   variable range
-                                     'xaxis' : mt2 + pll + gv,         #   x axis name
-                                     'fold'  : 1                       #   fold overflow
-                                 }
+        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                         'range' : ([0, 20, 40, 60, 80, 100, 120, 250 , 450, 650],[1]), # variable range
+                                         'xaxis' : mt2 + pll + gv,         #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+                                     }
+
+    else:
+    
+        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                         'range' : (   7,    0.,  140.),   #   variable range
+                                         'xaxis' : mt2 + pll + gv,         #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+                                     }
 
     if 'StudyVisHT' in opt.tag:
  

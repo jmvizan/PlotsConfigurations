@@ -61,21 +61,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'color': 798,    # kOrange-2
         'samples'  : ['WZ'] 
     }
-    
-    if '2018' not in opt.tag :
-        groupPlot['Others']  = {  
-            'nameHR' : 'Minor bkg.',
-            'isSignal' : 0,
-            'color': 394, #  kYellow-6
-            'samples'  : ['ttW', 'VZ', 'VVV', 'HWW']
-        }
-    elif '2018' in opt.tag : 
-        groupPlot['Others']  = {  
-            'nameHR' : 'Minor bkg.',
-            'isSignal' : 0,
-            'color': 394, #  kYellow-6
-            'samples'  : ['ttW', 'VVV', 'HWW']
-        }
+        
+    groupPlot['Others']  = {  
+        'nameHR' : 'Minor bkg.',
+        'isSignal' : 0,
+        'color': 394, #  kYellow-6
+        'samples'  : ['ttW', 'VVV', 'HWW']
+    }
+    if 'VZ' in samples :
+        groupPlot['Others']['samples'].append('VZ')
         
 #plot = {}
 
@@ -148,7 +142,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'scale'    : 1.0
     }
     
-    if '2018' not in opt.tag :
+    if 'VZ' in samples :
         plot['VZ'] = { 
             'nameHR' : 'VZ (#rightarrow 2' + sl + '2q)',
             'color'    : 394, #  kYellow-6
@@ -157,31 +151,31 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             'scale'    : 1.0
         }
         
-        plot['VVV'] = { 
-            'nameHR' : 'VVV',
-            'color'    : 394, #  kYellow-6
-            'isSignal' : 0,
-            'isData'   : 0,
-            'scale'    : 1.0
-        }
+    plot['VVV'] = { 
+        'nameHR' : 'VVV',
+        'color'    : 394, #  kYellow-6
+        'isSignal' : 0,
+        'isData'   : 0,
+        'scale'    : 1.0
+    }
 
-        plot['HWW'] = { 
-            'nameHR' : 'H #rightarrow WW',
-            'color'    : 394, #  kYellow-6
+    plot['HWW'] = { 
+        'nameHR' : 'H #rightarrow WW',
+        'color'    : 394, #  kYellow-6
+        'isSignal' : 0,
+        'isData'   : 0,
+        'scale'    : 1.0
+    }
+        
+    if 'ControlRegion-ZZ' in opt.tag:
+            
+        plot['ZZTo4L'] = {   
+            'nameHR' : 'ZZ (#rightarrow 4' + sl +')',
+            'color': 49,   
             'isSignal' : 0,
-            'isData'   : 0,
+            'isData'   : 0 ,
             'scale'    : 1.0
         }
-        
-        if 'ControlRegion-ZZ' in opt.tag:
-            
-            plot['ZZTo4L'] = {   
-                'nameHR' : 'ZZ (#rightarrow 4' + sl +')',
-                'color': 49,   
-                'isSignal' : 0,
-                'isData'   : 0 ,
-                'scale'    : 1.0
-            }
 
 sampleToRemoveFromPlot = [ ] 
 
