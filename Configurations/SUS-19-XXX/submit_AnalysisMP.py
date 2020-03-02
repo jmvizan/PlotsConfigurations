@@ -82,10 +82,16 @@ if(len(sys.argv)>4):
 else: fileset=sigset
 exec(open("signalMassPoints.py").read())
 
-inputfile='./Shapes/'+year+'/'+tag+'/plots_'+tag+'_SM-'+fileset+'.root'
-if os.path.exists(inputfile) is False:
-    print "ROOT File",inputfile," doesn't exist, exiting"
-    exit()
+print type(year), year.split('-')
+if('-' in year):
+    dcyears=year.split('-')
+else:
+    dcyears=year
+for dcyear in dcyears:
+    inputfile='./Shapes/'+year+'/'+tag+'/plots_'+tag+'_SM-'+fileset+'.root'
+    if os.path.exists(inputfile) is False:
+        print "ROOT File",inputfile," doesn't exist, exiting"
+    #exit()
 #Look for masspoints in the sigset
 mpInSigset=[]
 for model in signalMassPoints:
@@ -129,7 +135,7 @@ except IndexError:
     elif(nmX>1): writesigset[2] = rreplace(writesigset[2] , 'mX', '', nmX - 1)
 
 #divide masspoints in sets of nMPs and send jobs
-nMPs        = 2
+nMPs        = 1
 lognm       = '_'.join(writesigset)
 jobfolder   = "./Condor/"+year+'/'+tag
 logfile     = jobfolder + '/'+lognm+".log"
