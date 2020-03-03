@@ -36,7 +36,6 @@ nuisances['lumi']  = {
 }
 for sample in samples.keys():
     if not samples[sample]['isDATA']:
-        print 'lumi', sample
         nuisances['lumi']  ['samples'][sample] = lumi_uncertainty 
 
 # trigger
@@ -110,13 +109,12 @@ for scalefactor in leptonSF:
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                print 'lepSF', sample
                 nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
 
 # b-tagging scale factors
 
-weight1b = 'btagWeight_1tag_syst/btagWeight_1tag'
-weight0b = '(1.-btagWeight_1tag_syst)/(1.-btagWeight_1tag)'
+weight1b = btagWeight1tag+'_syst/'+btagWeight1tag
+weight0b = '(1.-'+btagWeight1tag+'_syst)/(1.-'+btagWeight1tag+')'
 
 btagSF = {
     'btag1b'     : [ weight1b.replace('syst', 'b_up'),         weight1b.replace('syst', 'b_down') ],
@@ -267,6 +265,7 @@ nuisances['ptmissfastsim']  = {
     'type'  : 'shape',
     'folderUp':   directorySig.replace('__susyMT2FS', '__susyMT2FSreco'),
     'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
+    'cuts'  : [ ]        
 }
 for sample in samples.keys():
     if samples[sample]['isFastsim']:

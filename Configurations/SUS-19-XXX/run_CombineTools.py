@@ -34,8 +34,6 @@ if __name__ == '__main__':
     hwwtools.loadOptDefaults(parser)
     (opt, args) = parser.parse_args()
 
-
-
     years=[]
     if opt.years =='2016':
         years=["2016"]
@@ -68,15 +66,18 @@ if __name__ == '__main__':
         print "On Test mode"
         opt.sigset='T2tt_mS-450_mX-350'
 
+    opt.tag = opt.years+opt.tag
+
     # Check whether any of the input config files exist
     isVarsF = os.path.exists(opt.variablesFile)
+    isSamsF = os.path.exists(opt.samplesFile)
     isCutsF = os.path.exists(opt.cutsFile)
     isSignF = os.path.exists(opt.signalMPcfg)
     cfgsF={}
     fMiss=''
     fIsMiss= False
-    vals = [isVarsF, isCutsF, isSignF]
-    keys = ["Variables", "Cuts", "Signal"]
+    vals = [isVarsF, isSamsF, isCutsF, isSignF]
+    keys = ["Variables", "Samples", "Cuts", "Signal"]
     for i in range(0, len(keys)):
         cfgsF[keys[i]]=vals[i]
         if vals[i] is False:
@@ -89,11 +90,16 @@ if __name__ == '__main__':
 
     #Generate dictionaries with variables and cuts
     variables = {}
+    samples = {}
     cuts = {}
     if (isVarsF):  exec(open(opt.variablesFile).read())
+    if (isSamsF):  exec(open(opt.samplesFile).read())
+    if (isCutsF):  exec(open(opt.cutsFile).read())
     if (isCutsF):  exec(open(opt.cutsFile).read())
     if (isSignF):  exec(open(opt.signalMPcfg).read())
     
+    opt.tag = opt.tag.replace(opt.years, '')
+
     #Loop over Signal mass points year cuts and variables, to get all Datacards
     cmsenv=' eval `scramv1 runtime -sh` '
     tagDC=''

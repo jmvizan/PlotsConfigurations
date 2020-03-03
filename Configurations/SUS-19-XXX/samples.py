@@ -47,10 +47,10 @@ if 'SameSign' in opt.tag :
     regionName = '__susyMT2SameSign'
 elif 'Fake' in opt.tag :
     regionName = '__susyMT2Fake'
-elif 'WZ' in opt.tag :
-    regionName = '__susyMT2WZ'
 elif 'WZtoWW' in opt.tag :
     regionName = '__susyMT2WZtoWW'
+elif 'WZ' in opt.tag :
+    regionName = '__susyMT2WZ'
 elif 'ZZ' in opt.tag :
     regionName = '__susyMT2ZZ'
 elif 'ttZ' in opt.tag :
@@ -479,7 +479,7 @@ for model in signalMassPoints:
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
                                        'suppressZeroTreeNuisances' : ['all'],
-                                       'isSignal'  : 0,
+                                       'isSignal'  : 1,
                                        'isDATA'    : 0, 
                                        'isFastsim' : 1
                                    }
