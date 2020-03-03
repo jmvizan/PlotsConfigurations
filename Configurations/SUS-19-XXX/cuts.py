@@ -137,7 +137,7 @@ if 'FakeValidationRegion' in opt.tag:
 
 if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
-    Zcut = mZ+'<ZCUT' #'fabs(mZ-'+massZ+')<ZCUT'
+    Zcut = 'mZ<ZCUT' #'fabs(mZ-'+massZ+')<ZCUT'
 
     WZselection = 'nLepton==3 && Lepton_pt[2]>=20. && ' + LepId3 + ' && ' + Zcut + ' && ptmiss>=140'
 

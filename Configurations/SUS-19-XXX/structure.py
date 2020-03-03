@@ -8,7 +8,7 @@
 for sample in samples:
 
     structure[sample] = {
-                  'isSignal' : samples[sample]['isSignal']
+                  'isSignal' : samples[sample]['isSignal'],
                   'isData'   : samples[sample]['isDATA']
     }
                                      
