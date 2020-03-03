@@ -265,7 +265,6 @@ nuisances['ptmissfastsim']  = {
     'type'  : 'shape',
     'folderUp':   directorySig.replace('__susyMT2FS', '__susyMT2FSreco'),
     'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
-    'cuts'  : [ ]        
 }
 for sample in samples.keys():
     if samples[sample]['isFastsim']:
