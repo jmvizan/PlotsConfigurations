@@ -33,7 +33,9 @@ def makeSubFile2(filename,folder,year,tag,sigset,fileset, doDC,writesigset):
     f.write("output                = "+folder+"/"+jobsent+".$(ClusterId).out\n")
     f.write("error                 = "+folder+"/"+jobsent+".$(ClusterId).err\n")
     f.write("log                   = "+folder+"/"+jobsent+".$(ClusterId).log\n")
-    f.write("+JobFlavour           = tomorrow\n")
+    #f.write("+JobFlavour           = nextweek\n")
+    f.write("+JobFlavour           = testmatch\n")
+    #f.write("+JobFlavour           = tomorrow\n")
     f.write("queue "+sigset+' from '+folder+'/joblist.txt \n')
     f.close()
 
@@ -89,7 +91,15 @@ for model in signalMassPoints:
     print "Model:", model,"\tSignal set", sigset
     if model not in sigset:  continue
     for massPoint in signalMassPoints[model]:
-        if(massPointInSignalSet(massPoint,sigset)): mpInSigset.append(massPoint)
+        if(massPointInSignalSet(massPoint,sigset)):
+            submitThis = True
+	    rootname = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_Blind.AsymptoticLimits.mH120.root'
+            if os.path.isfile(rootname):  
+                if os.path.getsize(rootname)>6500:
+                    submitThis = False
+	    if submitThis:
+		print 'submmm', massPoint 
+                mpInSigset.append(massPoint)
         if massPoint not in sigset: continue
         print "Mass Point:", massPoint
 
@@ -122,7 +132,7 @@ except IndexError:
     elif(nmX>1): writesigset[2] = rreplace(writesigset[2] , 'mX', '', nmX - 1)
 
 #divide masspoints in sets of nMPs and send jobs
-nMPs        = 2
+nMPs        = 1
 lognm       = '_'.join(writesigset)
 jobfolder   = "./Condor/"+year+'/'+tag
 logfile     = jobfolder + '/'+lognm+".log"
