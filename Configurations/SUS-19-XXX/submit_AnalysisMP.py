@@ -37,7 +37,9 @@ def makeSubFile2(filename,folder,year,tag,sigset,fileset, doDC,writesigset):
     f.write("output                = "+folder+"/"+jobsent+".$(ClusterId).out\n")
     f.write("error                 = "+folder+"/"+jobsent+".$(ClusterId).err\n")
     f.write("log                   = "+folder+"/"+jobsent+".$(ClusterId).log\n")
-    f.write("+JobFlavour           = tomorrow\n")
+    #f.write("+JobFlavour           = nextweek\n")
+    f.write("+JobFlavour           = testmatch\n")
+    #f.write("+JobFlavour           = tomorrow\n")
     f.write("queue "+sigset+' from '+folder+'/joblist.txt \n')
     f.close()
 
@@ -97,13 +99,22 @@ for dcyear in dcyears:
     if os.path.exists(inputfile) is False:
         print "ROOT File",inputfile," doesn't exist, exiting"
     #exit()
+
 #Look for masspoints in the sigset
 mpInSigset=[]
 for model in signalMassPoints:
     print "Model:", model,"\tSignal set", sigset
     if model not in sigset:  continue
     for massPoint in signalMassPoints[model]:
-        if(massPointInSignalSet(massPoint,sigset)): mpInSigset.append(massPoint)
+        if(massPointInSignalSet(massPoint,sigset)):
+            submitThis = True
+	    rootname = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_Blind.AsymptoticLimits.mH120.root'
+            if os.path.isfile(rootname):  
+                if os.path.getsize(rootname)>6500:
+                    submitThis = False
+	    if submitThis:
+		print 'submmm', massPoint 
+                mpInSigset.append(massPoint)
         if massPoint not in sigset: continue
         print "Mass Point:", massPoint
 
@@ -142,6 +153,10 @@ except IndexError:
 
 
 #divide masspoints in sets of nMPs and send jobs
+<<<<<<< HEAD
+=======
+nMPs        = 1
+>>>>>>> upstream/worker
 lognm       = '_'.join(writesigset)
 jobfolder   = "./Condor/"+year+'/'+tag
 logfile     = jobfolder + '/'+lognm+".log"
@@ -168,7 +183,7 @@ flist.close()
 
 makeSubFile2(subfilename,jobfolder, year, tag, 'MPs' , fileset,doDC,lognm)
 commandtorun="condor_submit "+subfilename+">>"+logfile
-#os.system(commandtorun)
+os.system(commandtorun)
 print "jobs sent:\n", commandtorun
 writetolog(logfile,"----------------------------------")
 
