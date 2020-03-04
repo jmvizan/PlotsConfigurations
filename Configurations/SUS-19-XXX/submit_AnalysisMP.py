@@ -153,10 +153,6 @@ except IndexError:
 
 
 #divide masspoints in sets of nMPs and send jobs
-<<<<<<< HEAD
-=======
-nMPs        = 1
->>>>>>> upstream/worker
 lognm       = '_'.join(writesigset)
 jobfolder   = "./Condor/"+year+'/'+tag
 logfile     = jobfolder + '/'+lognm+".log"
