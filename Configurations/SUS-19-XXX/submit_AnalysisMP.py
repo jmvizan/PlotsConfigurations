@@ -76,29 +76,38 @@ elif sys.argv[2]=='2':
 else:                                                                              
     tag=sys.argv[2] 
 sigset  = sys.argv[3]
-
+allMP=False
+allMPopts=['doallmp', 'doall','allmp', 'allmasspoints', 'alllims']
 doDC    = ' '
 if(len(sys.argv)>4):
-    if(sys.argv[4].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
+    if sys.argv[4].lower() in allMPopts:
+        allMP=True
+    
+    elif(sys.argv[4].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
         doDC=sys.argv[4]
         fileset=sigset
     else:
         fileset=sys.argv[4]
         
-    if(len(sys.argv)>5): 
-        doDC    = sys.argv[5]
+    if(len(sys.argv)>5):
+        if sys.argv[5].lower() in allMPopts:
+            allMP=True
+        else:
+            doDC    = sys.argv[5]
+            if len(sys.argv)>6 and sys.argv[6].lower() in allMPopts:
+                allMP=True
 else: fileset=sigset
 exec(open("signalMassPoints.py").read())
 
-if('-' in year):
-    dcyears=year.split('-')
-else:
-    dcyears=year
+dcyears=year.split('-')
 for dcyear in dcyears:
-    inputfile='./Shapes/'+year+'/'+tag+'/plots_'+tag+'_SM-'+fileset+'.root'
+    print dcyears, dcyear
+    inputfile='./Shapes/'+dcyear+'/'+tag+'/plots_'+tag+'_SM-'+fileset+'.root'
     if os.path.exists(inputfile) is False:
         print "ROOT File",inputfile," doesn't exist, exiting"
-    #exit()
+        exit()
+    else:
+        print "Reading:",inputfile
 
 #Look for masspoints in the sigset
 mpInSigset=[]
@@ -109,14 +118,15 @@ for model in signalMassPoints:
         if(massPointInSignalSet(massPoint,sigset)):
             submitThis = True
 	    rootname = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_Blind.AsymptoticLimits.mH120.root'
-            if os.path.isfile(rootname):  
+            if os.path.isfile(rootname) and allMP is False:  
                 if os.path.getsize(rootname)>6500:
                     submitThis = False
-	    if submitThis:
-		print 'submmm', massPoint 
+                    print "ignored", massPoint
+            if submitThis:
+		#print 'submmm', massPoint 
                 mpInSigset.append(massPoint)
         if massPoint not in sigset: continue
-        print "Mass Point:", massPoint
+        print "\n######################################\nMass Point:", massPoint,"\n##########################################################################"
 
 if len(mpInSigset)==0: 
     print "no masspoints in the given sigset. Exiting"
