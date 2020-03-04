@@ -267,6 +267,7 @@ if 'CharginoSignalRegions' in opt.tag:
     jetscutSR1  = 'nCleanJet>0'
     nojetcutSR2 = nojetcutSR1
     jetscutSR2  = jetscutSR1
+    isrcut=''
 
     if 'VisHTv1' in opt.tag:
         visht = '(Lepton_pt[0]+Lepton_pt[1]+Sum$(CleanJet_pt))'
@@ -288,6 +289,7 @@ if 'CharginoSignalRegions' in opt.tag:
         jetscutSR2  = visht+'>=100'
   
     if 'Data' in opt.sigset:
+        if 'ISR' in opt.tag:     isrcut= ISRCutData
         cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+BTAG
         cuts['SR1_NoTag_em'] = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+jetscutSR1+' && '+VETO
         cuts['SR1_NoJet_em'] = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+nojetcutSR1+' && '+VETO
@@ -304,13 +306,14 @@ if 'CharginoSignalRegions' in opt.tag:
         cuts['SR2_NoTag_sf'] = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+jetscutSR2+' && '+VETO
         cuts['SR2_NoJet_sf'] = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+nojetcutSR2+' && '+VETO
     
-        cuts['SR3_Tag_em']   = OC+' && '+DF+' && ptmiss>=300 && '+BTAG
-        cuts['SR3_Veto_em']  = OC+' && '+DF+' && ptmiss>=300 && '+VETO
+        cuts['SR3_Tag_em']   = OC+' && '+DF+' && ptmiss>=300 && '+isrcut+BTAG
+        cuts['SR3_Veto_em']  = OC+' && '+DF+' && ptmiss>=300 && '+isrcut+VETO
     
-        cuts['SR3_Tag_sf']   = OC+' && '+SF+' && ptmiss>=300 && '+BTAG
-        cuts['SR3_Veto_sf']  = OC+' && '+SF+' && ptmiss>=300 && '+VETO
+        cuts['SR3_Tag_sf']   = OC+' && '+SF+' && ptmiss>=300 && '+isrcut+BTAG
+        cuts['SR3_Veto_sf']  = OC+' && '+SF+' && ptmiss>=300 && '+isrcut+VETO
 
     else:
+        if "ISR" in opt.tag:   isrcut=ISRCutMC
         cuts['SR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200)*'+btagWeight1tag
         cuts['SR1_NoTag_em'] = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+jetscutSR1+')*'+btagWeight0tag
         cuts['SR1_NoJet_em'] = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+nojetcutSR1+')*'+btagWeight0tag
@@ -327,11 +330,11 @@ if 'CharginoSignalRegions' in opt.tag:
         cuts['SR2_NoTag_sf'] = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+jetscutSR2+')*'+btagWeight0tag
         cuts['SR2_NoJet_sf'] = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+nojetcutSR2+')*'+btagWeight0tag
 
-        cuts['SR3_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=300)*'+btagWeight1tag
-        cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=300)*'+btagWeight0tag
+        cuts['SR3_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+')*'+btagWeight1tag
+        cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+')*'+btagWeight0tag
 
-        cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300)*'+btagWeight1tag
-        cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300)*'+btagWeight0tag
+        cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+')*'+btagWeight1tag
+        cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+')*'+btagWeight0tag
 
 # apply background scale factors
  
