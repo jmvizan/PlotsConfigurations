@@ -4,7 +4,7 @@ from datetime import datetime
 import numpy as np
 
 
-nMPs        = 3
+nMPs        = 1
 
 
 #write header to logfile
@@ -78,12 +78,13 @@ else:
 sigset  = sys.argv[3]
 allMP=False
 allMPopts=['doallmp', 'doall','allmp', 'allmasspoints', 'alllims']
+doDCopts= ["dodatacards","dodc", "mkdc","makedatacards"]
 doDC    = ' '
 if(len(sys.argv)>4):
     if sys.argv[4].lower() in allMPopts:
         allMP=True
     
-    elif(sys.argv[4].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
+    elif(sys.argv[4].lower()in doDCopts):
         doDC=sys.argv[4]
         fileset=sigset
     else:
@@ -111,6 +112,10 @@ for dcyear in dcyears:
 
 #Look for masspoints in the sigset
 mpInSigset=[]
+emptyDC=[]
+missDC=[]
+missDCfolder=[]
+            
 for model in signalMassPoints:
     print "Model:", model,"\tSignal set", sigset
     if model not in sigset:  continue
@@ -121,15 +126,55 @@ for model in signalMassPoints:
             if os.path.isfile(rootname) and allMP is False:  
                 if os.path.getsize(rootname)>6500:
                     submitThis = False
-                    print "ignored", massPoint
-            if submitThis:
-		#print 'submmm', massPoint 
-                mpInSigset.append(massPoint)
+#                    print "ignored", massPoint
+            if submitThis is False: continue
+            mpInSigset.append(massPoint)
+            print massPoint, dcyear#, os.listdir(dclocs)
+            
+            if(doDC.lower() in doDCopts): continue
+ 
+            print '#####################\nDC', 
+            for dcyear in year.split('-'):
+                #+'SR*'#/mt2ll/datacard.txt'
+                dcfolder='./Datacards/'+dcyear+'/'+tag+'/'+massPoint+'/'
+                if(os.path.exists(dcfolder) is False): 
+                    missDCfolder.append(dcfolder) 
+                    continue
+                dclocs=os.listdir(dcfolder)
+                print dcfolder
+                for dcloc in dclocs:
+                    whichdc=dcfolder+'/'+dcloc+'/mt2ll/'
+                    if(os.path.exists(whichdc+'datacard.txt') is False):
+                        missDC.append(whichdc)
+                        continue
+                    dcsize=os.path.getsize(whichdc+'datacard.txt')
+                    if(dcsize<5000 and doDC not in doDCopts): emptyDC.append(whichDC)
+                                                
+            #print 'submmm', massPoint
+            print "missing datacards:", len(missDC)+len(emptyDC)
+            print "no miss"
+            
         if massPoint not in sigset: continue
-        print "\n######################################\nMass Point:", massPoint,"\n##########################################################################"
-
+        print "Mass Point:", massPoint #,"\n##########################################################################"
+print len(missDC)
 if len(mpInSigset)==0: 
     print "no masspoints in the given sigset. Exiting"
+    exit()
+missDCmessage="please use the doDC option, or check the DC themselves"
+if(len(missDCfolder)>0):
+    print "missing datacard folders:"
+    for dcfolder in missDCfolder: print dcfolder
+    print missDCmessage
+if(len(missDC)>0):
+    print "missing datacards:"
+    for dc in missDC: print dc
+    print missDCmessage
+if(len(emptyDC)>0):
+    print "unfilled datacards:"
+    for dc in emptyDC: print dc
+    print missDCmessage
+if(len(missDCfolder)>0 or len(missDC)>0 or len(emptyDC)>0):
+    print "exiting..."
     exit()
 
 #Make a more human-readable logfile if necessary
@@ -182,7 +227,7 @@ flist    = open(flistname,"w+")
 for ijob,job in enumerate(jobs):
     argsigset = ",".join(job)
     flist.write(argsigset+'\n')
-    submit="condor_submit "+subfilename+" >>"+logfile
+#    submit="condor_submit "+subfilename+" >>"+logfile
     print "sending job",str(ijob)+":", argsigset 
 flist.close()
 #Function to create sub file                                                         
