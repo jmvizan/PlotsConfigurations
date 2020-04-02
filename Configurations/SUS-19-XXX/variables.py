@@ -23,8 +23,7 @@ if '2017' in opt.tag:
 if '2018' in opt.tag: 
     bTagCut = '0.4184'
     btagWP  = '2018M'
-#nbjets = '2*(trailingPtTagged>=20.)+(leadingPtTagged>=20. && trailingPtTagged<20.)'
-nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+'. && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+')'
+nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+')'
 
 # variables = {}
 
@@ -55,7 +54,7 @@ if 'btagefficiencies' in opt.tag:
                             'xaxis' : 'jet pseudorapodity',        #   x axis name
                             } 
                             
-if 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag:
+if 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag:
 
     variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
                                     'range' : (  40,    0.,  400.),    #   variable range
@@ -99,6 +98,14 @@ if 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.
                                      'fold'  : 1                             #   fold overflow
                                  }
 
+    if 'TwoLeptons' in opt.tag:
+    
+        variables['mll']         = {   'name'  : 'mll',                #   variable name    
+                                       'range' : ( 100,    0.,  200.), #   variable range
+                                       'xaxis' : 'm' + pll + gv,       #   x axis name
+                                       'fold'  : 1                     #   fold overflow
+                                   }
+
 if 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     mt2ll = 'mt2ll'
@@ -110,8 +117,16 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
         T2 = '(Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])'
         mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'
 
-    if 'HighMT2' in opt.tag:
+    if 'StudyHighMT2' in opt.tag:
  
+        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                         'range' : (  40,    0.,  800.),   # variable range
+                                         'xaxis' : mt2 + pll + gv,         #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+                                     }
+
+    elif 'HighMT2' in opt.tag:
+
         variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
                                          'range' : ([0, 20, 40, 60, 80, 100, 120, 250 , 450, 650],[1]), # variable range
                                          'xaxis' : mt2 + pll + gv,         #   x axis name

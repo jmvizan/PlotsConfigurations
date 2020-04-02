@@ -257,18 +257,18 @@ for mt2llregion in mt2llRegions:
 # mt2ll ZZ (from k-factors)
 
 # mt2ll signal
-
-nuisances['ptmissfastsim']  = {
-    'name'  : 'ptmissfastsim', # mismodeling correlated through the years?
-    'samples'  : { },
-    'kind'  : 'tree',
-    'type'  : 'shape',
-    'folderUp':   directorySig.replace('__susyMT2FS', '__susyMT2FSreco'),
-    'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
-}
-for sample in samples.keys():
-    if samples[sample]['isFastsim']:
-        nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
+if '__susyMT2FSreco' not in directorySig:
+    nuisances['ptmissfastsim']  = {
+        'name'  : 'ptmissfastsim', # mismodeling correlated through the years?
+        'samples'  : { },
+        'kind'  : 'tree',
+        'type'  : 'shape',
+        'folderUp':   directorySig.replace('__susyMT2FS', '__susyMT2FSreco'),
+        'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
+    }
+    for sample in samples.keys():
+        if samples[sample]['isFastsim']:
+            nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
 ### LHE weights
 
