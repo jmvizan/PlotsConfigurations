@@ -3,6 +3,10 @@ import os,sys
 from datetime import datetime
 import numpy as np
 
+
+nMPs        = 3
+
+
 #write header to logfile
 def logtitle(filename,sigset):
     if(os.path.exists(filename) is False):  print "creating log file"
@@ -33,7 +37,9 @@ def makeSubFile2(filename,folder,year,tag,sigset,fileset, doDC,writesigset):
     f.write("output                = "+folder+"/"+jobsent+".$(ClusterId).out\n")
     f.write("error                 = "+folder+"/"+jobsent+".$(ClusterId).err\n")
     f.write("log                   = "+folder+"/"+jobsent+".$(ClusterId).log\n")
-    f.write("+JobFlavour           = tomorrow\n")
+    #f.write("+JobFlavour           = nextweek\n")
+    f.write("+JobFlavour           = testmatch\n")
+    #f.write("+JobFlavour           = tomorrow\n")
     f.write("queue "+sigset+' from '+folder+'/joblist.txt \n')
     f.close()
 
@@ -51,6 +57,8 @@ if len(sys.argv)<4:
 #Take args
 if sys.argv[1]=='-1':
     year='2016-2017-2018'
+    if(nMPs>=3):  nMPs=nMPs//3
+    if(nMPs<3):  nMPs=1
 elif sys.argv[1]=='0':
     year='2016'
 elif sys.argv[1]=='1':
@@ -82,6 +90,15 @@ if(len(sys.argv)>4):
 else: fileset=sigset
 exec(open("signalMassPoints.py").read())
 
+if('-' in year):
+    dcyears=year.split('-')
+else:
+    dcyears=year
+for dcyear in dcyears:
+    inputfile='./Shapes/'+year+'/'+tag+'/plots_'+tag+'_SM-'+fileset+'.root'
+    if os.path.exists(inputfile) is False:
+        print "ROOT File",inputfile," doesn't exist, exiting"
+    #exit()
 
 #Look for masspoints in the sigset
 mpInSigset=[]
@@ -89,9 +106,21 @@ for model in signalMassPoints:
     print "Model:", model,"\tSignal set", sigset
     if model not in sigset:  continue
     for massPoint in signalMassPoints[model]:
-        if(massPointInSignalSet(massPoint,sigset)): mpInSigset.append(massPoint)
+        if(massPointInSignalSet(massPoint,sigset)):
+            submitThis = True
+	    rootname = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_Blind.AsymptoticLimits.mH120.root'
+            if os.path.isfile(rootname):  
+                if os.path.getsize(rootname)>6500:
+                    submitThis = False
+	    if submitThis:
+		print 'submmm', massPoint 
+                mpInSigset.append(massPoint)
         if massPoint not in sigset: continue
         print "Mass Point:", massPoint
+
+if len(mpInSigset)==0: 
+    print "no masspoints in the given sigset. Exiting"
+    exit()
 
 #Make a more human-readable logfile if necessary
 sigsets     = sigset.split(',')
@@ -121,13 +150,15 @@ except IndexError:
     if(nmS>1):   writesigset[1] = rreplace(writesigset[1] , 'mS', '', nmS - 1)
     elif(nmX>1): writesigset[2] = rreplace(writesigset[2] , 'mX', '', nmX - 1)
 
+
+
 #divide masspoints in sets of nMPs and send jobs
-nMPs        = 2
 lognm       = '_'.join(writesigset)
 jobfolder   = "./Condor/"+year+'/'+tag
 logfile     = jobfolder + '/'+lognm+".log"
 subfilename = jobfolder + '/'+lognm+".sub"
 flistname   = jobfolder+'/joblist.txt'
+
 
 os.system("mkdir -p "+jobfolder)
 logtitle(logfile,fileset)
