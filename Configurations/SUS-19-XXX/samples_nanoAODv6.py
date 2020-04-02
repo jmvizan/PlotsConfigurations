@@ -20,12 +20,12 @@ treePrefix= 'nanoLatino_'
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirSig  = ''
     treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
     if '2016' in opt.tag : 
         treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
     else : 
         treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+    treeBaseDirSig  = treeBaseDirMC
 #elif 'ifca' in SITE:
 #    treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 #    treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -67,6 +67,8 @@ directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 # Complex cut variables
 
 ElectronWP = 'Lepton_isTightElectron_cutBasedMediumPOG'
+if 'IP' in opt.tag:
+    ElectronWP += 'IP'
 MuonWP     = 'Lepton_isTightMuon_mediumRelIsoTight'
 
 ElectronSF = ElectronWP.replace('isTightElectron', 'tightElectron')
