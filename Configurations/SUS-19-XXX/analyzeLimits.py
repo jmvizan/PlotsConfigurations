@@ -23,13 +23,25 @@ def roundBin(bincontent):
     else:
         return round(bincontent, 0)
 
-def takeBinsAverage(histo, xb, yb, stepX, stepY, checkEmpties):
+def takeBinsAverage(histo, xb, yb, stepX, stepY, checkEmpties = True):
 
     if checkEmpties:
         if histo.GetBinContent(xb+stepX, yb+stepY)==0. or histo.GetBinContent(xb-stepX, yb-stepY)==0.:
             return 0.
 
     return roundBin((histo.GetBinContent(xb+stepX, yb+stepY)+histo.GetBinContent(xb-stepX, yb-stepY))/2.)
+
+def takeLinearInterpolation(histo, xb, yb, xi, yi, xf, yf, checkEmpties = True):
+
+    limit1 = histo.GetBinContent(xi, yi)
+    limit2 = histo.GetBinContent(xf, yf)
+
+    if checkEmpties:
+        if limit1==0. or limit2==0.:
+            return 0.
+
+    distance = (xb-xi)/(xf-xi) if xf-xi!=0. else (yb-yi)(yf-yi)
+    return limit1 + (limit2-limit1)*distance
 
 def scaleByNeighbour(histo, xb, yb, stepH, stepV, stepD):
 
@@ -123,7 +135,7 @@ def fillEmptyBins(sigset, histo):
             for xb in range(1, histo.GetNbinsX()+1):
                 massX = histo.GetXaxis().GetBinCenter(xb)
                 for yb in range(2, histo.GetNbinsY()+1):
-                    massY = histo.GetYaxis().GetBinCenter(yb);
+                    massY = histo.GetYaxis().GetBinCenter(yb)
                     if massX-massY>80. and histo.GetBinContent(xb, yb)==0.:
                         
                         if massX%25==0:
@@ -131,22 +143,22 @@ def fillEmptyBins(sigset, histo):
                             if massX-massY<=300.:
                                 
                                 if iter==1: 
-                                    histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 1, True))
+                                    histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 1))
                         
                             elif massX-massY>300.:
 
                                 if massX%50==0:
 
                                     if iter==0 and massY%50==25:
-                                        histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 2, True))
+                                        histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 2))
 
                                     elif iter==1 and massY%25!=0:
-                                        histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 1, True))
+                                        histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 1))
                                         
                                 elif massX%50==25:
 
                                     if iter==2:
-                                        histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 2, 2, True))
+                                        histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 2, 2))
 
                                     elif iter==3:
                                         histo.SetBinContent(xb, yb, scaleByNeighbour(histo, xb, yb, 0, 3, 2))
@@ -154,7 +166,7 @@ def fillEmptyBins(sigset, histo):
                         elif massX%25!=0: 
                             
                             if iter==4:
-                                histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 1, 1, True))
+                                histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 1, 1))
                             
                             if iter==5:
                                 histo.SetBinContent(xb, yb, scaleByNeighbour(histo, xb, yb, 0, 3, 1))
@@ -227,6 +239,116 @@ def fillEmptyBins(sigset, histo):
                 else:
                     xb += 1; yb += 1
 
+    elif 'TChipmWW' in sigset:
+
+        binWidth = int(histo.GetXaxis().GetBinWidth(1))
+        
+        # First deal with missing fits ...
+        for Bin in range(histo.GetNbinsX()+histo.GetNbinsY(), 1, -1):
+            if Bin-histo.GetNbinsX()>=1:
+                xb, yb = 1, Bin-histo.GetNbinsX() 
+            else:
+                xb, yb = histo.GetNbinsX()-Bin+2, 1
+            while xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
+                massX = histo.GetXaxis().GetBinCenter(xb)
+                massY = histo.GetYaxis().GetBinCenter(yb)
+                if massX-massY>7.:
+
+                    massXStep = 25
+
+                    if massX-massY>=100.:
+                        massYStep = 25
+                    else:
+                        massYStep =  int(binWidth)
+
+                    binStep = int(massXStep/binWidth)
+
+                    if massX%massXStep==0 and massY%massYStep==0:
+                        
+                        if histo.GetBinContent(xb, yb)==0:
+
+                            if xb<=binStep:
+
+                                print 'fillEmptyBins: TChipmWW type-1 singularity to be studied at mC-',massX, 'mX-',massY
+                                while histo.GetBinContent(xb, yb)==0. and xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
+                                    xb += binStep; yb += binStep
+
+                            else:
+
+                                holeLenght = 1
+                                xbi, ybi, xbf, ybf = xb-binStep, yb-binStep, xb, yb
+                                while histo.GetBinContent(xbf, ybf)==0. and xbf<=histo.GetNbinsX() and ybf<=histo.GetNbinsY():
+                                    holeLenght += 1
+                                    xbf += binStep; ybf += binStep
+
+                                if xb>binStep and yb>binStep:
+                                
+                                    xbi, ybi  = xb-binStep, yb-binStep
+                                    if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
+                                        print 'fillEmptyBins: TChipmWW type-2 singularity to be better studied at mC-',massX, 'mX-',massY
+                                        xbf, ybf = xbi, ybi 
+
+                                    stepLimit = (histo.GetBinContent(xbf, ybf) - histo.GetBinContent(xbi, ybi))/holeLenght
+                                    for holeStep in range(1, holeLenght):
+                                        histo.SetBinContent(xb, yb, roundBin(histo.GetBinContent(xbi, ybi)+holeStep*stepLimit))
+                                        xb += binStep; yb += binStep
+
+                                else:
+
+                                    if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
+                                        print 'fillEmptyBins: TChipmWW type-3 singularity to be studied at mC-',massX, 'mX-',massY
+                                            
+                                    else:
+                                            
+                                        for holeStep in range(1, holeLenght):
+                                            xbc, ybc = xbf - holeStep*binStep, ybf - holeStep*binStep
+                                            histo.SetBinContent(xbc, ybc, roundBin(scaleByNeighbour(histo, xbc, ybc, 0, binStep, binStep)))
+
+                                    xb = xbf; yb = ybf
+                                                
+                        else:
+                            xb += binStep; yb += binStep
+
+                    else:
+                        xb += 1; yb += 1
+
+                else:
+                    xb += 1; yb += 1
+        
+        # ... then fill grid holes 
+        nIterations = 3 if binWidth==5. else 0
+        for iter in range(nIterations):
+            for xb in range(1, histo.GetNbinsX()+1):
+                massX = histo.GetXaxis().GetBinCenter(xb)
+                for yb in range(2, histo.GetNbinsY()+1):
+                    massY = histo.GetYaxis().GetBinCenter(yb)
+                    if massX-massY>7. and histo.GetBinContent(xb, yb)==0.:
+
+                        if iter==0:
+                            stepY = 25 if massX-massY>=100. else 10
+                            if massX-massY%stepY:
+                                massXref = 25*int(massX/25)
+                                massYref = massXref - (massX-massY)
+                                if massYref>=0.:
+                                    xi = histo.GetXaxis().FindBin(massXref)
+                                    yi = histo.GetYaxis().FindBin(massYref)
+                                    histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xi, yi, xi+5, yi+5))
+                                
+                        elif iter==1:
+                            if massX-massY<100.:
+                                histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 1))
+                            elif yb>((xb-1)%5+1):
+                                offDiagonal = massX - 25*int(massX/25)
+                                yi = histo.GetYaxis().FindBin(25*int((massY-offDiagonal)/25)) + (xb-1)%5
+                                histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xb, yi, xb, yi+5))
+                                
+                        elif iter==2:
+                            massXref = 25*int(massX/25)
+                            offDiagonal = massY - 25*int(massY/25)
+                            xi = histo.GetXaxis().FindBin(massXref+histo.GetXaxis().FindBin(massXref))
+                            xf = histo.GetXaxis().FindBin(massXref) + 5
+                            histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xi, yb, xf, yb))
+
     else:
         print 'Warning: strategy for filling empty bins not available for model', model
 
@@ -280,6 +402,8 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                                           'Y' : { 'binWidth' : 12.5, 'minCenter' : 1.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]' } },
                                'TChipmSlepSnu' : { 'X' : { 'binWidth' : 25., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{#pm}_{1}} [GeV]' },
                                                    'Y' : { 'binWidth' : 25., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'   } },
+                               'TChipmWW' : { 'X' : { 'binWidth' : 5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{#pm}_{1}} [GeV]' },
+                                              'Y' : { 'binWidth' : 5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'   } },
                                # ...
     }
     
