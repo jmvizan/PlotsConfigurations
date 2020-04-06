@@ -189,3 +189,28 @@ for mChipm in range( 100,  851, 25):
 
             signalMassPoints['TChipmWW'][massPointName] = massPoint
 
+signalMassPoints['TSlepSlep'] = {}
+
+for mSlep in range( 100, 1301, 25):
+    datasetName = 'TSlepSlep'
+    if mSlep>450:
+        if mSlep%50!=0:
+            continue
+        datasetName = 'TSlepSlep_mSlep-500to1300'
+    mNeutralinoList = [ ] 
+    mNeutralinoList.extend(range( 0,  min(mSlep-40+1, 651), 25))
+    for dm in [1,5,10,20,30,40]:
+        if mSlep-dm<=650 and (dm<40 or mSlep>=500):
+            mNeutralinoList.append(mSlep, mSlep-dm)
+    for mNeutralino in mNeutralinoList:
+
+            mLSP = mNeutralino if mLSP!=0 else 1
+            
+            massPointName = 'TSlepSlep' + '_mS-' + str(mSlep) + '_mX-' + str(mLSP)
+            massPointCut = '(susyMSlepton>=' + str(mSlep) + '-4 && susyMSlepton<=' + str(mSlep) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
+
+            massPoint = {}
+            massPoint['massPointDataset'] = datasetName
+            massPoint['massPointCut'] = massPointCut
+
+            signalMassPoints['TSlepSlep'][massPointName] = massPoint
