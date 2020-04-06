@@ -333,7 +333,7 @@ if 'CharginoSignalRegions' in opt.tag:
         cuts['SR2_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300)*'+btagWeight1tag
         cuts['SR2_NoTag_em'] = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+jetscutSR2+')*'+btagWeight0tag
         cuts['SR2_NoJet_em'] = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+nojetcutSR2+')*'+btagWeight0tag
-
+        
         cuts['SR2_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300)*'+btagWeight1tag
         cuts['SR2_NoTag_sf'] = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+jetscutSR2+')*'+btagWeight0tag
         cuts['SR2_NoJet_sf'] = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+nojetcutSR2+')*'+btagWeight0tag
@@ -399,6 +399,6 @@ if 'SignalRegions' in opt.tag and normBackgrounds is not None:
                         regionCut = 'nCleanJet==0'
                         regionScaleFactor = normBackgrounds[background]['nojet']['scalefactor'].keys()[0]
 
-                    regionWeight = '(!'+regionCut+')+'+regionCut+'*'+regionScaleFactor
+                    regionWeight = '(!'+regionCut+')+('+regionCut+')*'+regionScaleFactor
                     samples[background]['weight'] += '*('+regionWeight+')'
                     
