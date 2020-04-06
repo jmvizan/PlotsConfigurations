@@ -33,15 +33,15 @@ if  'cern' in SITE :
 
 if '2016' in opt.tag :
     ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6/MCSusy2016v6__MCCorr2016Susyv6'
-    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6/hadd__susyGen__MCSusy2016FS__susyW__MCCorr2016SusyFS'
+    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6/hadd__susyGen__MCSusy2016FSv6__susyW__MCCorr2016SusyFSv6'
     ProductionData = 'Run2016_102X_nAODv6_Full2016v6/DATASusy2016v6__hadd'
 elif '2017' in opt.tag :
     ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6/MCSusy2017v6__MCCorr2017Susyv6'
-    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6/hadd__susyGen__MCSusy2017FS__susyW__MCCorr2017SusyFS'
+    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6/hadd__susyGen__MCSusy2017FSv6__susyW__MCCorr2017SusyFSv6'
     ProductionData = 'Run2017_102X_nAODv6_Full2017v6/DATASusy2017v6__hadd'
 elif '2018' in opt.tag :
     ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6/MCSusy2018v6__MCCorr2018Susyv6'
-    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/hadd__susyGen__MCSusy2018FS__susyW__MCCorr2018SusyFS'
+    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/hadd__susyGen__MCSusy2018FSv6__susyW__MCCorr2018SusyFSv6'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6/DATASusy2018v6__hadd'
 
 regionName = '__susyMT2'

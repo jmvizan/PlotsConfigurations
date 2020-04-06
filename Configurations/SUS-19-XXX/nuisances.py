@@ -204,7 +204,7 @@ for sample in samples.keys():
         if sample in signalMassPoints[model].keys():
             if 'T2' in model:
                 isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
-            elif 'TChi' in model:
+            elif 'TChi' in model or 'TSlepSlep' in model:
                 isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
             else:
                 print 'ERROR: no isrW implementation for model', model

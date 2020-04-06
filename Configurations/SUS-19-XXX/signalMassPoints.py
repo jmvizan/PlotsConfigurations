@@ -201,7 +201,7 @@ for mSlep in range( 100, 1301, 25):
     mNeutralinoList.extend(range( 0,  min(mSlep-40+1, 651), 25))
     for dm in [1,5,10,20,30,40]:
         if mSlep-dm<=650 and (dm<40 or mSlep>=500):
-            mNeutralinoList.append(mSlep, mSlep-dm)
+            mNeutralinoList.append(mSlep-dm)
     for mNeutralino in mNeutralinoList:
 
             mLSP = mNeutralino if mLSP!=0 else 1
