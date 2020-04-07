@@ -69,6 +69,10 @@ directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 ElectronWP = 'Lepton_isTightElectron_cutBasedMediumPOG'
 if 'IP' in opt.tag:
     ElectronWP += 'IP'
+elif 'EleMiniIso' in opt.tag:
+    ElectronWP = 'Lepton_isTightElectron_cutBasedMediumMiniIso'
+elif 'EleTightPOG' in opt.tag:
+    ElectronWP = 'Lepton_isTightElectron_cutBasedTightPOG'
 MuonWP     = 'Lepton_isTightMuon_mediumRelIsoTight'
 
 ElectronSF = ElectronWP.replace('isTightElectron', 'tightElectron')

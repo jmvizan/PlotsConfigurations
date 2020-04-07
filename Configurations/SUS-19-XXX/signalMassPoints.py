@@ -189,7 +189,13 @@ for mChipm in range( 100,  851, 25):
 
             signalMassPoints['TChipmWW'][massPointName] = massPoint
 
-signalMassPoints['TSlepSlep'] = {}
+signalMassPoints['TSlepSlep']   = {}
+signalMassPoints['TSlepSlepLH'] = {}
+signalMassPoints['TSeleSeleLH'] = {}
+signalMassPoints['TSmuoSmuoLH'] = {}
+signalMassPoints['TSlepSlepRH'] = {}
+signalMassPoints['TSeleSeleRH'] = {}
+signalMassPoints['TSmuoSmuoRH'] = {}
 
 for mSlep in range( 100, 1301, 25):
     datasetName = 'TSlepSlep'
@@ -207,10 +213,18 @@ for mSlep in range( 100, 1301, 25):
             mLSP = mNeutralino if mLSP!=0 else 1
             
             massPointName = 'TSlepSlep' + '_mS-' + str(mSlep) + '_mX-' + str(mLSP)
-            massPointCut = '(susyMSlepton>=' + str(mSlep) + '-4 && susyMSlepton<=' + str(mSlep) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
+            massPointCut = 'susyMSlepton>=' + str(mSlep) + '-4 && susyMSlepton<=' + str(mSlep) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2'
 
-            massPoint = {}
-            massPoint['massPointDataset'] = datasetName
-            massPoint['massPointCut'] = massPointCut
+            for sleptonModel in [ 'TSlepSlep', 'TSlepSlepLH', 'TSeleSeleLH', 'TSmuoSmuoLH', 'TSlepSlepRH', 'TSeleSeleRH', 'TSmuoSmuoRH' ]:
+                signalMassPoints[sleptonModel][massPointName] = { }
+                signalMassPoints[sleptonModel][massPointName]['massPointDataset'] = datasetName
+                signalMassPoints[sleptonModel][massPointName]['massPointCut'] = '(' + massPointCut
+                
+            signalMassPoints['TSlepSlep']  [massPointName]['massPointCut'] += ')'
+            signalMassPoints['TSlepSlepLH'][massPointName]['massPointCut'] += ' && susyIDprompt<=1000016)'
+            signalMassPoints['TSeleSeleLH'][massPointName]['massPointCut'] += ' && susyIDprompt==1000011)'
+            signalMassPoints['TSmuoSmuoLH'][massPointName]['massPointCut'] += ' && susyIDprompt==1000013)'
+            signalMassPoints['TSlepSlepRH'][massPointName]['massPointCut'] += ' && susyIDprompt>=2000000)'
+            signalMassPoints['TSeleSeleRH'][massPointName]['massPointCut'] += ' && susyIDprompt==2000011)'
+            signalMassPoints['TSmuoSmuoRH'][massPointName]['massPointCut'] += ' && susyIDprompt==2000013)'
 
-            signalMassPoints['TSlepSlep'][massPointName] = massPoint
