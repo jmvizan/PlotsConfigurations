@@ -100,7 +100,7 @@ if 'TopValidationRegion' in opt.tag:
         cuts['VR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['VR1_Tag_jets'] = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*'+btagWeight1tag
 
-if 'WWValidationRegion' in opt.tag:
+if 'WWValidationRegion' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
 
     if 'Data' in opt.sigset:
         cuts['VR1_Veto_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+VETO
