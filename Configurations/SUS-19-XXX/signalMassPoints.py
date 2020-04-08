@@ -189,3 +189,42 @@ for mChipm in range( 100,  851, 25):
 
             signalMassPoints['TChipmWW'][massPointName] = massPoint
 
+signalMassPoints['TSlepSlep']   = {}
+signalMassPoints['TSlepSlepLH'] = {}
+signalMassPoints['TSeleSeleLH'] = {}
+signalMassPoints['TSmuoSmuoLH'] = {}
+signalMassPoints['TSlepSlepRH'] = {}
+signalMassPoints['TSeleSeleRH'] = {}
+signalMassPoints['TSmuoSmuoRH'] = {}
+
+for mSlep in range( 100, 1301, 25):
+    datasetName = 'TSlepSlep'
+    if mSlep>450:
+        if mSlep%50!=0:
+            continue
+        datasetName = 'TSlepSlep_mSlep-500to1300'
+    mNeutralinoList = [ ] 
+    mNeutralinoList.extend(range( 0,  min(mSlep-40+1, 651), 25))
+    for dm in [1,5,10,20,30,40]:
+        if mSlep-dm<=650 and (dm<40 or mSlep>=500):
+            mNeutralinoList.append(mSlep-dm)
+    for mNeutralino in mNeutralinoList:
+
+            mLSP = mNeutralino if mLSP!=0 else 1
+            
+            massPointName = 'TSlepSlep' + '_mS-' + str(mSlep) + '_mX-' + str(mLSP)
+            massPointCut = 'susyMSlepton>=' + str(mSlep) + '-4 && susyMSlepton<=' + str(mSlep) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2'
+
+            for sleptonModel in [ 'TSlepSlep', 'TSlepSlepLH', 'TSeleSeleLH', 'TSmuoSmuoLH', 'TSlepSlepRH', 'TSeleSeleRH', 'TSmuoSmuoRH' ]:
+                signalMassPoints[sleptonModel][massPointName] = { }
+                signalMassPoints[sleptonModel][massPointName]['massPointDataset'] = datasetName
+                signalMassPoints[sleptonModel][massPointName]['massPointCut'] = '(' + massPointCut
+                
+            signalMassPoints['TSlepSlep']  [massPointName]['massPointCut'] += ')'
+            signalMassPoints['TSlepSlepLH'][massPointName]['massPointCut'] += ' && susyIDprompt<=1000016)'
+            signalMassPoints['TSeleSeleLH'][massPointName]['massPointCut'] += ' && susyIDprompt==1000011)'
+            signalMassPoints['TSmuoSmuoLH'][massPointName]['massPointCut'] += ' && susyIDprompt==1000013)'
+            signalMassPoints['TSlepSlepRH'][massPointName]['massPointCut'] += ' && susyIDprompt>=2000000)'
+            signalMassPoints['TSeleSeleRH'][massPointName]['massPointCut'] += ' && susyIDprompt==2000011)'
+            signalMassPoints['TSmuoSmuoRH'][massPointName]['massPointCut'] += ' && susyIDprompt==2000013)'
+

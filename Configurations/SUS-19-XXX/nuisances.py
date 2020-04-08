@@ -204,7 +204,7 @@ for sample in samples.keys():
         if sample in signalMassPoints[model].keys():
             if 'T2' in model:
                 isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
-            elif 'TChi' in model:
+            elif 'TChi' in model or 'TSlepSlep' in model:
                 isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
             else:
                 print 'ERROR: no isrW implementation for model', model
@@ -257,18 +257,18 @@ for mt2llregion in mt2llRegions:
 # mt2ll ZZ (from k-factors)
 
 # mt2ll signal
-
-nuisances['ptmissfastsim']  = {
-    'name'  : 'ptmissfastsim', # mismodeling correlated through the years?
-    'samples'  : { },
-    'kind'  : 'tree',
-    'type'  : 'shape',
-    'folderUp':   directorySig.replace('__susyMT2FS', '__susyMT2FSreco'),
-    'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
-}
-for sample in samples.keys():
-    if samples[sample]['isFastsim']:
-        nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
+if '__susyMT2FSreco' not in directorySig:
+    nuisances['ptmissfastsim']  = {
+        'name'  : 'ptmissfastsim', # mismodeling correlated through the years?
+        'samples'  : { },
+        'kind'  : 'tree',
+        'type'  : 'shape',
+        'folderUp':   directorySig.replace('__susyMT2FS', '__susyMT2FSreco'),
+        'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
+    }
+    for sample in samples.keys():
+        if samples[sample]['isFastsim']:
+            nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
 ### LHE weights
 

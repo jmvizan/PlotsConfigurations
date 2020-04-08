@@ -4,7 +4,7 @@
 
 massZ = '91.1876'
 vetoZ = 'fabs(mll-'+massZ+')>15.'
-Zcut  = 'fabs(mZ-'+massZ+')<ZCUT'
+Zcut  = 'fabs(mll-'+massZ+')<ZCUT'
 
 OC = LepId + ' && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
 SF = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1]) && '+vetoZ
@@ -31,7 +31,17 @@ if 'Test' in opt.tag:
     cuts['TwoLep_em_Tag'] = '(' + OC+' && '+DF+' && ptmiss>=80)*'+btagWeight1tag
     cuts['TwoLep_em_Veto'] = '(' + OC+' && '+DF+' && ptmiss>=80)*'+btagWeight0tag
 
+if 'TwoLeptons' in opt.tag:
+
+    cuts['TwoLep_em'] = OC+' && '+DF
+    cuts['TwoLep_ee'] = OC+' && fabs(Lepton_pdgId[0])==11 && fabs(Lepton_pdgId[1])==11' 
+    cuts['TwoLep_mm'] = OC+' && fabs(Lepton_pdgId[0])==13 && fabs(Lepton_pdgId[1])==13'
+
 if 'Preselection' in opt.tag:
+
+    cuts['TwoLep_em_nometcut'] = OC+' && '+DF
+    cuts['TwoLep_ee_nometcut'] = OC+' && '+EE
+    cuts['TwoLep_mm_nometcut'] = OC+' && '+MM
 
     cuts['TwoLep_em'] = OC+' && '+DF+' && ptmiss>=80'
     cuts['TwoLep_ee'] = OC+' && '+EE+' && ptmiss>=80'
@@ -137,9 +147,7 @@ if 'FakeValidationRegion' in opt.tag:
 
 if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
-    Zcut = 'mZ<ZCUT' #'fabs(mZ-'+massZ+')<ZCUT'
-
-    WZselection = 'nLepton==3 && Lepton_pt[2]>=20. && ' + LepId3 + ' && ' + Zcut + ' && ptmiss>=140'
+    WZselection = 'nLepton==3 && Lepton_pt[2]>=20. && ' + LepId3 + ' && mZ<ZCUT && ptmiss>=140'
 
     if 'WZValidationRegion' in opt.tag:
 
@@ -325,7 +333,7 @@ if 'CharginoSignalRegions' in opt.tag:
         cuts['SR2_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300)*'+btagWeight1tag
         cuts['SR2_NoTag_em'] = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+jetscutSR2+')*'+btagWeight0tag
         cuts['SR2_NoJet_em'] = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+nojetcutSR2+')*'+btagWeight0tag
-
+        
         cuts['SR2_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300)*'+btagWeight1tag
         cuts['SR2_NoTag_sf'] = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+jetscutSR2+')*'+btagWeight0tag
         cuts['SR2_NoJet_sf'] = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+nojetcutSR2+')*'+btagWeight0tag
@@ -391,6 +399,6 @@ if 'SignalRegions' in opt.tag and normBackgrounds is not None:
                         regionCut = 'nCleanJet==0'
                         regionScaleFactor = normBackgrounds[background]['nojet']['scalefactor'].keys()[0]
 
-                    regionWeight = '(!'+regionCut+')+'+regionCut+'*'+regionScaleFactor
+                    regionWeight = '(!'+regionCut+')+('+regionCut+')*'+regionScaleFactor
                     samples[background]['weight'] += '*('+regionWeight+')'
                     

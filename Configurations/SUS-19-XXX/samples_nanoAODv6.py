@@ -20,12 +20,12 @@ treePrefix= 'nanoLatino_'
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirSig  = ''
     treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
     if '2016' in opt.tag : 
         treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
     else : 
         treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+    treeBaseDirSig  = treeBaseDirMC
 #elif 'ifca' in SITE:
 #    treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 #    treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -33,15 +33,15 @@ if  'cern' in SITE :
 
 if '2016' in opt.tag :
     ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6/MCSusy2016v6__MCCorr2016Susyv6'
-    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6/susyGen__susyW__MCSusy2016FS__MCCorr2016SusyFS'
+    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6/hadd__susyGen__MCSusy2016FSv6__susyW__MCCorr2016SusyFSv6'
     ProductionData = 'Run2016_102X_nAODv6_Full2016v6/DATASusy2016v6__hadd'
 elif '2017' in opt.tag :
     ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6/MCSusy2017v6__MCCorr2017Susyv6'
-    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6/susyGen__susyW__MCSusy2017FS__MCCorr2017SusyFS'
+    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6/hadd__susyGen__MCSusy2017FSv6__susyW__MCCorr2017SusyFSv6'
     ProductionData = 'Run2017_102X_nAODv6_Full2017v6/DATASusy2017v6__hadd'
 elif '2018' in opt.tag :
     ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6/MCSusy2018v6__MCCorr2018Susyv6'
-    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/susyGen__susyW__MCSusy2018FS__MCCorr2018SusyFS'
+    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/hadd__susyGen__MCSusy2018FSv6__susyW__MCCorr2018SusyFSv6'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6/DATASusy2018v6__hadd'
 
 regionName = '__susyMT2'
@@ -67,6 +67,12 @@ directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 # Complex cut variables
 
 ElectronWP = 'Lepton_isTightElectron_cutBasedMediumPOG'
+if 'IP' in opt.tag:
+    ElectronWP += 'IP'
+elif 'EleMiniIso' in opt.tag:
+    ElectronWP = 'Lepton_isTightElectron_cutBasedMediumMiniIso'
+elif 'EleTightPOG' in opt.tag:
+    ElectronWP = 'Lepton_isTightElectron_cutBasedTightPOG'
 MuonWP     = 'Lepton_isTightMuon_mediumRelIsoTight'
 
 ElectronSF = ElectronWP.replace('isTightElectron', 'tightElectron')
