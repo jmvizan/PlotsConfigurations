@@ -147,7 +147,7 @@ if 'FakeValidationRegion' in opt.tag:
 
 if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
-    WZselection = 'nLepton==3 && Lepton_pt[2]>=20. && ' + LepId3 + ' && mZ<ZCUT && ptmiss>=140'
+    WZselection = 'nLepton==3 && Lepton_pt[2]>=20. && ' + LepId3 + ' && deltaMassZ<ZCUT && ptmiss>=140'
 
     if 'WZValidationRegion' in opt.tag:
 
@@ -173,7 +173,7 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
     if 'ttZValidationRegion' in opt.tag:
 
-        ttZselection = sel4Lep + ' && ' + Zcut.replace('ZCUT',  '10.') + ' && nCleanJet>=2 && CleanJet_pt[1]>=20.'
+        ttZselection = sel4Lep + ' && deltaMassZ<10. && nCleanJet>=2 && CleanJet_pt[1]>=20.'
 
         if 'Data' in opt.sigset:
             cuts['ttZ']            = ttZselection + ' && '                + BTAG
