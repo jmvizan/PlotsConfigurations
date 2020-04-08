@@ -66,10 +66,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameHR' : 'Minor bkg.',
         'isSignal' : 0,
         'color': 394, #  kYellow-6
-        'samples'  : ['ttW', 'VVV', 'HWW']
+        'samples'  : ['ttW', 'VVV', 'HWW', 'VZ']
     }
-    if 'VZ' in samples :
-        groupPlot['Others']['samples'].append('VZ')
+    
+    groupPlot['ZZTo4L'] = {
+        'nameHR' : 'ZZ (#rightarrow 4' + sl +')',
+        'isSignal' : 0,
+        'color': 49,
+        'samples' : ['ZZTo4L']
+    }
         
 #plot = {}
 
@@ -142,14 +147,13 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'scale'    : 1.0
     }
     
-    if 'VZ' in samples :
-        plot['VZ'] = { 
-            'nameHR' : 'VZ (#rightarrow 2' + sl + '2q)',
-            'color'    : 394, #  kYellow-6
-            'isSignal' : 0,
-            'isData'   : 0,
-            'scale'    : 1.0
-        }
+    plot['VZ'] = { 
+        'nameHR' : 'VZ (#rightarrow 2' + sl + '2q)',
+        'color'    : 394, #  kYellow-6
+        'isSignal' : 0,
+        'isData'   : 0,
+        'scale'    : 1.0
+    }
         
     plot['VVV'] = { 
         'nameHR' : 'VVV',
@@ -166,16 +170,14 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'isData'   : 0,
         'scale'    : 1.0
     }
-        
-    if 'ControlRegion-ZZ' in opt.tag:
-            
-        plot['ZZTo4L'] = {   
-            'nameHR' : 'ZZ (#rightarrow 4' + sl +')',
-            'color': 49,   
-            'isSignal' : 0,
-            'isData'   : 0 ,
-            'scale'    : 1.0
-        }
+
+    plot['ZZTo4L'] = {   
+        'nameHR' : 'ZZ (#rightarrow 4' + sl +')',
+        'color': 49,   
+        'isSignal' : 0,
+        'isData'   : 0 ,
+        'scale'    : 1.0
+    }
 
 sampleToRemoveFromPlot = [ ] 
 
