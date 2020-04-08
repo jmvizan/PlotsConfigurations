@@ -162,10 +162,12 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
     elif 'WZtoWWValidationRegion' in opt.tag:
 
         if 'Data' in opt.sigset:
-            cuts['WZtoWW'] = WZselection.replace('ZCUT', '10.') + ' && ' + VETO
+            cuts['WZtoWW_Zcut10'] = WZselection.replace('ZCUT', '10.') + ' && ' + VETO
+            cuts['WZtoWW_Zcut15'] = WZselection.replace('ZCUT', '15.') + ' && ' + VETO
 
         else:
-            cuts['WZtoWW'] = '(' + WZselection.replace('ZCUT',  '10.') + ')*'+btagWeight0tag
+            cuts['WZtoWW_Zcut10'] = '(' + WZselection.replace('ZCUT',  '10.') + ')*'+btagWeight0tag
+            cuts['WZtoWW_Zcut15'] = '(' + WZselection.replace('ZCUT',  '15.') + ')*'+btagWeight0tag
 
 if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 

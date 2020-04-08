@@ -383,7 +383,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'FilesPerJob' : 2 ,
                                 }
         
-        if 'ZZ' in opt.tag or 'ttZ' in opt.tag :
+        if 'ZZ' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
             
             ZZ4Lext = '_ext2' if ('2018' in opt.tag) else '_ext1'
             samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo4L'+ZZ4Lext, False,treePrefix) + 
