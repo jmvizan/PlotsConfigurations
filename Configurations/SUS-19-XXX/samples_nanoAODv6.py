@@ -399,6 +399,14 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        'FilesPerJob' : 2 ,
                                    }
 
+        if 'SameSignValidationRegion' in opt.tag:
+    
+            ttSemilepFlag = '_ext3' if ('2018' in opt.tag) else ''
+            samples['ttSemilep'] = { 'name'   : getSampleFiles(directoryBkg,'TTToSemiLeptonic'+ttSemilepFlag,False,treePrefix),
+                                     'weight' : XSWeight+'*'+SFweight ,
+                                     'FilesPerJob' : 2 ,
+                                    }
+
 if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
 
     sampleToRemove = [ ] 

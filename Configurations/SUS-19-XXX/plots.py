@@ -75,6 +75,13 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'color': 49,
         'samples' : ['ZZTo4L']
     }
+
+    groupPlot['ttSemilep']  = {
+        'nameHR' : 't#bar{t} Semilep.',
+        'isSignal' : 0,
+        'color': 401,   # kYellow+1
+        'samples'  : ['ttSemilep'] 
+    }
         
 #plot = {}
 
@@ -134,6 +141,14 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     plot['ttbar'] = {   
         'nameHR' : 't#bar{t}',
         'color': 400,   # kYellow
+        'isSignal' : 0,
+        'isData'   : 0 ,
+        'scale'    : 1.0
+    }
+    
+    plot['ttSemilep'] = {   
+        'nameHR' : 't#bar{t} Semilep.',
+        'color': 401,   # kYellow+1
         'isSignal' : 0,
         'isData'   : 0 ,
         'scale'    : 1.0

@@ -360,6 +360,108 @@ def fillEmptyBins(sigset, histo):
                             limitR = histo.SetBinContent(xb-1, yb)
                             limitS = histo.SetBinContent(xb, yb+5)/histo.SetBinContent(xb-1, yb+5)
                             histo.SetBinContent(xb, yb, limitR*limitS)
+
+    elif 'TSlepSlep' in sigset:
+
+        binWidth = int(histo.GetXaxis().GetBinWidth(1))        
+        dMmin = 50. # There are points at lower dM, but we are not sensitive
+
+        # First deal with missing fits ...
+        for xb in range(1, histo.GetNbinsX()+1):
+            yb = 1
+            while yb<=histo.GetNbinsY():
+                massX = histo.GetXaxis().GetBinCenter(xb)
+                massY = histo.GetYaxis().GetBinCenter(yb)
+                if massX-massY>=dMmin and massY<=650.:
+
+                    massXStep, massYStep = 25, 10
+                
+                    if massX>450.:
+                        massXStep = 50
+                        massYStep = 25
+                    
+                    binYStep = int(massYStep/binWidth)
+
+                    if massX%massXStep==0 and massY%massYStep==0:
+                        
+                        if histo.GetBinContent(xb, yb)==0:
+                                
+                            if yb==1 or massX-massY==dMmin:
+
+                                print 'fillEmptyBins: TSlepSlep type-1 singularity to be studied at mC-',massX, 'mX-',massY
+                                while histo.GetBinContent(xb, yb)==0. and yb<=histo.GetNbinsY():
+                                    yb += binYStep
+
+                            else:
+
+                                holeLenght = 1
+                                xbi, ybi, xbf, ybf = xb, yb-binYStep, xb, yb
+                                while histo.GetBinContent(xbf, ybf)==0. and xbf<=histo.GetNbinsX() and ybf<=histo.GetNbinsY():
+                                    holeLenght += 1
+                                    ybf += binYStep
+
+                                if ybf>histo.GetNbinsY():
+                                    print 'fillEmptyBins: TSlepSlep type-2 singularity to be better studied at mC-',massX, 'mX-',massY
+                                    yb = ybf
+                                    
+                                else:
+                                    stepLimit = (histo.GetBinContent(xbf, ybf) - histo.GetBinContent(xbi, ybi))/holeLenght
+                                    for holeStep in range(1, holeLenght):
+                                        histo.SetBinContent(xb, yb, roundBin(histo.GetBinContent(xbi, ybi)+holeStep*stepLimit))
+                                        yb += binYStep
+                                                
+                        else:
+                            yb += binYStep
+
+                    else:
+                        yb += 1
+
+                else:
+                    yb += 1
+        
+        # ... then fill grid holes 
+        for iter in range(6):
+            for xb in range(1, histo.GetNbinsX()+1):
+                massX = histo.GetXaxis().GetBinCenter(xb)
+                for yb in range(1, histo.GetNbinsY()+1):
+                    massY = histo.GetYaxis().GetBinCenter(yb)
+                    if massX-massY>=dMmin and massY<=650. and histo.GetBinContent(xb, yb)==0.:
+
+                        if massX<=450 and massX%25==0.:
+                        
+                            if iter==0 and massX-massY!=dMmin:
+                                histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 0, 1))
+
+                            elif iter==1 and massX%50==25. and massX-massY==dMmin:
+                                histo.SetBinContent(xb, yb, takeBinsAverage(histo, xb, yb, 5, 5))
+
+                        elif massX>=500 and massX%50==0.:
+
+                            if iter==2:
+                                yi = histo.GetYaxis().FindBin(25.*int(massY/25))
+                                histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xb, yi, xb, yi+5))
+
+                        else:
+
+                            massXStep = 25. if massX<450. else 50.
+                            massXref = massXStep*int(massX/massXStep)
+                            massYref = massXref - massX + massY
+
+                            step = int(massXStep/binWidth)
+                            xr = histo.GetXaxis().FindBin(massXref)
+
+                            if iter==3 and massYref>=0. and massYref+50.<=650.:
+                                yr = histo.GetYaxis().FindBin(massYref)
+                                histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xr, yr, xr+step, yr+step))
+
+                            if iter==4 and massYref<0.:
+                                xi = histo.GetXaxis().FindBin(massXref+massY)
+                                histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xi, yb, xr+step, yb))
+
+                            if iter==5 and massYref+50.>650.:
+                                xf = histo.GetXaxis().FindBin(massXref+massY-600.)
+                                histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xr, yb, xf, yb))
+
     else:
         print 'Warning: strategy for filling empty bins not available for model', model
 
@@ -446,6 +548,8 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                                                    'Y' : { 'binWidth' : 25., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'   } },
                                'TChipmWW' : { 'X' : { 'binWidth' : 5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{#pm}_{1}} [GeV]' },
                                               'Y' : { 'binWidth' : 5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'   } },
+                               'TSlepSlep' : { 'X' : { 'binWidth' :  5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #font[12]{l}_{L,R}} [GeV]' },
+                                               'Y' : { 'binWidth' :  5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'       } }, 
                                # ...
     }
     
@@ -578,7 +682,7 @@ def makeMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, reMake
 
         if fillemptybins==False:
             outputFileName = outputFileName.replace('.root', '_noFillEmptyBins' + '.root')
-            
+
         if reMakeHistos or not fileExist(outputFileName):
             fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, outputFileName)
 

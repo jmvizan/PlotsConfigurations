@@ -199,32 +199,35 @@ signalMassPoints['TSmuoSmuoRH'] = {}
 
 for mSlep in range( 100, 1301, 25):
     datasetName = 'TSlepSlep'
+    lspStep = 10
     if mSlep>450:
         if mSlep%50!=0:
             continue
         datasetName = 'TSlepSlep_mSlep-500to1300'
+        lspStep = 25
     mNeutralinoList = [ ] 
-    mNeutralinoList.extend(range( 0,  min(mSlep-40+1, 651), 25))
+    mNeutralinoList.extend(range( 0,  min(mSlep-40+1, 651), lspStep))
     for dm in [1,5,10,20,30,40]:
         if mSlep-dm<=650 and (dm<40 or mSlep>=500):
             mNeutralinoList.append(mSlep-dm)
     for mNeutralino in mNeutralinoList:
 
-            mLSP = mNeutralino if mLSP!=0 else 1
+        mLSP = mNeutralino
+        if mLSP==0: mLSP = 1
             
-            massPointName = 'TSlepSlep' + '_mS-' + str(mSlep) + '_mX-' + str(mLSP)
-            massPointCut = 'susyMSlepton>=' + str(mSlep) + '-4 && susyMSlepton<=' + str(mSlep) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2'
+        massPointName = '_mS-' + str(mSlep) + '_mX-' + str(mLSP)
+        massPointCut = 'susyMSlepton>=' + str(mSlep) + '-4 && susyMSlepton<=' + str(mSlep) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2'
 
-            for sleptonModel in [ 'TSlepSlep', 'TSlepSlepLH', 'TSeleSeleLH', 'TSmuoSmuoLH', 'TSlepSlepRH', 'TSeleSeleRH', 'TSmuoSmuoRH' ]:
-                signalMassPoints[sleptonModel][massPointName] = { }
-                signalMassPoints[sleptonModel][massPointName]['massPointDataset'] = datasetName
-                signalMassPoints[sleptonModel][massPointName]['massPointCut'] = '(' + massPointCut
+        for sleptonModel in [ 'TSlepSlep', 'TSlepSlepLH', 'TSeleSeleLH', 'TSmuoSmuoLH', 'TSlepSlepRH', 'TSeleSeleRH', 'TSmuoSmuoRH' ]:
+            signalMassPoints[sleptonModel][sleptonModel+massPointName] = { }
+            signalMassPoints[sleptonModel][sleptonModel+massPointName]['massPointDataset'] = datasetName
+            signalMassPoints[sleptonModel][sleptonModel+massPointName]['massPointCut'] = '(' + massPointCut
                 
-            signalMassPoints['TSlepSlep']  [massPointName]['massPointCut'] += ')'
-            signalMassPoints['TSlepSlepLH'][massPointName]['massPointCut'] += ' && susyIDprompt<=1000016)'
-            signalMassPoints['TSeleSeleLH'][massPointName]['massPointCut'] += ' && susyIDprompt==1000011)'
-            signalMassPoints['TSmuoSmuoLH'][massPointName]['massPointCut'] += ' && susyIDprompt==1000013)'
-            signalMassPoints['TSlepSlepRH'][massPointName]['massPointCut'] += ' && susyIDprompt>=2000000)'
-            signalMassPoints['TSeleSeleRH'][massPointName]['massPointCut'] += ' && susyIDprompt==2000011)'
-            signalMassPoints['TSmuoSmuoRH'][massPointName]['massPointCut'] += ' && susyIDprompt==2000013)'
+        signalMassPoints['TSlepSlep']  ['TSlepSlep'+massPointName]  ['massPointCut'] += ')'
+        signalMassPoints['TSlepSlepLH']['TSlepSlepLH'+massPointName]['massPointCut'] += ' && susyIDprompt<=1000016)'
+        signalMassPoints['TSeleSeleLH']['TSeleSeleLH'+massPointName]['massPointCut'] += ' && susyIDprompt==1000011)'
+        signalMassPoints['TSmuoSmuoLH']['TSmuoSmuoLH'+massPointName]['massPointCut'] += ' && susyIDprompt==1000013)'
+        signalMassPoints['TSlepSlepRH']['TSlepSlepRH'+massPointName]['massPointCut'] += ' && susyIDprompt>=2000000)'
+        signalMassPoints['TSeleSeleRH']['TSeleSeleRH'+massPointName]['massPointCut'] += ' && susyIDprompt==2000011)'
+        signalMassPoints['TSmuoSmuoRH']['TSmuoSmuoRH'+massPointName]['massPointCut'] += ' && susyIDprompt==2000013)'
 
