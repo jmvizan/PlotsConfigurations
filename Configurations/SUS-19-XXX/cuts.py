@@ -100,7 +100,7 @@ if 'TopValidationRegion' in opt.tag:
         cuts['VR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['VR1_Tag_jets'] = '(' + OC+' && ('+SF+' || '+DF+') && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*'+btagWeight1tag
 
-if 'WWValidationRegion' in opt.tag:
+if 'WWValidationRegion' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
 
     if 'Data' in opt.sigset:
         cuts['VR1_Veto_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+VETO
@@ -121,10 +121,10 @@ if 'SameSignValidationRegion' in opt.tag:
         cuts['SS_ptmiss-140_minus'] = SS+' && ptmiss>=140 && Lepton_pdgId[0]>0 && '+BTAG
 
     else:
-        cuts['SS_ptmiss-100to140']   = '('+SS+' && ptmiss>=100 && ptmiss<140)*(btagWeight_1tag)'
-        cuts['SS_ptmiss-140']        = '('+SS+' && ptmiss>=140)*(btagWeight_1tag)'
-        cuts['SS_ptmiss-140_plus']   = '('+SS+' && ptmiss>=140 && Lepton_pdgId[0]<0)*(btagWeight_1tag)'
-        cuts['SS_ptmiss-140_minus']  = '('+SS+' && ptmiss>=140 && Lepton_pdgId[0]>0)*(btagWeight_1tag)'
+        cuts['SS_ptmiss-100to140']   = '('+SS+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
+        cuts['SS_ptmiss-140']        = '('+SS+' && ptmiss>=140)*'+btagWeight1tag
+        cuts['SS_ptmiss-140_plus']   = '('+SS+' && ptmiss>=140 && Lepton_pdgId[0]<0)*'+btagWeight1tag
+        cuts['SS_ptmiss-140_minus']  = '('+SS+' && ptmiss>=140 && Lepton_pdgId[0]>0)*'+btagWeight1tag
 
 if 'FakeValidationRegion' in opt.tag:
 
@@ -135,19 +135,19 @@ if 'FakeValidationRegion' in opt.tag:
     C0 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
     OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
     
-    Fake = 'nLeptons==3 && ' + LepId2of3 + ' && ' + OCT + ' && Lepton_pt[2]>=20.'
+    Fake = 'nLepton==3 && ' + LepId2of3 + ' && ' + OCT + ' && Lepton_pt[2]>=20.'
 
     if 'Data' in opt.sigset:
         cuts['Fake_ptmiss-100to140']  = Fake+' && ptmiss>=100 && ptmiss<140 && '       +BTAG
         cuts['Fake_ptmiss-140']       = Fake+' && ptmiss>=140 && '                     +BTAG
 
     else:
-        cuts['Fake_ptmiss-100to140']   = '('+Fake+' && ptmiss>=100 && ptmiss<140)*(btagWeight_1tag)'
-        cuts['Fake_ptmiss-140']        = '('+Fake+' && ptmiss>=140)*(btagWeight_1tag)'
+        cuts['Fake_ptmiss-100to140']   = '('+Fake+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
+        cuts['Fake_ptmiss-140']        = '('+Fake+' && ptmiss>=140)*'+btagWeight1tag
 
 if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
-    WZselection = 'nLepton==3 && Lepton_pt[2]>=20. && ' + LepId3 + ' && mZ<ZCUT && ptmiss>=140'
+    WZselection = 'nLepton==3 && Lepton_pt[2]>=20. && ' + LepId3 + ' && deltaMassZ<ZCUT && ptmiss>=140'
 
     if 'WZValidationRegion' in opt.tag:
 
@@ -162,10 +162,12 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
     elif 'WZtoWWValidationRegion' in opt.tag:
 
         if 'Data' in opt.sigset:
-            cuts['WZtoWW'] = WZselection.replace('ZCUT', '10.') + ' && ' + VETO
+            cuts['WZtoWW_Zcut10'] = WZselection.replace('ZCUT', '10.') + ' && ' + VETO
+            cuts['WZtoWW_Zcut15'] = WZselection.replace('ZCUT', '15.') + ' && ' + VETO
 
         else:
-            cuts['WZtoWW'] = '(' + WZselection.replace('ZCUT',  '10.') + ')*'+btagWeight0tag
+            cuts['WZtoWW_Zcut10'] = '(' + WZselection.replace('ZCUT',  '10.') + ')*'+btagWeight0tag
+            cuts['WZtoWW_Zcut15'] = '(' + WZselection.replace('ZCUT',  '15.') + ')*'+btagWeight0tag
 
 if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
@@ -173,15 +175,15 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
     if 'ttZValidationRegion' in opt.tag:
 
-        ttZselection = sel4Lep + ' && ' + Zcut.replace('ZCUT',  '10.') + ' && nCleanJet>=2 && CleanJet_pt[1]>=20.'
+        ttZselection = sel4Lep + ' && deltaMassZ<10. && nCleanJet>=2 && CleanJet_pt[1]>=20.'
 
         if 'Data' in opt.sigset:
             cuts['ttZ']            = ttZselection + ' && '                + BTAG
             cuts['ttZ_ptmiss-140'] = ttZselection + ' && ptmiss>=140 && ' + BTAG
 
         else:
-            cuts['ttZ']            = '(' + ttZselection +                ')*(btagWeight_1tag)'
-            cuts['ttZ_ptmiss-140'] = '(' + ttZselection + ' && ptmiss>=140)*(btagWeight_1tag)'
+            cuts['ttZ']            = '(' + ttZselection +                ')*'+btagWeight1tag
+            cuts['ttZ_ptmiss-140'] = '(' + ttZselection + ' && ptmiss>=140)*'+btagWeight1tag
 
     elif 'ZZValidationRegion' in opt.tag:
 

@@ -26,10 +26,10 @@ if  'cern' in SITE :
     else : 
         treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
     treeBaseDirSig  = treeBaseDirMC
-#elif 'ifca' in SITE:
-#    treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
-#    treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
-#    treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+elif 'ifca' in SITE or 'cloud' in SITE:
+    treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in opt.tag :
     ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6/MCSusy2016v6__MCCorr2016Susyv6'
@@ -383,7 +383,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'FilesPerJob' : 2 ,
                                 }
         
-        if 'ZZ' in opt.tag or 'ttZ' in opt.tag :
+        if 'ZZ' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
             
             ZZ4Lext = '_ext2' if ('2018' in opt.tag) else '_ext1'
             samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo4L'+ZZ4Lext, False,treePrefix) + 
@@ -398,6 +398,14 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        'weight' : XSWeight+'*'+SFweight ,
                                        'FilesPerJob' : 2 ,
                                    }
+
+        if 'SameSignValidationRegion' in opt.tag:
+    
+            ttSemilepFlag = '_ext3' if ('2018' in opt.tag) else ''
+            samples['ttSemilep'] = { 'name'   : getSampleFiles(directoryBkg,'TTToSemiLeptonic'+ttSemilepFlag,False,treePrefix),
+                                     'weight' : XSWeight+'*'+SFweight ,
+                                     'FilesPerJob' : 2 ,
+                                    }
 
 if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
 
