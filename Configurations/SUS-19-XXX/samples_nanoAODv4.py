@@ -20,9 +20,11 @@ treePrefix= 'nanoLatino_'
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
-    treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/'
-    treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
+    print 'nAODv4 trees not available on lxplus anymore, please use nAODv6 trees or work on gridui'
+    exit()
+    #treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
+    #treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/'
+    #treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
 elif 'ifca' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
