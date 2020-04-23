@@ -90,6 +90,20 @@ if 'HighPtMissControlRegion' in opt.tag:
         cuts['VR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['VR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
 
+if 'HighPtMissOptimisationRegion' in opt.tag:
+
+    if 'Data' in opt.sigset:
+        cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && '+BTAG
+        cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && '+VETO
+        cuts['VR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=100 && '+BTAG
+        cuts['VR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=100 && '+VETO
+
+    else:
+        cuts['VR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=100)*'+btagWeight1tag
+        cuts['VR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=100)*'+btagWeight0tag
+        cuts['VR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=100)*'+btagWeight1tag
+        cuts['VR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=100)*'+btagWeight0tag
+
 if 'TopValidationRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
