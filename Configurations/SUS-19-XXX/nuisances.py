@@ -200,11 +200,10 @@ nuisances['isrFS']  = {
     'type'  : 'shape',
 }
 for sample in samples.keys():
-    for model in signalMassPoints:
-        if sample in signalMassPoints[model].keys():
-            if 'T2' in model:
+    if 'isrObservable' in samples[sample]:
+            if samples[sample]['isrObservable']=='njetISR':
                 isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
-            elif 'TChi' in model or 'TSlepSlep' in model:
+            elif samples[sample]['isrObservable']=='ptISR':
                 isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
             else:
                 print 'ERROR: no isrW implementation for model', model

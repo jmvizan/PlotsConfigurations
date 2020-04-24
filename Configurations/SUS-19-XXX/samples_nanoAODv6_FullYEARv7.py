@@ -454,7 +454,7 @@ exec(open('./signalMassPoints.py').read())
 for model in signalMassPoints:
     if model in opt.sigset:
 
-        isrObservable = 'njetISR' if ('T2' in model) else 'ptISR'
+        isrObservable = 'ptISR' if ('T2' not in model and '2016' in opt.tag) else 'njetISR'
 
         for massPoint in signalMassPoints[model]:
             if massPointInSignalSet(massPoint, opt.sigset):

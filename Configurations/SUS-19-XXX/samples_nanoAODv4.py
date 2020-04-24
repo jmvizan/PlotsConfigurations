@@ -457,9 +457,13 @@ exec(open('./signalMassPoints.py').read())
 
 for model in signalMassPoints:
     if model in opt.sigset:
+
+        isrObservable = 'njetISR' if ('T2' in model) else 'ptISR'
+
         # v4 patch... 
         BranchingRatio = '(0.10497000068426132)' if (model=='TChipmWW') else '(1.)'
         if ('TChipm' in model): BranchingRatio = BranchingRatio.replace(')', '/1000.)')
+
         for massPoint in signalMassPoints[model]:
             if massPointInSignalSet(massPoint, opt.sigset):
 
@@ -481,6 +485,7 @@ for model in signalMassPoints:
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
                                        'suppressZeroTreeNuisances' : ['all'],
+                                       'isrObservable' : isrObservable,
                                        'isSignal'  : 1,
                                        'isDATA'    : 0, 
                                        'isFastsim' : 1
