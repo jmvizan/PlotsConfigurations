@@ -82,24 +82,8 @@ if 'SignalRegions' in opt.tag:
 
 # lepton reco, id, iso, fastsim
 
-weightEle   = '('+EleWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
-weightMuo   = '('+MuoWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
-weightLep   = '('+LepWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
-weightEleFS = weightEle.replace('IdIsoSF', 'FastSimSF')
-weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
-weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
-
-leptonSF = { 
-    #'trakreco'        : [ '1.', '1.' ], ->  no scale factor required 
-    #'electronIdIso'   : [ weightEle.replace('Syst', 'Up'),   weightEle.replace('Syst', 'Down')   ],
-    #'muonIdIso'       : [ weightMuo.replace('Syst', 'Up'),   weightMuo.replace('Syst', 'Down')   ],
-    'leptonIdIso'     : [ weightLep.replace('Syst', 'Up'),   weightLep.replace('Syst', 'Down')   ], 
-    #'electronIdIsoFS' : [ weightEleFS.replace('Syst', 'Up'), weightEleFS.replace('Syst', 'Down') ],
-    #'muonIdIsoFS'     : [ weightMuoFS.replace('Syst', 'Up'), weightMuoFS.replace('Syst', 'Down') ],
-    'leptonIdIsoFS'   : [ weightLepFS.replace('Syst', 'Up'), weightLepFS.replace('Syst', 'Down') ], 
-}
-
 for scalefactor in leptonSF:
+
     nuisances[scalefactor]  = {
         'name'  : scalefactor+year,
         'samples'  : { },

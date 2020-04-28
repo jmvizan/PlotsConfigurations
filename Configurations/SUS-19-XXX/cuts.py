@@ -5,12 +5,7 @@
 massZ = '91.1876'
 vetoZ = 'fabs(mll-'+massZ+')>15.'
 Zcut  = 'fabs(mll-'+massZ+')<ZCUT'
-
-OC = LepId + ' && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
-SF = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1]) && '+vetoZ
-DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
-EE = SF+' && fabs(Lepton_pdgId[0])==11'
-MM = SF+' && fabs(Lepton_pdgId[0])==13'
+SF    = LL+' && '+vetoZ  
 
 #cuts = {}
 
@@ -34,30 +29,30 @@ if 'Test' in opt.tag:
 if 'TwoLeptons' in opt.tag:
 
     cuts['TwoLep_em'] = OC+' && '+DF
-    cuts['TwoLep_ee'] = OC+' && fabs(Lepton_pdgId[0])==11 && fabs(Lepton_pdgId[1])==11' 
-    cuts['TwoLep_mm'] = OC+' && fabs(Lepton_pdgId[0])==13 && fabs(Lepton_pdgId[1])==13'
+    cuts['TwoLep_ee'] = OC+' && '+EE 
+    cuts['TwoLep_mm'] = OC+' && '+MM
 
 if 'Preselection' in opt.tag:
 
     cuts['TwoLep_em_nometcut'] = OC+' && '+DF
-    cuts['TwoLep_ee_nometcut'] = OC+' && '+EE
-    cuts['TwoLep_mm_nometcut'] = OC+' && '+MM
+    cuts['TwoLep_ee_nometcut'] = OC+' && '+EE+' && '+vetoZ
+    cuts['TwoLep_mm_nometcut'] = OC+' && '+MM+' && '+vetoZ
 
     cuts['TwoLep_em'] = OC+' && '+DF+' && ptmiss>=80'
-    cuts['TwoLep_ee'] = OC+' && '+EE+' && ptmiss>=80'
-    cuts['TwoLep_mm'] = OC+' && '+MM+' && ptmiss>=80'
+    cuts['TwoLep_ee'] = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=80'
+    cuts['TwoLep_mm'] = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=80'
 
 if 'TopControlRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
         cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20) && '+BTAG 
-        cuts['Top_ee'] = '(' + OC+' && '+EE+' && ptmiss>=50) && '+BTAG 
-        cuts['Top_mm'] = '(' + OC+' && '+MM+' && ptmiss>=50) && '+BTAG 
+        cuts['Top_ee'] = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=50) && '+BTAG 
+        cuts['Top_mm'] = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=50) && '+BTAG 
 
     else: #if 'Backgrounds' in opt.sigset:
         cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20)*'+btagWeight1tag
-        cuts['Top_ee'] = '(' + OC+' && '+EE+' && ptmiss>=50)*'+btagWeight1tag
-        cuts['Top_mm'] = '(' + OC+' && '+MM+' && ptmiss>=50)*'+btagWeight1tag
+        cuts['Top_ee'] = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=50)*'+btagWeight1tag
+        cuts['Top_mm'] = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=50)*'+btagWeight1tag
 
 if 'WWControlRegion' in opt.tag:
 
@@ -66,15 +61,15 @@ if 'WWControlRegion' in opt.tag:
 
 if 'DYControlRegion' in opt.tag:
 
-    DY = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1]) && ' + Zcut.replace('ZCUT',  '15.')
+    DY = OC+' && '+LL+' && '+Zcut.replace('ZCUT',  '15.')
 
     if 'Data' in opt.sigset:
-        cuts['DY_ee'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==11) && '+VETO
-        cuts['DY_mm'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==13) && '+VETO
+        cuts['DY_ee'] = '(' + DY+' && '+EE+' && '+VETO
+        cuts['DY_mm'] = '(' + DY+' && '+MM+' && '+VETO
 
     else: #if 'Backgrounds' in opt.sigset:
-        cuts['DY_ee'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==11)*'+btagWeight0tag
-        cuts['DY_mm'] = '(' + OC+' && '+DY+' && fabs(Lepton_pdgId[0])==13)*'+btagWeight0tag
+        cuts['DY_ee'] = '(' + DY+' && '+EE+')*'+btagWeight0tag
+        cuts['DY_mm'] = '(' + DY+' && '+MM+')*'+btagWeight0tag
 
 if 'HighPtMissControlRegion' in opt.tag:
 
@@ -112,30 +107,21 @@ if 'WWValidationRegion' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
 
 if 'SameSignValidationRegion' in opt.tag:
 
-    SS = LepId + ' && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]>0)'
-
     if 'Data' in opt.sigset:
-        cuts['SS_ptmiss-100to140']  = SS+' && ptmiss>=100 && ptmiss<140 && '       +BTAG
-        cuts['SS_ptmiss-140']       = SS+' && ptmiss>=140 && '                     +BTAG
-        cuts['SS_ptmiss-140_plus']  = SS+' && ptmiss>=140 && Lepton_pdgId[0]<0 && '+BTAG
-        cuts['SS_ptmiss-140_minus'] = SS+' && ptmiss>=140 && Lepton_pdgId[0]>0 && '+BTAG
+        cuts['SS_ptmiss-100to140']  = SS +' && ptmiss>=100 && ptmiss<140 && '       +BTAG
+        cuts['SS_ptmiss-140']       = SS +' && ptmiss>=140 && '                     +BTAG
+        cuts['SS_ptmiss-140_plus']  = SSP+' && ptmiss>=140 && '                     +BTAG
+        cuts['SS_ptmiss-140_minus'] = SSM+' && ptmiss>=140 && '                     +BTAG
 
     else:
-        cuts['SS_ptmiss-100to140']   = '('+SS+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
-        cuts['SS_ptmiss-140']        = '('+SS+' && ptmiss>=140)*'+btagWeight1tag
-        cuts['SS_ptmiss-140_plus']   = '('+SS+' && ptmiss>=140 && Lepton_pdgId[0]<0)*'+btagWeight1tag
-        cuts['SS_ptmiss-140_minus']  = '('+SS+' && ptmiss>=140 && Lepton_pdgId[0]>0)*'+btagWeight1tag
+        cuts['SS_ptmiss-100to140']   = '('+SS +' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
+        cuts['SS_ptmiss-140']        = '('+SS +' && ptmiss>=140)*'+btagWeight1tag
+        cuts['SS_ptmiss-140_plus']   = '('+SSP+' && ptmiss>=140)*'+btagWeight1tag
+        cuts['SS_ptmiss-140_minus']  = '('+SSM+' && ptmiss>=140)*'+btagWeight1tag
 
 if 'FakeValidationRegion' in opt.tag:
-
-    LepId2of3 = '('+T0+'+'+T1+'+'+T2+')==2'
-
-    C2 = '(Lepton_pdgId[0]*Lepton_pdgId[1])'
-    C1 = '(Lepton_pdgId[0]*Lepton_pdgId[2])'
-    C0 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
-    OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
     
-    Fake = 'nLepton==3 && ' + LepId2of3 + ' && ' + OCT + ' && Lepton_pt[2]>=20.'
+    Fake = LepId2of3 + ' && ' + OCT
 
     if 'Data' in opt.sigset:
         cuts['Fake_ptmiss-100to140']  = Fake+' && ptmiss>=100 && ptmiss<140 && '       +BTAG
@@ -147,7 +133,7 @@ if 'FakeValidationRegion' in opt.tag:
 
 if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
-    WZselection = 'nLepton==3 && Lepton_pt[2]>=20. && ' + LepId3 + ' && deltaMassZ<ZCUT && ptmiss>=140'
+    WZselection = nLooseLepton+'==3 && ' + nTightLepton + '==3 && deltaMassZ<ZCUT && ptmiss>=140'
 
     if 'WZValidationRegion' in opt.tag:
 
@@ -171,7 +157,7 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
 if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
-    sel4Lep = 'nLepton==4 && Lepton_pt[3]>=20. && ' + LepId3of4
+    sel4Lep = nLooseLepton+'==4 && ' + nTightLepton + '>=3'
 
     if 'ttZValidationRegion' in opt.tag:
 
@@ -197,7 +183,7 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
 if 'DYValidationRegion' in opt.tag:
 
-    DY = OC + ' && fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1]) && ' + Zcut.replace('ZCUT',  '15.')
+    DY = OC + ' && ' + LL + ' && ' + Zcut.replace('ZCUT',  '15.')
 
     if 'Data' in opt.sigset:
         cuts['ZZ_ptmiss-100to140']       = DY + ' && ptmiss>=100 && ptmiss<140 && ' + VETO
@@ -280,7 +266,7 @@ if 'CharginoSignalRegions' in opt.tag:
     isrcut=''
 
     if 'VisHTv1' in opt.tag:
-        visht = '(Lepton_pt[0]+Lepton_pt[1]+Sum$(CleanJet_pt))'
+        visht = '('+sumLeptonPt+'+Sum$(CleanJet_pt))'
         nojetcutSR1 = visht+'<200'
         jetscutSR1  = visht+'>=200'
         nojetcutSR2 = visht+'<300'
@@ -292,7 +278,7 @@ if 'CharginoSignalRegions' in opt.tag:
         nojetcutSR2 = visht+'<50'
         jetscutSR2  = visht+'>=50'
     elif 'VisHTv3' in opt.tag:
-        visht = '(Lepton_pt[0]+Lepton_pt[1])'
+        visht = '('+sumLeptonPt+')'
         nojetcutSR1 = visht+'<100'
         jetscutSR1  = visht+'>=100'
         nojetcutSR2 = visht+'<100'

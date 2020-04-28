@@ -78,24 +78,58 @@ MuonWP     = 'Lepton_isTightMuon_mediumRelIsoTight'
 ElectronSF = ElectronWP.replace('isTightElectron', 'tightElectron')
 MuonSF     = MuonWP.replace('isTightMuon', 'tightMuon')
 
-LepId = '('+ElectronWP+'[0]+'+MuonWP+'[0]+'+ElectronWP+'[1]+'+MuonWP+'[1])==2'
-LepId3 = '('+ElectronWP+'[0]+'+MuonWP+'[0]+'+ElectronWP+'[1]+'+MuonWP+'[1]+'+ElectronWP+'[2]+'+MuonWP+'[2])==3'
-LepId3of4 = '('+ElectronWP+'[0]+'+MuonWP+'[0]+'+ElectronWP+'[1]+'+MuonWP+'[1]+'+ElectronWP+'[2]+'+MuonWP+'[2]+'+ElectronWP+'[3]+'+MuonWP+'[3])==3'
+lep0idx = '0'
+lep1idx = '1'
+lep2idx = '2'
+
+nLooseLepton = 'nLepton'
+nTightLepton = 'Sum$(('+ElectronWP+'+'+MuonWP+')==1)'
+
+OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
+SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]>0)'
+SSP = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
+SSM = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]>0 && Lepton_pdgId[1]>0'
+
+LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
+DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
+EE = 'channel==0'
+MM = 'channel==2' 
 
 T0 = '('+ElectronWP+'[0]+'+MuonWP+'[0])'
 T1 = '('+ElectronWP+'[1]+'+MuonWP+'[1])'
 T2 = '('+ElectronWP+'[2]+'+MuonWP+'[2])'
 
-BTAG = '(leadingPtTagged_btagDeepBM_1c>=20.)' 
+LepId2of3 = nLooseLepton+'==3 && ('+T0+'+'+T1+'+'+T2+')==2'
+
+C2 = '(Lepton_pdgId[0]*Lepton_pdgId[1])'
+C1 = '(Lepton_pdgId[0]*Lepton_pdgId[2])'
+C0 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
+OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
+
+btagAlgo = 'btagDeepB'
+bTagWP = 'M'
+bTagPtCut  = '20.'
+bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
+bTagCut = '0.6321'
+btagWP  = '2016'
+if '2017' in opt.tag: 
+    bTagCut = '0.4941'
+    btagWP  = '2017'
+if '2018' in opt.tag: 
+    bTagCut = '0.4184'
+    btagWP  = '2018'
+btagWP += bTagWP
+
+BTAG = '(leadingPtTagged_'+btagAlgo+bTagWP+'_1c>='+bTagPtCut+')' 
 VETO = '!'+BTAG
 
-BTAG30= '(leadingPtTagged_btagDeepBM_1c>=30.)'
+BTAG30= '(leadingPtTagged_'+btagAlgo+bTagWP+'_1c>=30.)'
 VETO30 = '!'+BTAG30
 
-btagWeight1tag = 'btagWeight_1tag_btagDeepBM_1c'
+btagWeight1tag = 'btagWeight_1tag_'+btagAlgo+bTagWP+'_1c'
 btagWeight0tag = '(1.-'+btagWeight1tag+')'
 
-ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_btagDeepBM_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
+ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
 
@@ -129,6 +163,23 @@ LepWeight      = EleWeight + '*' + MuoWeight
 EleWeightFS    = EleWeight.replace('IdIsoSF', 'FastSimSF')
 MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
 LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
+
+weightEle   = '('+EleWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
+weightMuo   = '('+MuoWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
+weightLep   = '('+LepWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
+weightEleFS = weightEle.replace('IdIsoSF', 'FastSimSF')
+weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
+weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
+
+leptonSF = { 
+    #'trkreco'        : [ '1.', '1.' ], ->  no scale factor required
+    #'electronIdIso'   : [ weightEle.replace('Syst', 'Up'),   weightEle.replace('Syst', 'Down')   ],
+    #'muonIdIso'       : [ weightMuo.replace('Syst', 'Up'),   weightMuo.replace('Syst', 'Down')   ],
+    'leptonIdIso'     : [ weightLep.replace('Syst', 'Up'),   weightLep.replace('Syst', 'Down')   ], 
+    #'electronIdIsoFS' : [ weightEleFS.replace('Syst', 'Up'), weightEleFS.replace('Syst', 'Down') ],
+    #'muonIdIsoFS'     : [ weightMuoFS.replace('Syst', 'Up'), weightMuoFS.replace('Syst', 'Down') ],
+    'leptonIdIsoFS'   : [ weightLepFS.replace('Syst', 'Up'), weightLepFS.replace('Syst', 'Down') ], 
+}
 
 # nonprompt lepton rate
 

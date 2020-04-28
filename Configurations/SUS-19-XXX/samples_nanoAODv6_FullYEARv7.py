@@ -15,6 +15,13 @@ print 'Value of lumi set to', opt.lumi
 
 treePrefix= 'nanoLatino_'
 
+ElectronWP = 'SusyMVATight'
+MuonWP = 'mediumMiniIsoMedium' 
+looseLeptons = 'miniiso'
+#ElectronWP = 'cutBasedMedium'
+#MuonWP = 'mediumRelIsoTight' 
+#looseLeptons = 'reliso'
+
 ### Directories
   
 SITE=os.uname()[1]
@@ -44,58 +51,96 @@ elif '2018' in opt.tag :
     ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/hadd__susyGen__MCSusy2018FSv6__susyW__MCCorr2018SusyFSv6'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6/DATASusy2018v6__hadd'
 
-regionName = '__susyMT2'
+regionName = '__susy'+looseLeptons+'MT2'
 
 if 'SameSign' in opt.tag :
-    regionName = '__susyMT2SameSign'
+    regionName += 'SameSign'
 elif 'Fake' in opt.tag :
-    regionName = '__susyMT2Fake'
+    regionName += 'Fake'
 elif 'WZtoWW' in opt.tag :
-    regionName = '__susyMT2WZtoWW'
+    regionName += 'WZtoWW'
 elif 'WZ' in opt.tag :
-    regionName = '__susyMT2WZ'
+    regionName += 'WZ'
 elif 'ZZ' in opt.tag :
-    regionName = '__susyMT2ZZ'
+    regionName += 'ZZ'
 elif 'ttZ' in opt.tag :
-    regionName = '__susyMT2ttZ'
+    regionName += 'ttZ'
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName + '/'
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/' 
 directoryData = treeBaseDirData + ProductionData + regionName + '/'
-directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
+directoryData = directoryData.replace('MT2/', 'MT2data/')
 
 # Complex cut variables
 
-ElectronWP = 'Lepton_isTightElectron_cutBasedMediumPOG'
-if 'IP' in opt.tag:
-    ElectronWP += 'IP'
-elif 'EleMiniIso' in opt.tag:
-    ElectronWP = 'Lepton_isTightElectron_cutBasedMediumMiniIso'
-elif 'EleTightPOG' in opt.tag:
-    ElectronWP = 'Lepton_isTightElectron_cutBasedTightPOG'
-MuonWP     = 'Lepton_isTightMuon_mediumRelIsoTight'
+if looseLeptons=='miniiso':
+    looseEleWP = 'Lepton_isTightElectron_SusyMVAVLoose'
+    looseMuoWP = 'Lepton_isTightMuon_looseMiniIsoLoose'
+elif looseLeptons=='reliso':
+    looseEleWP = 'Lepton_isTightElectron_cutBasedVeto',
+    looseMuoWP = 'Lepton_isTightMuon_looseIsoVeryLoose'
+elif looseLeptons=='relisov6':
+    looseEleWP = 'Lepton_isTightElectron_cutBasedVeto'
+    looseMuoWP = 'Lepton_isTightMuon_looseIsoLoose'
 
-ElectronSF = ElectronWP.replace('isTightElectron', 'tightElectron')
-MuonSF     = MuonWP.replace('isTightMuon', 'tightMuon')
+tightEleWP = 'Lepton_isTightElectron_'+ElectronWP
+tightMuoWP = 'Lepton_isTightMuon_'+MuonWP 
 
-LepId = '('+ElectronWP+'[0]+'+MuonWP+'[0]+'+ElectronWP+'[1]+'+MuonWP+'[1])==2'
-LepId3 = '('+ElectronWP+'[0]+'+MuonWP+'[0]+'+ElectronWP+'[1]+'+MuonWP+'[1]+'+ElectronWP+'[2]+'+MuonWP+'[2])==3'
-LepId3of4 = '('+ElectronWP+'[0]+'+MuonWP+'[0]+'+ElectronWP+'[1]+'+MuonWP+'[1]+'+ElectronWP+'[2]+'+MuonWP+'[2]+'+ElectronWP+'[3]+'+MuonWP+'[3])==3'
+ElectronSF = tightEleWP.replace('isTightElectron', 'tightElectron')
+MuonSF     = tightMuoWP.replace('isTightMuon', 'tightMuon')
 
-T0 = '('+ElectronWP+'[0]+'+MuonWP+'[0])'
-T1 = '('+ElectronWP+'[1]+'+MuonWP+'[1])'
-T2 = '('+ElectronWP+'[2]+'+MuonWP+'[2])'
+lep0idx = 'lep0idx'
+lep1idx = 'lep1idx'
+lep2idx = 'lep2idx'
 
-BTAG = '(leadingPtTagged_btagDeepBM_1c>=20.)' 
+nLooseLepton = 'Sum$(('+looseEleWP+'+'+looseMuoWP+')==1)'
+nTightLepton = 'Sum$(('+tightEleWP+'+'+tightMuoWP+')==1)'
+
+OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[lep0idx]>=25. && Lepton_pt[lep1idx]>=20. && channel<0'
+SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[lep0idx]>=25. && Lepton_pt[lep1idx]>=20. && channel>0)'
+SSP = nTightLepton + '==2 && mll>=20. && Lepton_pt[lep0idx]>=25. && Lepton_pt[lep1idx]>=20. && Lepton_pdgId[lep0idx]<0 && Lepton_pdgId[lep1idx]<0'
+SSM = nTightLepton + '==2 && mll>=20. && Lepton_pt[lep0idx]>=25. && Lepton_pt[lep1idx]>=20. && Lepton_pdgId[lep0idx]>0 && Lepton_pdgId[lep1idx]>0'
+
+LL = 'fabs(channel)%2==1'
+DF = 'fabs(channel)%2==0'
+EE = 'fabs(channel)==1'
+MM = 'fabs(channel)==3' 
+
+T0 = '('+tightEleWP+'[lep0idx]+'+tightMuoWP+'[lep0idx])'
+T1 = '('+tightEleWP+'[lep1idx]+'+tightMuoWP+'[lep1idx])'
+T2 = '('+tightEleWP+'[lep2idx]+'+tightMuoWP+'[lep2idx])'
+
+LepId2of3 = nLooseLepton+'==3 && '+nTightLepton+'==2'
+
+C2 = '(Lepton_pdgId[lep0idx]*Lepton_pdgId[lep1idx])'
+C1 = '(Lepton_pdgId[lep0idx]*Lepton_pdgId[lep2idx])'
+C0 = '(Lepton_pdgId[lep1idx]*Lepton_pdgId[lep2idx])'
+OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
+
+btagAlgo = 'btagDeepB'
+bTagWP = 'M'
+bTagPtCut  = '20.'
+bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
+bTagCut = '0.6321'
+btagWP  = '2016'
+if '2017' in opt.tag: 
+    bTagCut = '0.4941'
+    btagWP  = '2017'
+if '2018' in opt.tag: 
+    bTagCut = '0.4184'
+    btagWP  = '2018'
+btagWP += bTagWP
+
+BTAG = '(leadingPtTagged_'+btagAlgo+bTagWP+'_1c>='+bTagPtCut+')' 
 VETO = '!'+BTAG
 
-BTAG30= '(leadingPtTagged_btagDeepBM_1c>=30.)'
+BTAG30= '(leadingPtTagged_'+btagAlgo+bTagWP+'_1c>=30.)'
 VETO30 = '!'+BTAG30
 
-btagWeight1tag = 'btagWeight_1tag_btagDeepBM_1c'
+btagWeight1tag = 'btagWeight_1tag_'+btagAlgo+bTagWP+'_1c'
 btagWeight0tag = '(1.-'+btagWeight1tag+')'
 
-ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_btagDeepBM_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
+ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
 
@@ -123,18 +168,33 @@ XSWeight       = 'baseW*genWeight'
 
 # lepton weights
 
-EleWeight      = ElectronSF+'_IdIsoSF[0]*'+ElectronSF+'_IdIsoSF[1]'
-MuoWeight      = MuonSF+'_IdIsoSF[0]*'+MuonSF+'_IdIsoSF[1]'
+EleWeight      = ElectronSF+'_IdIsoSF[lep0idx]*'+ElectronSF+'_IdIsoSF[lep1idx]'
+MuoWeight      = MuonSF+'_IdIsoSF[lep0idx]*'+MuonSF+'_IdIsoSF[lep1idx]'
 LepWeight      = EleWeight + '*' + MuoWeight
 EleWeightFS    = EleWeight.replace('IdIsoSF', 'FastSimSF')
 MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
 LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
 
+weightEle   = '('+EleWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
+weightMuo   = '('+MuoWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
+weightLep   = '('+LepWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
+
+leptonSF = { 
+    #'trkreco'        : [ '1.', '1.' ], ->  no scale factor required 
+    'elereco'         : [],
+    #'electronIdIso'   : [ weightEle.replace('Syst', 'Up'),   weightEle.replace('Syst', 'Down')   ],
+    #'muonIdIso'       : [ weightMuo.replace('Syst', 'Up'),   weightMuo.replace('Syst', 'Down')   ],
+    'leptonIdIso'     : [ weightLep.replace('Syst', 'Up'),   weightLep.replace('Syst', 'Down')   ], 
+    #'electronIdIsoFS' : [ weightEleFS.replace('Syst', 'Up'), weightEleFS.replace('Syst', 'Down') ],
+    #'muonIdIsoFS'     : [ weightMuoFS.replace('Syst', 'Up'), weightMuoFS.replace('Syst', 'Down') ],
+    'leptonIdIsoFS'   : [ '1.0404000', '0.96040000' ], 
+}
+
 # nonprompt lepton rate
 
 #nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.50', 'rateDown' : '0.50' } 
 nonpromptLep = { 'rate' : '1.08', 'rateUp' : '1.29', 'rateDown' : '0.87' } 
-promptLeptons = 'Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]'
+promptLeptons = 'Lepton_promptgenmatched[lep0idx]*Lepton_promptgenmatched[lep1idx]'
 nonpromptLepSF      = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rate']      + ')'
 nonpromptLepSF_Up   = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateUp']    + ')'
 nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateDown']  + ')'
