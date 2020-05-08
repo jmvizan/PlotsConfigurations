@@ -305,6 +305,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 getSampleFiles(directoryBkg,'ggZZ2e2n',False,treePrefix) +
                                 getSampleFiles(directoryBkg,'ggZZ2m2n',False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
+                                'suppressNegative':['all'],
+                                'suppressNegativeNuisances' :['all'],
                                 'FilesPerJob' : 2 ,
                                 }
 
@@ -361,6 +363,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 #getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',                              False,treePrefix) + 
                                 getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125',                             False,treePrefix) ,
                                 'weight' : XSWeight+'*'+SFweight ,
+                                'suppressNegative':['all'],
+                                'suppressNegativeNuisances' :['all'],
                                 'FilesPerJob' : 2 ,
                                 }
         if '2018' not in opt.tag : 
@@ -402,6 +406,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        #getSampleFiles(directoryBkg,'qqHToZZTo4L_M125',    False,treePrefix) +
                                        #getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,treePrefix),
                                        'weight' : XSWeight+'*'+SFweight ,
+                                       'suppressNegative':['all'],
+                                       'suppressNegativeNuisances' :['all'],
                                        'FilesPerJob' : 2 ,
                                        }
             if '2017' not in opt.tag : 
