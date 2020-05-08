@@ -336,7 +336,7 @@ if 'StopSignalRegions' in opt.tag:
                 
 
 
-if 'CharginoSignalRegions' in opt.tag or 'CharginoOptimisationRegion' in opt.tag:
+if 'CharginoSignalRegions' in opt.tag:
 
     nojetcutSR1 = 'nCleanJet==0'
     jetscutSR1  = 'nCleanJet>0'
