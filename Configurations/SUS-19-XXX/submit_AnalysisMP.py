@@ -25,7 +25,7 @@ def writetolog(filename,line):
     f.close()
     #print "line", line
 
-     
+#Function to create sub file                                                              
 def makeSubFile2(filename,folder,year,tag,sigset,fileset, doDC,writesigset):
     PWD = os.getenv('PWD')+'/'
     f = open(filename,"w+")
@@ -123,19 +123,19 @@ for model in signalMassPoints:
         if(massPointInSignalSet(massPoint,sigset)):
             submitThis = True
 	    rootname = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_Blind.AsymptoticLimits.mH120.root'
+            #Only do empty files unless otherwise implied
             if os.path.isfile(rootname) and allMP is False:  
                 if os.path.getsize(rootname)>6500:
                     submitThis = False
-#                    print "ignored", massPoint
+                    print "ignored", massPoint
             if submitThis is False: continue
             mpInSigset.append(massPoint)
-            print massPoint, dcyear#, os.listdir(dclocs)
+            #print massPoint, dcyear#, os.listdir(dclocs)
             
+            #Pick datacards if necessary 
             if(doDC.lower() in doDCopts): continue
- 
             print '#####################\nDC', 
             for dcyear in year.split('-'):
-                #+'SR*'#/mt2ll/datacard.txt'
                 dcfolder='./Datacards/'+dcyear+'/'+tag+'/'+massPoint+'/'
                 if(os.path.exists(dcfolder) is False): 
                     missDCfolder.append(dcfolder) 
@@ -150,12 +150,13 @@ for model in signalMassPoints:
                     dcsize=os.path.getsize(whichdc+'datacard.txt')
                     if(dcsize<5000 and doDC not in doDCopts): emptyDC.append(whichDC)
                                                 
-            #print 'submmm', massPoint
             print "missing datacards:", len(missDC)+len(emptyDC)
             print "no miss"
             
         if massPoint not in sigset: continue
-        print "Mass Point:", massPoint #,"\n##########################################################################"
+        print "Mass Point:", massPoint 
+
+#Print missing MP/DC
 print len(missDC)
 if len(mpInSigset)==0: 
     print "no masspoints in the given sigset. Exiting"
@@ -230,7 +231,6 @@ for ijob,job in enumerate(jobs):
 #    submit="condor_submit "+subfilename+" >>"+logfile
     print "sending job",str(ijob)+":", argsigset 
 flist.close()
-#Function to create sub file                                                         
 
 makeSubFile2(subfilename,jobfolder, year, tag, 'MPs' , fileset,doDC,lognm)
 commandtorun="condor_submit "+subfilename+">>"+logfile
