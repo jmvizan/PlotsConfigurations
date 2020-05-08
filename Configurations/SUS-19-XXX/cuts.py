@@ -85,6 +85,20 @@ if 'HighPtMissControlRegion' in opt.tag:
         cuts['VR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['VR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
 
+if 'HighPtMissOptimisationRegion' in opt.tag:
+
+    if 'Data' in opt.sigset:
+        cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && '+BTAG
+        cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && '+VETO
+        cuts['VR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=100 && '+BTAG
+        cuts['VR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=100 && '+VETO
+
+    else:
+        cuts['VR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=100)*'+btagWeight1tag
+        cuts['VR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=100)*'+btagWeight0tag
+        cuts['VR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=100)*'+btagWeight1tag
+        cuts['VR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=100)*'+btagWeight0tag
+
 if 'TopValidationRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
@@ -207,23 +221,49 @@ if 'StopSignalRegions' in opt.tag:
         if 'pt30' in opt.tag:
             btagcut=BTAG30
             vetocut=VETO30
-        cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+btagcut
-        cuts['SR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+vetocut
-    
-        cuts['SR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && '+btagcut
-        cuts['SR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && '+vetocut
-    
-        cuts['SR2_Tag_em']   = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+btagcut
-        cuts['SR2_Veto_em']  = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+vetocut
-    
-        cuts['SR2_Tag_sf']   = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+btagcut
-        cuts['SR2_Veto_sf']  = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+vetocut
-    
-        cuts['SR3_Tag_em']   = OC+' && '+DF+' && ptmiss>=300 && '+isrcut+btagcut
-        cuts['SR3_Veto_em']  = OC+' && '+DF+' && ptmiss>=300 && '+isrcut+vetocut
-    
-        cuts['SR3_Tag_sf']   = OC+' && '+SF+' && ptmiss>=300 && '+isrcut+btagcut
-        cuts['SR3_Veto_sf']  = OC+' && '+SF+' && ptmiss>=300 && '+isrcut+vetocut   
+
+
+        if "Optim" in opt.tag:
+            cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=160 && ptmiss<220'+btagcut
+            cuts['SR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=160 && ptmiss<220'+vetocut
+            cuts['SR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=160 && ptmiss<220'+btagcut
+            cuts['SR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=160 && ptmiss<220'+vetocut
+
+            cuts['SR2_Tag_em']   = OC+' && '+DF+' && ptmiss>=220 && ptmiss<280'+btagcut
+            cuts['SR2_Veto_em']  = OC+' && '+DF+' && ptmiss>=220 && ptmiss<280'+vetocut
+            cuts['SR2_Tag_sf']   = OC+' && '+SF+' && ptmiss>=220 && ptmiss<280'+btagcut
+            cuts['SR2_Veto_sf']  = OC+' && '+SF+' && ptmiss>=220 && ptmiss<280'+vetocut
+
+            cuts['SR3_Tag_em']   = OC+' && '+DF+' && ptmiss>=280 && ptmiss<380'+btagcut
+            cuts['SR3_Veto_em']  = OC+' && '+DF+' && ptmiss>=280 && ptmiss<380'+vetocut
+            cuts['SR3_Tag_sf']   = OC+' && '+SF+' && ptmiss>=280 && ptmiss<380'+btagcut
+            cuts['SR3_Veto_sf']  = OC+' && '+SF+' && ptmiss>=280 && ptmiss<380'+vetocut
+
+            cuts['SR4_Tag_em']   = OC+' && '+DF+' && ptmiss>=380'+isrcut+btagcut
+            cuts['SR4_Veto_em']  = OC+' && '+DF+' && ptmiss>=380'+isrcut+vetocut
+            cuts['SR4_Tag_sf']   = OC+' && '+SF+' && ptmiss>=380'+isrcut+btagcut
+            cuts['SR4_Veto_sf']  = OC+' && '+SF+' && ptmiss>=380'+isrcut+vetocut
+
+
+        
+        else:
+            cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+btagcut
+            cuts['SR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=140 && ptmiss<200 && '+vetocut
+
+            cuts['SR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && '+btagcut
+            cuts['SR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=140 && ptmiss<200 && '+vetocut
+
+            cuts['SR2_Tag_em']   = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+btagcut
+            cuts['SR2_Veto_em']  = OC+' && '+DF+' && ptmiss>=200 && ptmiss<300 && '+vetocut
+
+            cuts['SR2_Tag_sf']   = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+btagcut
+            cuts['SR2_Veto_sf']  = OC+' && '+SF+' && ptmiss>=200 && ptmiss<300 && '+vetocut
+
+            cuts['SR3_Tag_em']   = OC+' && '+DF+' && ptmiss>=300 && '+isrcut+btagcut
+            cuts['SR3_Veto_em']  = OC+' && '+DF+' && ptmiss>=300 && '+isrcut+vetocut
+
+            cuts['SR3_Tag_sf']   = OC+' && '+SF+' && ptmiss>=300 && '+isrcut+btagcut
+            cuts['SR3_Veto_sf']  = OC+' && '+SF+' && ptmiss>=300 && '+isrcut+vetocut   
 
     else:
         isrcut= ' '
@@ -235,23 +275,48 @@ if 'StopSignalRegions' in opt.tag:
             btagcut=' && '+BTAG30
             vetocut=' && '+VETO30
         
-        cuts['SR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200'+btagcut+')*'+btagWeight1tag
-        cuts['SR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200'+vetocut+')*'+btagWeight0tag
+        if "Optim" in opt.tag:
+            cuts['SR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=160 && ptmiss<220'+btagcut+')*'+btagWeight1tag
+            cuts['SR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=160 && ptmiss<220'+vetocut+')*'+btagWeight0tag
+            cuts['SR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=160 && ptmiss<220'+btagcut+')*'+btagWeight1tag
+            cuts['SR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=160 && ptmiss<220'+vetocut+')*'+btagWeight0tag
 
-        cuts['SR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200'+btagcut+')*'+btagWeight1tag
-        cuts['SR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200'+vetocut+')*'+btagWeight0tag
+            cuts['SR2_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=220 && ptmiss<280'+btagcut+')*'+btagWeight1tag
+            cuts['SR2_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=220 && ptmiss<280'+vetocut+')*'+btagWeight0tag
+            cuts['SR2_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=220 && ptmiss<280'+btagcut+')*'+btagWeight1tag
+            cuts['SR2_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=220 && ptmiss<280'+vetocut+')*'+btagWeight0tag
 
-        cuts['SR2_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300'+btagcut+')*'+btagWeight1tag
-        cuts['SR2_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300'+vetocut+')*'+btagWeight0tag
+            cuts['SR3_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=280 && ptmiss<380'+btagcut+')*'+btagWeight1tag
+            cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=280 && ptmiss<380'+vetocut+')*'+btagWeight0tag
+            cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=280 && ptmiss<380'+btagcut+')*'+btagWeight1tag
+            cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=280 && ptmiss<380'+vetocut+')*'+btagWeight0tag
 
-        cuts['SR2_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300'+btagcut+')*'+btagWeight1tag
-        cuts['SR2_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300'+vetocut+')*'+btagWeight0tag
+            cuts['SR4_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=380'+isrcut+btagcut+')*'+btagWeight1tag
+            cuts['SR4_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=380'+isrcut+vetocut+')*'+btagWeight0tag
+            cuts['SR4_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=380'+isrcut+btagcut+')*'+btagWeight1tag
+            cuts['SR4_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=380'+isrcut+vetocut+')*'+btagWeight0tag
 
-        cuts['SR3_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+btagcut+')*'+btagWeight1tag
-        cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+vetocut+')*'+btagWeight0tag
 
-        cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+btagcut+')*'+btagWeight1tag
-        cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+vetocut+')*'+btagWeight0tag
+        
+        else:
+            cuts['SR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200'+btagcut+')*'+btagWeight1tag
+            cuts['SR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=140 && ptmiss<200'+vetocut+')*'+btagWeight0tag
+
+            cuts['SR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200'+btagcut+')*'+btagWeight1tag
+            cuts['SR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=140 && ptmiss<200'+vetocut+')*'+btagWeight0tag
+
+            cuts['SR2_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300'+btagcut+')*'+btagWeight1tag
+            cuts['SR2_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=200 && ptmiss<300'+vetocut+')*'+btagWeight0tag
+
+            cuts['SR2_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300'+btagcut+')*'+btagWeight1tag
+            cuts['SR2_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=200 && ptmiss<300'+vetocut+')*'+btagWeight0tag
+
+            cuts['SR3_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+btagcut+')*'+btagWeight1tag
+            cuts['SR3_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=300'+isrcut+vetocut+')*'+btagWeight0tag
+
+            cuts['SR3_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+btagcut+')*'+btagWeight1tag
+            cuts['SR3_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=300'+isrcut+vetocut+')*'+btagWeight0tag
+         
         
             
                 
