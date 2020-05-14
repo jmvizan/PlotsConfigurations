@@ -237,7 +237,7 @@ if 'StopSignalRegions' in opt.tag:
             vetocut=VETO30
 
 
-        if "Optim" in opt.tag:
+        if "Optim" in opt.tag and "Ptm" in opt.tag:
             cuts['SR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=160 && ptmiss<220'+btagcut
             cuts['SR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=160 && ptmiss<220'+vetocut
             cuts['SR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=160 && ptmiss<220'+btagcut
@@ -289,7 +289,7 @@ if 'StopSignalRegions' in opt.tag:
             btagcut=' && '+BTAG30
             vetocut=' && '+VETO30
         
-        if "Optim" in opt.tag:
+        if "Optim" in opt.tag and "Ptm" in opt.tag:
             cuts['SR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=160 && ptmiss<220'+btagcut+')*'+btagWeight1tag
             cuts['SR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=160 && ptmiss<220'+vetocut+')*'+btagWeight0tag
             cuts['SR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=160 && ptmiss<220'+btagcut+')*'+btagWeight1tag
