@@ -156,7 +156,7 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
     elif "Optim" in opt.tag and "MT2" in opt.tag:
 
         variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                         'range' : ([0, 20, 40, 60, 80, 100, 160],[1]), # variable range
+                                         'range' : ([0, 20, 40, 60, 80, 100, 160, 220],[1]), # variable range
                                          'xaxis' : mt2 + pll + gv,         #   x axis name
                                          'fold'  : 1                       #   fold overflow
 

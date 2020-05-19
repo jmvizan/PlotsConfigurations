@@ -419,7 +419,7 @@ if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrou
         if 'Veto' in opt.sigset:
             if sample in opt.sigset:
                 sampleToRemove.append(sample)
-        elif sample not in opt.sigset:
+        elif 'Backgrounds'+sample!= opt.sigset:
             sampleToRemove.append(sample)
 
     for sample in sampleToRemove:
