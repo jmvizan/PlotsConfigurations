@@ -98,7 +98,6 @@ btagWeight0tag = '(1.-'+btagWeight1tag+')'
 ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_btagDeepBM_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
-
 ### MET Filters
 
 METFilters_Common = 'Flag_goodVertices*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'
@@ -236,7 +235,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     ttbarFlag = '_PSWeights' if ('2017' in opt.tag) else ''
     samples['ttbar'] = {    'name'   : getSampleFiles(directoryBkg,'TTTo2L2Nu'+ttbarFlag,False,treePrefix),
                             'weight' : XSWeight+'*'+SFweight+'*'+centralTopPt ,
-                            'FilesPerJob' : 2 ,
+                            'FilesPerJob' : 20 ,
                         }
 
     if 'btagefficiencies' in opt.tag:
@@ -345,7 +344,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500'+DYMhighHT1200ext, False,treePrefix) +
                                 getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toInf'+DYMhighHT2500ext,  False,treePrefix) ,
                                 'weight' : XSWeight+'*'+SFweight ,
-                                'FilesPerJob' : 2 ,
+                                'FilesPerJob' : 40 ,
                                 } 
         if '2016' in opt.tag : 
             samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100',False,treePrefix)
@@ -375,7 +374,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'suppressNegative':['all'],
                                 'suppressNegativeNuisances' :['all'],
-                                'FilesPerJob' : 2 ,
+                                'FilesPerJob' : 20 ,
         }
         
         samples['VVV']   = {    'name'   :   getSampleFiles(directoryBkg,'WWW',False,treePrefix) + 
@@ -438,7 +437,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'weight' : '1.', 
                            'weights' : [ ],
                            'isData': ['all'],                            
-                           'FilesPerJob' : 20 ,
+                           'FilesPerJob' : 100 ,
                            'isSignal'  : 0,
                            'isDATA'    : 1, 
                            'isFastsim' : 0
