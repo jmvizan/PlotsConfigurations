@@ -255,15 +255,15 @@ if 'VisHT' in opt.tag:
 splitjets=False  
 if 'CharginoSignalRegions' in opt.tag or 'VisHT' in opt.tag: splitjets=True
 
-cuts={"SR1": ' && ptmiss>=140 && ptmiss<200 ',
+ptmiss_cuts={"SR1": ' && ptmiss>=140 && ptmiss<200 ',
       "SR2": ' && ptmiss>=200 && ptmiss<300 ',
       "SR3": ' && ptmiss>=300 '}
-if 'StopSignalRegions' in opt.tag and 'Optim' in opt.tag and 'Ptm' in opt.tag:
-    cuts={"SR1": ' && ptmiss>=160 && ptmiss<220 ',
+if 'Optim' in opt.tag and 'Ptm' in opt.tag:
+    ptmiss_cuts={"SR1": ' && ptmiss>=160 && ptmiss<220 ',
           "SR2": ' && ptmiss>=220 && ptmiss<280 ',
           "SR3": ' && ptmiss>=280 && ptmiss<380 ',
           "SR4": ' && ptmiss>=380 '}#CHECK THE ANDS
-for SR in cuts.keys():
+for SR in ptmiss_cuts:
     isrcut = ''
     doISR  = False
     if "ISR" in opt. tag:
@@ -274,12 +274,12 @@ for SR in cuts.keys():
                 doISR = True
 
     if splitjets is True:
-        if   SR in "SR1":
-            jetscut  = jetscutSR1
-            nojetcut = nojetcutSR1
-        elif SR in "SR2":
-            jetscut  = jetscutSR2
-            nojetcut = nojetcutSR2
+        if   SR == "SR1":
+            jetscut  = ' && '+jetscutSR1
+            nojetcut = ' && '+nojetcutSR1
+        elif SR == "SR2":
+            jetscut  = ' && '+jetscutSR2
+            nojetcut = ' && '+nojetcutSR2
     
     if doISR: isrcut=' && '+ISRCut
 
@@ -289,22 +289,22 @@ for SR in cuts.keys():
         if 'pt30' in opt.tag:
             btagcut=' && '+BTAG30
             vetocut=' && '+VETO30
+        
+        cuts[SR+'_Tag_em' ] = OC+' && '+DF+ptmiss_cuts[SR]+btagcut+isrcut
+        cuts[SR+'_Tag_sf' ] = OC+' && '+SF+ptmiss_cuts[SR]+btagcut+isrcut
+
         if splitjets is True and SR in ["SR1","SR2"]:
 
-            cuts[SR+'_Tag_em' ]  = OC+' && '+DF+cuts[SR]+btagcut
-            cuts[SR+'_Tag_sf' ]  = OC+' && '+SF+cuts[SR]+btagcut
 
-            cuts[SR+'_NoTag_em'] = OC+' && '+DF+cuts[SR]+vetocut+' && '+jetscut
-            cuts[SR+'_NoTag_sf'] = OC+' && '+SF+cuts[SR]+vetocut+' && '+jetscut
+            cuts[SR+'_NoTag_em'] = OC+' && '+DF+ptmiss_cuts[SR]+vetocut+jetscut+isrcut
+            cuts[SR+'_NoTag_sf'] = OC+' && '+SF+ptmiss_cuts[SR]+vetocut+jetscut+isrcut
 
-            cuts[SR+'_NoJet_em'] = OC+' && '+DF+cuts[SR]+vetocut+' && '+nojetcut
-            cuts[SR+'_NoJet_sf'] = OC+' && '+SF+cuts[SR]+vetocut+' && '+nojetcut
+            cuts[SR+'_NoJet_em'] = OC+' && '+DF+ptmiss_cuts[SR]+vetocut+nojetcut+isrcut
+            cuts[SR+'_NoJet_sf'] = OC+' && '+SF+ptmiss_cuts[SR]+vetocut+nojetcut+isrcut
 
         else:
-            cuts[SR+'_Tag_em' ] = OC+' && '+DF+cuts[SR]+btagcut+isrcut
-            cuts[SR+'_Tag_sf' ] = OC+' && '+SF+cuts[SR]+btagcut+isrcut
-            cuts[SR+'_Veto_em'] = OC+' && '+DF+cuts[SR]+vetocut+isrcut
-            cuts[SR+'_Veto_sf'] = OC+' && '+SF+cuts[SR]+vetocut+isrcut
+            cuts[SR+'_Veto_em'] = OC+' && '+DF+ptmiss_cuts[SR]+vetocut+isrcut
+            cuts[SR+'_Veto_sf'] = OC+' && '+SF+ptmiss_cuts[SR]+vetocut+isrcut
     
     else:
         btagcut=''
@@ -312,23 +312,22 @@ for SR in cuts.keys():
         if 'pt30' in opt.tag:
             btagcut=' && '+BTAG30
             vetocut=' && '+VETO30
+        
+        cuts[SR+'_Tag_em' ]  = '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+btagcut+')*'+btagWeight1tag
+        cuts[SR+'_Tag_sf' ]  = '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+btagcut+')*'+btagWeight1tag
+
         if splitjets is True and SR in ["SR1","SR2"]:
-            cuts[SR+'_Tag_em' ]   = '(' + OC+' && '+DF+cuts[SR]+btagcut+')*'+btagWeight1tag
-            cuts[SR+'_Tag_sf' ]   = '(' + OC+' && '+SF+cuts[SR]+btagcut+')*'+btagWeight1tag
+            cuts[SR+'_NoTag_em'] = '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+vetocut+jetscut +')*'+btagWeight0tag
+            cuts[SR+'_NoTag_sf'] = '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+vetocut+jetscut +')*'+btagWeight0tag
 
-            cuts[SR+'_NoTag_em']  = '(' + OC+' && '+DF+cuts[SR]+vetocut+ ' &&' +jetscut +')*'+btagWeight0tag
-            cuts[SR+'_NoTag_sf']  = '(' + OC+' && '+SF+cuts[SR]+vetocut+ ' &&' +jetscut +')*'+btagWeight0tag
-
-            cuts[SR+'_NoJet_em']  = '(' + OC+' && '+DF+cuts[SR]+vetocut+ ' &&' +nojetcut+')*'+btagWeight0tag
-            cuts[SR+'_NoJet_sf']  = '(' + OC+' && '+SF+cuts[SR]+vetocut+ ' &&' +nojetcut+')*'+btagWeight0tag
+            cuts[SR+'_NoJet_em'] = '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+vetocut+nojetcut+')*'+btagWeight0tag
+            cuts[SR+'_NoJet_sf'] = '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+vetocut+nojetcut+')*'+btagWeight0tag
 
 
         else:
-            cuts[SR+'_Tag_em' ]  = '(' + OC+' && '+DF+cuts[SR]+isrcut+btagcut+')*'+btagWeight1tag
-            cuts[SR+'_Tag_sf' ]  = '(' + OC+' && '+SF+cuts[SR]+isrcut+btagcut+')*'+btagWeight1tag
 
-            cuts[SR+'_Veto_em']  = '(' + OC+' && '+DF+cuts[SR]+isrcut+vetocut+')*'+btagWeight0tag
-            cuts[SR+'_Veto_sf']  = '(' + OC+' && '+SF+cuts[SR]+isrcut+vetocut+')*'+btagWeight0tag
+            cuts[SR+'_Veto_em']  = '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+vetocut+')*'+btagWeight0tag
+            cuts[SR+'_Veto_sf']  = '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+vetocut+')*'+btagWeight0tag
     
 
 # apply background scale factors
