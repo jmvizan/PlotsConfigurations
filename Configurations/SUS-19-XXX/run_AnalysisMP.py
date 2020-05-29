@@ -3,14 +3,15 @@ import timeit
 import optparse
 import sys, os
 
+gridui=True
 #To be updated to a more general option
-SUS19='/afs/cern.ch/work/p/pmatorra/private/CMSSW_10_2_14/src/PlotsConfigurations/Configurations/SUS-19-XXX/'
-print "cwddir before the change", os.getcwd()
+#if gridui is True:
+#    SUS19='/gpfs/users/pmatorra/CMSSW_10_2_14/src/PlotsConfigurations/Configurations/SUS-19-XXX/'
+#else:
 cmsenv=' eval `scramv1 runtime -sh` '
 abspath = os.path.abspath(__file__)
 dname = os.path.dirname(abspath)
-os.chdir(dname)
-
+SUS19 = dname
 
 if __name__ == '__main__':
     doDC=False
@@ -70,7 +71,6 @@ if __name__ == '__main__':
     name='python run_CombineTools.py'
     command= ' '+name+' '+opts
     print "Command sent:\t", command,'\n','CWD:', os.getcwd()
-    print "ABSPATH", abspath, "\tOSCWD", os.getcwd(), "\tLONGER OPTION", os.path.dirname(os.path.realpath(__file__))
     if doDC: print " datacards:\n", cmdDatacards
     else: print "datacards are not made"
     os.system('cd '+ SUS19+ '; '+cmsenv+';'+ cmdDatacards +command)

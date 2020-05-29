@@ -3,9 +3,10 @@ import os,sys
 from datetime import datetime
 import numpy as np
 
-
+PWD = os.getenv('PWD')+'/'
+    
 nMPs        = 1
-
+flavour="workday"
 
 #write header to logfile
 def logtitle(filename,sigset):
@@ -26,11 +27,9 @@ def writetolog(filename,line):
     #print "line", line
 
 #Function to create sub file                                                              
-def makeSubFile2(filename,folder,year,tag,sigset,fileset, doDC,writesigset):
-    PWD = os.getenv('PWD')+'/'
+def makeSubFile(filename,folder,sigset,flavour):
     f = open(filename,"w+")
     jobsent= '$(' +sigset + ')'
-    arguments = year+' '+tag+' '+jobsent+ ' ' +PWD+' '+fileset+' '+str(doDC)
     #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
@@ -38,7 +37,7 @@ def makeSubFile2(filename,folder,year,tag,sigset,fileset, doDC,writesigset):
     f.write("error                 = "+folder+"/"+jobsent+".$(ClusterId).err\n")
     f.write("log                   = "+folder+"/"+jobsent+".$(ClusterId).log\n")
     #f.write("+JobFlavour           = nextweek\n")
-    f.write("+JobFlavour           = workday\n")
+    f.write("+JobFlavour           = "+flavour+"\n")
     #f.write("+JobFlavour           = testmatch\n")
     #f.write("+JobFlavour           = tomorrow\n")
     f.write("queue "+sigset+' from '+folder+'/joblist.txt \n')
@@ -104,7 +103,9 @@ exec(open("signalMassPoints.py").read())
 dcyears=year.split('-')
 for dcyear in dcyears:
     print dcyears, dcyear
-    inputfile='./Shapes/'+dcyear+'/'+tag+'/plots_'+tag+'_SM-'+fileset+'.root'
+    str_SM='_'
+    if 'SM-' not in fileset: str_SM='_SM-' 
+    inputfile='./Shapes/'+dcyear+'/'+tag+'/plots_'+tag+str_SM+fileset+'.root'
     if os.path.exists(inputfile) is False:
         print "ROOT File",inputfile," doesn't exist, exiting"
         exit()
@@ -122,6 +123,7 @@ for model in signalMassPoints:
     if model not in sigset:  continue
     for massPoint in signalMassPoints[model]:
         if(massPointInSignalSet(massPoint,sigset)):
+
             submitThis = True
 	    rootname = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_Blind.AsymptoticLimits.mH120.root'
             #Only do empty files unless otherwise implied
@@ -226,18 +228,40 @@ writetolog(logfile, logline)
 
 jobs     = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
 flist    = open(flistname,"w+")
+if 'gpfs' in PWD: 
+    gridui=True
+    gridfol='Jobs/'+fileset+'/'
+    os.system('mkdir -p '+gridfol) 
 for ijob,job in enumerate(jobs):
     argsigset = ",".join(job)
     flist.write(argsigset+'\n')
-#    submit="condor_submit "+subfilename+" >>"+logfile
-    print "sending job",str(ijob)+":", argsigset 
+    #    submit="condor_submit "+subfilename+" >>"+logfile
+    
+    if gridui:
+        arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)
+        gridnm=gridfol+argsigset
+        f2 = open(gridnm+".sh","w+")
+        f2.write("#!/bin/bash")
+        f2.write("\npython run_AnalysisMP.py "+arguments)
+        f2.close()
+        gridcomm='sbatch -o '+gridnm+'.out -e '+gridnm+'.err --qos=gridui_sort --partition=cloudcms '+gridnm+'.sh>'+gridnm+'.jid'
+        os.system(gridcomm)
+        #print gridcomm
+    print "sending job",str(ijob)+":", argsigset# arguments  
 flist.close()
 
-makeSubFile2(subfilename,jobfolder, year, tag, 'MPs' , fileset,doDC,lognm)
-commandtorun="condor_submit "+subfilename+">>"+logfile
-os.system(commandtorun)
-print "jobs sent:\n", commandtorun
-writetolog(logfile,"----------------------------------")
+
+print PWD
+#exit()
+if 'cern.ch' in PWD: 
+    jobsent= '$(' +sigset + ')'
+    arguments = year+' '+tag+' '+jobsent+ ' ' +PWD+' '+fileset+' '+str(doDC)
+ 
+    makeSubFile(subfilename,jobfolder, 'MPs' , arguments, flavour)
+    commandtorun="condor_submit "+subfilename+">>"+logfile
+    #os.system(commandtorun)
+    print "jobs sent:\n", commandtorun
+    writetolog(logfile,"----------------------------------")
 
 print "LIMITS SENT\nlog file:\t"+logfile,"\nsub file:\t"+subfilename,"\njob list:\t"+flistname 
 
