@@ -10,6 +10,7 @@ mt2  = '#font[50]{m}_{T2}'
 ptll = pt+'^{'+sll+'}'
 dphill = '#Delta#phi(lep1,lep2)'
 
+print "test this"
 # Complex variables
 
 btagAlgo = 'btagDeepB'
@@ -154,28 +155,31 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                      }
 
     elif "Optim" in opt.tag and "MT2" in opt.tag:
+        if "High" in opt.tag:
+            
+            if "extrabin" in opt.tag:
+                variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                                 'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
+                                                 'xaxis' : mt2 + pll + gv,         #   x axis name
+                                                 'fold'  : 1                       #   fold overflow
+                }
+            else:
+                variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                                 'range' : ([0, 20, 40, 60, 80, 100, 160, 370, 500],[1]), # variable range
+                                                 'xaxis' : mt2 + pll + gv,         #   x axis name
+                                                 'fold'  : 1                       #   fold overflow
+                                                 
+                                             }
 
-        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+
+        else:
+            variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
                                          'range' : ([0, 20, 40, 60, 80, 100, 160, 220],[1]), # variable range
                                          'xaxis' : mt2 + pll + gv,         #   x axis name
                                          'fold'  : 1                       #   fold overflow
 
                                      }
 
-    elif "HighMT2" in opt.tag and "Optim" in opt.tag:
-        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                         'range' : ([0, 20, 40, 60, 80, 100, 160, 240, 320],[1]), # variable range
-                                         'xaxis' : mt2 + pll + gv,         #   x axis name
-                                         'fold'  : 1                       #   fold overflow
-
-                                     }
-    elif "HighMT2_l" in opt.tag and "Optim" in opt.tag:
-        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                         'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
-                                         'xaxis' : mt2 + pll + gv,         #   x axis name
-                                         'fold'  : 1                       #   fold overflow
-
-                                     }
 
 
     else:
@@ -186,6 +190,7 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          'fold'  : 1                       #   fold overflow
                                      }
 
+        #exit()
     if 'StudyVisHT' in opt.tag:
  
         visht = 'Lepton_pt[0]+Lepton_pt[1]+Sum$(CleanJet_pt)'
@@ -253,3 +258,4 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                             'xaxis' : 'number of jets',        #   x axis name
                                             'fold'  : 1                        #   fold overflow
                                          }
+     

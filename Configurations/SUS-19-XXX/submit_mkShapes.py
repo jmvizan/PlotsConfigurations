@@ -92,6 +92,6 @@ if __name__ == '__main__':
         for year in yearset:
             command = "./run_mkShapes.sh "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
             print command
-            #os.system(command+" 2>&1 | tee -a "+shapes_file)
+            os.system(command+" 2>&1 | tee -a "+shapes_file)
 
     print "Shapes logfile in: \n"+shapes_file
