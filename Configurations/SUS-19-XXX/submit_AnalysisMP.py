@@ -5,8 +5,8 @@ import numpy as np
 
 PWD = os.getenv('PWD')+'/'
     
-nMPs        = 1
-flavour="workday"
+nMPs        = 2
+flavour="\"nextweek\""
 
 #write header to logfile
 def logtitle(filename,sigset):
@@ -27,9 +27,9 @@ def writetolog(filename,line):
     #print "line", line
 
 #Function to create sub file                                                              
-def makeSubFile(filename,folder,sigset,flavour):
+def makeSubFile(filename,folder,sigset,arguments,flavour):
     f = open(filename,"w+")
-    jobsent= '$(' +sigset + ')'
+    jobsent= '$('+sigset+')'
     #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
@@ -228,6 +228,8 @@ writetolog(logfile, logline)
 
 jobs     = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
 flist    = open(flistname,"w+")
+
+gridui=False
 if 'gpfs' in PWD: 
     gridui=True
     gridfol='Jobs/'+fileset+'/'
@@ -237,7 +239,7 @@ for ijob,job in enumerate(jobs):
     flist.write(argsigset+'\n')
     #    submit="condor_submit "+subfilename+" >>"+logfile
     
-    if gridui:
+    if gridui is True:
         arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)
         gridnm=gridfol+argsigset
         f2 = open(gridnm+".sh","w+")
@@ -254,12 +256,13 @@ flist.close()
 print PWD
 #exit()
 if 'cern.ch' in PWD: 
-    jobsent= '$(' +sigset + ')'
-    arguments = year+' '+tag+' '+jobsent+ ' ' +PWD+' '+fileset+' '+str(doDC)
- 
-    makeSubFile(subfilename,jobfolder, 'MPs' , arguments, flavour)
+    jobsent= 'MPs'#Works since files MPs are already in joblist.txt
+    argsent= '$('+jobsent+')'
+    arguments = year+' '+tag+' '+argsent+ ' ' +PWD+' '+fileset+' '+str(doDC)
+    print "SIGSET", sigset, argsigset, fileset
+    makeSubFile(subfilename,jobfolder,jobsent, arguments, flavour)
     commandtorun="condor_submit "+subfilename+">>"+logfile
-    #os.system(commandtorun)
+    os.system(commandtorun)
     print "jobs sent:\n", commandtorun
     writetolog(logfile,"----------------------------------")
 

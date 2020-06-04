@@ -162,6 +162,22 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
 
                                      }
 
+    elif "HighMT2" in opt.tag and "Optim" in opt.tag:
+        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                         'range' : ([0, 20, 40, 60, 80, 100, 160, 240, 320],[1]), # variable range
+                                         'xaxis' : mt2 + pll + gv,         #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+
+                                     }
+    elif "HighMT2_l" in opt.tag and "Optim" in opt.tag:
+        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                         'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
+                                         'xaxis' : mt2 + pll + gv,         #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+
+                                     }
+
+
     else:
     
         variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
