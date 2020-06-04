@@ -232,7 +232,7 @@ flist    = open(flistname,"w+")
 gridui=False
 if 'gpfs' in PWD: 
     gridui=True
-    gridfol='Jobs/'+fileset+'/'
+    gridfol='Limits/Jobs/'+fileset+'/'
     os.system('mkdir -p '+gridfol) 
 for ijob,job in enumerate(jobs):
     argsigset = ",".join(job)
