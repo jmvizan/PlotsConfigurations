@@ -10,7 +10,6 @@ mt2  = '#font[50]{m}_{T2}'
 ptll = pt+'^{'+sll+'}'
 dphill = '#Delta#phi(lep1,lep2)'
 
-print "test this"
 # Complex variables
 
 btagAlgo = 'btagDeepB'
