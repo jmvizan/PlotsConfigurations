@@ -1,7 +1,15 @@
 #!/usr/bin/env python
 import os,sys
 from datetime import datetime
-# 1013  ./run_mkShapes.sh 2 CharginoSignalRegionsOptimisedPtmHighMT2_l 0 Data AsMuchAsPossible
+# ask for confirmation to run the commands
+def confirm():
+    answer = raw_input("Do you wish to continue? [Y/N] ").lower()
+    if answer in ["no","n"]: 
+        print "aborting..."
+        exit()
+    return 
+
+
 def logtitle(filename,sigset):
     if(os.path.exists(filename) is False):  print "CREATING LOG FILE\n:"+filename
     f = open(filename,"a")
@@ -57,14 +65,16 @@ if __name__ == '__main__':
                 split = args[6]
         else:
             split  = args[5]
-
+    
     keepsplit = False
+    allsam  = None
     bkgs    = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY']
     bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY']
     smsend  = bkgsend+ ['Data']
     if 'backgrounds' in split.lower(): allsend = bkgsend
     elif        'sm' in split.lower(): allsend = smsend
     elif       'all' in split.lower(): 
+        all_sam = True
         if sigset in bkgs or sigset == 'Data': 
             print "please choose a valid signal"
             exit()
@@ -77,7 +87,7 @@ if __name__ == '__main__':
     shapes_fol  = "./Shapes/"+yearnm+'/log/'
     shapes_file = shapes_fol+tag+'_'+sigset+'.log'
     os.system('mkdir -p '+shapes_fol)
-    
+    allcomms= []
 
     if rmlog:
         os.system('rm '+shapes_file)
@@ -91,7 +101,16 @@ if __name__ == '__main__':
                 split = ''
         for year in yearset:
             command = "./run_mkShapes.sh "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
-            print command
-            os.system(command+" 2>&1 | tee -a "+shapes_file)
+            allcomms.append(command)
+    print "Commands to be run:"
+    for comm in allcomms:
+        print comm
+        
+    if len(allsend)>1: confirm()
+    
+    #exit()
+    for comm in allcomms:
+        print comm
+        os.system(comm+" 2>&1 | tee -a "+shapes_file)
 
     print "Shapes logfile in: \n"+shapes_file
