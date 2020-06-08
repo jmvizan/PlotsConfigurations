@@ -37,7 +37,14 @@ else
     fi
     if [ $# == 2 ] || [ $3 == '0' ] || [ $3 == 'shapes' ]; then
 	BATCH=True
-	QUEUE=testmatch
+	echo $HOSTNAME
+	if [[ "$HOSTNAME" = *"ifca"* ]]; then
+	    echo "in"
+	    QUEUE="gridui_sort"
+	else
+     
+	    QUEUE=testmatch
+	fi
 	DOHADD=False
 	KEEPINPUT=False
     else
@@ -57,7 +64,7 @@ else
 	if [ $# -lt 5 ]; then
 	    SPLIT='Samples'
 	else
-	    if [ $5 == 'tomorrow' ] || [ $5 == 'workday' ]; then
+	    if [ $5 == 'tomorrow' ] || [ $5 == 'workday' ] ; then
 		QUEUE=$5
 		if [ $# -lt 6 ]; then
 		    SPLIT='Samples'
@@ -72,7 +79,8 @@ else
 fi
 
 mkdir -p ./Shapes/$YEAR/$TAG/$SPLIT
-
+echo $QUEUE
+#exit()
 if [ $BATCH == True ]; then
     mkShapes.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$TAG/$SPLIT --doBatch=True --batchQueue=$QUEUE --batchSplit=$SPLIT
 else 

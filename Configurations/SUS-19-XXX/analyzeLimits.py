@@ -832,7 +832,9 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
 
     plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 1200, 900)
     tagnm=tags[0]
-    if len(tags[1])>0: tagnm+='_vs_'+tags[1]  
+    if len(tags[1])>0:
+        tagnm+='_vs_'+tags[1]  
+
     plotTitle = tagnm + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
     if tags[1]!='':
         plotTitle.replace(tags[0], tags[0] + '_to_' + tags[1]) 
@@ -884,16 +886,24 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         tagObj[0].Draw(drawPlotOption)
 
     else:
-
+        print "Constructing legend"
+        legend = ROOT.TLegend(0.15,0.75,0.50,0.85);
+        doleg=True
         same = ''
         for iobj in range(len(tagObj)):
 
             if iobj>=3:
                 tagObj[iobj].SetLineColor(2)
-
+                
+                doleg=False
             tagObj[iobj].Draw(same)
-
+            if '' in same : a=1
             same = 'same'
+            if iobj is 2:legend.AddEntry(tagObj[iobj],tags[0], 'l')
+            if iobj is 5:legend.AddEntry(tagObj[iobj],tags[1], 'l')
+            #legend.AddEntry(tagnm, 'f')
+            #legend.AddEntry(tags[1],'f')
+        legend.Draw()
 
     outputFileName = getFileName('./Plots/' + year + '/Limits', plotTitle, '.png')
     plotCanvas.Print(outputFileName)

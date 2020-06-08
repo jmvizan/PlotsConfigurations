@@ -137,7 +137,36 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          'range' : ([0, 20, 40, 60, 80, 100, 120, 250 , 450, 650],[1]), # variable range
                                          'xaxis' : mt2 + pll + gv,         #   x axis name
                                          'fold'  : 1                       #   fold overflow
+
                                      }
+
+    elif "Optim" in opt.tag and "MT2" in opt.tag:
+        if "High" in opt.tag:
+            
+            if "extrabin" in opt.tag:
+                variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                                 'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
+                                                 'xaxis' : mt2 + pll + gv,         #   x axis name
+                                                 'fold'  : 1                       #   fold overflow
+                }
+            else:
+                variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                                 'range' : ([0, 20, 40, 60, 80, 100, 160, 370, 500],[1]), # variable range
+                                                 'xaxis' : mt2 + pll + gv,         #   x axis name
+                                                 'fold'  : 1                       #   fold overflow
+                                                 
+                                             }
+
+
+        else:
+            variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                         'range' : ([0, 20, 40, 60, 80, 100, 160, 220],[1]), # variable range
+                                         'xaxis' : mt2 + pll + gv,         #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+
+                                     }
+
+
 
     else:
     
@@ -147,6 +176,7 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          'fold'  : 1                       #   fold overflow
                                      }
 
+        #exit()
     if 'StudyVisHT' in opt.tag:
  
         visht = sumLeptonPt+'+Sum$(CleanJet_pt)'
@@ -214,3 +244,4 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                             'xaxis' : 'number of jets',        #   x axis name
                                             'fold'  : 1                        #   fold overflow
                                          }
+     
