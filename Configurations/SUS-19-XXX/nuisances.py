@@ -213,7 +213,8 @@ for mt2llregion in mt2llRegions:
             'name'  : 'Top_'+mt2llsystname+year,
             'samples'  : { 
                 'ttbar' : [ mt2llweightUp, mt2llweightDo],
-                'tW'    : [ mt2llweightUp, mt2llweightDo],
+                'STtW'  : [ mt2llweightUp, mt2llweightDo],
+                'tW'    : [ mt2llweightUp, mt2llweightDo], # backward compatibility for background names
             },
             'kind'  : 'weight',
             'type'  : 'shape',
@@ -321,7 +322,9 @@ if hasattr(opt, 'inputFile'):
             rateparamname = rateparam + '_' + mt2llregion
             
             for sample in rateparameters[rateparam]['samples']:
-                
+
+                if sample not in samples: continue # backward compatibility for background names
+
                 nuisances[sample+rateparamname]  = {
                     'name'  : rateparamname+year,
                     'samples'  : { sample : '1.00' },

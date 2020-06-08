@@ -31,7 +31,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameHR' : 'tW',
         'isSignal' : 0,
         'color': 403,   # kYellow+3
-        'samples'  : ['tW'] 
+        'samples'  : ['STtW', 'tW'] 
     }
 
     groupPlot['DY']  = {
@@ -45,7 +45,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameHR' : 'ZZ (#rightarrow 2' + sl + '2#nu)',
         'isSignal' : 0,
         'color': 803,   # kOrange+3
-        'samples'  : ['ZZ'] 
+        'samples'  : ['ZZTo2L2Nu', 'ZZ'] 
     }
 
     groupPlot['ttZ']  = {
@@ -66,7 +66,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameHR' : 'Minor bkg.',
         'isSignal' : 0,
         'color': 394, #  kYellow-6
-        'samples'  : ['ttW', 'VVV', 'HWW', 'VZ']
+        'samples'  : ['ttW', 'VVV', 'Higgs', 'VZ', 'HWW']
     }
     
     groupPlot['ZZTo4L'] = {
@@ -98,7 +98,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'scale'    : 1.   ,
     }
     
-    plot['ZZ'] = { 
+    plot['ZZTo2L2Nu'] = { 
         'nameHR' : 'ZZ (#rightarrow 2' + sl + '2#nu)',
         'color'    : 803,   # kOrange+3
         'isSignal' : 0,
@@ -130,7 +130,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'scale'    : 1.0                  
     }
     
-    plot['tW'] = {
+    plot['STtW'] = {
         'nameHR' : 'tW',
         'color': 403,   # kYellow+3
         'isSignal' : 0,
@@ -178,7 +178,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'scale'    : 1.0
     }
 
-    plot['HWW'] = { 
+    plot['Higgs'] = { 
         'nameHR' : 'H #rightarrow WW',
         'color'    : 394, #  kYellow-6
         'isSignal' : 0,
@@ -193,6 +193,11 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'isData'   : 0 ,
         'scale'    : 1.0
     }
+
+# Backward compatibility for background names
+plot['tW']  = plot['STtW']
+plot['ZZ']  = plot['ZZTo2L2Nu']
+plot['HWW'] = plot['Higgs']
 
 sampleToRemoveFromPlot = [ ] 
 

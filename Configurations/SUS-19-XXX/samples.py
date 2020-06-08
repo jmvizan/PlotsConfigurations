@@ -136,8 +136,8 @@ ISRCutMC   = '&& '+ISRCut
 ### MET Filters
 
 METFilters_Common = 'Flag_goodVertices*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'
-if '2017' in opt.tag or '2018' in opt.tag : # Deprecated ???
-    METFilters_Common += '*Flag_ecalBadCalibFilter' 
+if '2017' in opt.tag or '2018' in opt.tag :
+    METFilters_Common += '*Flag_ecalBadCalibFilterV2'
 METFilters_MC     = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter'
 METFilters_Data   = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter*Flag_eeBadScFilter'
 METFilters_FS     = METFilters_Common
@@ -287,7 +287,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     ttbarFlag = '_PSWeights' if ('2017' in opt.tag) else ''
     samples['ttbar'] = {    'name'   : getSampleFiles(directoryBkg,'TTTo2L2Nu'+ttbarFlag,False,treePrefix),
                             'weight' : XSWeight+'*'+SFweight+'*'+centralTopPt ,
-                            'FilesPerJob' : 2 ,
+                            'FilesPerJob' : 25 ,
                         }
 
     if 'btagefficiencies' in opt.tag:
@@ -396,7 +396,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500'+DYMhighHT1200ext, False,treePrefix) +
                                 getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toInf'+DYMhighHT2500ext,  False,treePrefix) ,
                                 'weight' : XSWeight+'*'+SFweight ,
-                                'FilesPerJob' : 2 ,
+                                'FilesPerJob' : 70 ,
                                 } 
         if '2016' in opt.tag : 
             samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100',False,treePrefix)
@@ -489,7 +489,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'weight' : '1.', 
                            'weights' : [ ],
                            'isData': ['all'],                            
-                           'FilesPerJob' : 20 ,
+                           'FilesPerJob' : 50 ,
                            'isSignal'  : 0,
                            'isDATA'    : 1, 
                            'isFastsim' : 0
