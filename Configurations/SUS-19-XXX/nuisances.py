@@ -82,24 +82,8 @@ if 'SignalRegions' in opt.tag:
 
 # lepton reco, id, iso, fastsim
 
-weightEle   = '('+EleWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
-weightMuo   = '('+MuoWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
-weightLep   = '('+LepWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
-weightEleFS = weightEle.replace('IdIsoSF', 'FastSimSF')
-weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
-weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
-
-leptonSF = { 
-    #'trakreco'        : [ '1.', '1.' ], ->  no scale factor required 
-    #'electronIdIso'   : [ weightEle.replace('Syst', 'Up'),   weightEle.replace('Syst', 'Down')   ],
-    #'muonIdIso'       : [ weightMuo.replace('Syst', 'Up'),   weightMuo.replace('Syst', 'Down')   ],
-    'leptonIdIso'     : [ weightLep.replace('Syst', 'Up'),   weightLep.replace('Syst', 'Down')   ], 
-    #'electronIdIsoFS' : [ weightEleFS.replace('Syst', 'Up'), weightEleFS.replace('Syst', 'Down') ],
-    #'muonIdIsoFS'     : [ weightMuoFS.replace('Syst', 'Up'), weightMuoFS.replace('Syst', 'Down') ],
-    'leptonIdIsoFS'   : [ weightLepFS.replace('Syst', 'Up'), weightLepFS.replace('Syst', 'Down') ], 
-}
-
 for scalefactor in leptonSF:
+
     nuisances[scalefactor]  = {
         'name'  : scalefactor+year,
         'samples'  : { },
@@ -200,11 +184,10 @@ nuisances['isrFS']  = {
     'type'  : 'shape',
 }
 for sample in samples.keys():
-    for model in signalMassPoints:
-        if sample in signalMassPoints[model].keys():
-            if 'T2' in model:
+    if 'isrObservable' in samples[sample]:
+            if samples[sample]['isrObservable']=='njetISR':
                 isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
-            elif 'TChi' in model or 'TSlepSlep' in model:
+            elif samples[sample]['isrObservable']=='ptISR':
                 isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
             else:
                 print 'ERROR: no isrW implementation for model', model
@@ -230,7 +213,8 @@ for mt2llregion in mt2llRegions:
             'name'  : 'Top_'+mt2llsystname+year,
             'samples'  : { 
                 'ttbar' : [ mt2llweightUp, mt2llweightDo],
-                'tW'    : [ mt2llweightUp, mt2llweightDo],
+                'STtW'  : [ mt2llweightUp, mt2llweightDo],
+                'tW'    : [ mt2llweightUp, mt2llweightDo], # backward compatibility for background names
             },
             'kind'  : 'weight',
             'type'  : 'shape',
@@ -338,7 +322,9 @@ if hasattr(opt, 'inputFile'):
             rateparamname = rateparam + '_' + mt2llregion
             
             for sample in rateparameters[rateparam]['samples']:
-                
+
+                if sample not in samples: continue # backward compatibility for background names
+
                 nuisances[sample+rateparamname]  = {
                     'name'  : rateparamname+year,
                     'samples'  : { sample : '1.00' },

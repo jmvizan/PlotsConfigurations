@@ -65,17 +65,49 @@ directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 
 # Complex cut variables
 
-LepId = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])==2'
+lep0idx = '0'
+lep1idx = '1'
+lep2idx = '2'
 
-LepId3 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1]+Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])==3'
+nLooseLepton = 'nLepton'
+nTightLepton = 'Sum$((Lepton_isTightElectron_cutBasedMediumPOG+Lepton_isTightMuon_mediumRelIsoTight)==1)'
 
-LepId3of4 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0]+Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1]+Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2]+Lepton_isTightElectron_cutBasedMediumPOG[3]+Lepton_isTightMuon_mediumRelIsoTight[3])==3'
+OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
+SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]>0)'
+SSP = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
+SSM = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]>0 && Lepton_pdgId[1]>0'
+
+LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
+DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
+EE = 'channel==0'
+MM = 'channel==2' 
 
 T0 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0])'
 T1 = '(Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])'
 T2 = '(Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])'
 
-BTAG = '(leadingPtTagged>=20.)' 
+LepId2of3 = nLooseLepton+'==3 && ('+T0+'+'+T1+'+'+T2+')==2'
+
+C2 = '(Lepton_pdgId[0]*Lepton_pdgId[1])'
+C1 = '(Lepton_pdgId[0]*Lepton_pdgId[2])'
+C0 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
+OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
+
+btagAlgo = 'btagDeepB'
+bTagWP = 'M'
+bTagPtCut  = '20.'
+bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
+bTagCut = '0.6321'
+btagWP  = '2016'
+if '2017' in opt.tag: 
+    bTagCut = '0.4941'
+    btagWP  = '2017'
+if '2018' in opt.tag: 
+    bTagCut = '0.4184'
+    btagWP  = '2018'
+btagWP += bTagWP
+
+BTAG = '(leadingPtTagged>='+bTagPtCut+')' 
 VETO = '!'+BTAG
 
 BTAG30= '(leadingPtTagged>=30.)'
@@ -118,6 +150,23 @@ LepWeight      = EleWeight + '*' + MuoWeight
 EleWeightFS    = EleWeight.replace('IdIsoSF', 'FastSimSF')
 MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
 LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
+
+weightEle   = '('+EleWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
+weightMuo   = '('+MuoWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
+weightLep   = '('+LepWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
+weightEleFS = weightEle.replace('IdIsoSF', 'FastSimSF')
+weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
+weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
+
+leptonSF = { 
+    #'trkreco'        : [ '1.', '1.' ], ->  no scale factor required
+    #'electronIdIso'   : [ weightEle.replace('Syst', 'Up'),   weightEle.replace('Syst', 'Down')   ],
+    #'muonIdIso'       : [ weightMuo.replace('Syst', 'Up'),   weightMuo.replace('Syst', 'Down')   ],
+    'leptonIdIso'     : [ weightLep.replace('Syst', 'Up'),   weightLep.replace('Syst', 'Down')   ], 
+    #'electronIdIsoFS' : [ weightEleFS.replace('Syst', 'Up'), weightEleFS.replace('Syst', 'Down') ],
+    #'muonIdIsoFS'     : [ weightMuoFS.replace('Syst', 'Up'), weightMuoFS.replace('Syst', 'Down') ],
+    'leptonIdIsoFS'   : [ weightLepFS.replace('Syst', 'Up'), weightLepFS.replace('Syst', 'Down') ], 
+}
 
 # nonprompt lepton rate
 
@@ -463,9 +512,13 @@ exec(open('./signalMassPoints.py').read())
 
 for model in signalMassPoints:
     if model in opt.sigset:
+
+        isrObservable = 'njetISR' if ('T2' in model) else 'ptISR'
+
         # v4 patch... 
         BranchingRatio = '(0.10497000068426132)' if (model=='TChipmWW') else '(1.)'
         if ('TChipm' in model): BranchingRatio = BranchingRatio.replace(')', '/1000.)')
+
         for massPoint in signalMassPoints[model]:
             if massPointInSignalSet(massPoint, opt.sigset):
 
@@ -487,6 +540,7 @@ for model in signalMassPoints:
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
                                        'suppressZeroTreeNuisances' : ['all'],
+                                       'isrObservable' : isrObservable,
                                        'isSignal'  : 1,
                                        'isDATA'    : 0, 
                                        'isFastsim' : 1

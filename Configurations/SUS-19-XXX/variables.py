@@ -12,17 +12,8 @@ dphill = '#Delta#phi(lep1,lep2)'
 
 # Complex variables
 
-btagAlgo = 'btagDeepB'
-bTagPtCut  = '20.'
-bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
-bTagCut = '0.6321'
-btagWP  = '2016M'
-if '2017' in opt.tag: 
-    bTagCut = '0.4941'
-    btagWP  = '2017M'
-if '2018' in opt.tag: 
-    bTagCut = '0.4184'
-    btagWP  = '2018M'
+sumLeptonPt = 'Lepton_pt['+lep0idx+']+Lepton_pt['+lep1idx+']'
+
 nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+')'
 
 # variables = {}
@@ -105,13 +96,13 @@ if 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.
                                      'fold'  : 1                       #   fold overflow
                                  }
     
-    variables['Lep1pt']        = {   'name'  : 'Lepton_pt[0]',               #   variable name    
+    variables['Lep1pt']        = {   'name'  : 'Lepton_pt['+lep0idx+']',     #   variable name    
                                      'range' : (  40,    0.,  200.),         #   variable range
                                      'xaxis' : 'leading lepton ' + pt + gv,  #   x axis name
                                      'fold'  : 1                             #   fold overflow
                                  }
     
-    variables['Lep2pt']        = {   'name'  : 'Lepton_pt[1]',               #   variable name    
+    variables['Lep2pt']        = {   'name'  : 'Lepton_pt['+lep1idx+']',     #   variable name    
                                      'range' : (  40,    0.,  200.),         #   variable range
                                      'xaxis' : 'trailing lepton ' + pt + gv, #   x axis name
                                      'fold'  : 1                             #   fold overflow
@@ -130,10 +121,6 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
     mt2ll = 'mt2ll'
 
     if 'FakeValidationRegion' in opt.tag:
-
-        T0 = '(Lepton_isTightElectron_cutBasedMediumPOG[0]+Lepton_isTightMuon_mediumRelIsoTight[0])'
-        T1 = '(Lepton_isTightElectron_cutBasedMediumPOG[1]+Lepton_isTightMuon_mediumRelIsoTight[1])'
-        T2 = '(Lepton_isTightElectron_cutBasedMediumPOG[2]+Lepton_isTightMuon_mediumRelIsoTight[2])'
         mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'
 
     if 'StudyHighMT2' in opt.tag:
@@ -192,7 +179,7 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
         #exit()
     if 'StudyVisHT' in opt.tag:
  
-        visht = 'Lepton_pt[0]+Lepton_pt[1]+Sum$(CleanJet_pt)'
+        visht = sumLeptonPt+'+Sum$(CleanJet_pt)'
         
         variables['visht']         = {   'name'  : visht,                  #   variable name    
                                          'range' : ( 120,    0., 3000.),   #   variable range
@@ -206,7 +193,7 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          'fold'  : 1                       #   fold overflow
                                      }
         
-        variables['sumLepPt']      = {   'name'  : 'Lepton_pt[0]+Lepton_pt[1]', #   variable name    
+        variables['sumLepPt']      = {   'name'  : sumLeptonPt,            #   variable name    
                                          'range' : ( 120,    0., 3000.),   #   variable range
                                          'xaxis' : 'sumleppt' + gv,        #   x axis name
                                          'fold'  : 1                       #   fold overflow
@@ -228,14 +215,14 @@ if 'Validation' in opt.tag or 'Signal' in opt.tag:
 
         if 'DYValidationRegion' in opt.tag:   
 
-            variables['deltaPhiLep']   = {  'name'  : 'acos(cos(Lepton_phi[1]-Lepton_phi[0]))', #   variable name    
+            variables['deltaPhiLep']   = {  'name'  : 'acos(cos(Lepton_phi['+lep1idx+']-Lepton_phi['+lep0idx+']))', #   variable name    
                                             'range' : (  10,    0.,  3.2),     #   variable range
                                             'xaxis' : dphill,                  #   x axis name
                                             'fold'  : 1                        #   fold overflow
                                          }
 
-            pxll = '(Lepton_pt[0]*cos(Lepton_phi[0])+Lepton_pt[1]*cos(Lepton_phi[1]))'
-            pyll = '(Lepton_pt[0]*sin(Lepton_phi[0])+Lepton_pt[1]*sin(Lepton_phi[1]))'
+            pxll = '(Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+']))'
+            pyll = '(Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+']))'
             pTll = 'sqrt('+pxll+'*'+pxll+'+'+pyll+'*'+pyll+')'
 
             variables['ptll']          = {  'name'  : pTll,                    #   variable name    
