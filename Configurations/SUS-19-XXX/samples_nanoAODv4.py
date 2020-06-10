@@ -507,10 +507,11 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
 ### Files per job
 
-if 'AsMuchAsPossible' in opt.batchSplit : 
-    for sample in samples:
-        ntrees = len(samples[sample]['name'])  
-        samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/3))
+if hasattr(opt, 'batchSplit'):
+    if 'AsMuchAsPossible' in opt.batchSplit : 
+        for sample in samples:
+            ntrees = len(samples[sample]['name'])  
+            samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/3))
 
 ### Signals
 
