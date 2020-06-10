@@ -96,6 +96,8 @@ OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
 btagAlgo = 'btagDeepB'
 bTagWP = 'M'
 bTagPtCut  = '20.'
+if 'pt25' in opt.tag: bTagPtCut  = '25.' 
+if 'pt30' in opt.tag: bTagPtCut  = '30.' 
 bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
 bTagCut = '0.6321'
 btagWP  = '2016'
@@ -107,11 +109,8 @@ if '2018' in opt.tag:
     btagWP  = '2018'
 btagWP += bTagWP
 
-BTAG = '(leadingPtTagged>='+bTagPtCut+')' 
-VETO = '!'+BTAG
-
-BTAG30= '(leadingPtTagged>=30.)'
-VETO30 = '!'+BTAG30
+bTagPass = '(leadingPtTagged>='+bTagPtCut+')' 
+bTagVeto = '!'+bTagPass
 
 btagWeight1tag = 'btagWeight_1tag'
 btagWeight0tag = '(1.-'+btagWeight1tag+')'
@@ -505,6 +504,13 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                 #print(iFile)
                 samples['DATA']['name'].append(iFile)
                 samples['DATA']['weights'].append(DataTrig[DataSet]+'*'+METFilters_Data)
+
+### Files per job
+
+if 'AsMuchAsPossible' in opt.batchSplit : 
+    for sample in samples:
+        ntrees = len(samples[sample]['name'])  
+        samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/3))
 
 ### Signals
 

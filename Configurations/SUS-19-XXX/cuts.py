@@ -45,9 +45,9 @@ if 'Preselection' in opt.tag:
 if 'TopControlRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
-        cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20) && '+BTAG 
-        cuts['Top_ee'] = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=50) && '+BTAG 
-        cuts['Top_mm'] = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=50) && '+BTAG 
+        cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20) && '+bTagPass 
+        cuts['Top_ee'] = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=50) && '+bTagPass 
+        cuts['Top_mm'] = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=50) && '+bTagPass 
 
     else: #if 'Backgrounds' in opt.sigset:
         cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20)*'+btagWeight1tag
@@ -64,8 +64,8 @@ if 'DYControlRegion' in opt.tag:
     DY = OC+' && '+LL+' && '+Zcut.replace('ZCUT',  '15.')
 
     if 'Data' in opt.sigset:
-        cuts['DY_ee'] = '(' + DY+' && '+EE+') && '+VETO
-        cuts['DY_mm'] = '(' + DY+' && '+MM+') && '+VETO
+        cuts['DY_ee'] = '(' + DY+' && '+EE+') && '+bTagVeto
+        cuts['DY_mm'] = '(' + DY+' && '+MM+') && '+bTagVeto
 
     else: #if 'Backgrounds' in opt.sigset:
         cuts['DY_ee'] = '(' + DY+' && '+EE+')*'+btagWeight0tag
@@ -74,10 +74,10 @@ if 'DYControlRegion' in opt.tag:
 if 'HighPtMissControlRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
-        cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+BTAG
-        cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+VETO
-        cuts['VR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+BTAG
-        cuts['VR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+VETO
+        cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
+        cuts['VR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        cuts['VR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
 
     else:
         cuts['VR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
@@ -88,10 +88,10 @@ if 'HighPtMissControlRegion' in opt.tag:
 if 'HighPtMissOptimisationRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
-        cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && '+BTAG
-        cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && '+VETO
-        cuts['VR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=100 && '+BTAG
-        cuts['VR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=100 && '+VETO
+        cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && '+bTagPass
+        cuts['VR1_Veto_em']  = OC+' && '+DF+' && ptmiss>=100 && '+bTagVeto
+        cuts['VR1_Tag_sf']   = OC+' && '+SF+' && ptmiss>=100 && '+bTagPass
+        cuts['VR1_Veto_sf']  = OC+' && '+SF+' && ptmiss>=100 && '+bTagVeto
 
     else:
         cuts['VR1_Tag_em']   = '(' + OC+' && '+DF+' && ptmiss>=100)*'+btagWeight1tag
@@ -102,13 +102,13 @@ if 'HighPtMissOptimisationRegion' in opt.tag:
 if 'TopValidationRegionMore' in opt.tag:
 
     if 'Data' in opt.sigset:
-        cuts['VR1_Tag_em']      = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && '+BTAG
-        cuts['VR1_Tag_mm']      = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+BTAG
-        cuts['VR1_Tag_ee']      = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+BTAG
-        cuts['VR1_Tag_em_jets'] = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+BTAG
-        cuts['VR1_Tag_mm_jets'] = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+BTAG
-        cuts['VR1_Tag_ee_jets'] = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+BTAG
-        cuts['VR1_Tag_jets']    = OC+' && ('+SF+' || '+DF+')  && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+BTAG
+        cuts['VR1_Tag_em']      = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        cuts['VR1_Tag_mm']      = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        cuts['VR1_Tag_ee']      = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        cuts['VR1_Tag_em_jets'] = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+bTagPass
+        cuts['VR1_Tag_mm_jets'] = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+bTagPass
+        cuts['VR1_Tag_ee_jets'] = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+bTagPass
+        cuts['VR1_Tag_jets']    = OC+' && ('+SF+' || '+DF+')  && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+bTagPass
 
     else:
         cuts['VR1_Tag_em']        = '(' + OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
@@ -122,9 +122,9 @@ if 'TopValidationRegionMore' in opt.tag:
 if 'WWValidationRegionMore' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
 
     if 'Data' in opt.sigset:
-        cuts['VR1_Veto_em']        = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && '+VETO
-        cuts['VR1_Veto_mm']        = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+VETO
-        cuts['VR1_Veto_ee']        = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+VETO
+        cuts['VR1_Veto_em']        = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
+        cuts['VR1_Veto_mm']        = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
+        cuts['VR1_Veto_ee']        = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
         cuts['VR1_Veto_em_0jet']   = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
         cuts['VR1_Veto_mm_0jet']   = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
         cuts['VR1_Veto_ee_0jet']   = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
@@ -142,10 +142,10 @@ if 'WWValidationRegionMore' in opt.tag and 'WZtoWWValidationRegion' not in opt.t
 if 'SameSignValidationRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
-        cuts['SS_ptmiss-100to140']  = SS +' && ptmiss>=100 && ptmiss<140 && '       +BTAG
-        cuts['SS_ptmiss-140']       = SS +' && ptmiss>=140 && '                     +BTAG
-        cuts['SS_ptmiss-140_plus']  = SSP+' && ptmiss>=140 && '                     +BTAG
-        cuts['SS_ptmiss-140_minus'] = SSM+' && ptmiss>=140 && '                     +BTAG
+        cuts['SS_ptmiss-100to140']  = SS +' && ptmiss>=100 && ptmiss<140 && '       +bTagPass
+        cuts['SS_ptmiss-140']       = SS +' && ptmiss>=140 && '                     +bTagPass
+        cuts['SS_ptmiss-140_plus']  = SSP+' && ptmiss>=140 && '                     +bTagPass
+        cuts['SS_ptmiss-140_minus'] = SSM+' && ptmiss>=140 && '                     +bTagPass
 
     else:
         cuts['SS_ptmiss-100to140']   = '('+SS +' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
@@ -158,8 +158,8 @@ if 'FakeValidationRegion' in opt.tag:
     Fake = LepId2of3 + ' && ' + OCT
 
     if 'Data' in opt.sigset:
-        cuts['Fake_ptmiss-100to140']  = Fake+' && ptmiss>=100 && ptmiss<140 && '       +BTAG
-        cuts['Fake_ptmiss-140']       = Fake+' && ptmiss>=140 && '                     +BTAG
+        cuts['Fake_ptmiss-100to140']  = Fake+' && ptmiss>=100 && ptmiss<140 && '       +bTagPass
+        cuts['Fake_ptmiss-140']       = Fake+' && ptmiss>=140 && '                     +bTagPass
 
     else:
         cuts['Fake_ptmiss-100to140']   = '('+Fake+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
@@ -172,8 +172,8 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
     if 'WZValidationRegion' in opt.tag:
 
         if 'Data' in opt.sigset:
-            cuts['WZ_3Lep']  = WZselection.replace('ZCUT', '999.') + ' && ' + VETO
-            cuts['WZ_3LepZ'] = WZselection.replace('ZCUT',  '15.') + ' && ' + VETO
+            cuts['WZ_3Lep']  = WZselection.replace('ZCUT', '999.') + ' && ' + bTagVeto
+            cuts['WZ_3LepZ'] = WZselection.replace('ZCUT',  '15.') + ' && ' + bTagVeto
 
         else:
             cuts['WZ_3Lep']  = '(' + WZselection.replace('ZCUT', '999.') + ')*'+btagWeight0tag
@@ -182,8 +182,8 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
     elif 'WZtoWWValidationRegion' in opt.tag:
 
         if 'Data' in opt.sigset:
-            cuts['WZtoWW_Zcut10'] = WZselection.replace('ZCUT', '10.') + ' && ' + VETO
-            cuts['WZtoWW_Zcut15'] = WZselection.replace('ZCUT', '15.') + ' && ' + VETO
+            cuts['WZtoWW_Zcut10'] = WZselection.replace('ZCUT', '10.') + ' && ' + bTagVeto
+            cuts['WZtoWW_Zcut15'] = WZselection.replace('ZCUT', '15.') + ' && ' + bTagVeto
 
         else:
             cuts['WZtoWW_Zcut10'] = '(' + WZselection.replace('ZCUT',  '10.') + ')*'+btagWeight0tag
@@ -198,8 +198,8 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
         ttZselection = sel4Lep + ' && deltaMassZ<10. && nCleanJet>=2 && CleanJet_pt[1]>=20.'
 
         if 'Data' in opt.sigset:
-            cuts['ttZ']            = ttZselection + ' && '                + BTAG
-            cuts['ttZ_ptmiss-140'] = ttZselection + ' && ptmiss>=140 && ' + BTAG
+            cuts['ttZ']            = ttZselection + ' && '                + bTagPass
+            cuts['ttZ_ptmiss-140'] = ttZselection + ' && ptmiss>=140 && ' + bTagPass
 
         else:
             cuts['ttZ']            = '(' + ttZselection +                ')*'+btagWeight1tag
@@ -208,8 +208,8 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
     elif 'ZZValidationRegion' in opt.tag:
 
         if 'Data' in opt.sigset:
-            cuts['ZZ']            = sel4Lep + ' && '                + VETO
-            cuts['ZZ_ptmiss-140'] = sel4Lep + ' && ptmiss>=140 && ' + VETO
+            cuts['ZZ']            = sel4Lep + ' && '                + bTagVeto
+            cuts['ZZ_ptmiss-140'] = sel4Lep + ' && ptmiss>=140 && ' + bTagVeto
 
         else:
             cuts['ZZ']            = '(' + sel4Lep +                ')*'+btagWeight0tag
@@ -220,8 +220,8 @@ if 'DYValidationRegion' in opt.tag:
     DY = OC + ' && ' + LL + ' && ' + Zcut.replace('ZCUT',  '15.')
 
     if 'Data' in opt.sigset:
-        cuts['ZZ_ptmiss-100to140']       = DY + ' && ptmiss>=100 && ptmiss<140 && ' + VETO
-        cuts['ZZ_ptmiss-140']            = DY + ' && ptmiss>=140 && '               + VETO
+        cuts['ZZ_ptmiss-100to140']       = DY + ' && ptmiss>=100 && ptmiss<140 && ' + bTagVeto
+        cuts['ZZ_ptmiss-140']            = DY + ' && ptmiss>=140 && '               + bTagVeto
         cuts['ZZ_ptmiss-100to140_nojet'] = DY + ' && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
         cuts['ZZ_ptmiss-140_nojet']      = DY + ' && ptmiss>=140 && nCleanJet==0'            
         
@@ -231,45 +231,47 @@ if 'DYValidationRegion' in opt.tag:
         cuts['ZZ_ptmiss-100to140_nojet'] = '(' + DY + ' && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
         cuts['ZZ_ptmiss-140_nojet']      = '(' + DY + ' && ptmiss>=140 && nCleanJet==0)' 
 
-nojetcutSR1 = 'nCleanJet==0'
-jetscutSR1  = 'nCleanJet>0'
-nojetcutSR2 = nojetcutSR1
-jetscutSR2  = jetscutSR1
-
-if 'VisHT' in opt.tag:
-    if 'VisHTv1' in opt.tag:
-        visht = '('+sumLeptonPt+'+Sum$(CleanJet_pt))'
-        nojetcutSR1 = visht+'<200'
-        jetscutSR1  = visht+'>=200'
-        nojetcutSR2 = visht+'<300'
-        jetscutSR2  = visht+'>=300'
-    elif 'VisHTv2' in opt.tag:
-        visht = '(Sum$(CleanJet_pt))'
-        nojetcutSR1 = visht+'<50'
-        jetscutSR1  = visht+'>=50'
-        nojetcutSR2 = visht+'<50'
-        jetscutSR2  = visht+'>=50'
-    elif 'VisHTv3' in opt.tag:
-        visht = '('+sumLeptonPt+')'
-        nojetcutSR1 = visht+'<100'
-        jetscutSR1  = visht+'>=100'
-        nojetcutSR2 = visht+'<100'
-        jetscutSR2  = visht+'>=100'
-
-
 if 'SignalRegion' in opt.tag:
+
+    nojetcutSR1 = 'nCleanJet==0'
+    jetscutSR1  = 'nCleanJet>0'
+    nojetcutSR2 = nojetcutSR1
+    jetscutSR2  = jetscutSR1
+
+    if 'VisHT' in opt.tag:
+        if 'VisHTv1' in opt.tag:
+            visht = '('+sumLeptonPt+'+Sum$(CleanJet_pt))'
+            nojetcutSR1 = visht+'<200'
+            jetscutSR1  = visht+'>=200'
+            nojetcutSR2 = visht+'<300'
+            jetscutSR2  = visht+'>=300'
+        elif 'VisHTv2' in opt.tag:
+            visht = '(Sum$(CleanJet_pt))'
+            nojetcutSR1 = visht+'<50'
+            jetscutSR1  = visht+'>=50'
+            nojetcutSR2 = visht+'<50'
+            jetscutSR2  = visht+'>=50'
+        elif 'VisHTv3' in opt.tag:
+            visht = '('+sumLeptonPt+')'
+            nojetcutSR1 = visht+'<100'
+            jetscutSR1  = visht+'>=100'
+            nojetcutSR2 = visht+'<100'
+            jetscutSR2  = visht+'>=100'
+
     splitjets=False  
     if 'CharginoSignalRegions' in opt.tag or 'VisHT' in opt.tag: splitjets=True
 
     ptmiss_cuts={"SR1": ' && ptmiss>=140 && ptmiss<200 ',
-          "SR2": ' && ptmiss>=200 && ptmiss<300 ',
-          "SR3": ' && ptmiss>=300 '}
+                 "SR2": ' && ptmiss>=200 && ptmiss<300 ',
+                 "SR3": ' && ptmiss>=300 '}
     if 'Optim' in opt.tag and 'Ptm' in opt.tag:
         ptmiss_cuts={"SR1": ' && ptmiss>=160 && ptmiss<220 ',
-              "SR2": ' && ptmiss>=220 && ptmiss<280 ',
-              "SR3": ' && ptmiss>=280 && ptmiss<380 ',
-              "SR4": ' && ptmiss>=380 '}#CHECK THE ANDS
+                     "SR2": ' && ptmiss>=220 && ptmiss<280 ',
+                     "SR3": ' && ptmiss>=280 && ptmiss<380 ',
+                     "SR4": ' && ptmiss>=380 '}
+
     for SR in ptmiss_cuts:
+
         isrcut = ''
         doISR  = False
         if "ISR" in opt. tag:
@@ -279,6 +281,8 @@ if 'SignalRegion' in opt.tag:
                 if SR in ["SR3","SR4"]:
                     doISR = True
 
+        if doISR: isrcut=' && '+ISRCut
+
         if splitjets is True:
             if   SR == "SR1":
                 jetscut  = ' && '+jetscutSR1
@@ -287,21 +291,14 @@ if 'SignalRegion' in opt.tag:
                 jetscut  = ' && '+jetscutSR2
                 nojetcut = ' && '+nojetcutSR2
 
-        if doISR: isrcut=' && '+ISRCut
-
         if 'Data' in opt.sigset:
-            btagcut=' && '+BTAG
-            vetocut=' && '+VETO
-            if 'pt30' in opt.tag:
-                btagcut=' && '+BTAG30
-                vetocut=' && '+VETO30
+            btagcut=' && '+bTagPass
+            vetocut=' && '+bTagVeto
 
             cuts[SR+'_Tag_em' ] = OC+' && '+DF+ptmiss_cuts[SR]+btagcut+isrcut
             cuts[SR+'_Tag_sf' ] = OC+' && '+SF+ptmiss_cuts[SR]+btagcut+isrcut
 
             if splitjets is True and SR in ["SR1","SR2"]:
-
-
                 cuts[SR+'_NoTag_em'] = OC+' && '+DF+ptmiss_cuts[SR]+vetocut+jetscut+isrcut
                 cuts[SR+'_NoTag_sf'] = OC+' && '+SF+ptmiss_cuts[SR]+vetocut+jetscut+isrcut
 
@@ -315,9 +312,6 @@ if 'SignalRegion' in opt.tag:
         else:
             btagcut=''
             vetocut=''
-            if 'pt30' in opt.tag:
-                btagcut=' && '+BTAG30
-                vetocut=' && '+VETO30
 
             cuts[SR+'_Tag_em' ]  = '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+btagcut+')*'+btagWeight1tag
             cuts[SR+'_Tag_sf' ]  = '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+btagcut+')*'+btagWeight1tag
@@ -329,9 +323,7 @@ if 'SignalRegion' in opt.tag:
                 cuts[SR+'_NoJet_em'] = '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+vetocut+nojetcut+')*'+btagWeight0tag
                 cuts[SR+'_NoJet_sf'] = '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+vetocut+nojetcut+')*'+btagWeight0tag
 
-
             else:
-
                 cuts[SR+'_Veto_em']  = '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+vetocut+')*'+btagWeight0tag
                 cuts[SR+'_Veto_sf']  = '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+vetocut+')*'+btagWeight0tag
     
