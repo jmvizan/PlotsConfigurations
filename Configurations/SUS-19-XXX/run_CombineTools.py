@@ -110,8 +110,9 @@ if __name__ == '__main__':
         for massPoint in signalMassPoints[model]:
             dirDC=''
             dirDClocal=''
-            #print opt.sigset, "<-sigset, masspoint->", massPoint
+            print opt.sigset, "<-sigset, masspoint->", massPoint
             if not massPointInSignalSet(massPoint, opt.sigset): continue
+            print "after"
             for year in years:
                 mpLoc=PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+opt.tag+'/'+massPoint
                 if(os.path.exists(mpLoc) is not True):

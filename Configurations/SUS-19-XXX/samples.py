@@ -313,6 +313,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'TTZToQQ'         +ttZToQQext,False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
+                                'suppressNegative':['all'],
+                                'suppressNegativeNuisances' :['all'],
                                 }
         
         ttWToLLext = ''
@@ -504,14 +506,16 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                 samples['DATA']['weights'].append(DataTrig[DataSet]+'*'+METFilters_Data)
 
 ### Files per job
-
-if 'AsMuchAsPossible' in opt.batchSplit : 
-    for sample in samples:
-        ntrees = len(samples[sample]['name'])  
-        samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/3))
-
+print "SPLIT"
+try:
+    if 'AsMuchAsPossible' in opt.batchSplit : 
+        for sample in samples:
+            ntrees = len(samples[sample]['name'])  
+            samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/3))
+except AttributeError:
+    print "---> opt.batchSplit not defined"
 ### Signals
-
+print "here"
 exec(open('./signalMassPoints.py').read())
 
 for model in signalMassPoints:

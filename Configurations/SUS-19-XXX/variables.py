@@ -1,4 +1,3 @@
-# variables
     
 # Flags  
 gv   = ' [GeV]'
@@ -12,10 +11,9 @@ dphill = '#Delta#phi(lep1,lep2)'
 
 # Complex variables
 
-sumLeptonPt = 'Lepton_pt['+lep0idx+']+Lepton_pt['+lep1idx+']'
+#sumLeptonPt = 'Lepton_pt['+lep0idx+']+Lepton_pt['+lep1idx+']'
 
-nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+')'
-
+#nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+')'
 # variables = {}
 
 if 'Test' in opt.tag: 
