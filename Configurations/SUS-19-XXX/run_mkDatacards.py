@@ -46,5 +46,4 @@ for year in years:
         if model in sigset:
             for massPoint in signalMassPoints[model]:
                 if massPointInSignalSet(massPoint, sigset):
-                    print "do first"
                     os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+tag+'/'+massPoint+' --inputFile=./Shapes/'+year+'/'+tag+'/plots_'+tag+'_'+fileset+'.root') 
