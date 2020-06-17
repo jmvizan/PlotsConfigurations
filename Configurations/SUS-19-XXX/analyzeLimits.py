@@ -850,12 +850,18 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
     tagObj[0].GetYaxis().SetLabelSize(0.035)
 
     if plotOption=='Histograms':
-
+        legend = ROOT.TLegend(0.12,0.8,0.52,0.88);
+        legend.SetTextFont(62)
+        legend.SetTextSize(0.017);
+            
         if tags[1]!='':
+            legend.SetHeader("ratio  #frac{"+tags[0]+"}{"+tags[1]+"}", 'c')
             tagObj[0].Divide(tagObj[1])
             tagObj[0].SetMinimum(0.5)
             tagObj[0].SetMaximum(1.5)
-        else:            
+            
+        else:
+            legend.Header(tags[0], 'c')
             tagObj[0].SetMinimum(0)
             tagObj[0].SetMaximum(3)
 
@@ -864,7 +870,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         tagObj[0].GetZaxis().SetTitleFont(42)
         tagObj[0].GetZaxis().SetLabelSize(0.035)
         tagObj[0].GetZaxis().SetTitleSize(0.035)
-
+            
 
         if maxMassY>0.:
             tagObj[0].GetYaxis().SetRange(1, tagObj[0].GetYaxis().FindBin(maxMassY)+1);
@@ -884,12 +890,14 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
             ROOT.gStyle.SetPaintTextFormat("4.2f")
 
         tagObj[0].Draw(drawPlotOption)
-
+        legend.Draw()
+        
     elif plotOption=='Contours':
 
         legend = ROOT.TLegend(0.15,0.75,0.50,0.85);
 
         same = ''
+        ntag = 0
         for iobj in range(len(tagObj)):
 
             if iobj>=3:
@@ -897,12 +905,12 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
                 
             tagObj[iobj].Draw(same)
             same = 'same'
-
-            if iobj is 2: legend.AddEntry(tagObj[iobj],tags[0], 'l')
-            if iobj is 5: legend.AddEntry(tagObj[iobj],tags[1], 'l')
-
+            hname = tagObj[iobj].GetName()
+            if "down" not in hname and "up" not in hname: 
+                legend.AddEntry(tagObj[iobj],tags[ntag], 'l')
+                ntag+=1
         legend.Draw()
-
+        #exit()
     outputFileName = getFileName('./Plots/' + year + '/Limits', plotTitle, '.png')
     plotCanvas.Print(outputFileName)
 
