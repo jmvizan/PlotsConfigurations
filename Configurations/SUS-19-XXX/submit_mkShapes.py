@@ -72,11 +72,11 @@ if __name__ == '__main__':
     bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY']
     smsend  = bkgsend+ ['Data']
     if 'backgrounds' in split.lower(): allsend = bkgsend
-    elif        'sm' in split.lower(): allsend = smsend
-    elif       'all' in split.lower(): 
+    elif        'SM' in split        : allsend = smsend
+    elif       'all' in split.lower():
         all_sam = True
         if hadd == '1' and "SM-" not in sigset and sigset not in smsend+["SM","Backgrounds"]: sigset="SM-"+sigset
-        if sigset in bkgs or sigset == 'Data': 
+        if sigset.replace('Backgrounds','') in bkgs or sigset == 'Data': 
             print "please choose a valid signal"
             exit()
         else:
@@ -95,6 +95,7 @@ if __name__ == '__main__':
         print "REMOVING FILE:\n", shapes_file
     logtitle(shapes_file,tag+" "+sigset+" "+split)
     for samsend in allsend:
+        if hadd =='1' and 'Veto' in samsend: continue
         if keepsplit is False:
             if samsend in smsend and 'Veto' not in samsend:
                 split = 'AsMuchAsPossible'
@@ -107,9 +108,9 @@ if __name__ == '__main__':
     for comm in allcomms:
         print comm
         
-    if len(allcomms)>1: confirm()
+    #if len(allcomms)>1: confirm()
     
-    #exit()
+    exit()
     for comm in allcomms:
         print comm
         os.system(comm+" 2>&1 | tee -a "+shapes_file)
