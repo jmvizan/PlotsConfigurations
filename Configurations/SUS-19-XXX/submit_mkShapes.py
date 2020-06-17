@@ -108,9 +108,9 @@ if __name__ == '__main__':
     for comm in allcomms:
         print comm
         
-    #if len(allcomms)>1: confirm()
+    if len(allcomms)>1: confirm()
     
-    exit()
+    #exit()
     for comm in allcomms:
         print comm
         os.system(comm+" 2>&1 | tee -a "+shapes_file)
