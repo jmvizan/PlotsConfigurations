@@ -102,7 +102,7 @@ if __name__ == '__main__':
         for year in yearset:
             command = "./run_mkShapes.sh "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
             allcomms.append(command)
-    print "Commands to be run:"
+    print "Commands to be ran:"
     for comm in allcomms:
         print comm
         
