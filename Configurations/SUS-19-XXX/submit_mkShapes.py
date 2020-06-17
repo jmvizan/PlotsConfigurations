@@ -75,6 +75,7 @@ if __name__ == '__main__':
     elif        'sm' in split.lower(): allsend = smsend
     elif       'all' in split.lower(): 
         all_sam = True
+        if hadd == '1' and "SM-" not in sigset and sigset not in smsend+["SM","Backgrounds"]: sigset="SM-"+sigset
         if sigset in bkgs or sigset == 'Data': 
             print "please choose a valid signal"
             exit()
@@ -106,7 +107,7 @@ if __name__ == '__main__':
     for comm in allcomms:
         print comm
         
-    if len(allsend)>1: confirm()
+    if len(allcomms)>1: confirm()
     
     #exit()
     for comm in allcomms:
