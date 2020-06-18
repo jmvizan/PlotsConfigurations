@@ -7,9 +7,12 @@ import LatinoAnalysis.Gardener.hwwtools as hwwtools
 from LatinoAnalysis.Tools.commonTools import *
 
 COMBINE = os.getenv('COMBINE')
-PWD = os.getenv('PWD')
+PWD     = os.getenv('PWD')
+CMSSW_v = PWD.split("CMSSW_")[1].split("/")[0]
 if(COMBINE is None): 
-    COMBINE = PWD.split('CMSSW_')[0]+'CMSSW_8_1_0/src/' # So ugly ... :p
+    COMBINE = PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'#'CMSSW_8_1_0/src/' # So ugly ... :p
+    if os.path.isdir(COMBINE) is False: COMBINE=PWD.split('CMSSW_')[0]+'CMSSW_8_1_0/src/'
+ 
 #if(type(PWD) is None): PWD = " "
 
 if __name__ == '__main__':
@@ -34,19 +37,19 @@ if __name__ == '__main__':
     hwwtools.loadOptDefaults(parser)
     (opt, args) = parser.parse_args()
 
-    years=[]
-    if opt.years =='2016':
-        years=["2016"]
+    years = []
+    if   opt.years == '2016':
+        years = ["2016"]
     elif opt.years == '2017':
-        years=["2017"]
-    elif opt.years == '-1':
-        years=["2016","2017","2018"]
-        opt.years="2016-2017-2018"
+        years = ["2017"]
+    elif opt.years == '-1'  :
+        years = ["2016","2017","2018"]
+        opt.years = "2016-2017-2018"
     else:
-        years=opt.years.split('-')
+        years = opt.years.split('-')
 
-    doTest = opt.test
-    doMerge = opt.nomerge
+    doTest   = opt.test
+    doMerge  = opt.nomerge
     doLimits = opt.nolimits
 
     print "\n\t Optional arguments"
@@ -61,10 +64,10 @@ if __name__ == '__main__':
     print " Merge Datacards    = ", doMerge
     print " Calculate limits   = ", doLimits
     print "\n"
-
+    
     if(doTest):
         print "On Test mode"
-        opt.sigset='T2tt_mS-450_mX-350'
+        opt.sigset = 'T2tt_mS-450_mX-350'
 
     opt.tag = opt.years+opt.tag
 
@@ -73,25 +76,26 @@ if __name__ == '__main__':
     isSamsF = os.path.exists(opt.samplesFile)
     isCutsF = os.path.exists(opt.cutsFile)
     isSignF = os.path.exists(opt.signalMPcfg)
-    cfgsF={}
-    fMiss=''
-    fIsMiss= False
-    vals = [isVarsF, isSamsF, isCutsF, isSignF]
-    keys = ["Variables", "Samples", "Cuts", "Signal"]
-    for i in range(0, len(keys)):
-        cfgsF[keys[i]]=vals[i]
-        if vals[i] is False:
-            fMiss+= keys[i] +" "
-            fIsMiss=True
+
+    fIsMiss = False
+    fMiss   = ''
+    allcfgs = {"Variables": isVarsF, "Samples": isSamsF,
+               "Cuts"     : isCutsF, "Signal" : isSignF}
+
+    for cfg_f in allcfgs:
+        if allcfgs[cfg_f] is False:
+            fMiss  += cfg_f
+            fIsMiss = True
+
     #Stop the program if some file is missing
     if(fIsMiss is True):
-        error=fMiss+"file Missing, check the input"
+        error = fMiss+"file Missing, check the input"
         raise NameError(error)
 
     #Generate dictionaries with variables and cuts
     variables = {}
-    samples = {}
-    cuts = {}
+    samples   = {}
+    cuts      = {}
     if (isVarsF):  exec(open(opt.variablesFile).read())
     if (isSamsF):  exec(open(opt.samplesFile).read())
     if (isCutsF):  exec(open(opt.cutsFile).read())
@@ -101,71 +105,74 @@ if __name__ == '__main__':
     opt.tag = opt.tag.replace(opt.years, '')
 
     #Loop over Signal mass points year cuts and variables, to get all Datacards
-    cmsenv=' eval `scramv1 runtime -sh` '
-    tagDC=''
-    thereIsDC=False
+    cmsenv       = ' eval `scramv1 runtime -sh` '
+    tagDC        = ''
+    thereIsDC    = False
+    doCombcmsenv = ''
+    if CMSSW_v not in opt.combineLocation: doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
+
+    
+
     for model in signalMassPoints:
         print "Model:", model,"\tSignal set", opt.sigset
         if model not in opt.sigset:  continue
         for massPoint in signalMassPoints[model]:
-            dirDC=''
-            dirDClocal=''
+            dirDC      = ''
+            dirDClocal = ''
             if not massPointInSignalSet(massPoint, opt.sigset): continue
             for year in years:
-                mpLoc=PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+opt.tag+'/'+massPoint
+                mpLoc = PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+opt.tag+'/'+massPoint
                 if(os.path.exists(mpLoc) is not True):
                     print mpLoc
                     if(doTest is True): print "\n Folder for MassPoint", massPoint," does not exist:"
                     continue
                 print "Mass Point:", massPoint,"\t Year:",  year
                 for cut in cuts:
-                    cutLoc=mpLoc+'/'+cut
+                    cutLoc = mpLoc+'/'+cut
                     #print os.path.exists(mpLoc), mpLoc, "cuts", cuts, variables
                     if(os.path.exists(cutLoc) is not True):
-                        print "Folder for Cut", cut, "Does not exist"
+                        print "Folder for ", cut, "Does not exist"
                         continue
                     for variable in variables:
-                        thisDC=cutLoc+'/'+variable+"/datacard.txt"
-                        tagDC =cut #Could be changed to more complex in the future
-                        dirDC+=tagDC+year+'='+thisDC+' '
-                        dirDClocal+=tagDC+year+'='+thisDC.split('/Datacards/')[1]+' '
+                        thisDC      = cutLoc+'/'+variable+"/datacard.txt"
+                        tagDC       = cut #Could be changed to more complex in the future
+                        dirDC      += tagDC+year+'='+thisDC+' '
+                        dirDClocal += tagDC+year+'='+thisDC.split('/Datacards/')[1]+' '
                         
                         if(os.path.exists(thisDC) is True):
-                            thereIsDC=True
+                            thereIsDC = True
 #                            print "Datacard: ", thisDC, "dirDC="
                         else:
                             if(doTest):print "DC", thisDC, "does not exist"
             #Do not combine DC nor calculate limits if no DC is found
-            mergeCommand=''
-            combCommand =''
+            mergeCommand = ''
+            combCommand  = ''
             if(thereIsDC is False):
                 print "there are no Datacards in the folder under the input parameters"
             else:
                 #Actually merge the DC
-                dcLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+opt.tag+'/'+massPoint
-                os.system('mkdir -p '+dcLoc)
-                finalDC=dcLoc+'/'+opt.tag+'.txt'
-
-                print "FINAL DC:", finalDC
-                doCombcmsenv='cd '+opt.combineLocation+ ';'+cmsenv+'; cd -; '
+                dcLoc   = PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+opt.tag+'/'+massPoint
+                finalDC = dcLoc+'/'+opt.tag+'.txt'
+                os.system('mkdir -p '+dcLoc)                
+                #print "FINAL DC:", finalDC
                 if(doMerge is True and thereIsDC is True):
-                    mergeCommand=opt.combcfg+' '+dirDC+">"+finalDC+";"
-                    mergePrint=''
+                    mergeCommand = opt.combcfg+' '+dirDC+">"+finalDC+";"
+                    mergePrint   = ''
                     if(doTest): 
-                        mergePrint=mergeCommand
-                    else: mergePrint= opt.combcfg+' '+dirDClocal+">"+finalDC+";"
-                    print "Combining Datacards:", mergePrint, "\t<---"
+                        mergePrint   = mergeCommand
+                    else: mergePrint = opt.combcfg+' '+dirDClocal+">"+finalDC+";"
+                    print "Combining Datacards"
                     os.system(doCombcmsenv+mergeCommand)
-                    print "Final Datacard:", finalDC
+                    print "FINAL DATACARD:\t:", finalDC
                 else:
                     print "\n Data card merging option set to false: no DC combination is done"
 
                 #Calculate the limits
                 if(doLimits is True and thereIsDC is True):
-                    outLoc=PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+opt.tag+'/'+massPoint
+                    outLoc = PWD+'/'+opt.outputDirLimit+'/'+opt.years+'/'+opt.tag+'/'+massPoint
                     os.system('mkdir -p '+outLoc)
                     
-                    combCommand='cd '+outLoc+'; combine -M AsymptoticLimits --run '+opt.limrun.lower() +' ' +finalDC+' -n _'+opt.tag+'_'+opt.limrun
+                    combCommand = 'cd '+outLoc+'; combine -M AsymptoticLimits --run '+opt.limrun.lower() +' ' +finalDC+' -n _'+opt.tag+'_'+opt.limrun
                     print "Sending combination", combCommand
                     os.system(doCombcmsenv+combCommand)
                 else:
