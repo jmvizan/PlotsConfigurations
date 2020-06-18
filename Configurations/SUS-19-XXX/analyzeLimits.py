@@ -851,17 +851,17 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
 
     if plotOption=='Histograms':
         legend = ROOT.TLegend(0.12,0.8,0.52,0.88);
-        legend.SetTextFont(62)
-        legend.SetTextSize(0.017);
-            
+        legend.SetMargin(0.01)
+        
         if tags[1]!='':
-            legend.SetHeader("ratio  #frac{"+tags[0]+"}{"+tags[1]+"}", 'c')
+            legend.AddEntry(tagObj[1],"ratio  #frac{"+tags[0]+"}{"+tags[1]+"}", '')
+            
             tagObj[0].Divide(tagObj[1])
             tagObj[0].SetMinimum(0.5)
             tagObj[0].SetMaximum(1.5)
             
         else:
-            legend.Header(tags[0], 'c')
+            legend.AddEntry(tagObj[1],tags[0], '')
             tagObj[0].SetMinimum(0)
             tagObj[0].SetMaximum(3)
 
@@ -894,8 +894,10 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         
     elif plotOption=='Contours':
 
-        legend = ROOT.TLegend(0.15,0.75,0.50,0.85);
-
+        legend = ROOT.TLegend(0.12,0.8,0.55,0.88);
+        print legend.GetMargin()
+        legend.SetMargin(0.1)
+        #exit()
         same = ''
         ntag = 0
         for iobj in range(len(tagObj)):
