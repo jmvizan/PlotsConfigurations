@@ -149,8 +149,6 @@ for mStop in range( 200,  1501, 25):
 signalMassPoints['TChipmSlepSnu'] = {}
 
 for mChipm in range( 100,  1501, 25):
-    if mChipm>1000. and mChipm%100==25:
-        continue
     datasetName = 'TChipmSlepSnu'
     if mChipm>800:
         datasetName += '_mC1_825_1500'
