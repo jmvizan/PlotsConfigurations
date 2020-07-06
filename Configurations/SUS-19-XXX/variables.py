@@ -9,6 +9,12 @@ pll  = '('+sll+')'
 mt2  = '#font[50]{m}_{T2}'
 ptll = pt+'^{'+sll+'}'
 dphill = '#Delta#phi(lep1,lep2)'
+dphillptmiss = '#Delta#phi('+sll+','+met+')'
+dphiminlepptmiss = '#Delta#phi^{min}(lep,'+met+')'
+dphijet0ptmiss = '#Delta#phi(lead. jet,'+met+')'
+dphijet1ptmiss = '#Delta#phi(trai. jet,'+met+')'
+drll = '#Delta R(lep1,lep2)'
+mtllptmiss = '#font[50]{m}_{T}('+sll+','+met+')'
 
 # Complex variables
 
@@ -116,6 +122,64 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                        'fold'  : 1                     #   fold overflow
                                    }
 
+    if 'TopControlRegion' in opt.tag or 'SignalRegions' in opt.tag:
+
+        variables['dPhijet0ptmiss']   = {  'name'  : dPhijet0ptmiss,      #   variable name    
+                                           'range' : (  10,    0.,  3.2), #   variable range
+                                           'xaxis' : dphijet0ptmiss,      #   x axis name
+                                           'fold'  : 1                    #   fold overflow
+                                       }
+
+        variables['dPhijet1ptmiss']   = {  'name'  : dPhijet1ptmiss,      #   variable name    
+                                           'range' : (  10,    0.,  3.2), #   variable range
+                                           'xaxis' : dphijet1ptmiss,      #   x axis name
+                                           'fold'  : 1                    #   fold overflow
+                                       }
+
+        variables['ptmisssig']   = {  'name'  : 'MET_significance',       #   variable name    
+                                      'range' : (  25,    0.,  25.),      #   variable range
+                                      'xaxis' : met+' significance',      #   x axis name
+                                      'fold'  : 1                         #   fold overflow
+                                   }
+
+    if 'LatinoControlRegion' in opt.tag or 'More' in opt.tag:
+
+        variables['deltaRLep']   = {  'name'  : dRll,                    #   variable name    
+                                      'range' : (  20,    0.,  3.),      #   variable range
+                                      'xaxis' : drll,                    #   x axis name
+                                      'fold'  : 1                        #   fold overflow
+                                   }   
+
+        variables['deltaPhiLep']   = {  'name'  : dPhill,                  #   variable name    
+                                        'range' : (  10,    0.,  3.2),     #   variable range
+                                        'xaxis' : dphill,                  #   x axis name
+                                        'fold'  : 1                        #   fold overflow
+                                     }
+
+        variables['dPhillptmiss']   = {  'name'  : dPhillptmiss,        #   variable name    
+                                         'range' : (  10,    0.,  3.2), #   variable range
+                                         'xaxis' : dphillptmiss,        #   x axis name
+                                         'fold'  : 1                    #   fold overflow
+                                     }
+
+        variables['dPhiMinlepptmiss'] = {  'name'  : dPhiMinlepptmiss,    #   variable name    
+                                           'range' : (  10,    0.,  3.2), #   variable range
+                                           'xaxis' : dphiminlepptmiss,    #   x axis name
+                                           'fold'  : 1                    #   fold overflow
+                                       }
+
+        variables['ptll']          = {  'name'  : pTll,                    #   variable name    
+                                        'range' : ([20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 300, 400, 500, 1000],[1]), #   variable range
+                                        'xaxis' : ptll + gv,               #   x axis name
+                                        'fold'  : 1                        #   fold overflow
+                                     }
+
+        variables['mTllptmiss']    = {  'name'  : mTllptmiss,              #   variable name    
+                                        'range' : (  30,  40., 400.),      #   variable range
+                                        'xaxis' : mtllptmiss + gv,         #   x axis name
+                                        'fold'  : 1                        #   fold overflow
+                                     }
+        
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     mt2ll = 'mt2ll'
@@ -202,15 +266,11 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
         if 'DYValidationRegion' in opt.tag:   
 
-            variables['deltaPhiLep']   = {  'name'  : 'acos(cos(Lepton_phi['+lep1idx+']-Lepton_phi['+lep0idx+']))', #   variable name    
+            variables['deltaPhiLep']   = {  'name'  : dPhill,                  #   variable name    
                                             'range' : (  10,    0.,  3.2),     #   variable range
                                             'xaxis' : dphill,                  #   x axis name
                                             'fold'  : 1                        #   fold overflow
                                          }
-
-            pxll = '(Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+']))'
-            pyll = '(Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+']))'
-            pTll = 'sqrt('+pxll+'*'+pxll+'+'+pyll+'*'+pyll+')'
 
             variables['ptll']          = {  'name'  : pTll,                    #   variable name    
                                             'range' : ([20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 300, 400, 500, 1000],[1]), #   variable range

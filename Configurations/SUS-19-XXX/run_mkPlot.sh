@@ -15,7 +15,9 @@ elif [ $# == 1 ]; then
     echo ''
     exit
 else
-    if [ $1 == '0' ]; then
+    if [ $1 == '-1' ]; then
+	YEAR='2016-2017-2018'
+    elif [ $1 == '0' ]; then
 	YEAR='2016'
     elif [ $1 == '1' ]; then
 	YEAR='2017'
@@ -43,11 +45,17 @@ fi
 
 mkdir -p ./Plots/$YEAR/$TAG
 
+if [ $YEAR == '2016-2017-2018' ]; then
+    mkdir -p ./Shapes/$YEAR/$TAG
+    hadd -k -f ./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root ./Shapes/2016/$TAG/plots_${TAG}_$FILESET.root ./Shapes/2017/$TAG/plots_${TAG}_$FILESET.root ./Shapes/2018/$TAG/plots_${TAG}_$FILESET.root 
+fi
+
+
 if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
     if [ $# -gt 4 ]; then
-	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedDistributions=1 --nuisancesFile=None
+        mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedDistributions=1 --nuisancesFile=None
     else
-	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2
+	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None
     fi
 else 
     mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None

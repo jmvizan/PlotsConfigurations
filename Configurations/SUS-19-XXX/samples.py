@@ -6,12 +6,16 @@ from LatinoAnalysis.Tools.commonTools import *
 
 ### Generals
 
+opt.lumi = 0.
 if '2016' in opt.tag : 
-    opt.lumi = 35.9 # 35.92
-elif '2017' in opt.tag : 
-    opt.lumi = 41.5 # 41.53
-elif '2018' in opt.tag : 
-    opt.lumi = 59.7 # 59.74
+    opt.lumi += 35.9 # 35.92
+    yeartag = '2016'
+if '2017' in opt.tag : 
+    opt.lumi += 41.5 # 41.53
+    yeartag = '2017'
+if '2018' in opt.tag : 
+    opt.lumi += 59.7 # 59.74
+    yeartag = '2018'
 print 'Value of lumi set to', opt.lumi
 
 treePrefix= 'nanoLatino_'
@@ -22,7 +26,7 @@ SITE=os.uname()[1]
 
 if  'cern' in SITE :
     treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    if '2016' in opt.tag : 
+    if '2016' in yeartag : 
         treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
     else : 
         treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
@@ -32,15 +36,15 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
-if '2016' in opt.tag :
+if '2016' in yeartag :
     ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6/MCSusy2016v6__MCCorr2016Susyv6'
     ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6/hadd__susyGen__MCSusy2016FSv6__susyW__MCCorr2016SusyFSv6'
     ProductionData = 'Run2016_102X_nAODv6_Full2016v6/DATASusy2016v6__hadd'
-elif '2017' in opt.tag :
+elif '2017' in yeartag :
     ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6/MCSusy2017v6__MCCorr2017Susyv6'
     ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6/hadd__susyGen__MCSusy2017FSv6__susyW__MCCorr2017SusyFSv6'
     ProductionData = 'Run2017_102X_nAODv6_Full2017v6/DATASusy2017v6__hadd'
-elif '2018' in opt.tag :
+elif '2018' in yeartag :
     ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6/MCSusy2018v6__MCCorr2018Susyv6'
     ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/hadd__susyGen__MCSusy2018FSv6__susyW__MCCorr2018SusyFSv6'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6/DATASusy2018v6__hadd'
@@ -94,6 +98,12 @@ dPhill = 'acos(cos(Lepton_phi['+lep1idx+']-Lepton_phi['+lep0idx+']))'
 dEtall = 'Lepton_eta['+lep1idx+']-Lepton_eta['+lep0idx+']'
 dRll = 'sqrt('+dPhill+'*'+dPhill+'+'+dEtall+'*'+dEtall+')'
 mTllptmiss = 'sqrt(2*'+pTll+'*ptmiss*(1.-cos('+phill+'-ptmiss_phi)))'
+dPhillptmiss = 'acos(cos('+phill+'-ptmiss_phi))'
+dPhilep0ptmiss = 'acos(cos(Lepton_phi['+lep0idx+']-ptmiss_phi))'
+dPhilep1ptmiss = 'acos(cos(Lepton_phi['+lep1idx+']-ptmiss_phi))'
+dPhiMinlepptmiss = 'TMath::Min('+dPhilep0ptmiss+','+dPhilep1ptmiss+')'
+dPhijet0ptmiss = 'acos(cos(CleanJet_phi[0]-ptmiss_phi))'
+dPhijet1ptmiss = 'acos(cos(CleanJet_phi[1]-ptmiss_phi))'
 
 OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
 SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]>0)'
@@ -122,12 +132,13 @@ bTagPtCut  = '20.'
 if 'pt25' in opt.tag: bTagPtCut  = '25.' 
 if 'pt30' in opt.tag: bTagPtCut  = '30.' 
 bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
-bTagCut = '0.6321'
-btagWP  = '2016'
-if '2017' in opt.tag: 
+if '2016' in yeartag: 
+    bTagCut = '0.6321'
+    btagWP  = '2016'
+elif '2017' in yeartag: 
     bTagCut = '0.4941'
     btagWP  = '2017'
-if '2018' in opt.tag: 
+elif '2018' in yeartag: 
     bTagCut = '0.4184'
     btagWP  = '2018'
 btagWP += bTagWP
@@ -203,7 +214,7 @@ nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' 
 # global SF weights 
 
 SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight + '*' + nonpromptLepSF
-if '2016' in opt.tag or '2017' in opt.tag: 
+if '2016' in yeartag or '2017' in yeartag: 
     SFweightCommon += '*PrefireWeight'
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
@@ -239,7 +250,7 @@ systematicTopPt = '1.'
 
 ### Data info
 
-if '2016' in opt.tag or '2017' in opt.tag :
+if '2016' in yeartag or '2017' in yeartag :
 
     if '2016' in opt.tag :
         DataRun = [ 
@@ -251,7 +262,7 @@ if '2016' in opt.tag or '2017' in opt.tag :
             ['G','Run2016G-Nano25Oct2019-v1'] ,
             ['H','Run2016H-Nano25Oct2019-v1'] 
         ]
-    elif '2017' in opt.tag :
+    elif '2017' in yeartag :
         DataRun = [ 
             ['B','Run2017B-Nano25Oct2019-v1'],
             ['C','Run2017C-Nano25Oct2019-v1'],
@@ -270,7 +281,7 @@ if '2016' in opt.tag or '2017' in opt.tag :
         'SingleElectron' : '!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl' ,
     }
 
-elif '2018' in opt.tag :
+elif '2018' in yeartag :
 
     DataRun = [ 
         ['A','Run2018A-Nano25Oct2019-v1'] ,
@@ -288,13 +299,11 @@ elif '2018' in opt.tag :
         'EGamma'         : '!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)' ,
     }
 
-
-
 ### Backgrounds
 
 if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
-    ttbarFlag = '_PSWeights' if ('2017' in opt.tag) else ''
+    ttbarFlag = '_PSWeights' if ('2017' in yeartag) else ''
     samples['ttbar'] = {    'name'   : getSampleFiles(directoryBkg,'TTTo2L2Nu'+ttbarFlag,False,treePrefix),
                             'weight' : XSWeight+'*'+SFweight+'*'+centralTopPt ,
                             'FilesPerJob' : 20 ,
@@ -309,15 +318,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     if 'btagefficiencies' not in opt.tag and 'Test' not in opt.tag:
     
-        tWext = '_ext1' if ('2018' in opt.tag) else ''
+        tWext = '_ext1' if ('2018' in yeartag) else ''
         samples['tW']    = {    'name'   :   getSampleFiles(directoryBkg,'ST_tW_antitop'+tWext,False,treePrefix) +
                                              getSampleFiles(directoryBkg,'ST_tW_top'+tWext,    False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                             }
 
-        ttZToLLext = '_ext3' if ('2016' in opt.tag) else ''
-        ttZToQQext = '_ext1' if ('2017' in opt.tag) else ''
+        ttZToLLext = '_ext3' if ('2016' in yeartag) else ''
+        ttZToQQext = '_ext1' if ('2017' in yeartag) else ''
         samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZToLLext,False,treePrefix) + 
                                              getSampleFiles(directoryBkg,'TTZToQQ'         +ttZToQQext,False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
@@ -325,8 +334,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 }
         
         ttWToLLext = ''
-        if ('2016' in opt.tag): ttWToLLext = '_ext2'
-        if ('2017' in opt.tag): ttWToLLext = '_newpmx'
+        if ('2016' in yeartag): ttWToLLext = '_ext2'
+        if ('2017' in yeartag): ttWToLLext = '_newpmx'
         samples['ttW']   = {    'name'   :   getSampleFiles(directoryBkg,'TTWJetsToLNu'+ttWToLLext,False,treePrefix) +
                                 getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix), 
                                 'weight' : XSWeight+'*'+SFweight ,
@@ -340,7 +349,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
         }
-        if '2016' in opt.tag : 
+        if '2016' in yeartag : 
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluWWTo2L2Nu_MCFM',False,treePrefix) 
         else : 
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToENEN',False,treePrefix) \
@@ -353,16 +362,16 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                    + getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,treePrefix) \
                                    + getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix)
 
-        WZext = '_ext1' if ('2018' in opt.tag) else ''
+        WZext = '_ext1' if ('2018' in yeartag) else ''
         samples['WZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 }
 
         ZZext = ''
-        if '2016' in opt.tag : 
+        if '2016' in yeartag : 
             ZZext = '_ext1'
-        elif '2018' in opt.tag : 
+        elif '2018' in yeartag : 
             ZZext = '_ext2'
         samples['ZZ']    = {    'name'   : getSampleFiles(directoryBkg,'ZZTo2L2Nu'+ZZext,False,treePrefix) +
                                            getSampleFiles(directoryBkg,'ggZZ2e2n',       False,treePrefix) +
@@ -373,23 +382,23 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'FilesPerJob' : 2 ,
                                 }
 
-        DYM10ext = '_ext1' if ('2016' not in opt.tag) else ''
-        DYMlow = 'M-5to50' if ('2016' in opt.tag) else 'M-4to50' 
+        DYM10ext = '_ext1' if ('2016' not in yeartag) else ''
+        DYMlow = 'M-5to50' if ('2016' in yeartag) else 'M-4to50' 
         DYMlowHT70ext, DYMlowHT100ext, DYMlowHT200ext, DYMlowHT400ext, DYMlowHT600ext = '', '', '', '', '' 
-        if '2016' in opt.tag:
+        if '2016' in yeartag:
             DYMlowHT100ext = '_ext1'
             DYMlowHT200ext = '_ext1'
             DYMlowHT400ext = '_ext1'
             DYMlowHT600ext = '_ext1'
-        DYM50ext = '_ext2' if ('2016' in opt.tag) else ''
+        DYM50ext = '_ext2' if ('2016' in yeartag) else ''
         DYMhighHT70ext = ''
-        DYMhighHT100ext = '_ext1' if ('2018' not in opt.tag) else ''
-        DYMhighHT200ext = '_ext1' if ('2016' in opt.tag) else ''
-        DYMhighHT400ext = '_ext1' if ('2018' not in opt.tag) else ''
-        DYMhighHT600ext = '_newpmx' if ('2017' in opt.tag) else ''
-        DYMhighHT800ext = '_newpmx' if ('2017' in opt.tag) else ''
+        DYMhighHT100ext = '_ext1' if ('2018' not in yeartag) else ''
+        DYMhighHT200ext = '_ext1' if ('2016' in yeartag) else ''
+        DYMhighHT400ext = '_ext1' if ('2018' not in yeartag) else ''
+        DYMhighHT600ext = '_newpmx' if ('2017' in yeartag) else ''
+        DYMhighHT800ext = '_newpmx' if ('2017' in yeartag) else ''
         DYMhighHT1200ext = '' 
-        DYMhighHT2500ext = '_newpmx' if ('2017' in opt.tag) else ''
+        DYMhighHT2500ext = '_newpmx' if ('2017' in yeartag) else ''
         samples['DY']    = {    'name'   :   getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'+DYM10ext,        False,treePrefix) +
                                 #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100'+DYMlowHT70ext, False,treePrefix) +
                                 getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-100to200'+DYMlowHT100ext,False,treePrefix) +
@@ -408,15 +417,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 40 ,
                                 } 
-        if '2016' in opt.tag : 
+        if '2016' in yeartag : 
             samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100',False,treePrefix)
             addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO'+DYM10ext,  'LHE_HT<70.0')
         else :
             addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO'+DYM10ext,  'LHE_HT<100.0')
         addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO'+DYM50ext, 'LHE_HT<70.0')
         
-        ggHWWgen = 'AMCNLO'  if ('2016' in opt.tag) else ''
-        ggHTText = '_newpmx' if ('2017' in opt.tag) else ''
+        ggHWWgen = 'AMCNLO'  if ('2016' in yeartag) else ''
+        ggHTText = '_newpmx' if ('2017' in yeartag) else ''
         samples['HWW']   = {    'name'   :   getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix) + 
                                              getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'+ggHTText,      False,treePrefix) + 
                                              getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125',               False,treePrefix) + 
@@ -450,7 +459,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         
         if 'ZZ' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
             
-            ZZ4Lext = '_ext2' if ('2018' in opt.tag) else '_ext1'
+            ZZ4Lext = '_ext2' if ('2018' in yeartag) else '_ext1'
             samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo4L'+ZZ4Lext, False,treePrefix) + 
                                        getSampleFiles(directoryBkg,'ggZZ4e',              False,treePrefix) +
                                        getSampleFiles(directoryBkg,'ggZZ4m',              False,treePrefix) +
@@ -466,7 +475,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
         if 'SameSignValidationRegion' in opt.tag:
     
-            ttSemilepFlag = '_ext3' if ('2018' in opt.tag) else ''
+            ttSemilepFlag = '_ext3' if ('2018' in yeartag) else ''
             samples['ttSemilep'] = { 'name'   : getSampleFiles(directoryBkg,'TTToSemiLeptonic'+ttSemilepFlag,False,treePrefix),
                                      'weight' : XSWeight+'*'+SFweight ,
                                      'FilesPerJob' : 2 ,

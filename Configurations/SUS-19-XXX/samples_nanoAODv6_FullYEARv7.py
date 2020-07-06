@@ -88,6 +88,21 @@ lep2idx = 'lep2idx'
 nLooseLepton = 'Sum$(('+looseEleWP+'+'+looseMuoWP+')==1)'
 nTightLepton = 'Sum$(('+tightEleWP+'+'+tightMuoWP+')==1)'
 
+pxll = '(Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+']))'
+pyll = '(Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+']))'
+pTll = 'sqrt('+pxll+'*'+pxll+'+'+pyll+'*'+pyll+')'
+phill = 'atan('+pyll+'/'+pxll+')'
+dPhill = 'acos(cos(Lepton_phi['+lep1idx+']-Lepton_phi['+lep0idx+']))'
+dEtall = 'Lepton_eta['+lep1idx+']-Lepton_eta['+lep0idx+']'
+dRll = 'sqrt('+dPhill+'*'+dPhill+'+'+dEtall+'*'+dEtall+')'
+mTllptmiss = 'sqrt(2*'+pTll+'*ptmiss*(1.-cos('+phill+'-ptmiss_phi)))'
+dPhillptmiss = 'acos(cos('+phill+'-ptmiss_phi))'
+dPhilep0ptmiss = 'acos(cos(Lepton_phi['+lep0idx+']-ptmiss_phi))'
+dPhilep1ptmiss = 'acos(cos(Lepton_phi['+lep1idx+']-ptmiss_phi))'
+dPhiMinlepptmiss = 'TMath::Min('+dPhilep0ptmiss+','+dPhilep1ptmiss+')'
+dPhijet0ptmiss = 'acos(cos(CleanJet_phi[0]-ptmiss_phi))'
+dPhijet1ptmiss = 'acos(cos(CleanJet_phi[1]-ptmiss_phi))'
+
 OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[lep0idx]>=25. && Lepton_pt[lep1idx]>=20. && channel<0'
 SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[lep0idx]>=25. && Lepton_pt[lep1idx]>=20. && channel>0'
 SSP = nTightLepton + '==2 && mll>=20. && Lepton_pt[lep0idx]>=25. && Lepton_pt[lep1idx]>=20. && Lepton_pdgId[lep0idx]<0 && Lepton_pdgId[lep1idx]<0'
@@ -406,7 +421,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         elif '2018' in opt.tag :
             samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'+DYM10ext,False,treePrefix)
             addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO'+DYM10ext,  'LHE_HT<100.0')
-        addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO_ext1', 'LHE_HT<70.0')
+        addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO'+DYM50ext, 'LHE_HT<70.0')
         
         ggHWWgen = 'AMCNLO'  if ('2016' in opt.tag) else ''
         ggHTText = '_newpmx' if ('2017' in opt.tag) else ''
