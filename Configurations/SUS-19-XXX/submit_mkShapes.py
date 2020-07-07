@@ -75,12 +75,14 @@ if __name__ == '__main__':
     elif        'SM' in split        : allsend = smsend
     elif       'all' in split.lower():
         all_sam = True
+        #print bool(hadd=='0'), bool(sigset in 
         if hadd == '1' and "SM-" not in sigset and sigset not in smsend+["SM","Backgrounds"]: sigset="SM-"+sigset
         if sigset.replace('Backgrounds','') in bkgs or sigset == 'Data': 
             print "please choose a valid signal"
             exit()
-        else:
-            allsend = smsend+[sigset]
+        elif hadd == '0' and sigset in ["SM", "Backgrounds"]:
+            allsend = smsend
+        else: allsend = smsend+[sigset]
     else: 
         allsend   = [sigset]
         keepsplit = True
@@ -96,6 +98,7 @@ if __name__ == '__main__':
     logtitle(shapes_file,tag+" "+sigset+" "+split)
     for samsend in allsend:
         if hadd =='1' and 'Veto' in samsend: continue
+        #if hadd =='0' and all_sam is True and  : continue
         if keepsplit is False:
             if samsend in smsend and 'Veto' not in samsend:
                 split = 'AsMuchAsPossible'

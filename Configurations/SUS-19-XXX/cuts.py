@@ -42,6 +42,19 @@ if 'Preselection' in opt.tag:
     cuts['TwoLep_ee'] = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=80'
     cuts['TwoLep_mm'] = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=80'
 
+if 'DYchecks' in opt.tag:
+    print "Doing DY Checks"
+    cuts['lowMll_sf']  = OC + ' && ' + SF + ' && nCleanJet>1 && '+ bTagPass
+    cuts['lowMll_ee']  = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 && '+ bTagPass
+    cuts['lowMll_mm']  = OC + ' && ' + MM + ' && nCleanJet>1 && PuppiMET_pt> 50 &&  '+ bTagPass
+    cuts['highMll_sf'] = OC + ' && ' + SF + ' && nCleanJet>1 && mll>=76 && mll<106 && ' + bTagPass
+    cuts['highMll_ee'] = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 &&  mll>=76 && mll<106 && ' + bTagPass
+    cuts['highMll_mm'] = OC + ' && ' + MM + ' && nCleanJet>1 &&  PuppiMET_pt> 50 && mll>=76 && mll<106 && ' + bTagPass
+    cuts['lowMll_ee_noMETcut']  = OC + ' && ' + EE + ' && nCleanJet>1 && '+ bTagPass
+    cuts['lowMll_mm_noMETcut']  = OC + ' && ' + MM + ' && nCleanJet>1 &&  '+ bTagPass
+    cuts['highMll_ee_noMETcut'] = OC + ' && ' + EE + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + bTagPass
+    cuts['highMll_mm_noMETcut'] = OC + ' && ' + MM + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + bTagPass
+
 if 'TopControlRegion' in opt.tag:
 
     if 'Data' in opt.sigset:

@@ -24,6 +24,47 @@ if 'Test' in opt.tag:
                                     'xaxis' : 'number of b-tagged jets', #   x axis name
                                     'fold'  : 1                          #   fold overflow
                                 }
+elif 'DYchecks' in opt.tag:
+    #print "inside this plots"
+    #exit()
+    variables['PuppiMET_pt']  = {  'name'  : 'PuppiMET_pt',           #   variable name    
+                                    'range' : (  60,    0.,  350.),    #   variable range
+                                    'xaxis' : "Puppi " + met + gv,      #   x axis name
+                                    'fold'  : 1                        #   fold overflow
+                                }
+
+
+    variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
+                                    'range' : (  60,    0.,  350.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : 1                        #   fold overflow
+                                }
+
+    variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name    
+                                    'range' : (  6 ,    0.,  6.),      #   variable range
+                                    'xaxis' : "number of jets",        #   x axis name
+                                    'fold'  : 1                        #   fold overflow
+                                }
+
+    variables['nbjets']         = {  'name'  : nbjets,                 #   variable name    
+                                    'range' : (  5 ,    0.,  5.),      #   variable range
+                                    'xaxis' : "number of b-taggedjets",#   x axis name
+                                    'fold'  : 1                        #   fold overflow
+                                }
+    variables['mt2ll']         = {  'name'  : 'mt2ll',                 #   variable name    
+                                    'range' : (  40,    0.,  150.),    #   variable range
+                                    'xaxis' : mt2+ pll  + gv,          #   x axis name
+                                    'fold'  : 1                        #   fold overflow
+                                }
+
+    variables['mll']           = {  'name'  : 'mll'  ,                 #   variable name    
+                                    'range' : (  60,    0.,  200.),    #   variable range
+                                    'xaxis' : 'm' + pll  + gv,         #   x axis name
+                                    'fold'  : 1                        #   fold overflow
+                                }
+
+
+
 
 elif 'HighPtMissOptimisationRegion' in opt.tag: 
     
