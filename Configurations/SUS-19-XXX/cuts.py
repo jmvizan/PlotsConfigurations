@@ -41,6 +41,23 @@ if 'Preselection' in opt.tag:
     cuts['TwoLep_em'] = OC+' && '+DF+' && ptmiss>=80'
     cuts['TwoLep_ee'] = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=80'
     cuts['TwoLep_mm'] = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=80'
+    if 'Data' in opt.sigset:
+        cuts['TwoLep_em_Veto'] = OC+' && '+DF             +' && '+bTagVeto
+        cuts['TwoLep_ee_Veto'] = OC+' && '+EE+' && '+vetoZ+' && '+bTagVeto
+        cuts['TwoLep_mm_Veto'] = OC+' && '+MM+' && '+vetoZ+' && '+bTagVeto
+
+        cuts['TwoLep_em_Tag']  = OC+' && '+DF             +' && '+bTagPass
+        cuts['TwoLep_ee_Tag']  = OC+' && '+EE+' && '+vetoZ+' && '+bTagPass
+        cuts['TwoLep_mm_Tag']  = OC+' && '+MM+' && '+vetoZ+' && '+bTagPass
+
+    else: #if 'Backgrounds' in opt.sigset:
+        cuts['TwoLep_em_Veto'] = '('+OC+' && '+DF             +')*'+btagWeight0tag
+        cuts['TwoLep_ee_Veto'] = '('+OC+' && '+EE+' && '+vetoZ+')*'+btagWeight0tag
+        cuts['TwoLep_mm_Veto'] = '('+OC+' && '+MM+' && '+vetoZ+')*'+btagWeight0tag
+
+        cuts['TwoLep_em_Tag']  = '('+OC+' && '+DF             +')*'+btagWeight1tag
+        cuts['TwoLep_ee_Tag']  = '('+OC+' && '+EE+' && '+vetoZ+')*'+btagWeight1tag
+        cuts['TwoLep_mm_Tag']  = '('+OC+' && '+MM+' && '+vetoZ+')*'+btagWeight1tag
 
 if 'DYchecks' in opt.tag:
     print "Doing DY Checks"
@@ -61,11 +78,15 @@ if 'TopControlRegion' in opt.tag:
         cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20) && '+bTagPass 
         cuts['Top_ee'] = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=50) && '+bTagPass 
         cuts['Top_mm'] = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=50) && '+bTagPass 
-
+        cuts['Top_cr'] = '(' + OC+' && (('+DF+') || ('+SF+'))  && ptmiss>=50  && CleanJet_pt[1]>=30.) && '+bTagPass 
+        cuts['Top_hm'] = '(' + OC+' && (('+DF+') || ('+SF+'))  && MET_significance>12  && CleanJet_pt[1]>=30. && '+dPhijet0ptmiss+'>0.64 && '+dPhijet1ptmiss+'>0.25) && '+bTagPass 
+        
     else: #if 'Backgrounds' in opt.sigset:
         cuts['Top_em'] = '(' + OC+' && '+DF+' && ptmiss>=20)*'+btagWeight1tag
         cuts['Top_ee'] = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=50)*'+btagWeight1tag
         cuts['Top_mm'] = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=50)*'+btagWeight1tag
+        cuts['Top_cr'] = '(' + OC+' && (('+DF+') || ('+SF+'))  && ptmiss>=50  && CleanJet_pt[1]>=30.)*'+btagWeight1tag
+        cuts['Top_hm'] = '(' + OC+' && (('+DF+') || ('+SF+'))  && MET_significance>12  && CleanJet_pt[1]>=30. && '+dPhijet0ptmiss+'>0.64 && '+dPhijet1ptmiss+'>0.25)*'+btagWeight1tag
 
 if 'WWControlRegion' in opt.tag:
 
@@ -98,6 +119,20 @@ if 'HighPtMissControlRegion' in opt.tag:
         cuts['VR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['VR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
 
+if 'LatinoControlRegion' in opt.tag:
+
+    if 'Data' in opt.sigset:
+        cuts['Top_em'] = OC+' && '+DF+' && ptmiss>=20 && mll<76 && '          +pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40 && '+bTagPass
+        cuts['WW_em']  = OC+' && '+DF+' && ptmiss>=20 && mll>76 && '          +pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40 && '+bTagVeto
+        cuts['Top_sf'] = OC+' && '+SF+' && ptmiss>=50 && mll>25 && mll<76 && '+pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40 && '+bTagPass
+        cuts['DY_sf']  = OC+' && '+LL+' && ptmiss>=50 && '+Zcut.replace('ZCUT','15')+'&& '+pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40 && '+bTagVeto
+
+    else:
+        cuts['Top_em'] = '('+OC+' && '+DF+' && ptmiss>=20 && mll<76 && '          +pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40)*'+btagWeight1tag
+        cuts['WW_em']  = '('+OC+' && '+DF+' && ptmiss>=20 && mll>76 && '          +pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40)*'+btagWeight0tag
+        cuts['Top_sf'] = '('+OC+' && '+SF+' && ptmiss>=50 && mll>25 && mll<76 && '+pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40)*'+btagWeight1tag
+        cuts['DY_sf']  = '('+OC+' && '+LL+' && ptmiss>=50 && '+Zcut.replace('ZCUT','15')+'&& '+pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40)*'+btagWeight0tag
+
 if 'HighPtMissOptimisationRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
@@ -112,44 +147,68 @@ if 'HighPtMissOptimisationRegion' in opt.tag:
         cuts['VR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=100)*'+btagWeight1tag
         cuts['VR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=100)*'+btagWeight0tag
 
-if 'TopValidationRegionMore' in opt.tag:
+if 'TopValidationRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
         cuts['VR1_Tag_em']      = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        cuts['VR1_Tag_sf']      = OC+' && '+SF+             ' && ptmiss>=100 && ptmiss<140 && '+bTagPass
         cuts['VR1_Tag_mm']      = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
         cuts['VR1_Tag_ee']      = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
         cuts['VR1_Tag_em_jets'] = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+bTagPass
+        cuts['VR1_Tag_sf_jets'] = OC+' && '+SF+             ' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+bTagPass
         cuts['VR1_Tag_mm_jets'] = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+bTagPass
         cuts['VR1_Tag_ee_jets'] = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+bTagPass
+        if 'More' in opt.tag:
+            cuts['VR1_Tag_em_mt2']  = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && mt2ll>100.          && '+bTagPass
+            cuts['VR1_Tag_mm_mt2']  = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.          && '+bTagPass
+            cuts['VR1_Tag_ee_mt2']  = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.          && '+bTagPass
         cuts['VR1_Tag_jets']    = OC+' && ('+SF+' || '+DF+')  && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30. && '+bTagPass
 
     else:
         cuts['VR1_Tag_em']        = '(' + OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
+        cuts['VR1_Tag_sf']        = '(' + OC+' && '+SF+             ' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['VR1_Tag_mm']        = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['VR1_Tag_ee']        = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['VR1_Tag_em_jets']   = '(' + OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*'+btagWeight1tag
+        cuts['VR1_Tag_sf_jets']   = '(' + OC+' && '+SF+             ' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*'+btagWeight1tag
         cuts['VR1_Tag_mm_jets']   = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*'+btagWeight1tag
         cuts['VR1_Tag_ee_jets']   = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*'+btagWeight1tag
+        if 'More' in opt.tag:
+            cuts['VR1_Tag_em_mt2']    = '(' + OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && mt2ll>100.         )*'+btagWeight1tag
+            cuts['VR1_Tag_mm_mt2']    = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.         )*'+btagWeight1tag
+            cuts['VR1_Tag_ee_mt2']    = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.         )*'+btagWeight1tag
         cuts['VR1_Tag_jets']      = '(' + OC+' && ('+SF+' || '+DF+')  && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)*'+btagWeight1tag
 
-if 'WWValidationRegionMore' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
+if 'WWValidationRegion' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
 
     if 'Data' in opt.sigset:
         cuts['VR1_Veto_em']        = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
+        cuts['VR1_Veto_sf']        = OC+' && '+SF+             ' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
         cuts['VR1_Veto_mm']        = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
         cuts['VR1_Veto_ee']        = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
         cuts['VR1_Veto_em_0jet']   = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
+        cuts['VR1_Veto_sf_0jet']   = OC+' && '+SF+             ' && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
         cuts['VR1_Veto_mm_0jet']   = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
         cuts['VR1_Veto_ee_0jet']   = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
+        if 'More' in opt.tag:
+            cuts['VR1_Veto_em_mt2']    = OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && mt2ll>100.'
+            cuts['VR1_Veto_mm_mt2']    = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.'
+            cuts['VR1_Veto_ee_mt2']    = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.'
         cuts['VR1_Veto_0jet']      = OC+' && ('+SF+' || '+DF+')  && ptmiss>=100 && ptmiss<140 && nCleanJet==0'
 
     else:
         cuts['VR1_Veto_em']        = '(' + OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
+        cuts['VR1_Veto_sf']        = '(' + OC+' && '+SF+             ' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
         cuts['VR1_Veto_mm']        = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
         cuts['VR1_Veto_ee']        = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
         cuts['VR1_Veto_em_0jet']   = '(' + OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
+        cuts['VR1_Veto_sf_0jet']   = '(' + OC+' && '+SF+             ' && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
         cuts['VR1_Veto_mm_0jet']   = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
         cuts['VR1_Veto_ee_0jet']   = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
+        if 'More' in opt.tag:
+            cuts['VR1_Veto_em_mt2']    = '(' + OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && mt2ll>100.)'
+            cuts['VR1_Veto_mm_mt2']    = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.)'
+            cuts['VR1_Veto_ee_mt2']    = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.)'
         cuts['VR1_Veto_0jet']      = '(' + OC+' && ('+SF+' || '+DF+')  && ptmiss>=100 && ptmiss<140 && nCleanJet==0)'
 
 if 'SameSignValidationRegion' in opt.tag:

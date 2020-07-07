@@ -72,6 +72,19 @@ lep2idx = '2'
 nLooseLepton = 'nLepton'
 nTightLepton = 'Sum$((Lepton_isTightElectron_cutBasedMediumPOG+Lepton_isTightMuon_mediumRelIsoTight)==1)'
 
+pxll = '(Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+']))'
+pyll = '(Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+']))'
+pTll = 'sqrt('+pxll+'*'+pxll+'+'+pyll+'*'+pyll+')'
+phill = 'atan('+pyll+'/'+pxll+')'
+dPhill = 'acos(cos(Lepton_phi['+lep1idx+']-Lepton_phi['+lep0idx+']))'
+dEtall = 'Lepton_eta['+lep1idx+']-Lepton_eta['+lep0idx+']'
+dRll = 'sqrt('+dPhill+'*'+dPhill+'+'+dEtall+'*'+dEtall+')'
+mTllptmiss = 'sqrt(2*'+pTll+'*ptmiss*(1.-cos('+phill+'-ptmiss_phi)))'
+dPhillptmiss = 'acos(cos('+phill+'-ptmiss_phi))'
+dPhilep0ptmiss = 'acos(cos(Lepton_phi['+lep0idx+']-ptmiss_phi))'
+dPhilep1ptmiss = 'acos(cos(Lepton_phi['+lep1idx+']-ptmiss_phi))'
+dPhiMinlepptmiss = 'TMath::Min('+dPhilep0ptmiss+','+dPhilep1ptmiss+')'
+
 OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
 SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]>0)'
 SSP = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
@@ -540,6 +553,9 @@ for model in signalMassPoints:
                             XSWeight = '0.00192*genWeight'
                         else:
                             XSWeight = '1000.*Xsec*genWeight/30000.'
+
+                if 'TChipmSlepSnu_mC-1025' in massPoint or 'TChipmSlepSnu_mC-1125' in massPoint or 'TChipmSlepSnu_mC-1225' in massPoint or 'TChipmSlepSnu_mC-1325' in massPoint or 'TChipmSlepSnu_mC-1425' in massPoint:
+                    continue
 
                 samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix),
                                        'weight' : BranchingRatio+'*'+XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut'] ,

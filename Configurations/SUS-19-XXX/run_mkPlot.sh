@@ -15,7 +15,9 @@ elif [ $# == 1 ]; then
     echo ''
     exit
 else
-    if [ $1 == '0' ]; then
+    if [ $1 == '-1' ]; then
+	YEAR='2016-2017-2018'
+    elif [ $1 == '0' ]; then
 	YEAR='2016'
     elif [ $1 == '1' ]; then
 	YEAR='2017'
@@ -42,6 +44,12 @@ else
 fi
 
 mkdir -p ./Plots/$YEAR/$TAG
+
+if [ $YEAR == '2016-2017-2018' ]; then
+    mkdir -p ./Shapes/$YEAR/$TAG
+    hadd -k -f ./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root ./Shapes/2016/$TAG/plots_${TAG}_$FILESET.root ./Shapes/2017/$TAG/plots_${TAG}_$FILESET.root ./Shapes/2018/$TAG/plots_${TAG}_$FILESET.root 
+fi
+
 
 if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
     if [ $# -gt 4 ]; then
