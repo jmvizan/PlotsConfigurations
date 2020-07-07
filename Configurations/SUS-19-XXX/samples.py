@@ -177,9 +177,6 @@ if 'WZ' in opt.tag or 'ZZ' in opt.tag or 'ttZ' in opt.tag :
 
 XSWeight       = 'baseW*genWeight'
 
-if '2018AB' in opt.tag :
-    XSWeight += '*()'
-
 # lepton weights
 
 EleWeight      = ElectronSF+'_IdIsoSF[0]*'+ElectronSF+'_IdIsoSF[1]'
