@@ -290,6 +290,14 @@ elif '2018' in yeartag :
         ['D','Run2018D-Nano25Oct2019_ver2-v1'] ,
     ]
 
+    if '2018AB' in opt.tag :
+        DataRun.remove( ['C','Run2018C-Nano25Oct2019-v1'] )
+        DataRun.remove( ['D','Run2018D-Nano25Oct2019_ver2-v1'] )
+
+    if '2018CD' in opt.tag :
+        DataRun.remove( ['A','Run2018A-Nano25Oct2019-v1'] )
+        DataRun.remove( ['B','Run2018B-Nano25Oct2019-v1'] )
+
     DataSets = ['MuonEG','DoubleMuon','SingleMuon','EGamma']
 
     DataTrig = {
