@@ -41,9 +41,7 @@ exec(open('./signalMassPoints.py').read())
 years = yearset.split('-')
 
 for year in years:
-    
     os.system('mkdir -p ./Datacards/'+year+'/'+tag)
-                    
     for model in signalMassPoints:
         if model in sigset:
             for massPoint in signalMassPoints[model]:

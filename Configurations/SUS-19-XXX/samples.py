@@ -339,6 +339,9 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'TTZToQQ'         +ttZToQQext,False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
+                                'suppressNegative':['all'],
+                                'suppressNegativeNuisances' :['all'],
+                                
                                 }
         
         ttWToLLext = ''

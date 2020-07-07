@@ -72,14 +72,17 @@ if __name__ == '__main__':
     bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY']
     smsend  = bkgsend+ ['Data']
     if 'backgrounds' in split.lower(): allsend = bkgsend
-    elif        'sm' in split.lower(): allsend = smsend
-    elif       'all' in split.lower(): 
+    elif        'SM' in split        : allsend = smsend
+    elif       'all' in split.lower():
         all_sam = True
-        if sigset in bkgs or sigset == 'Data': 
+        #print bool(hadd=='0'), bool(sigset in 
+        if hadd == '1' and "SM-" not in sigset and sigset not in smsend+["SM","Backgrounds"]: sigset="SM-"+sigset
+        if sigset.replace('Backgrounds','') in bkgs or sigset == 'Data': 
             print "please choose a valid signal"
             exit()
-        else:
-            allsend = smsend+[sigset]
+        elif hadd == '0' and sigset in ["SM", "Backgrounds"]:
+            allsend = smsend
+        else: allsend = smsend+[sigset]
     else: 
         allsend   = [sigset]
         keepsplit = True
@@ -94,6 +97,8 @@ if __name__ == '__main__':
         print "REMOVING FILE:\n", shapes_file
     logtitle(shapes_file,tag+" "+sigset+" "+split)
     for samsend in allsend:
+        if hadd =='1' and 'Veto' in samsend: continue
+        #if hadd =='0' and all_sam is True and  : continue
         if keepsplit is False:
             if samsend in smsend and 'Veto' not in samsend:
                 split = 'AsMuchAsPossible'
@@ -102,11 +107,11 @@ if __name__ == '__main__':
         for year in yearset:
             command = "./run_mkShapes.sh "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
             allcomms.append(command)
-    print "Commands to be run:"
+    print "Commands to be ran:"
     for comm in allcomms:
         print comm
         
-    if len(allsend)>1: confirm()
+    if len(allcomms)>1: confirm()
     
     #exit()
     for comm in allcomms:

@@ -5,9 +5,11 @@ import numpy as np
 
 PWD = os.getenv('PWD')+'/'
     
-nMPs        = 3
-flavour="\"workday\""
-
+nMPs    = 3
+server  = os.uname()[1]
+flavour = "\"workday\""
+if 'ifca' in server.lower():
+    flavour = "gridui_sort"
 #write header to logfile
 def logtitle(filename,sigset):
     if(os.path.exists(filename) is False):  print "creating log file"
@@ -78,6 +80,8 @@ else:
     tag = args[2]
  
 sigset    = args[3]
+signm     = sigset.split('_')[0]
+fileset   = sigset
 allMP     = False
 allMPopts = ['doallmp', 'doall','allmp', 'allmasspoints', 'alllims']
 doDCopts  = ["dodatacards","dodc", "mkdc","makedatacards"]
@@ -86,11 +90,41 @@ flavopts  = {"0" : "espresso", "1" : "microcentury", "2" : "longlunch",
              "7" : "nextweek"}
  
 doDC      = ' '
+argfloc   = 0
+print "before the loop"
+for arg in args[4:]:
+    print arg, sigset.split('_')[0]
+    if arg.lower() in doDCopts : doDC    = arg
+    if arg.lower() in allMPopts: allMP   = True
+    if signm       in arg      : fileset = arg
+    if "nmp=" in arg.lower():
+        nMPi= arg.split("=")[1]
+        if nMPi.isdigit():
+            nMPs = nMPi
+            print "JOBS SPLIT EACH "+nMPi+" MASSPOINTS"
+        else:
+            print "MASSPOINT NUMBER NOT VALID"
+            exit()
+    if "fl=" in arg.lower():
+        flvi=arg.split("=")[1]
+        print "FLVI", flvi
+        if   flvi in flavopts:
+            flavour = "\"" + flavopts[flvi] + "\""
+        elif flvi in flavopts.values():
+            flavour = "\"" + flvi           + "\""
+        else:
+            print "flavour not recognised"
+            exit()
+
+
+
+'''
 if(len(args)>4):
     if   args[4].lower() in allMPopts:
         allMP = True
     
     elif args[4].lower()in doDCopts  :
+        print "in here"
         doDC    = args[4]
         fileset = sigset
     else:
@@ -104,6 +138,7 @@ if(len(args)>4):
             if len(args)>6 and args[6].lower() in allMPopts:
                 allMP = True
 else: fileset = sigset
+
 nMPi=None
 if "nmp=" in args[len(args)-1].lower():
     nMPi = args[len(args)-1].split("=")[1]
@@ -125,8 +160,15 @@ if "fl=" in args[flloc]:
         print "flavour not recognised"
         exit()
 
+
 if args[flloc] in flavopts:
     flavour = "\""+args[flloc]+"\""
+'''
+
+
+print flavour, "MP", nMPs
+print year, tag, sigset,"\n MISSING ARGUMENTS:", doDC, fileset, flavour
+#exit()
 
 
 exec(open("signalMassPoints.py").read())
@@ -147,6 +189,7 @@ missDCfolder = []
 mpInSigset   = []
 emptyDC      = []
 missDC       = []
+
             
 for model in signalMassPoints:
     print "Model:", model,"\tSignal set", sigset
