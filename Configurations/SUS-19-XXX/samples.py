@@ -154,6 +154,7 @@ btagWeight0tag = '(1.-'+btagWeight1tag+')'
 ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
+
 ### MET Filters
 
 METFilters_Common = 'Flag_goodVertices*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'
@@ -289,6 +290,14 @@ elif '2018' in yeartag :
         ['C','Run2018C-Nano25Oct2019-v1'] ,
         ['D','Run2018D-Nano25Oct2019_ver2-v1'] ,
     ]
+
+    if '2018AB' in opt.tag :
+        DataRun.remove( ['C','Run2018C-Nano25Oct2019-v1'] )
+        DataRun.remove( ['D','Run2018D-Nano25Oct2019_ver2-v1'] )
+
+    if '2018CD' in opt.tag :
+        DataRun.remove( ['A','Run2018A-Nano25Oct2019-v1'] )
+        DataRun.remove( ['B','Run2018B-Nano25Oct2019-v1'] )
 
     DataSets = ['MuonEG','DoubleMuon','SingleMuon','EGamma']
 
