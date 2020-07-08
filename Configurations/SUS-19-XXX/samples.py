@@ -154,6 +154,7 @@ btagWeight0tag = '(1.-'+btagWeight1tag+')'
 ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
+
 ### MET Filters
 
 METFilters_Common = 'Flag_goodVertices*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'
