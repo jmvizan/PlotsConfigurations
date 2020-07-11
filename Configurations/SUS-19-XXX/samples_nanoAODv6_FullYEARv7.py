@@ -26,12 +26,8 @@ if 'IsoTight' in opt.tag:
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
-    if '2018' in opt.tag:
-        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    else:
-        treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
-    treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/'
+    print 'nAODv6_FullYEARv7 trees not available on lxplus anymore, please use nAODv6 trees or work on gridui'
+    exit()
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'

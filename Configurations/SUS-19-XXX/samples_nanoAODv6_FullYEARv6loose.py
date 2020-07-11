@@ -25,12 +25,9 @@ treePrefix= 'nanoLatino_'
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    if '2016' in yeartag : 
-        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    else : 
-        treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-    treeBaseDirSig  = treeBaseDirMC
+    treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
+    treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
+    treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -112,8 +109,8 @@ SSM = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. 
 
 LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
 DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
-EE = 'channel==0'
-MM = 'channel==2' 
+EE = 'channel==1'
+MM = 'channel==3' 
 
 T0 = '('+ElectronWP+'[0]+'+MuonWP+'[0])'
 T1 = '('+ElectronWP+'[1]+'+MuonWP+'[1])'
@@ -395,7 +392,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                    'FilesPerJob' : 2 ,
                                  }
 
-        DYM10ext = '_ext1' if ('2016' not in yeartag) else ''
+        DYM10ext = '_ext1' if ('2018' in yeartag) else ''
         DYMlow = 'M-5to50' if ('2016' in yeartag) else 'M-4to50' 
         DYMlowHT70ext, DYMlowHT100ext, DYMlowHT200ext, DYMlowHT400ext, DYMlowHT600ext = '', '', '', '', '' 
         if '2016' in yeartag:
@@ -412,24 +409,24 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         DYMhighHT800ext = '_newpmx' if ('2017' in yeartag) else ''
         DYMhighHT1200ext = '' 
         DYMhighHT2500ext = '_newpmx' if ('2017' in yeartag) else ''
-        samples['DY']    = {    'name'   :   getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'+DYM10ext,        False,treePrefix) +
-                                #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100'+DYMlowHT70ext, False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-100to200'+DYMlowHT100ext,False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-200to400'+DYMlowHT200ext,False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-400to600'+DYMlowHT400ext,False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toInf'+DYMlowHT600ext,False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'+DYM50ext,   False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-70to100'+DYMhighHT70ext,    False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-100to200'+DYMhighHT100ext,   False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-200to400'+DYMhighHT200ext,   False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-400to600'+DYMhighHT400ext,   False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-600to800'+DYMhighHT600ext,   False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-800to1200'+DYMhighHT800ext,  False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500'+DYMhighHT1200ext, False,treePrefix) +
-                                getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toInf'+DYMhighHT2500ext,  False,treePrefix) ,
-                                'weight' : XSWeight+'*'+SFweight ,
-                                'FilesPerJob' : 40 ,
-                                } 
+        samples['DY'] = { 'name' : getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'+DYM10ext,        False,treePrefix) +
+                                   #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100'+DYMlowHT70ext, False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-100to200'+DYMlowHT100ext,False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-200to400'+DYMlowHT200ext,False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-400to600'+DYMlowHT400ext,False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toInf'+DYMlowHT600ext,False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'+DYM50ext,   False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-70to100'+DYMhighHT70ext,    False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-100to200'+DYMhighHT100ext,   False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-200to400'+DYMhighHT200ext,   False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-400to600'+DYMhighHT400ext,   False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-600to800'+DYMhighHT600ext,   False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-800to1200'+DYMhighHT800ext,  False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500'+DYMhighHT1200ext, False,treePrefix) +
+                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toInf'+DYMhighHT2500ext,  False,treePrefix) ,
+                          'weight' : XSWeight+'*'+SFweight ,
+                          'FilesPerJob' : 40 ,
+                        } 
         if '2016' in yeartag : 
             samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100',False,treePrefix)
             addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO'+DYM10ext,  'LHE_HT<70.0')
@@ -479,12 +476,14 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        getSampleFiles(directoryBkg,'ggZZ4t',              False,treePrefix) +
                                        getSampleFiles(directoryBkg,'ggZZ2e2m',            False,treePrefix) +
                                        getSampleFiles(directoryBkg,'ggZZ2e2t',            False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ2m2t',            False,treePrefix) +
+                                       #getSampleFiles(directoryBkg,'ggZZ2m2t',            False,treePrefix) +
                                        getSampleFiles(directoryBkg,'VBFHToZZTo4L_M125',   False,treePrefix) +
                                        getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,treePrefix),
                                        'weight' : XSWeight+'*'+SFweight ,
                                        'FilesPerJob' : 2 ,
                                    }
+	    if '2016' not in yeartag :
+                samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'ggZZ2m2t',False,treePrefix)
 
         if 'SameSignValidationRegion' in opt.tag:
     

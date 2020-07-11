@@ -61,7 +61,7 @@ else
 	if [ $# -lt 5 ]; then
 	    SPLIT='Samples'
 	else
-	    if [ $5 == 'tomorrow' ] || [ $5 == 'workday' ] ; then
+	    if [ $5 == 'tomorrow' ] || [ $5 == 'workday' ] || [ $5 == 'gridui_medium' ] ; then
 		QUEUE=$5
 		if [ $# -lt 6 ]; then
 		    SPLIT='Samples'
