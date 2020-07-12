@@ -334,8 +334,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         ttWToLLext = ''
         if ('2016' in yeartag): ttWToLLext = '_ext2'
         if ('2017' in yeartag): ttWToLLext = '_newpmx'
-        samples['ttW']   = {    'name'   :   getSampleFiles(directoryBkg,'TTWJetsToLNu'+ttWToLLext,False,treePrefix) +
-                                getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix), 
+        samples['ttW']   = {    'name'   :   getSampleFiles(directoryBkg,'TTWJetsToLNu'+ttWToLLext,False,treePrefix), #+
+                                #getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix), 
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 'suppressNegative':['all'],
