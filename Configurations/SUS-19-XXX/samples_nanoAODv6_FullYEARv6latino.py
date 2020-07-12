@@ -41,7 +41,7 @@ elif '2017' in yeartag :
 elif '2018' in yeartag :
     ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6/MCl1loose2018v6__MCCorr2018v6__l2loose'
     ProductionSig  = '' 
-    ProductionData = 'Run2018_102X_nAODv6_Full2018v6loose/DATAl1loose2018v6__l2loose'
+    ProductionData = 'Run2018_102X_nAODv6_Full2018v6/DATAl1loose2018v6__l2loose'
 
 regionName = '__susyMT2'
 
@@ -322,8 +322,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
         ttZToLLext = '_ext3' if ('2016' in yeartag) else ''
         ttZToQQext = '_ext1' if ('2017' in yeartag) else ''
-        samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZToLLext,False,treePrefix) + 
-                                             getSampleFiles(directoryBkg,'TTZToQQ'         +ttZToQQext,False,treePrefix),
+        samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZToLLext,False,treePrefix) #+ 
+                                             #getSampleFiles(directoryBkg,'TTZToQQ'         +ttZToQQext,False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
                                 'suppressNegative':['all'],
