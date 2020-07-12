@@ -39,7 +39,7 @@ elif '2017' in yeartag :
     print 'nAODv6_FullYEARv6latino trees not available for 2017'
     exit()
 elif '2018' in yeartag :
-    ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6/MCl1loose2018v6__MCCorr2018v6__l2loose/'
+    ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6/MCl1loose2018v6__MCCorr2018v6__l2loose'
     ProductionSig  = '' 
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6loose/DATAl1loose2018v6__l2loose'
 
