@@ -322,7 +322,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
         ttZToLLext = '_ext3' if ('2016' in yeartag) else ''
         ttZToQQext = '_ext1' if ('2017' in yeartag) else ''
-        samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZToLLext,False,treePrefix) #+ 
+        samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZToLLext,False,treePrefix), #+ 
                                              #getSampleFiles(directoryBkg,'TTZToQQ'         +ttZToQQext,False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 'FilesPerJob' : 2 ,
