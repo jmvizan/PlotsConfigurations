@@ -63,16 +63,16 @@ if 'Preselection' in opt.tag:
 
 if 'DYchecks' in opt.tag:
     print "Doing DY Checks"
-    cuts['lowMll_sf']  = OC + ' && ' + SF + ' && nCleanJet>1 && '+ bTagPass
-    cuts['lowMll_ee']  = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 && '+ bTagPass
-    cuts['lowMll_mm']  = OC + ' && ' + MM + ' && nCleanJet>1 && PuppiMET_pt> 50 &&  '+ bTagPass
-    cuts['highMll_sf'] = OC + ' && ' + SF + ' && nCleanJet>1 && mll>=76 && mll<106 && ' + bTagPass
-    cuts['highMll_ee'] = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 &&  mll>=76 && mll<106 && ' + bTagPass
-    cuts['highMll_mm'] = OC + ' && ' + MM + ' && nCleanJet>1 &&  PuppiMET_pt> 50 && mll>=76 && mll<106 && ' + bTagPass
-    cuts['lowMll_ee_noMETcut']  = OC + ' && ' + EE + ' && nCleanJet>1 && '+ bTagPass
-    cuts['lowMll_mm_noMETcut']  = OC + ' && ' + MM + ' && nCleanJet>1 &&  '+ bTagPass
-    cuts['highMll_ee_noMETcut'] = OC + ' && ' + EE + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + bTagPass
-    cuts['highMll_mm_noMETcut'] = OC + ' && ' + MM + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + bTagPass
+    cuts['lowMll_sf']  = OC + ' && ' + LL + ' && nCleanJet>1 && '+ btagWeight1tag
+    cuts['lowMll_ee']  = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 && '+ btagWeight1tag
+    cuts['lowMll_mm']  = OC + ' && ' + MM + ' && nCleanJet>1 && PuppiMET_pt> 50 &&  '+ btagWeight1tag
+    cuts['highMll_sf'] = OC + ' && ' + LL + ' && nCleanJet>1 && mll>=76 && mll<106 && ' + btagWeight1tag
+    cuts['highMll_ee'] = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 &&  mll>=76 && mll<106 && ' + btagWeight1tag
+    cuts['highMll_mm'] = OC + ' && ' + MM + ' && nCleanJet>1 &&  PuppiMET_pt> 50 && mll>=76 && mll<106 && ' + btagWeight1tag
+    cuts['lowMll_ee_noMETcut']  = OC + ' && ' + EE + ' && nCleanJet>1 && '+ btagWeight1tag
+    cuts['lowMll_mm_noMETcut']  = OC + ' && ' + MM + ' && nCleanJet>1 &&  '+ btagWeight1tag
+    cuts['highMll_ee_noMETcut'] = OC + ' && ' + EE + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + btagWeight1tag
+    cuts['highMll_mm_noMETcut'] = OC + ' && ' + MM + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + btagWeight1tag
 
 if 'TopControlRegion' in opt.tag:
 
