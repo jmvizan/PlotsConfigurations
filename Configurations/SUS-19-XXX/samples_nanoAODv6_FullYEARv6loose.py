@@ -69,11 +69,7 @@ directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 # Complex cut variables
 
 ElectronWP = 'Lepton_isTightElectron_cutBasedMediumPOG'
-if 'IP' in opt.tag:
-    ElectronWP += 'IP'
-elif 'EleMiniIso' in opt.tag:
-    ElectronWP = 'Lepton_isTightElectron_cutBasedMediumMiniIso'
-elif 'EleTightPOG' in opt.tag:
+if 'EleTightPOG' in opt.tag:
     ElectronWP = 'Lepton_isTightElectron_cutBasedTightPOG'
 MuonWP     = 'Lepton_isTightMuon_mediumRelIsoTight'
 
@@ -109,8 +105,8 @@ SSM = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. 
 
 LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
 DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
-EE = 'channel==1'
-MM = 'channel==3' 
+EE = 'fabs(channel)==1'
+MM = 'fabs(channel)==3' 
 
 T0 = '('+ElectronWP+'[0]+'+MuonWP+'[0])'
 T1 = '('+ElectronWP+'[1]+'+MuonWP+'[1])'
@@ -273,11 +269,11 @@ if '2016' in yeartag or '2017' in yeartag :
     DataSets = ['MuonEG','DoubleMuon','SingleMuon','DoubleEG','SingleElectron']
 
     DataTrig = {
-        'MuonEG'         : 'Trigger_ElMu' ,
-        'DoubleMuon'     : '!Trigger_ElMu && Trigger_dblMu' ,
-        'SingleMuon'     : '!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu' ,
-        'DoubleEG'       : '!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && Trigger_dblEl' ,
-        'SingleElectron' : '!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl' ,
+        'MuonEG'         : '(Trigger_ElMu)' ,
+        'DoubleMuon'     : '(!Trigger_ElMu && Trigger_dblMu)' ,
+        'SingleMuon'     : '(!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu)' ,
+        'DoubleEG'       : '(!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && Trigger_dblEl)' ,
+        'SingleElectron' : '(!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && !Trigger_dblEl && Trigger_sngEl)' ,
     }
 
 elif '2018' in yeartag :
@@ -300,10 +296,10 @@ elif '2018' in yeartag :
     DataSets = ['MuonEG','DoubleMuon','SingleMuon','EGamma']
 
     DataTrig = {
-        'MuonEG'         : 'Trigger_ElMu' ,
-        'DoubleMuon'     : '!Trigger_ElMu && Trigger_dblMu' ,
-        'SingleMuon'     : '!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu' ,
-        'EGamma'         : '!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl)' ,
+        'MuonEG'         : '(Trigger_ElMu)' ,
+        'DoubleMuon'     : '(!Trigger_ElMu && Trigger_dblMu)' ,
+        'SingleMuon'     : '(!Trigger_ElMu && !Trigger_dblMu && Trigger_sngMu)' ,
+        'EGamma'         : '(!Trigger_ElMu && !Trigger_dblMu && !Trigger_sngMu && (Trigger_sngEl || Trigger_dblEl))' ,
     }
 
 ### Backgrounds
@@ -517,7 +513,7 @@ for sample in samples:
 if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
     samples['DATA']  = {   'name': [ ] ,    
-                           'weight' : '1.', 
+                           'weight' : METFilters_Data, 
                            'weights' : [ ],
                            'isData': ['all'],
                            'FilesPerJob' : 100 ,
@@ -531,7 +527,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
             FileTarget = getSampleFiles(directoryData,DataSet+'_'+Run[1],True,treePrefix)
             for iFile in FileTarget:
                 samples['DATA']['name'].append(iFile)
-                samples['DATA']['weights'].append(DataTrig[DataSet]+'*'+METFilters_Data)
+                samples['DATA']['weights'].append(DataTrig[DataSet])
 
 ### Files per job
 

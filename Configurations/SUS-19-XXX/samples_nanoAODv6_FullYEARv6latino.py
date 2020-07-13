@@ -100,8 +100,8 @@ SSM = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. 
 
 LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
 DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
-EE = 'channel==1'
-MM = 'channel==3' 
+EE = 'fabs(channel)==1'
+MM = 'fabs(channel)==3' 
 
 T0 = '('+ElectronWP+'[0]+'+MuonWP+'[0])'
 T1 = '('+ElectronWP+'[1]+'+MuonWP+'[1])'
