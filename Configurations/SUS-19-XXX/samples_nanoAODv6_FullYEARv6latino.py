@@ -146,7 +146,7 @@ ISRCutMC   = '&& '+ISRCut
 ### MET Filters
 
 METFilters_MC     = 'METFilter_MC' 
-METFilters_Data   = 'METFilters_DATA'
+METFilters_Data   = 'METFilter_DATA'
 METFilters_FS     = METFilters_MC
 
 ### Trigger Efficiencies
