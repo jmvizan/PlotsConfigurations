@@ -134,10 +134,10 @@ btagWP += bTagWP
 bTagPass = '((Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+'))>0)' 
 bTagVeto = '!'+bTagPass
 
-btagWeight1tag = 'btagWeight_DeepCSVB'
+btagWeight1tag = bTagPass+'*btagWeight_DeepCSVB'
 if 'pt25' in opt.tag: btagWeight1tag += '_Pt25'
 if 'pt30' in opt.tag: btagWeight1tag += '_Pt30'
-btagWeight0tag = '(1.-'+btagWeight1tag+')'
+btagWeight0tag = bTagVeto+'*btagWeight_DeepCSVB'
 
 ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '

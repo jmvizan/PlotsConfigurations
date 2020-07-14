@@ -66,6 +66,10 @@ directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/'
 directoryData = treeBaseDirData + ProductionData + regionName + '/'
 directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 
+if 'Puppi' in opt.tag :
+    directoryBkg  = directoryBkg.replace('__susyMT2', '__susyMT2puppi')
+    directoryData = directoryData.replace('__susyMT2', '__susyMT2puppi')
+
 # Complex cut variables
 
 ElectronWP = 'Lepton_isTightElectron_cutBasedMediumPOG'
