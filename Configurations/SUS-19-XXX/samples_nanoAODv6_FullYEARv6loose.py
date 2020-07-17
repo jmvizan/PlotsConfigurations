@@ -35,15 +35,15 @@ elif 'ifca' in SITE or 'cloud' in SITE:
 
 if '2016' in yeartag :
     ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6loose/MCSusy2016v6__MCCorr2016Susyv6'
-    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__MCSusy2016FSv6__susyW__MCCorr2016SusyFSv6'
+    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__MCSusy2016FSv6__MCCorr2016SusyFSv6'
     ProductionData = 'Run2016_102X_nAODv6_Full2016v6loose/DATASusy2016v6__hadd'
 elif '2017' in yeartag :
     ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6loose/MCSusy2017v6__MCCorr2017Susyv6'
-    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6loose/hadd__susyGen__MCSusy2017FSv6__susyW__MCCorr2017SusyFSv6'
+    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6loose/hadd__susyGen__susyW__MCSusy2017FSv6__MCCorr2017SusyFSv6'
     ProductionData = 'Run2017_102X_nAODv6_Full2017v6loose/DATASusy2017v6__hadd'
 elif '2018' in yeartag :
     ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6loose/MCSusy2018v6__MCCorr2018Susyv6'
-    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6loose/hadd__susyGen__MCSusy2018FSv6__susyW__MCCorr2018SusyFSv6'
+    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6loose/hadd__susyGen__susyW__MCSusy2018FSv6__MCCorr2018SusyFSv6'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6loose/DATASusy2018v6__hadd'
 
 regionName = '__susyMT2'
@@ -66,9 +66,9 @@ directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/'
 directoryData = treeBaseDirData + ProductionData + regionName + '/'
 directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 
-if 'Puppi' in opt.tag :
-    directoryBkg  = directoryBkg.replace('__susyMT2', '__susyMT2puppi')
-    directoryData = directoryData.replace('__susyMT2', '__susyMT2puppi')
+#if 'Puppi' in opt.tag :
+#    directoryBkg  = directoryBkg.replace('__susyMT2', '__susyMT2puppi')
+#    directoryData = directoryData.replace('__susyMT2', '__susyMT2puppi')
 
 # Complex cut variables
 
@@ -233,6 +233,15 @@ if '2018' in yeartag and 'HEM' in opt.tag:
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
 
+if 'pu1sigma' in opt.tag: 
+    SFweight = SFweight.replace('puWeight', 'puWeightUp')
+elif 'pu2sigma' in opt.tag:
+    SFweight = SFweight.replace('puWeight', '(2.*(puWeightUp-puWeight)+puWeight)')	
+
+if 'PVw' in opt.tag:
+    if '2018' in yeartag: 
+        SFweight += '*((1./0.95395364)*((9.48824e-01)+(-3.22506e-02)*PV_npvs+(3.42005e-03)*PV_npvs*PV_npvs+(-1.42342e-04)*PV_npvs*PV_npvs*PV_npvs+(2.03952e-06)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
+    
 ### Special weights
 
 # background cross section uncertainties and normalization scale factors
