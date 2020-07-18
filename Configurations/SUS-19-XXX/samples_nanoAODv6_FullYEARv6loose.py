@@ -28,6 +28,8 @@ if  'cern' in SITE :
     treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
     treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
     treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
+    if '2017' in yeartag or '2018' in yeartag:
+        treeBaseDirSig = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -43,7 +45,7 @@ elif '2017' in yeartag :
     ProductionData = 'Run2017_102X_nAODv6_Full2017v6loose/DATASusy2017v6__hadd'
 elif '2018' in yeartag :
     ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6loose/MCSusy2018v6__MCCorr2018Susyv6'
-    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6loose/hadd__susyGen__susyW__MCSusy2018FSv6__MCCorr2018SusyFSv6'
+    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/hadd__susyGen__MCSusy2018FSv6__susyW__MCCorr2018SusyFSv6'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6loose/DATASusy2018v6__hadd'
 
 regionName = '__susyMT2'
@@ -239,7 +241,9 @@ elif 'pu2sigma' in opt.tag:
     SFweight = SFweight.replace('puWeight', '(2.*(puWeightUp-puWeight)+puWeight)')	
 
 if 'PVw' in opt.tag:
-    if '2018' in yeartag: 
+    if '2017' in yeartag: 
+        SFweight += '*((1./1.0028780)*((8.05485e-01)+(-2.30668e-02)*PV_npvs+(2.62330e-03)*PV_npvs*PV_npvs+(-7.65300e-05)*PV_npvs*PV_npvs*PV_npvs+(7.54356e-07)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
+    elif '2018' in yeartag: 
         SFweight += '*((1./0.95395364)*((9.48824e-01)+(-3.22506e-02)*PV_npvs+(3.42005e-03)*PV_npvs*PV_npvs+(-1.42342e-04)*PV_npvs*PV_npvs*PV_npvs+(2.03952e-06)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
     
 ### Special weights

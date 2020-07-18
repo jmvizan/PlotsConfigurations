@@ -226,7 +226,9 @@ elif 'pu2sigma' in opt.tag:
     SFweight = SFweight.replace('puWeight', '(2.*(puWeightUp-puWeight)+puWeight)')	
 
 if 'PVw' in opt.tag:
-    if '2018' in yeartag: 
+    if '2017' in yeartag: 
+        SFweight += '*((1./1.0028780)*((8.05485e-01)+(-2.30668e-02)*PV_npvs+(2.62330e-03)*PV_npvs*PV_npvs+(-7.65300e-05)*PV_npvs*PV_npvs*PV_npvs+(7.54356e-07)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
+    elif '2018' in yeartag: 
         SFweight += '*((1./0.95395364)*((9.48824e-01)+(-3.22506e-02)*PV_npvs+(3.42005e-03)*PV_npvs*PV_npvs+(-1.42342e-04)*PV_npvs*PV_npvs*PV_npvs+(2.03952e-06)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
 
 ### Special weights
