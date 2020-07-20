@@ -154,13 +154,17 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                      'fold'  : 1                             #   fold overflow
                                  }
 
-    if 'TwoLeptons' in opt.tag or 'DY' in opt.tag:
+    variables['nPV']           = {   'name'  : 'PV_npvs',                    #   variable name    
+                                     'range' : (  80,    0.,  80.),          #   variable range
+                                     'xaxis' : 'Number of PVs',              #   x axis name
+                                     'fold'  : 1                             #   fold overflow
+                                 }
     
-        variables['mll']         = {   'name'  : 'mll',                #   variable name    
-                                       'range' : ( 100,    0.,  200.), #   variable range
-                                       'xaxis' : 'm' + pll + gv,       #   x axis name
-                                       'fold'  : 1                     #   fold overflow
-                                   }
+    variables['mll']           = {   'name'  : 'mll',                #   variable name    
+                                     'range' : ( 100,    0.,  200.), #   variable range
+                                     'xaxis' : 'm' + pll + gv,       #   x axis name
+                                     'fold'  : 1                     #   fold overflow
+                                 }
 
     variables['dPhijet0ptmiss']   = {  'name'  : dPhijet0ptmiss,      #   variable name    
                                        'range' : (  10,    0.,  3.2), #   variable range

@@ -26,7 +26,10 @@ SITE=os.uname()[1]
 
 if  'cern' in SITE :
     print 'nAODv6_FullYEARv6latino trees not available on lxplus anymore, please use nAODv6 trees or work on gridui'
-    exit()
+    #exit()
+    treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
+    treeBaseDirData = ''
+    treeBaseDirSig  = ''
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'

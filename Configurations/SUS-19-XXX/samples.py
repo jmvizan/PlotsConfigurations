@@ -164,6 +164,18 @@ METFilters_MC     = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter'
 METFilters_Data   = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter*Flag_eeBadScFilter'
 METFilters_FS     = METFilters_Common
 
+### HEM Issue in 2018
+
+VetoEENoise, VetoHEMdata, VetoHEMmc  = '1.', '1.', '1.'
+if '2017' in yeartag and 'EENoise' in opt.tag:
+    VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
+elif '2018' in yeartag and 'HEM' in opt.tag:
+    VetoHEMele  = '(Sum$(Electron_pt>30. && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)==0)'
+    VetoHEMjet  = '(Sum$(Jet_pt>30. && Jet_eta>-3.2 && Jet_eta<-1.2 && Jet_phi>-1.77 && Jet_phi<-0.67)==0)'
+    VetoHEM     = '('+VetoHEMele+' && '+VetoHEMjet+')'
+    VetoHEMdata = '(run<319077 || '+VetoHEM+')'
+    VetoHEMmc   = '('+VetoHEM+' + (1.-'+VetoHEM+')*0.35225285)'
+
 ### Trigger Efficiencies
 
 TriggerEff = 'TriggerEffWeight_2l'
@@ -217,8 +229,23 @@ nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' 
 SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight + '*' + nonpromptLepSF
 if '2016' in yeartag or '2017' in yeartag: 
     SFweightCommon += '*PrefireWeight'
+if '2017' in yeartag and 'EENoise' in opt.tag:
+    SFweightCommon += '*' + VetoEENoise
+if '2018' in yeartag and 'HEM' in opt.tag:
+    SFweightCommon += '*' + VetoHEMmc
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
+
+if 'pu1sigma' in opt.tag: 
+    SFweight = SFweight.replace('puWeight', 'puWeightUp')
+elif 'pu2sigma' in opt.tag:
+    SFweight = SFweight.replace('puWeight', '(2.*(puWeightUp-puWeight)+puWeight)')	
+
+if 'PVw' in opt.tag:
+    if '2017' in yeartag: 
+        SFweight += '*((1./1.0028780)*((8.05485e-01)+(-2.30668e-02)*PV_npvs+(2.62330e-03)*PV_npvs*PV_npvs+(-7.65300e-05)*PV_npvs*PV_npvs*PV_npvs+(7.54356e-07)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
+    elif '2018' in yeartag: 
+        SFweight += '*((1./0.95395364)*((9.48824e-01)+(-3.22506e-02)*PV_npvs+(3.42005e-03)*PV_npvs*PV_npvs+(-1.42342e-04)*PV_npvs*PV_npvs*PV_npvs+(2.03952e-06)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
 
 ### Special weights
 
@@ -517,7 +544,7 @@ for sample in samples:
 if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
     samples['DATA']  = {   'name': [ ] ,    
-                           'weight' : '1.', 
+                           'weight' : METFilters_Data+'*'+VetoHEMdata+'*'+VetoEENoise, 
                            'weights' : [ ],
                            'isData': ['all'],
                            'FilesPerJob' : 100 ,
@@ -531,7 +558,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
             FileTarget = getSampleFiles(directoryData,DataSet+'_'+Run[1],True,treePrefix)
             for iFile in FileTarget:
                 samples['DATA']['name'].append(iFile)
-                samples['DATA']['weights'].append(DataTrig[DataSet]+'*'+METFilters_Data)
+                samples['DATA']['weights'].append(DataTrig[DataSet])
 
 ### Files per job
 

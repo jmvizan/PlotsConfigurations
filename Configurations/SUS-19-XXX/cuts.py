@@ -31,6 +31,13 @@ if 'TwoLeptons' in opt.tag:
     cuts['TwoLep_em'] = OC+' && '+DF
     cuts['TwoLep_ee'] = OC+' && '+EE 
     cuts['TwoLep_mm'] = OC+' && '+MM
+    
+if 'PV35' in opt.tag:
+
+    cuts['TwoLep_em_PVm35'] = OC+' && '+DF+' && PV_npvs<35'
+    cuts['TwoLep_em_PVp35'] = OC+' && '+DF+' && PV_npvs>=35'
+    cuts['TwoLep_sf_PVm35'] = OC+' && '+SF+' && PV_npvs<35'
+    cuts['TwoLep_sf_PVp35'] = OC+' && '+SF+' && PV_npvs>=35'
 
 if 'Preselection' in opt.tag:
 
@@ -41,6 +48,7 @@ if 'Preselection' in opt.tag:
     cuts['TwoLep_em'] = OC+' && '+DF+' && ptmiss>=80'
     cuts['TwoLep_ee'] = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=80'
     cuts['TwoLep_mm'] = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=80'
+
     if 'Data' in opt.sigset:
         cuts['TwoLep_em_Veto'] = OC+' && '+DF             +' && '+bTagVeto
         cuts['TwoLep_ee_Veto'] = OC+' && '+EE+' && '+vetoZ+' && '+bTagVeto
