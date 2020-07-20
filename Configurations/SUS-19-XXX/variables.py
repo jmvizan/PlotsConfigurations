@@ -216,6 +216,15 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                     'fold'  : 1                        #   fold overflow
                                  }
         
+    if 'extrabin' in opt.tag:
+        mt2ll = 'mt2ll'
+        print "extrabin in"
+        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                         'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
+                                         'xaxis' : mt2 + pll + gv,         #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+                                     }
+
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     mt2ll = 'mt2ll'
@@ -293,6 +302,13 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                     }
 
     if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
+        if 'extrabin' in opt.tag:
+            variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
+                                             'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
+                                             'xaxis' : mt2 + pll + gv,         #   x axis name
+                                             'fold'  : 1                       #   fold overflow
+            }
+
 
         variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
                                         'range' : (  20,    0.,  400.),    #   variable range                             
