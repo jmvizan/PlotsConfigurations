@@ -135,6 +135,14 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                      'xaxis' : mt2 + pll + gv,         #   x axis name
                                      'fold'  : 1                       #   fold overflow
                                  }
+
+    if 'Latino' in opt.tag:
+    
+        variables['mT2']         = {   'name'  : 'mT2',                 #   variable name    
+                                       'range' : (  20,    0.,  200.),  #   variable range
+                                       'xaxis' : mt2 + pll + gv,        #   x axis name
+                                       'fold'  : 1                      #   fold overflow
+                                   }
     
     variables['jetpt']         = {   'name'  : 'CleanJet_pt',          #   variable name    
                                      'range' : (  40,    0.,  200.),   #   variable range
@@ -219,7 +227,16 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                     'xaxis' : mtllptmiss + gv,         #   x axis name
                                     'fold'  : 1                        #   fold overflow
                                  }
+
+    if 'TopControlRegion' in opt.tag:
         
+        variables['mt2cr']         = {   'name'  : 'mt2ll',                #   variable name    
+                                         'range' : ([0, 20, 40, 60, 80, 100, 140, 240, 340],[1]), # variable range
+                                         'xaxis' : mt2 + pll + gv,         #   x axis name
+                                         'fold'  : 1                       #   fold overflow
+                                     }
+
+   
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     mt2ll = 'mt2ll'
