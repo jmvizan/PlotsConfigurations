@@ -17,7 +17,6 @@ drll = '#Delta R(lep1,lep2)'
 mtllptmiss = '#font[50]{m}_{T}('+sll+','+met+')'
 
 # Complex variables
-
 sumLeptonPt = 'Lepton_pt['+lep0idx+']+Lepton_pt['+lep1idx+']'
 
 nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+')'

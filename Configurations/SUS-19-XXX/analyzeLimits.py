@@ -861,7 +861,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
             tagObj[0].SetMaximum(1.5)
             
         else:
-            legend.AddEntry(tagObj[1],tags[0], '')
+            legend.AddEntry(tagObj[0],tags[0], '')
             tagObj[0].SetMinimum(0)
             tagObj[0].SetMaximum(3)
 
