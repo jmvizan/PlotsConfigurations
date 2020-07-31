@@ -69,6 +69,9 @@ directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/'
 directoryData = treeBaseDirData + ProductionData + regionName + '/'
 directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 
+treeNuisances = { } 
+treeNuisanceDirs = { }
+
 # Complex cut variables
 
 ElectronWP = 'Lepton_isTightElectron_cutBasedMediumPOG'
@@ -125,6 +128,8 @@ C2 = '(Lepton_pdgId[0]*Lepton_pdgId[1])'
 C1 = '(Lepton_pdgId[0]*Lepton_pdgId[2])'
 C0 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
 OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
+
+MET_significance = 'METFixEE2017_significance' if '2017' in yeartag else 'MET_significance'
 
 btagAlgo = 'btagDeepB'
 bTagWP = 'M'

@@ -66,6 +66,9 @@ directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/'
 directoryData = treeBaseDirData + ProductionData + regionName + '/'
 directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
 
+treeNuisances = { }
+treeNuisanceDirs = { }
+
 # Complex cut variables
 
 ElectronWP = 'Lepton_isTightElectron_cutFall17V2Iso_Tight'
