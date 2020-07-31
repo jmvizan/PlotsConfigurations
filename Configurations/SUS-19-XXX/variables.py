@@ -245,7 +245,7 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
    
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
-    mt2ll = 'mt2ll'
+    mt2ll = 'mt2ll' + ctrltag
 
     if 'FakeValidationRegion' in opt.tag:
         mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'
@@ -321,7 +321,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
 
-        variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
+        variables['ptmiss']        = {  'name'  : 'ptmiss'+ctrltag,        #   variable name    
                                         'range' : (  20,    0.,  400.),    #   variable range                             
                                         'xaxis' : met + gv,                #   x axis name
                                         'fold'  : 1                        #   fold overflow

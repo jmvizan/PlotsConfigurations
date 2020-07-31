@@ -48,6 +48,8 @@ elif '2018' in opt.tag :
 
 regionName = '__susyMT2'
 
+ctrltag = ''
+
 if 'SameSign' in opt.tag :
     regionName += 'SameSign'
 elif 'Fake' in opt.tag :
