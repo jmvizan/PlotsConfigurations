@@ -25,11 +25,18 @@ treePrefix= 'nanoLatino_'
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
-    treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
-    treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
-    if '2017' in yeartag or '2018' in yeartag:
-        treeBaseDirSig = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+    if '2016' in yeartag:
+        treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
+        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
+        treeBaseDirSig  = '/eos/cms/store/user/scodella/SUSY/Nano/'
+    elif '2017' in yeartag:
+        treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+        treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+        treeBaseDirSig  = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+    elif '2018' in yeartag:
+        treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
+        treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
+        treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -37,11 +44,11 @@ elif 'ifca' in SITE or 'cloud' in SITE:
 
 if '2016' in yeartag :
     ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6loose/MCSusy2016v6__MCCorr2016Susyv6'
-    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__MCSusy2016FSv6__MCCorr2016SusyFSv6'
+    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6/hadd__susyGen__MCSusy2016FSv6__susyW__MCCorr2016SusyFSv6'
     ProductionData = 'Run2016_102X_nAODv6_Full2016v6loose/DATASusy2016v6__hadd'
 elif '2017' in yeartag :
     ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6loose/MCSusy2017v6__MCCorr2017Susyv6'
-    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6loose/hadd__susyGen__susyW__MCSusy2017FSv6__MCCorr2017SusyFSv6'
+    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6/hadd__susyGen__MCSusy2017FSv6__susyW__MCCorr2017SusyFSv6'
     ProductionData = 'Run2017_102X_nAODv6_Full2017v6loose/DATASusy2017v6__hadd'
 elif '2018' in yeartag :
     ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6loose/MCSusy2018v6__MCCorr2018Susyv6'
@@ -120,15 +127,15 @@ dPhiMinlepptmiss = 'TMath::Min('+dPhilep0ptmiss+','+dPhilep1ptmiss+')'
 dPhijet0ptmiss = 'acos(cos(CleanJet_phi[0]-ptmiss_phi))'
 dPhijet1ptmiss = 'acos(cos(CleanJet_phi[1]-ptmiss_phi))'
 
-OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
-SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]>0)'
+OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])<0'
+SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])>0'
 SSP = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
 SSM = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]>0 && Lepton_pdgId[1]>0'
 
 LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
 DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
-EE = 'fabs(channel)==1'
-MM = 'fabs(channel)==3' 
+EE = 'fabs(Lepton_pdgId[0])==11 && fabs(Lepton_pdgId[1])==11'
+MM = 'fabs(Lepton_pdgId[0])==13 && fabs(Lepton_pdgId[1])==13'
 
 T0 = '('+ElectronWP+'[0]+'+MuonWP+'[0])'
 T1 = '('+ElectronWP+'[1]+'+MuonWP+'[1])'

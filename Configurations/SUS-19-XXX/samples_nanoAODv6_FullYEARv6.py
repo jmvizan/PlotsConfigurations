@@ -25,12 +25,8 @@ treePrefix= 'nanoLatino_'
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    if '2016' in yeartag : 
-        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    else : 
-        treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-    treeBaseDirSig  = treeBaseDirMC
+    print 'Trees only available on gridui, please move to FullYEARv6loose'
+    exit()
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
