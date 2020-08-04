@@ -319,7 +319,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                         'fold'  : 1                        #   fold overflow
                                     }
 
-    if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
+    if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
 
         variables['ptmiss']        = {  'name'  : 'ptmiss'+ctrltag,        #   variable name    
                                         'range' : (  20,    0.,  400.),    #   variable range                             
