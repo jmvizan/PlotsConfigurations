@@ -43,39 +43,34 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6loose/MCSusy2016v6__MCCorr2016Susyv6'
+    ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6loose/MCSusy2016v6loose__MCSusyCorr2016v6loose__MCSusyNomin2016v6loose'
     ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6/hadd__susyGen__MCSusy2016FSv6__susyW__MCCorr2016SusyFSv6'
     ProductionData = 'Run2016_102X_nAODv6_Full2016v6loose/DATASusy2016v6__hadd'
 elif '2017' in yeartag :
-    ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6loose/MCSusy2017v6__MCCorr2017Susyv6'
+    ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6loose/MCSusy2017v6loose__MCSusyCorr2017v6loose__MCSusyNomin2017v6loose'
     ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6/hadd__susyGen__MCSusy2017FSv6__susyW__MCCorr2017SusyFSv6'
     ProductionData = 'Run2017_102X_nAODv6_Full2017v6loose/DATASusy2017v6__hadd'
 elif '2018' in yeartag :
-    ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6loose/MCSusy2018v6__MCCorr2018Susyv6'
+    ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6loose/MCSusy2018v6loose__MCSusyCorr2018v6loose__MCSusyNomin2018v6loose'
     ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/hadd__susyGen__MCSusy2018FSv6__susyW__MCCorr2018SusyFSv6'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6loose/DATASusy2018v6__hadd'
 
-regionName = '__susyMT2'
+regionName = '__susyMT2recoNomin/'
 
 ctrltag = ''
 
-if 'SameSign' in opt.tag :
-    regionName = '__susyMT2SameSign'
-elif 'Fake' in opt.tag :
-    regionName = '__susyMT2Fake'
-elif 'WZtoWW' in opt.tag :
-    regionName = '__susyMT2WZtoWW'
-elif 'WZ' in opt.tag :
-    regionName = '__susyMT2WZ'
-elif 'ZZ' in opt.tag :
-    regionName = '__susyMT2ZZ'
-elif 'ttZ' in opt.tag :
-    regionName = '__susyMT2ttZ'
+if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZ' in opt.tag or 'WZtoWW' in opt.tag or 'ttZ' in opt.tag or 'ZZ' in opt.tag:
+    regionName = '__susyMT2ctrlNomin/'
+    if 'SameSign' in opt.tag: ctrltag = '_SameSign'
+    if 'Fake'     in opt.tag: ctrltag = '_Fake'
+    if 'WZ'       in opt.tag: ctrltag = '_WZ'
+    if 'WZtoWW'   in opt.tag: ctrltag = '_WZtoWW'
+    if 'ttZ'      in opt.tag: ctrltag = '_ttZ'
+    if 'ZZ'       in opt.tag: ctrltag = '_ZZ'	
 
-directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName + '/'
-directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/' 
-directoryData = treeBaseDirData + ProductionData + regionName + '/'
-directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
+directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
+directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('recoNomin', 'FS')  #.replace('reco', 'fast')
+directoryData = treeBaseDirData + ProductionData + regionName
 
 #treeNuisances = { 'jesTotal'  : { name : 'JES', 'year' : False, 'MCtoFS' : True }, 
 #                  'jer'       : { name : 'JER', 'year' : False, 'MCtoFS' : True },
