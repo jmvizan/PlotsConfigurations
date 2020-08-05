@@ -48,6 +48,8 @@ elif '2018' in yeartag :
 
 regionName = '__susyMT2'
 
+ctrltag = ''
+
 if 'SameSign' in opt.tag :
     regionName = '__susyMT2SameSign'
 elif 'Fake' in opt.tag :
@@ -65,6 +67,9 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName + '/'
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/' 
 directoryData = treeBaseDirData + ProductionData + regionName + '/'
 directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
+
+treeNuisances = { }
+treeNuisanceDirs = { }
 
 # Complex cut variables
 

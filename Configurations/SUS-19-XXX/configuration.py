@@ -12,8 +12,8 @@ variablesFile = 'variables.py'
 cutsFile = 'cuts.py' 
 
 # file with list of samples
-samplesFile = 'samples.py'
-#samplesFile = 'samples_nanoAODv6_FullYEARv7.py' 
+samplesFile = 'samples_nanoAODv6_FullYEARv6loose.py'
+#samplesFile = 'samples.py' 
 
 # file with the definition of the mass points for the signals
 #signalMassPointsFile = 'signalMassPoints.py'

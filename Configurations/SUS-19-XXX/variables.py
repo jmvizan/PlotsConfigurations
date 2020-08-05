@@ -177,7 +177,7 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                        'fold'  : 1                    #   fold overflow
                                     }
 
-    variables['ptmisssig']   = {  'name'  : 'MET_significance',       #   variable name    
+    variables['ptmisssig']   = {  'name'  : MET_significance,         #   variable name    
                                   'range' : (  25,    0.,  25.),      #   variable range
                                   'xaxis' : met+' significance',      #   x axis name
                                   'fold'  : 1                         #   fold overflow
@@ -208,29 +208,43 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                     }
 
     variables['ptll']          = {  'name'  : pTll,                    #   variable name    
-                                    'range' : ([20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 300, 400, 500, 1000],[1]), #   variable range
+                                    'range' : ([0, 20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 300, 400, 500, 1000],[1]), #   variable range
                                     'xaxis' : ptll + gv,               #   x axis name
                                     'fold'  : 1                        #   fold overflow
                                  }
     
     variables['mTllptmiss']    = {  'name'  : mTllptmiss,              #   variable name    
-                                    'range' : (  30,  40., 400.),      #   variable range
+                                    'range' : (  40,  0., 400.),      #   variable range
                                     'xaxis' : mtllptmiss + gv,         #   x axis name
                                     'fold'  : 1                        #   fold overflow
                                  }
-        
-    if 'extrabin' in opt.tag:
-        mt2ll = 'mt2ll'
-        print "extrabin in"
-        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                         'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
-                                         'xaxis' : mt2 + pll + gv,         #   x axis name
-                                         'fold'  : 1                       #   fold overflow
-                                     }
 
+    if 'Latino' in opt.tag:
+    
+        variables['mT2']         = {   'name'  : 'mT2',                 #   variable name    
+                                       'range' : (  20,    0.,  200.),  #   variable range
+                                       'xaxis' : mt2 + pll + gv,        #   x axis name
+                                       'fold'  : 1                      #   fold overflow
+                                   }
+    
+        variables['mT2cr']       = {   'name'  : 'mT2',                 #   variable name    
+                                       'range' : ([0, 20, 40, 60, 80, 100, 140, 240, 340],[1]),  # variable range
+                                       'xaxis' : mt2 + pll + gv,        #   x axis name
+                                       'fold'  : 1                      #   fold overflow
+                                   }
+
+    if 'HMControlRegion' in opt.tag:
+        
+        variables['mt2cr']       = {   'name'  : 'mt2ll',                #   variable name    
+                                       'range' : ([0, 20, 40, 60, 80, 100, 140, 240, 340],[1]),  # variable range
+                                       'xaxis' : mt2 + pll + gv,         #   x axis name
+                                       'fold'  : 1                       #   fold overflow
+                                   }
+
+   
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
-    mt2ll = 'mt2ll'
+    mt2ll = 'mt2ll' + ctrltag
 
     if 'FakeValidationRegion' in opt.tag:
         mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'
@@ -304,16 +318,9 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                         'fold'  : 1                        #   fold overflow
                                     }
 
-    if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
-        if 'extrabin' in opt.tag:
-            variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                             'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
-                                             'xaxis' : mt2 + pll + gv,         #   x axis name
-                                             'fold'  : 1                       #   fold overflow
-            }
+    if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
 
-
-        variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
+        variables['ptmiss']        = {  'name'  : 'ptmiss'+ctrltag,        #   variable name    
                                         'range' : (  20,    0.,  400.),    #   variable range                             
                                         'xaxis' : met + gv,                #   x axis name
                                         'fold'  : 1                        #   fold overflow
@@ -328,7 +335,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          }
 
             variables['ptll']          = {  'name'  : pTll,                    #   variable name    
-                                            'range' : ([20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 300, 400, 500, 1000],[1]), #   variable range
+                                            'range' : ([0, 20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 300, 400, 500, 1000],[1]), #   variable range
                                             'xaxis' : ptll + gv,               #   x axis name
                                             'fold'  : 1                        #   fold overflow
                                          } 

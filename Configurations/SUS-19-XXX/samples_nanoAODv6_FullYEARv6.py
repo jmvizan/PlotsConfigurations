@@ -25,12 +25,8 @@ treePrefix= 'nanoLatino_'
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    if '2016' in yeartag : 
-        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
-    else : 
-        treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-    treeBaseDirSig  = treeBaseDirMC
+    print 'Trees only available on gridui, please move to FullYEARv6loose'
+    exit()
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -51,6 +47,8 @@ elif '2018' in yeartag :
 
 regionName = '__susyMT2'
 
+ctrltag = ''
+
 if 'SameSign' in opt.tag :
     regionName = '__susyMT2SameSign'
 elif 'Fake' in opt.tag :
@@ -68,6 +66,9 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName + '/'
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/' 
 directoryData = treeBaseDirData + ProductionData + regionName + '/'
 directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
+
+treeNuisances = { } 
+treeNuisanceDirs = { }
 
 # Complex cut variables
 
@@ -125,6 +126,8 @@ C2 = '(Lepton_pdgId[0]*Lepton_pdgId[1])'
 C1 = '(Lepton_pdgId[0]*Lepton_pdgId[2])'
 C0 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
 OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
+
+MET_significance = 'METFixEE2017_significance' if '2017' in yeartag else 'MET_significance'
 
 btagAlgo = 'btagDeepB'
 bTagWP = 'M'

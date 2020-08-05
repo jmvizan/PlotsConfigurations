@@ -280,7 +280,33 @@ for sample in samples.keys():
     if not samples[sample]['isDATA']:
         nuisances['QCDscale']['samples'][sample] = [ 'LHEScaleWeight[8]', 'LHEScaleWeight[0]' ] 
 """
-### JES and MET
+### JES, JER and MET
+
+for treeNuisance in treeNuisances:
+
+    for mcType in treeNuisanceDirs[treeNuisance]:
+        if 'Down' not in treeNuisanceDirs[treeNuisance][mcType] or 'Up' not in treeNuisanceDirs[treeNuisance][mcType]:
+            print 'nuisance warning: missing trees for', treeNuisance, mcType, 'variations'
+        else:
+
+            mcTypeName = '_'+mcTpye if (mcType=='FS' and not treeNuisances[treeNuisance]['MCtoFS']) else ''
+            yearCorr = '' if treeNuisances[treeNuisance]['year'] else year # correlated through the years?
+
+            nuisances[treeNuisance+mcType] = {
+                'name': treeNuisance+mcTypeName+yearCorr, 
+                'kind': 'tree',
+                'type': 'shape',
+                'samples': { },
+                'folderDown': treeNuisanceDirs[treeNuisance][mcType]['Down'],
+                'folderUp':   treeNuisanceDirs[treeNuisance][mcType]['Up'],
+            }
+            for sample in samples.keys():
+                if not samples[sample]['isDATA']:
+                    if (mcType=='MC' and not samples[sample]['isFastsim']) or (mcType=='FS' and samples[sample]['isFastsim']):
+                        nuisances[treeNuisance+mcType]['samples'][sample] = ['1.', '1.']
+
+            if len(nuisances[treeNuisance+mcType]['samples'].keys())==0:
+                del nuisances[treeNuisance+mcType]
 
 ### rate parameters
 
@@ -368,20 +394,27 @@ if hasattr(opt, 'inputFile'):
 
 ### Nasty tricks ...
 
-if 'ControlRegion' in opt.tag:
+nuisanceToRemove = [ ] 
 
-    nuisanceToRemove = [ ] 
+if 'ValidationRegion' in opt.tag:
+
+    for nuisance in nuisances:
+        if 'kind' not in nuisances[nuisance]:
+            nuisanceToRemove.append(nuisance)
+        elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
+            nuisanceToRemove.append(nuisance)
+
+elif 'ControlRegion' not in opt.tag:
 
     for nuisance in nuisances:
         if nuisance!='stat' and nuisance!='lumi': # example ...
             nuisanceToRemove.append(nuisance)
             
-    for nuisance in nuisanceToRemove:
-        del nuisances[nuisance]
+elif 'SignalRegion' not in opt.tag:
 
-elif 'SignalRegions' not in opt.tag:
+    for nuisance in nuisances:
+        nuisanceToRemove.append(nuisance)
 
-    nuisances.clear()
-
-
+for nuisance in nuisanceToRemove:
+    del nuisances[nuisance]
 

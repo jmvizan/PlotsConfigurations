@@ -48,6 +48,8 @@ elif '2018' in opt.tag :
 
 regionName = '__susyMT2'
 
+ctrltag = ''
+
 if 'SameSign' in opt.tag :
     regionName += 'SameSign'
 elif 'Fake' in opt.tag :
@@ -65,6 +67,9 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName + '/'
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/' 
 directoryData = treeBaseDirData + ProductionData + regionName + '/'
 directoryData = directoryData.replace('MT2/', 'MT2data/')
+
+treeNuisances = { }
+treeNuisanceDirs = { }
 
 # Complex cut variables
 
@@ -119,6 +124,8 @@ C2 = '(Lepton_pdgId[lep0idx]*Lepton_pdgId[lep1idx])'
 C1 = '(Lepton_pdgId[lep0idx]*Lepton_pdgId[lep2idx])'
 C0 = '(Lepton_pdgId[lep1idx]*Lepton_pdgId[lep2idx])'
 OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
+
+MET_significance = 'METFixEE2017_significance' if '2017' in yeartag else 'MET_significance'
 
 btagAlgo = 'btagDeepB'
 bTagWP = 'M'

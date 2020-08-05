@@ -55,7 +55,7 @@ if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
     if [ $# -gt 4 ]; then
 	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedDistributions=1 --nuisancesFile=None --showIntegralLegend=1
     else
-	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1
+	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1 # --fileFormats='png,root,C'
     fi
 else 
     mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None --showIntegralLegend=1

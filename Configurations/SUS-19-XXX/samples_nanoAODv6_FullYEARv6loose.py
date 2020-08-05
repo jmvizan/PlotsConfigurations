@@ -25,48 +25,66 @@ treePrefix= 'nanoLatino_'
 SITE=os.uname()[1]
 
 if  'cern' in SITE :
-    treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
-    treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
-    treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
-    if '2017' in yeartag or '2018' in yeartag:
-        treeBaseDirSig = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+    if '2016' in yeartag:
+        treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
+        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
+        treeBaseDirSig  = '/eos/cms/store/user/scodella/SUSY/Nano/'
+    elif '2017' in yeartag:
+        treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+        treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+        treeBaseDirSig  = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+    elif '2018' in yeartag:
+        treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
+        treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
+        treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6loose/MCSusy2016v6__MCCorr2016Susyv6'
-    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__MCSusy2016FSv6__MCCorr2016SusyFSv6'
+    ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6loose/MCSusy2016v6loose__MCSusyCorr2016v6loose__MCSusyNomin2016v6loose'
+    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6/hadd__susyGen__MCSusy2016FSv6__susyW__MCCorr2016SusyFSv6'
     ProductionData = 'Run2016_102X_nAODv6_Full2016v6loose/DATASusy2016v6__hadd'
 elif '2017' in yeartag :
-    ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6loose/MCSusy2017v6__MCCorr2017Susyv6'
-    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6loose/hadd__susyGen__susyW__MCSusy2017FSv6__MCCorr2017SusyFSv6'
+    ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6loose/MCSusy2017v6loose__MCSusyCorr2017v6loose__MCSusyNomin2017v6loose'
+    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6/hadd__susyGen__MCSusy2017FSv6__susyW__MCCorr2017SusyFSv6'
     ProductionData = 'Run2017_102X_nAODv6_Full2017v6loose/DATASusy2017v6__hadd'
 elif '2018' in yeartag :
-    ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6loose/MCSusy2018v6__MCCorr2018Susyv6'
+    ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6loose/MCSusy2018v6loose__MCSusyCorr2018v6loose__MCSusyNomin2018v6loose'
     ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/hadd__susyGen__MCSusy2018FSv6__susyW__MCCorr2018SusyFSv6'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6loose/DATASusy2018v6__hadd'
 
-regionName = '__susyMT2'
+regionName = '__susyMT2recoNomin/'
 
-if 'SameSign' in opt.tag :
-    regionName = '__susyMT2SameSign'
-elif 'Fake' in opt.tag :
-    regionName = '__susyMT2Fake'
-elif 'WZtoWW' in opt.tag :
-    regionName = '__susyMT2WZtoWW'
-elif 'WZ' in opt.tag :
-    regionName = '__susyMT2WZ'
-elif 'ZZ' in opt.tag :
-    regionName = '__susyMT2ZZ'
-elif 'ttZ' in opt.tag :
-    regionName = '__susyMT2ttZ'
+ctrltag = ''
 
-directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName + '/'
-directorySig  = treeBaseDirSig  + ProductionSig  + regionName + 'FS/' 
-directoryData = treeBaseDirData + ProductionData + regionName + '/'
-directoryData = directoryData.replace('__susyMT2/', '__susyMT2data/')
+if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZ' in opt.tag or 'WZtoWW' in opt.tag or 'ttZ' in opt.tag or 'ZZ' in opt.tag:
+    regionName = '__susyMT2ctrlNomin/'
+    if 'SameSign' in opt.tag: ctrltag = '_SameSign'
+    if 'Fake'     in opt.tag: ctrltag = '_Fake'
+    if 'WZ'       in opt.tag: ctrltag = '_WZ'
+    if 'WZtoWW'   in opt.tag: ctrltag = '_WZtoWW'
+    if 'ttZ'      in opt.tag: ctrltag = '_ttZ'
+    if 'ZZ'       in opt.tag: ctrltag = '_ZZ'	
+
+directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
+directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('recoNomin', 'FS')  #.replace('reco', 'fast')
+directoryData = treeBaseDirData + ProductionData + regionName
+
+#treeNuisances = { 'jesTotal'  : { name : 'JES', 'year' : False, 'MCtoFS' : True }, 
+#                  'jer'       : { name : 'JER', 'year' : False, 'MCtoFS' : True },
+#                  'unclustEn' : { name : 'MET', 'year' : False, 'MCtoFS' : True }, }
+treeNuisances = { }
+treeNuisanceDirs = { }
+for treeNuisance in treeNuisances:
+    treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
+
+if 'cern' in SITE :
+    for treeNuisance in treeNuisances:
+        for variation in [ 'Down', 'Up' ]:
+            treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkg.repace('Nomin', treeNuisances['name']+variation)
+        
 
 #if 'Puppi' in opt.tag :
 #    directoryBkg  = directoryBkg.replace('__susyMT2', '__susyMT2puppi')
@@ -104,15 +122,15 @@ dPhiMinlepptmiss = 'TMath::Min('+dPhilep0ptmiss+','+dPhilep1ptmiss+')'
 dPhijet0ptmiss = 'acos(cos(CleanJet_phi[0]-ptmiss_phi))'
 dPhijet1ptmiss = 'acos(cos(CleanJet_phi[1]-ptmiss_phi))'
 
-OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]<0)'
-SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1]>0)'
+OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])<0'
+SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])>0'
 SSP = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
 SSM = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]>0 && Lepton_pdgId[1]>0'
 
 LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
 DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
-EE = 'fabs(channel)==1'
-MM = 'fabs(channel)==3' 
+EE = 'fabs(Lepton_pdgId[0])==11 && fabs(Lepton_pdgId[1])==11'
+MM = 'fabs(Lepton_pdgId[0])==13 && fabs(Lepton_pdgId[1])==13'
 
 T0 = '('+ElectronWP+'[0]+'+MuonWP+'[0])'
 T1 = '('+ElectronWP+'[1]+'+MuonWP+'[1])'
@@ -124,6 +142,8 @@ C2 = '(Lepton_pdgId[0]*Lepton_pdgId[1])'
 C1 = '(Lepton_pdgId[0]*Lepton_pdgId[2])'
 C0 = '(Lepton_pdgId[1]*Lepton_pdgId[2])'
 OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
+
+MET_significance = 'METFixEE2017_significance' if '2017' in yeartag else 'MET_significance'
 
 btagAlgo = 'btagDeepB'
 bTagWP = 'M'
