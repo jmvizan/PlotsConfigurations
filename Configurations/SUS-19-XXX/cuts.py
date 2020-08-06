@@ -70,54 +70,23 @@ if 'Preselection' in opt.tag:
 
 
 if 'DYchecks' in opt.tag:
-<<<<<<< HEAD
-    print "Doing DY Checks"
-    cuts['lowMll_sf_nojetcut']  = OC + ' && ' + LL + ' && PuppiMET_pt> 50' 
-    cuts['lowMll_ee_nojetcut']  = OC + ' && ' + EE + ' && PuppiMET_pt> 50 '  
-    cuts['lowMll_mm_nojetcut']  = OC + ' && ' + MM + ' && PuppiMET_pt> 50 '   
-    cuts['highMll_sf_nojetcut'] = OC + ' && ' + LL + ' && PuppiMET_pt> 50 && mll>=76 && mll<106'
-    cuts['highMll_ee_nojetcut'] = OC + ' && ' + EE + ' && PuppiMET_pt> 50 && mll>=76 && mll<106'
-    cuts['highMll_mm_nojetcut'] = OC + ' && ' + MM + ' && PuppiMET_pt> 50 && mll>=76 && mll<106' 
-    cuts['lowMll_sf_noMETcut_nojetcut']  = OC + ' && ' + LL   
-    cuts['lowMll_ee_noMETcut_nojetcut']  = OC + ' && ' + EE   
-    cuts['lowMll_mm_noMETcut_nojetcut']  = OC + ' && ' + MM    
-    cuts['highMll_sf_noMETcut_nojetcut'] = OC + ' && ' + LL + ' && mll>=76 && mll<106'
-    cuts['highMll_ee_noMETcut_nojetcut'] = OC + ' && ' + EE + ' && mll>=76 && mll<106' 
-    cuts['highMll_mm_noMETcut_nojetcut'] = OC + ' && ' + MM + ' && mll>=76 && mll<106' 
+    if 'nojets' in opt.tag:
+        print "nojets"
+        cuts['lowMll_sf_nojetcut']  = OC + ' && ' + LL + ' && PuppiMET_pt> 50' 
+        cuts['lowMll_ee_nojetcut']  = OC + ' && ' + EE + ' && PuppiMET_pt> 50 '  
+        cuts['lowMll_mm_nojetcut']  = OC + ' && ' + MM + ' && PuppiMET_pt> 50 '   
+        cuts['highMll_sf_nojetcut'] = OC + ' && ' + LL + ' && PuppiMET_pt> 50 && mll>=76 && mll<106'
+        cuts['highMll_ee_nojetcut'] = OC + ' && ' + EE + ' && PuppiMET_pt> 50 && mll>=76 && mll<106'
+        cuts['highMll_mm_nojetcut'] = OC + ' && ' + MM + ' && PuppiMET_pt> 50 && mll>=76 && mll<106' 
+        cuts['lowMll_sf_noMETcut_nojetcut']  = OC + ' && ' + LL   
+        cuts['lowMll_ee_noMETcut_nojetcut']  = OC + ' && ' + EE   
+        cuts['lowMll_mm_noMETcut_nojetcut']  = OC + ' && ' + MM    
+        cuts['highMll_sf_noMETcut_nojetcut'] = OC + ' && ' + LL + ' && mll>=76 && mll<106'
+        cuts['highMll_ee_noMETcut_nojetcut'] = OC + ' && ' + EE + ' && mll>=76 && mll<106' 
+        cuts['highMll_mm_noMETcut_nojetcut'] = OC + ' && ' + MM + ' && mll>=76 && mll<106' 
 
-    '''
-    if 'Data' in opt.sigset:
-        cuts['lowMll_sf']  = OC + ' && ' + LL + ' && nCleanJet>1 && PuppiMET_pt> 50 && '    + bTagPass
-        cuts['lowMll_ee']  = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 && '    + bTagPass
-        cuts['lowMll_mm']  = OC + ' && ' + MM + ' && nCleanJet>1 && PuppiMET_pt> 50 &&  '   + bTagPass
-        cuts['highMll_sf'] = OC + ' && ' + LL + ' && nCleanJet>1 && PuppiMET_pt> 50 && mll>=76 && mll<106 && ' + bTagPass
-        cuts['highMll_ee'] = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 && mll>=76 && mll<106 && ' + bTagPass
-        cuts['highMll_mm'] = OC + ' && ' + MM + ' && nCleanJet>1 && PuppiMET_pt> 50 && mll>=76 && mll<106 && ' + bTagPass
-        cuts['lowMll_sf_noMETcut']  = OC + ' && ' + LL + ' && nCleanJet>1 && '+ bTagPass
-        cuts['lowMll_ee_noMETcut']  = OC + ' && ' + EE + ' && nCleanJet>1 && '+ bTagPass
-        cuts['lowMll_mm_noMETcut']  = OC + ' && ' + MM + ' && nCleanJet>1 && '+ bTagPass
-        cuts['highMll_sf_noMETcut'] = OC + ' && ' + LL + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + bTagPass
-        cuts['highMll_ee_noMETcut'] = OC + ' && ' + EE + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + bTagPass
-        cuts['highMll_mm_noMETcut'] = OC + ' && ' + MM + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + bTagPass
-
-    else:
-        cuts['lowMll_sf']  = OC + ' && ' + LL + ' && nCleanJet>1 && PuppiMET_pt> 50 && '    + btagWeight1tag
-        cuts['lowMll_ee']  = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 && '    + btagWeight1tag
-        cuts['lowMll_mm']  = OC + ' && ' + MM + ' && nCleanJet>1 && PuppiMET_pt> 50 &&  '   + btagWeight1tag
-        cuts['highMll_sf'] = OC + ' && ' + LL + ' && nCleanJet>1 && mll>=76 && mll<106 && ' + btagWeight1tag
-        cuts['highMll_ee'] = OC + ' && ' + EE + ' && nCleanJet>1 && PuppiMET_pt> 50 &&  mll>=76 && mll<106 && ' + btagWeight1tag
-        cuts['highMll_mm'] = OC + ' && ' + MM + ' && nCleanJet>1 &&  PuppiMET_pt> 50 && mll>=76 && mll<106 && ' + btagWeight1tag
-        cuts['lowMll_sf_noMETcut']  = OC + ' && ' + LL + ' && nCleanJet>1 && '+ btagWeight1tag
-        cuts['lowMll_ee_noMETcut']  = OC + ' && ' + EE + ' && nCleanJet>1 && '+ btagWeight1tag
-        cuts['lowMll_mm_noMETcut']  = OC + ' && ' + MM + ' && nCleanJet>1 && '+ btagWeight1tag
-        cuts['highMll_sf_noMETcut'] = OC + ' && ' + LL + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + btagWeight1tag
-        cuts['highMll_ee_noMETcut'] = OC + ' && ' + EE + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + btagWeight1tag
-        cuts['highMll_mm_noMETcut'] = OC + ' && ' + MM + ' && nCleanJet>1 &&  mll>=76 && mll<106 && ' + btagWeight1tag
-    '''
-    
-=======
-    
-    if 'Data' in opt.sigset:
+    elif 'Data' in opt.sigset:
+        print "DO DATA"
         cuts['lowMll_sf']  = OC + ' && ' + LL + ' && Alt$(CleanJet_pt[1], 0)>=30. && '+ bTagPass
         cuts['lowMll_ee']  = OC + ' && ' + EE + ' && Alt$(CleanJet_pt[1],0)>=30. && PuppiMET_pt> 50 && '+ bTagPass
         cuts['lowMll_mm']  = OC + ' && ' + MM + ' && Alt$(CleanJet_pt[1],0)>=30. && PuppiMET_pt> 50 &&  '+ bTagPass
@@ -141,7 +110,6 @@ if 'DYchecks' in opt.tag:
         cuts['highMll_ee_noMETcut'] = '(' + OC + ' && ' + EE + ' && Alt$(CleanJet_pt[1],0)>=30. &&  mll>=76 && mll<106)*' + btagWeight1tag
         cuts['highMll_mm_noMETcut'] = '(' + OC + ' && ' + MM + ' && Alt$(CleanJet_pt[1],0)>=30. &&  mll>=76 && mll<106)*' + btagWeight1tag
         
->>>>>>> upstream/worker
 if 'TopControlRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
