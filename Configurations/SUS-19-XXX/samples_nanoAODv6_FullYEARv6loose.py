@@ -44,15 +44,15 @@ elif 'ifca' in SITE or 'cloud' in SITE:
 
 if '2016' in yeartag :
     ProductionMC   = 'Summer16_102X_nAODv6_Full2016v6loose/MCSusy2016v6loose__MCSusyCorr2016v6loose__MCSusyNomin2016v6loose'
-    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6/hadd__susyGen__MCSusy2016FSv6__susyW__MCCorr2016SusyFSv6'
+    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
     ProductionData = 'Run2016_102X_nAODv6_Full2016v6loose/DATASusy2016v6__hadd'
 elif '2017' in yeartag :
     ProductionMC   = 'Fall2017_102X_nAODv6_Full2017v6loose/MCSusy2017v6loose__MCSusyCorr2017v6loose__MCSusyNomin2017v6loose'
-    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6/hadd__susyGen__MCSusy2017FSv6__susyW__MCCorr2017SusyFSv6'
+    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6loose/hadd__susyGen__susyW__FSSusy2017v6loose__FSSusyCorr2017v6loose__FSSusyNomin2017v6loose'
     ProductionData = 'Run2017_102X_nAODv6_Full2017v6loose/DATASusy2017v6__hadd'
 elif '2018' in yeartag :
     ProductionMC   = 'Autumn18_102X_nAODv6_Full2018v6loose/MCSusy2018v6loose__MCSusyCorr2018v6loose__MCSusyNomin2018v6loose'
-    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6/hadd__susyGen__MCSusy2018FSv6__susyW__MCCorr2018SusyFSv6'
+    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6loose/hadd__susyGen__susyW__FSSusy2018v6loose__FSSusyCorr2018v6loose__FSSusyNomin2018v6loose'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6loose/DATASusy2018v6__hadd'
 
 regionName = '__susyMT2recoNomin/'
@@ -69,26 +69,24 @@ if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZ' in opt.tag or 'WZtoWW' in 
     if 'ZZ'       in opt.tag: ctrltag = '_ZZ'	
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
-directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('recoNomin', 'FS')  #.replace('reco', 'fast')
+directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco', 'fast')
 directoryData = treeBaseDirData + ProductionData + regionName
 
-#treeNuisances = { 'jesTotal'  : { name : 'JES', 'year' : False, 'MCtoFS' : True }, 
-#                  'jer'       : { name : 'JER', 'year' : False, 'MCtoFS' : True },
-#                  'unclustEn' : { name : 'MET', 'year' : False, 'MCtoFS' : True }, }
-treeNuisances = { }
+##treeNuisances = { 'jesTotal'  : { 'name' : 'JES', 'year' : False, 'MCtoFS' : True }, 
+##                  'jer'       : { 'name' : 'JER', 'year' : False, 'MCtoFS' : True },
+##                  'unclustEn' : { 'name' : 'MET', 'year' : False, 'MCtoFS' : True }, }
+#treeNuisances = { 'jer'  : { 'name' : 'Smear', 'year' : False, 'MCtoFS' : True } }
 treeNuisanceDirs = { }
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
 
-if 'cern' in SITE :
-    for treeNuisance in treeNuisances:
-        for variation in [ 'Down', 'Up' ]:
-            treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkg.repace('Nomin', treeNuisances['name']+variation)
-        
-
-#if 'Puppi' in opt.tag :
-#    directoryBkg  = directoryBkg.replace('__susyMT2', '__susyMT2puppi')
-#    directoryData = directoryData.replace('__susyMT2', '__susyMT2puppi')
+##if 'cern' in SITE :
+##    for treeNuisance in treeNuisances:
+##        for variation in [ 'Down', 'Up' ]:
+##            treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkg.replace('Nomin', treeNuisances[treeNuisance]['name']+variation)
+ 
+#treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace('recoNomin', 'recoSmear').replace('ctrlNomin', 'ctrlSmear')  
+#treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg  
 
 # Complex cut variables
 
@@ -261,7 +259,9 @@ elif 'pu2sigma' in opt.tag:
     SFweight = SFweight.replace('puWeight', '(2.*(puWeightUp-puWeight)+puWeight)')	
 
 if 'PVw' in opt.tag:
-    if '2017' in yeartag: 
+    if '2016' in yeartag:
+        SFweight += '*((1./0.97916503)*((1.11250e+00)+(1.69184e-02)*PV_npvs+(-1.30092e-03)*PV_npvs*PV_npvs+(-1.99571e-05)*PV_npvs*PV_npvs*PV_npvs+(1.10773e-06)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
+    elif '2017' in yeartag: 
         SFweight += '*((1./1.0028780)*((8.05485e-01)+(-2.30668e-02)*PV_npvs+(2.62330e-03)*PV_npvs*PV_npvs+(-7.65300e-05)*PV_npvs*PV_npvs*PV_npvs+(7.54356e-07)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
     elif '2018' in yeartag: 
         SFweight += '*((1./0.95395364)*((9.48824e-01)+(-3.22506e-02)*PV_npvs+(3.42005e-03)*PV_npvs*PV_npvs+(-1.42342e-04)*PV_npvs*PV_npvs*PV_npvs+(2.03952e-06)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'

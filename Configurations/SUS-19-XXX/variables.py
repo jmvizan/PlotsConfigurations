@@ -265,21 +265,24 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                 variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
                                                  'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
                                                  'xaxis' : mt2 + pll + gv,         #   x axis name
-                                                 'fold'  : 1                       #   fold overflow
+                                                 'fold'  : 1,                      #   fold overflow
+                                                 'CRbins' : [1, 4] 
                                              }
 
             else:
                 variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
                                                  'range' : ([0, 20, 40, 60, 80, 100, 160, 370, 500],[1]), # variable range
                                                  'xaxis' : mt2 + pll + gv,         #   x axis name
-                                                 'fold'  : 1                       #   fold overflow
+                                                 'fold'  : 1,                      #   fold overflow
+                                                 'CRbins' : [1, 4] 
                                              }
 
         else:
             variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
                                              'range' : ([0, 20, 40, 60, 80, 100, 160, 220],[1]), # variable range
                                              'xaxis' : mt2 + pll + gv,         #   x axis name
-                                             'fold'  : 1                       #   fold overflow
+                                             'fold'  : 1,                      #   fold overflow
+                                             'CRbins' : [1, 4] 
                                          }
 
     else:
@@ -287,8 +290,22 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
         variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
                                          'range' : (   7,    0.,  140.),   #   variable range
                                          'xaxis' : mt2 + pll + gv,         #   x axis name
-                                         'fold'  : 1                       #   fold overflow
+                                         'fold'  : 1,                      #   fold overflow
+                                         'CRbins' : [1, 4] 
                                      }
+
+        if 'ValidationRegion' in opt.tag:
+
+            mt2llOptimBin = [0, 20, 40, 60, 80, 100, 160, 220]
+
+            variables['mt2llOptim'] = {   'name'  : mt2ll,                  #   variable name    
+                                          'range' : (mt2llOptimBin,[1]),    # variable range
+                                          'xaxis' : mt2 + pll + gv,         #   x axis name
+                                          'fold'  : 1,                      #   fold overflow
+                                          'CRbins' : [1, 4] 
+                                      }
+
+            
 
         #exit()
     if 'StudyVisHT' in opt.tag:

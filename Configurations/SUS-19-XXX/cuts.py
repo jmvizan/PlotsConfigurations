@@ -140,7 +140,7 @@ if 'DYControlRegion' in opt.tag:
         cuts['DY_ee'] = '(' + DY+' && '+EE+')*'+btagWeight0tag
         cuts['DY_mm'] = '(' + DY+' && '+MM+')*'+btagWeight0tag
 
-if 'HighPtMissControlRegion' in opt.tag:
+if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.tag:
 
     if 'Data' in opt.sigset:
         cuts['VR1_Tag_em']   = OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
