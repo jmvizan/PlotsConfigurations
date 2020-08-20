@@ -76,6 +76,7 @@ directoryData = treeBaseDirData + ProductionData + regionName
 ##                  'jer'       : { 'name' : 'JER', 'year' : False, 'MCtoFS' : True },
 ##                  'unclustEn' : { 'name' : 'MET', 'year' : False, 'MCtoFS' : True }, }
 #treeNuisances = { 'jer'  : { 'name' : 'Smear', 'year' : False, 'MCtoFS' : True } }
+treeNuisances = { }
 treeNuisanceDirs = { }
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
