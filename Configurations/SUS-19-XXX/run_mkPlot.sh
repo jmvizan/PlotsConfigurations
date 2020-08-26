@@ -38,8 +38,23 @@ else
     fi
     if [ $# -lt 4 ]; then
 	FILESET=$SIGSET
+        NORM='None'
+    elif [ $# -eq 4 ]; then
+        if [ $4 == 'Norm' ] || [ $4 == 'CRnorm' ]; then 
+	    NORM=$4
+	    FILESET='SM'
+	else
+	    NORM='None'
+	    FILESET=$4
+	fi
     else
-	FILESET=$4
+        if [ $4 == 'Norm' ] || [ $4 == 'CRnorm' ]; then 
+	    NORM=$4
+	    FILESET=$5
+	else
+	    NORM=$5
+	    FILESET=$4
+	fi
     fi
 fi
 
@@ -50,10 +65,11 @@ if [ $YEAR == '2016-2017-2018' ]; then
     hadd -k -f ./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root ./Shapes/2016/$TAG/plots_${TAG}_$FILESET.root ./Shapes/2017/$TAG/plots_${TAG}_$FILESET.root ./Shapes/2018/$TAG/plots_${TAG}_$FILESET.root 
 fi
 
-
 if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
-    if [ $# -gt 4 ]; then
+    if [ $NORM == 'Norm' ]; then
 	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedDistributions=1 --nuisancesFile=None --showIntegralLegend=1
+    elif [ $NORM == 'CRnorm' ]; then
+	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedCRratio=1
     else
 	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1 # --fileFormats='png,root,C'
     fi
@@ -73,5 +89,5 @@ if [ $# -lt 5 ]; then
 	rm ./Plots/$YEAR/$TAG/log_cratio_*
     fi
     rm ./Plots/$YEAR/$TAG/cdifference*
-    rm ./Plots/$YEAR/$TAG/log_cdifference_*
+    rm ./Plots/$YEAR/$TAG/log_cdifference*
 fi

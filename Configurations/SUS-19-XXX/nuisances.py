@@ -241,14 +241,14 @@ for mt2llregion in mt2llRegions:
 # mt2ll ZZ (from k-factors)
 
 # mt2ll signal
-if '__susyMT2FSreco' not in directorySig:
+if '__susyMT2reco' not in directorySig:
     nuisances['ptmissfastsim']  = {
         'name'  : 'ptmissfastsim', # mismodeling correlated through the years?
         'samples'  : { },
         'kind'  : 'tree',
         'type'  : 'shape',
-        'folderUp':   directorySig.replace('__susyMT2FS', '__susyMT2FSreco'),
-        'folderDown': directorySig.replace('__susyMT2FS', '__susyMT2FSgen'),
+        'folderUp':   directorySig.replace('__susyMT2fast', '__susyMT2reco'),
+        'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm'),
     }
     for sample in samples.keys():
         if samples[sample]['isFastsim']:
@@ -394,20 +394,22 @@ if hasattr(opt, 'inputFile'):
 
 ### Nasty tricks ...
 
-nuisanceToRemove = [ ] 
+nuisanceToRemove = [ ]  
 
 if 'ValidationRegion' in opt.tag:
 
     for nuisance in nuisances:
-        if 'kind' not in nuisances[nuisance]:
-            nuisanceToRemove.append(nuisance)
-        elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
+        #if 'kind' not in nuisances[nuisance]:
+        #    nuisanceToRemove.append(nuisance)
+        #elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
+        if 'jer' not in nuisance: # 
             nuisanceToRemove.append(nuisance)
 
-elif 'ControlRegion' not in opt.tag:
+elif 'ControlRegion' in opt.tag or 'TwoLeptons' in opt.tag or 'Preselection' in opt.tag:
 
     for nuisance in nuisances:
-        if nuisance!='stat' and nuisance!='lumi': # example ...
+        #if nuisance!='stat' and nuisance!='lumi': # example ...
+        if 'jer' not in nuisance: # 
             nuisanceToRemove.append(nuisance)
             
 elif 'SignalRegion' not in opt.tag:
