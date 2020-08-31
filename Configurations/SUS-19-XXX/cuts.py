@@ -100,7 +100,7 @@ if 'METFix' in opt.tag:
         cuts['METFixEE_low_em_Tag']  = '('+OC+' && '+DF             +')*'+btagWeight1tag
         cuts['METFixEE_low_ee_Tag']  = '('+OC+' && '+EE+' && '+vetoZ+')*'+btagWeight1tag
         cuts['METFixEE_low_mm_Tag']  = '('+OC+' && '+MM+' && '+vetoZ+')*'+btagWeight1tag
-        cuts['METFixEE_low_mm_Tag']  = '('+OC+' && '+SF+' && '+vetoZ+')*'+btagWeight1tag
+        cuts['METFixEE_low_sf_Tag']  = '('+OC+' && '+SF+' && '+vetoZ+')*'+btagWeight1tag
 
         cuts['METFixEE_high_em_Veto'] = '('+OC+' && '+DF             +' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
         cuts['METFixEE_high_ee_Veto'] = '('+OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
@@ -110,7 +110,7 @@ if 'METFix' in opt.tag:
         cuts['METFixEE_high_em_Tag']  = '('+OC+' && '+DF             +' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['METFixEE_high_ee_Tag']  = '('+OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['METFixEE_high_mm_Tag']  = '('+OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
-        cuts['METFixEE_high_mm_Tag']  = '('+OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
+        cuts['METFixEE_high_sf_Tag']  = '('+OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
     
 
 if 'DYchecks' in opt.tag:
