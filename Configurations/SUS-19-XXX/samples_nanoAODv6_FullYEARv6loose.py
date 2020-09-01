@@ -187,7 +187,7 @@ METFilters_FS     = METFilters_Common
 VetoEENoise, VetoHEMdata, VetoHEMmc  = '1.', '1.', '1.'
 if '2017' in yeartag and 'EENoise' in opt.tag:
     VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
-    if 'Veto' in opt.tag: VetoEENoise= '1-(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
+    if 'Veto' in opt.tag: VetoEENoise= '(1-(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0))'
 elif '2018' in yeartag and 'HEM' in opt.tag:
     VetoHEMele  = '(Sum$(Electron_pt>30. && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)==0)'
     VetoHEMjet  = '(Sum$(Jet_pt>30. && Jet_eta>-3.2 && Jet_eta<-1.2 && Jet_phi>-1.77 && Jet_phi<-0.67)==0)'
