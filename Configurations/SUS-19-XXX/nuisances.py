@@ -415,7 +415,8 @@ elif 'ControlRegion' in opt.tag or 'TwoLeptons' in opt.tag or 'Preselection' in 
 elif 'SignalRegion' not in opt.tag:
 
     for nuisance in nuisances:
-        nuisanceToRemove.append(nuisance)
+        if 'lumi' not in nuisance: 
+            nuisanceToRemove.append(nuisance)
 
 for nuisance in nuisanceToRemove:
     del nuisances[nuisance]

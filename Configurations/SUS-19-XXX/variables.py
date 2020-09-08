@@ -11,6 +11,7 @@ ptll = pt+'^{'+sll+'}'
 dphill = '#Delta#phi(lep1,lep2)'
 dphillptmiss = '#Delta#phi('+sll+','+met+')'
 dphiminlepptmiss = '#Delta#phi^{min}(lep,'+met+')'
+dphijetptmiss  = '#Delta#phi(jet,'+met+')'
 dphijet0ptmiss = '#Delta#phi(lead. jet,'+met+')'
 dphijet1ptmiss = '#Delta#phi(trai. jet,'+met+')'
 drll = '#Delta R(lep1,lep2)'
@@ -102,8 +103,55 @@ elif 'DYchecks' in opt.tag:
                                     'fold'  : 1                        #   fold overflow
                                 }
 
+elif 'VetoNoiseEE' in opt.tag:
 
+    variables['jetRawPtEENoise'] = { 'name'  : jetrawpteenoise,                      #   variable name    
+                                     'range' : (  20, 0., 100.),                     #   variable range
+                                     'xaxis' : 'jet raw ' + pt + ' (EE Noise)' + gv, #   x axis name
+                                     'fold'  : 1                                     #   fold overflow
+                                    }
+        
+    variables['dPhiEENoisePtMissPt30'] = { 'name'  : dPhieenoiseptmiss_pt30, #   variable name    
+                                           'range' : (  10,    0.,  3.2),    #   variable range
+                                           'xaxis' : dphijetptmiss,          #   x axis name
+                                           'fold'  : 1                       #   fold overflow
+                                          }
+    
+    variables['dPhiEENoisePtMissPt15'] = { 'name'  : dPhieenoiseptmiss_pt15, #   variable name    
+                                           'range' : (  10,    0.,  3.2),    #   variable range
+                                           'xaxis' : dphijetptmiss,          #   x axis name
+                                           'fold'  : 1                       #   fold overflow
+                                          }
 
+    variables['dPhiEENoisePtMissHard'] = { 'name'  : dPhieenoiseptmiss_hard, #   variable name
+                                           'range' : (  10,    0.,  3.2),    #   variable range
+                                           'xaxis' : dphijetptmiss,          #   x axis name
+                                           'fold'  : 1                       #   fold overflow
+                                          }
+        
+    variables['dPhiEENoisePtMissPt30NoRawCut'] = { 'name'  : dPhieenoiseptmiss_pt30_norawcut, #   variable name    
+                                                   'range' : (  10,    0.,  3.2),    #   variable range
+                                                   'xaxis' : dphijetptmiss,          #   x axis name
+                                                   'fold'  : 1                       #   fold overflow
+                                                  }
+    
+    variables['dPhiEENoisePtMissPt15NoRawCut'] = { 'name'  : dPhieenoiseptmiss_pt15_norawcut, #   variable name    
+                                                   'range' : (  10,    0.,  3.2),    #   variable range
+                                                   'xaxis' : dphijetptmiss,          #   x axis name
+                                                   'fold'  : 1                       #   fold overflow
+                                                  }
+
+    variables['HTForwardSoft'] = { 'name'  : HTForwardSoft,             #   variable name    
+                                   'range' : (  30,    0.,  300),       #   variable range
+                                   'xaxis' : 'H_{T} forward soft' + gv, #   x axis name
+                                   'fold'  : 1                          #   fold overflow
+                                  }
+
+    variables['HTForward']     = { 'name'  : HTForward,            #   variable name    
+                                   'range' : (  30,    0.,  300),  #   variable range
+                                   'xaxis' : 'H_{T} forward' + gv, #   x axis name
+                                   'fold'  : 1                     #   fold overflow
+                                  }
 
 elif 'HighPtMissOptimisationRegion' in opt.tag: 
     
