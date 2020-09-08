@@ -75,8 +75,8 @@ directoryData = treeBaseDirData + ProductionData + regionName
 ##treeNuisances = { 'jesTotal'  : { 'name' : 'JES', 'year' : False, 'MCtoFS' : True }, 
 ##                  'jer'       : { 'name' : 'JER', 'year' : False, 'MCtoFS' : True },
 ##                  'unclustEn' : { 'name' : 'MET', 'year' : False, 'MCtoFS' : True }, }
-#treeNuisances = { 'jer'  : { 'name' : 'Smear', 'year' : False, 'MCtoFS' : True } }
-treeNuisances = { }
+treeNuisances = { 'jer'  : { 'name' : 'Smear', 'year' : False, 'MCtoFS' : True } }
+#treeNuisances = { }
 treeNuisanceDirs = { }
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
@@ -86,8 +86,8 @@ for treeNuisance in treeNuisances:
 ##        for variation in [ 'Down', 'Up' ]:
 ##            treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkg.replace('Nomin', treeNuisances[treeNuisance]['name']+variation)
  
-#treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace('recoNomin', 'recoSmear').replace('ctrlNomin', 'ctrlSmear')  
-#treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg  
+treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace('recoNomin', 'recoSmear').replace('ctrlNomin', 'ctrlSmear')  
+treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg  
 
 # Complex cut variables
 
@@ -120,6 +120,14 @@ dPhilep1ptmiss = 'acos(cos(Lepton_phi['+lep1idx+']-ptmiss_phi))'
 dPhiMinlepptmiss = 'TMath::Min('+dPhilep0ptmiss+','+dPhilep1ptmiss+')'
 dPhijet0ptmiss = 'acos(cos(CleanJet_phi[0]-ptmiss_phi))'
 dPhijet1ptmiss = 'acos(cos(CleanJet_phi[1]-ptmiss_phi))'
+jetrawpteenoise = '(Jet_pt*(1.-Jet_rawFactor)*(2*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)-1))'
+dPhieenoiseptmiss_pt30 = 'acos(cos(Jet_phi-ptmiss_phi))*(2.*((Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
+dPhieenoiseptmiss_pt15 = 'acos(cos(Jet_phi-ptmiss_phi))*(2.*((Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>15. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
+dPhieenoiseptmiss_hard = 'acos(cos(Jet_phi-ptmiss_phi))*(2.*((Jet_pt*(1.-Jet_rawFactor)>50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
+dPhieenoiseptmiss_pt30_norawcut = 'acos(cos(Jet_phi-ptmiss_phi))*(2.*((Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
+dPhieenoiseptmiss_pt15_norawcut = 'acos(cos(Jet_phi-ptmiss_phi))*(2.*((Jet_pt>15. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
+HTForward     = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139))'
+HTForwardSoft = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && Jet_pt*(1.-Jet_rawFactor)<50.))'
 
 OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])<0'
 SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])>0'
@@ -187,10 +195,16 @@ METFilters_FS     = METFilters_Common
 VetoEENoise, VetoHEMdata, VetoHEMmc  = '1.', '1.', '1.'
 if '2017' in yeartag and 'EENoise' in opt.tag:
     VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
-    if 'Veto' in opt.tag: VetoEENoise= '(1-(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0))'
+    if 'EENoiseHT' in opt.tag:
+        VetoEENoise = '('+HTForwardSoft+'<40.)'
+    elif 'EENoiseDPhiHard' in opt.tag:
+        VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0)'
+    if 'Veto' in opt.tag:
+        VetoEENoise = '(1. - '+VetoEENoise+')'
 elif '2018' in yeartag and 'HEM' in opt.tag:
-    VetoHEMele  = '(Sum$(Electron_pt>30. && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)==0)'
-    VetoHEMjet  = '(Sum$(Jet_pt>30. && Jet_eta>-3.2 && Jet_eta<-1.2 && Jet_phi>-1.77 && Jet_phi<-0.67)==0)'
+    hemPtCut = '20.' if 'HEM20' in opt.tag else '30.' 
+    VetoHEMele  = '(Sum$(Electron_pt>'+hemPtCut+' && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)==0)'
+    VetoHEMjet  = '(Sum$(Jet_pt>'+hemPtCut+' && Jet_eta>-3.2 && Jet_eta<-1.2 && Jet_phi>-1.77 && Jet_phi<-0.67)==0)'
     VetoHEM     = '('+VetoHEMele+' && '+VetoHEMjet+')'
     VetoHEMdata = '(run<319077 || '+VetoHEM+')'
     VetoHEMmc   = '('+VetoHEM+' + (1.-'+VetoHEM+')*0.35225285)'
