@@ -69,28 +69,28 @@ if 'Preselection' in opt.tag:
 
 if 'METFix' in opt.tag:
     if 'Data' in opt.sigset:
-        print "ignore"
-        '''
+        #print "ignore"
+        
         cuts['METFixEE_low_em_Veto'] = OC+' && '+DF             +' && '+bTagVeto
         cuts['METFixEE_low_ee_Veto'] = OC+' && '+EE+' && '+vetoZ+' && '+bTagVeto
         cuts['METFixEE_low_mm_Veto'] = OC+' && '+MM+' && '+vetoZ+' && '+bTagVeto
-        cuts['METFixEE_low_mm_Veto'] = OC+' && '+SF+' && '+vetoZ+' && '+bTagVeto
+        cuts['METFixEE_low_sf_Veto'] = OC+' && '+SF+' && '+vetoZ+' && '+bTagVeto
     
         cuts['METFixEE_low_em_Tag']  = OC+' && '+DF             +' && '+bTagPass
         cuts['METFixEE_low_ee_Tag']  = OC+' && '+EE+' && '+vetoZ+' && '+bTagPass
         cuts['METFixEE_low_mm_Tag']  = OC+' && '+MM+' && '+vetoZ+' && '+bTagPass
-        cuts['METFixEE_low_mm_Tag']  = OC+' && '+SF+' && '+vetoZ+' && '+bTagPass
+        cuts['METFixEE_low_sf_Tag']  = OC+' && '+SF+' && '+vetoZ+' && '+bTagPass
 
         cuts['METFixEE_high_em_Veto'] = OC+' && '+DF             +' && ptmiss>=100 && ptmiss<140 &&'+bTagVeto
         cuts['METFixEE_high_ee_Veto'] = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
         cuts['METFixEE_high_mm_Veto'] = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
-        cuts['METFixEE_high_mm_Veto'] = OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
+        cuts['METFixEE_high_sf_Veto'] = OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
     
         cuts['METFixEE_high_em_Tag']  = OC+' && '+DF             +' && ptmiss>=100 && ptmiss<140 && '+bTagPass
         cuts['METFixEE_high_ee_Tag']  = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
         cuts['METFixEE_high_mm_Tag']  = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
-        cuts['METFixEE_high_mm_Tag']  = OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
-        '''
+        cuts['METFixEE_high_sf_Tag']  = OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        
     else:
         cuts['METFixEE_low_em_Veto'] = '('+OC+' && '+DF             +')*'+btagWeight0tag
         cuts['METFixEE_low_ee_Veto'] = '('+OC+' && '+EE+' && '+vetoZ+')*'+btagWeight0tag
