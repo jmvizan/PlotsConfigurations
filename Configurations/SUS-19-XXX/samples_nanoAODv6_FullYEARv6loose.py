@@ -200,7 +200,7 @@ if '2017' in yeartag and 'EENoise' in opt.tag:
     elif 'EENoiseDPhiHard' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0)'
     if 'Veto' in opt.tag:
-	VetoEENoise = '(1. - '+VetoEENoise+')'
+        VetoEENoise = '(1. - '+VetoEENoise+')'
 elif '2018' in yeartag and 'HEM' in opt.tag:
     hemPtCut = '20.' if 'HEM20' in opt.tag else '30.' 
     VetoHEMele  = '(Sum$(Electron_pt>'+hemPtCut+' && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)==0)'

@@ -18,9 +18,9 @@ drll = '#Delta R(lep1,lep2)'
 mtllptmiss = '#font[50]{m}_{T}('+sll+','+met+')'
 
 # Complex variables
-
 sumLeptonPt = 'Lepton_pt['+lep0idx+']+Lepton_pt['+lep1idx+']'
-
+deltaMET    = 'MET_pt     - GenMET_pt' 
+deltaMETFix = 'METFixEE2017_pt - GenMET_pt'
 nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+')'
 # variables = {}
 
@@ -31,6 +31,39 @@ if 'Test' in opt.tag:
                                     'xaxis' : 'number of b-tagged jets', #   x axis name
                                     'fold'  : 1                          #   fold overflow
                                 }
+elif 'METFix' in opt.tag:
+    variables['deltaMET']   = {  'name'  : deltaMET,                 #   variable name    
+                                  'range' : (  40,    -20.,  20.),   #   variable range
+                                  'xaxis' : deltaMET,             #   x axis name
+                                  'fold'  : 1                        #   fold overflow
+                              }   
+    variables['deltaMETfix']   = {  'name'  : deltaMETFix,           #   variable name    
+                                    'range' : (  40,    -20.,  20.), #   variable range
+                                    'xaxis' : deltaMETFix,           #   x axis name
+                                    'fold'  : 1                      #   fold overflow
+                                 }   
+    variables['deltaMET_2']   = {  'name'  : deltaMET,                 #   variable name    
+                                   'range' : (  40,    -50.,  50.),    #   variable range
+                                   'xaxis' : deltaMET,              #   x axis name
+                                   'fold'  : 1                         #   fold overflow
+                              }   
+    variables['deltaMETfix_2']   = {  'name'  : deltaMETFix,           #   variable name    
+                                      'range' : (  40,    -50.,  50.), #   variable range
+                                      'xaxis' : deltaMETFix,           #   x axis name
+                                      'fold'  : 1                      #   fold overflow
+                                 }   
+    variables['deltaMET_3']   = {  'name'  : deltaMET,                   #   variable name    
+                                   'range' : (  40,    -100.,  100.),    #   variable range
+                                   'xaxis' : deltaMET,                #   x axis name
+                                   'fold'  : 1                           #   fold overflow
+                              }   
+    variables['deltaMETfix_3']   = {  'name'  : deltaMETFix,             #   variable name    
+                                      'range' : (  40,    -100.,  100.), #   variable range
+                                      'xaxis' : deltaMETFix,             #   x axis name
+                                      'fold'  : 1                        #   fold overflow
+                                 }   
+    
+    
 elif 'DYchecks' in opt.tag:
     #print "inside this plots"
     #exit()

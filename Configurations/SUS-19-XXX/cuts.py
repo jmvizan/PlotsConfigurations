@@ -67,6 +67,51 @@ if 'Preselection' in opt.tag:
         cuts['TwoLep_ee_Tag']  = '('+OC+' && '+EE+' && '+vetoZ+')*'+btagWeight1tag
         cuts['TwoLep_mm_Tag']  = '('+OC+' && '+MM+' && '+vetoZ+')*'+btagWeight1tag
 
+if 'METFix' in opt.tag:
+  
+    if 'Data' in opt.sigset:
+        '''
+        cuts['METFixEE_low_em_Veto'] = OC+' && '+DF             +' && '+bTagVeto
+        cuts['METFixEE_low_ee_Veto'] = OC+' && '+EE+' && '+vetoZ+' && '+bTagVeto
+        cuts['METFixEE_low_mm_Veto'] = OC+' && '+MM+' && '+vetoZ+' && '+bTagVeto
+        cuts['METFixEE_low_sf_Veto'] = OC+' && '+SF+' && '+vetoZ+' && '+bTagVeto
+    
+        cuts['METFixEE_low_em_Tag']  = OC+' && '+DF             +' && '+bTagPass
+        cuts['METFixEE_low_ee_Tag']  = OC+' && '+EE+' && '+vetoZ+' && '+bTagPass
+        cuts['METFixEE_low_mm_Tag']  = OC+' && '+MM+' && '+vetoZ+' && '+bTagPass
+        cuts['METFixEE_low_sf_Tag']  = OC+' && '+SF+' && '+vetoZ+' && '+bTagPass
+
+        cuts['METFixEE_high_em_Veto'] = OC+' && '+DF             +' && ptmiss>=100 && ptmiss<140 &&'+bTagVeto
+        cuts['METFixEE_high_ee_Veto'] = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
+        cuts['METFixEE_high_mm_Veto'] = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
+        cuts['METFixEE_high_sf_Veto'] = OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagVeto
+    
+        cuts['METFixEE_high_em_Tag']  = OC+' && '+DF             +' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        cuts['METFixEE_high_ee_Tag']  = OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        cuts['METFixEE_high_mm_Tag']  = OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        cuts['METFixEE_high_sf_Tag']  = OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && '+bTagPass
+        '''
+    else:
+        cuts['METFixEE_low_em_Veto'] = '('+OC+' && '+DF             +')*'+btagWeight0tag
+        cuts['METFixEE_low_ee_Veto'] = '('+OC+' && '+EE+' && '+vetoZ+')*'+btagWeight0tag
+        cuts['METFixEE_low_mm_Veto'] = '('+OC+' && '+MM+' && '+vetoZ+')*'+btagWeight0tag
+        cuts['METFixEE_low_sf_Veto'] = '('+OC+' && '+SF+' && '+vetoZ+')*'+btagWeight0tag
+
+        cuts['METFixEE_low_em_Tag']  = '('+OC+' && '+DF             +')*'+btagWeight1tag
+        cuts['METFixEE_low_ee_Tag']  = '('+OC+' && '+EE+' && '+vetoZ+')*'+btagWeight1tag
+        cuts['METFixEE_low_mm_Tag']  = '('+OC+' && '+MM+' && '+vetoZ+')*'+btagWeight1tag
+        cuts['METFixEE_low_sf_Tag']  = '('+OC+' && '+SF+' && '+vetoZ+')*'+btagWeight1tag
+
+        cuts['METFixEE_high_em_Veto'] = '('+OC+' && '+DF             +' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
+        cuts['METFixEE_high_ee_Veto'] = '('+OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
+        cuts['METFixEE_high_mm_Veto'] = '('+OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
+        cuts['METFixEE_high_sf_Veto'] = '('+OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
+
+        cuts['METFixEE_high_em_Tag']  = '('+OC+' && '+DF             +' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
+        cuts['METFixEE_high_ee_Tag']  = '('+OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
+        cuts['METFixEE_high_mm_Tag']  = '('+OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
+        cuts['METFixEE_high_sf_Tag']  = '('+OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
+    
 if 'VetoNoiseEE' in opt.tag:
 
     EENoiseVeto0 = '(Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
@@ -102,8 +147,23 @@ if 'VetoNoiseEE' in opt.tag:
         cuts['Veto2_Veto_highptmiss'] = '('+OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight0tag
     
 if 'DYchecks' in opt.tag:
-    
-    if 'Data' in opt.sigset:
+    if 'nojets' in opt.tag:
+        print "nojets"
+        cuts['lowMll_sf_nojetcut']  = OC + ' && ' + LL + ' && PuppiMET_pt> 50' 
+        cuts['lowMll_ee_nojetcut']  = OC + ' && ' + EE + ' && PuppiMET_pt> 50 '  
+        cuts['lowMll_mm_nojetcut']  = OC + ' && ' + MM + ' && PuppiMET_pt> 50 '   
+        cuts['highMll_sf_nojetcut'] = OC + ' && ' + LL + ' && PuppiMET_pt> 50 && mll>=76 && mll<106'
+        cuts['highMll_ee_nojetcut'] = OC + ' && ' + EE + ' && PuppiMET_pt> 50 && mll>=76 && mll<106'
+        cuts['highMll_mm_nojetcut'] = OC + ' && ' + MM + ' && PuppiMET_pt> 50 && mll>=76 && mll<106' 
+        cuts['lowMll_sf_noMETcut_nojetcut']  = OC + ' && ' + LL   
+        cuts['lowMll_ee_noMETcut_nojetcut']  = OC + ' && ' + EE   
+        cuts['lowMll_mm_noMETcut_nojetcut']  = OC + ' && ' + MM    
+        cuts['highMll_sf_noMETcut_nojetcut'] = OC + ' && ' + LL + ' && mll>=76 && mll<106'
+        cuts['highMll_ee_noMETcut_nojetcut'] = OC + ' && ' + EE + ' && mll>=76 && mll<106' 
+        cuts['highMll_mm_noMETcut_nojetcut'] = OC + ' && ' + MM + ' && mll>=76 && mll<106' 
+
+    elif 'Data' in opt.sigset:
+        print "DO DATA"
         cuts['lowMll_sf']  = OC + ' && ' + LL + ' && Alt$(CleanJet_pt[1], 0)>=30. && '+ bTagPass
         cuts['lowMll_ee']  = OC + ' && ' + EE + ' && Alt$(CleanJet_pt[1],0)>=30. && PuppiMET_pt> 50 && '+ bTagPass
         cuts['lowMll_mm']  = OC + ' && ' + MM + ' && Alt$(CleanJet_pt[1],0)>=30. && PuppiMET_pt> 50 &&  '+ bTagPass

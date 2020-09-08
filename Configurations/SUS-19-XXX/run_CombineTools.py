@@ -96,8 +96,8 @@ if __name__ == '__main__':
     variables = {}
     samples   = {}
     cuts      = {}
-    if (isVarsF):  exec(open(opt.variablesFile).read())
     if (isSamsF):  exec(open(opt.samplesFile).read())
+    if (isVarsF):  exec(open(opt.variablesFile).read())
     if (isCutsF):  exec(open(opt.cutsFile).read())
     if (isCutsF):  exec(open(opt.cutsFile).read())
     if (isSignF):  exec(open(opt.signalMPcfg).read())
