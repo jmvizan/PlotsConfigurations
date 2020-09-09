@@ -129,6 +129,17 @@ dPhieenoiseptmiss_pt15_norawcut = 'acos(cos(Jet_phi-ptmiss_phi))*(2.*((Jet_pt>15
 HTForward     = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139))'
 HTForwardSoft = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && Jet_pt*(1.-Jet_rawFactor)<50.))'
 
+jetrawpteenoise_clean = '(CleanJet_pt[0]*(1.-Jet_rawFactor)*(2*(abs(CleanJet_eta[0])>2.650 && abs(CleanJet_eta[0])<3.139)-1))'
+dPhieenoiseptmiss_pt30_clean = 'acos(cos(CleanJet_pt[0]-ptmiss_phi))*(2.*((CleanJet_pt[0]*(1.-Jet_rawFactor)<50. && CleanJet_pt[0]>30. && abs(CleanJet_eta[0])>2.650 && abs(CleanJet_eta[0])<3.139)==1)-1.)'
+dPhieenoiseptmiss_pt15_clean = 'acos(cos(CleanJet_pt[0]-ptmiss_phi))*(2.*((CleanJet_pt[0]*(1.-Jet_rawFactor)<50. && CleanJet_pt[0]>15. && abs(CleanJet_eta[0])>2.650 && abs(CleanJet_eta[0])<3.139)==1)-1.)'
+dPhieenoiseptmiss_hard_clean = 'acos(cos(CleanJet_pt[0]-ptmiss_phi))*(2.*((CleanJet_pt[0]*(1.-Jet_rawFactor)>50. && CleanJet_pt[0]>30. && abs(CleanJet_eta[0])>2.650 && abs(CleanJet_eta[0])<3.139)==1)-1.)'
+dPhieenoiseptmiss_pt30_norawcut_clean = 'acos(cos(CleanJet_pt[0]-ptmiss_phi))*(2.*((CleanJet_pt[0]>30. && abs(CleanJet_eta[0])>2.650 && abs(CleanJet_eta[0])<3.139)==1)-1.)'
+dPhieenoiseptmiss_pt15_norawcut_clean = 'acos(cos(CleanJet_pt[0]-ptmiss_phi))*(2.*((CleanJet_pt[0]>15. && abs(CleanJet_eta[0])>2.650 && abs(CleanJet_eta[0])<3.139)==1)-1.)'
+HTForward_clean     = 'Sum$(CleanJet_pt[0]*(abs(CleanJet_eta[0])>2.650 && abs(CleanJet_eta[0])<3.139))'
+HTForwardSoft_clean = 'Sum$(CleanJet_pt[0]*(abs(CleanJet_eta[0])>2.650 && abs(CleanJet_eta[0])<3.139 && CleanJet_pt[0]*(1.-Jet_rawFactor)<50.))'
+
+
+
 OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])<0'
 SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])>0'
 SSP = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
