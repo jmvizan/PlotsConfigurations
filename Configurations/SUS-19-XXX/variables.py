@@ -154,6 +154,7 @@ elif 'VetoNoiseEE' in opt.tag:
                                   }
 
     ##clean version
+    '''
     variables['jetRawPtEENoise_clean'] = { 'name'  : jetrawpteenoise_clean,                      #   variable name    
                                      'range' : (  20, 0., 100.),                     #   variable range
                                      'xaxis' : 'jet raw ' + pt + ' (EE Noise)' + gv, #   x axis name
@@ -201,7 +202,7 @@ elif 'VetoNoiseEE' in opt.tag:
                                    'xaxis' : 'H_{T} forward' + gv, #   x axis name
                                    'fold'  : 1                     #   fold overflow
                                   }
-
+    '''
 
 
 elif 'HighPtMissOptimisationRegion' in opt.tag: 
@@ -242,8 +243,8 @@ elif 'btagefficiencies' in opt.tag:
                             'xaxis' : 'jet pseudorapodity',        #   x axis name
                             } 
                             
-elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag or 'More' in opt.tag:
-
+if 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag or 'More' in opt.tag:
+    #exit()
     variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
                                     'range' : (  40,    0.,  400.),    #   variable range
                                     'xaxis' : met + gv,                #   x axis name

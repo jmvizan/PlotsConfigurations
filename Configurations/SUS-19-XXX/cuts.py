@@ -1,4 +1,3 @@
-# cuts
 
 #
 
@@ -115,7 +114,7 @@ if 'VetoNoiseEE' in opt.tag:
     EENoiseVeto0 = '(Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     EENoiseVeto1 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     EENoiseVeto2 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
-
+    #print "eee", bool('HTF' in opt.tag)
     if 'Data' in opt.sigset:
         cuts['Veto0_Tag']             = OC+' && '+EENoiseVeto0+' && '+bTagPass
         cuts['Veto0_Tag_highptmiss']  = OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagPass
@@ -129,7 +128,20 @@ if 'VetoNoiseEE' in opt.tag:
         cuts['Veto1_Veto_highptmiss'] = OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagVeto
         cuts['Veto2_Veto']            = OC+' && '+EENoiseVeto2+' && '+bTagVeto
         cuts['Veto2_Veto_highptmiss'] = OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagVeto
-
+        if 'HTF' in opt.tag:
+            cuts['Veto0_Tag_HTF']             = OC+' && '+EENoiseVeto0+' && '+bTagPass
+            cuts['Veto0_Tag_highptmiss_HTF']  = OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagPass
+            cuts['Veto1_Tag_HTF']             = OC+' && '+EENoiseVeto1+' && '+ HTForward + '>=60. && '+bTagPass
+            cuts['Veto1_Tag_highptmiss_HTF']  = OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagPass
+            cuts['Veto2_Tag_HTF']             = OC+' && '+EENoiseVeto2+' && '+ HTForward + '>=60. && '+bTagPass
+            cuts['Veto2_Tag_highptmiss_HTF']  = OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagPass
+            cuts['Veto0_Veto_HTF']            = OC+' && '+EENoiseVeto0+' && '+ HTForward + '>=60. && '+bTagVeto
+            cuts['Veto0_Veto_highptmiss_HTF'] = OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagVeto
+            cuts['Veto1_Veto_HTF']            = OC+' && '+EENoiseVeto1+' && '+ HTForward + '>=60. && '+bTagVeto
+            cuts['Veto1_Veto_highptmiss_HTF'] = OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagVeto
+            cuts['Veto2_Veto_HTF']            = OC+' && '+EENoiseVeto2+' && '+ HTForward + '>=60. && '+bTagVeto
+            cuts['Veto2_Veto_highptmiss_HTF'] = OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagVeto
+        
     else: #if 'Backgrounds' in opt.sigset:
         cuts['Veto0_Tag']             = '('+OC+' && '+EENoiseVeto0+')*'+btagWeight1tag
         cuts['Veto0_Tag_highptmiss']  = '('+OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight1tag
@@ -143,7 +155,24 @@ if 'VetoNoiseEE' in opt.tag:
         cuts['Veto1_Veto_highptmiss'] = '('+OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight0tag
         cuts['Veto2_Veto']            = '('+OC+' && '+EENoiseVeto2+')*'+btagWeight0tag
         cuts['Veto2_Veto_highptmiss'] = '('+OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight0tag
-    
+        if 'HTF' in opt.tag:
+            #print "doing HTF"
+            #exit()
+
+            cuts['Veto0_Tag_HTF']             = '('+OC+' && '+EENoiseVeto0+' && ' + HTForward + '>=60.'+')*'+btagWeight1tag
+            cuts['Veto0_Tag_highptmiss_HTF']  = '('+OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')*'+btagWeight1tag
+            cuts['Veto1_Tag_HTF']             = '('+OC+' && '+EENoiseVeto1+' && ' + HTForward + '>=60.' +')*'+btagWeight1tag
+            cuts['Veto1_Tag_highptmiss_HTF']  = '('+OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')*'+btagWeight1tag
+            cuts['Veto2_Tag_HTF']             = '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '>=60.'+')*'+btagWeight1tag
+            cuts['Veto2_Tag_highptmiss_HTF']  = '('+OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')*'+btagWeight1tag
+            cuts['Veto0_Veto_HTF']            = '('+OC+' && '+EENoiseVeto0+' && ' + HTForward + '>=60.'+')*'+btagWeight0tag
+            cuts['Veto0_Veto_highptmiss_HTF'] = '('+OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')*'+btagWeight0tag
+            cuts['Veto1_Veto_HTF']            = '('+OC+' && '+EENoiseVeto1+' && ' + HTForward + '>=60.'+')*'+btagWeight0tag
+            cuts['Veto1_Veto_highptmiss_HTF'] = '('+OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')*'+btagWeight0tag
+            cuts['Veto2_Veto_HTF']            = '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '>=60.'+')*'+btagWeight0tag
+            cuts['Veto2_Veto_highptmiss_HTF'] = '('+OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')*'+btagWeight0tag
+
+
 if 'DYchecks' in opt.tag:
     if 'nojets' in opt.tag:
         print "nojets"
