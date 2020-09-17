@@ -248,7 +248,7 @@ if '__susyMT2reco' not in directorySig:
         'kind'  : 'tree',
         'type'  : 'shape',
         'folderUp':   directorySig.replace('__susyMT2fast', '__susyMT2reco'),
-        'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm'),
+        'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm').replace('Smear', 'Nomin'),
     }
     for sample in samples.keys():
         if samples[sample]['isFastsim']:
