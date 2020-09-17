@@ -312,7 +312,7 @@ for treeNuisance in treeNuisances:
 
 rateparameters = {
     'Topnorm' :  { 
-        'samples' : [ 'ttbar', 'tW' ],
+        'samples' : [ 'ttbar', 'tW', 'STtW' ],
         'subcut'  : '',
     },
     'WWnorm'  : {
@@ -320,12 +320,12 @@ rateparameters = {
         'subcut'  : '',
     },
     'NoJetRate_JetBack' : {
-        'samples' : [ 'ttbar', 'tW', 'ttW', 'ttZ' ],
+        'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
         'subcut'  : '_NoJet_',
         'limits'  : '[0.5,1.5]',
     },
     'JetRate_JetBack' : {
-        'samples'  : [ 'ttbar', 'tW', 'ttW', 'ttZ' ],
+        'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
         'subcut'   : '_NoTag_',
         'bondrate' : 'NoJetRate_JetBack',
     },
