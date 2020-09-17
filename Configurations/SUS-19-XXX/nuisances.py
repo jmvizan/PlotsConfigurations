@@ -248,7 +248,7 @@ if '__susyMT2reco' not in directorySig:
         'kind'  : 'tree',
         'type'  : 'shape',
         'folderUp':   directorySig.replace('__susyMT2fast', '__susyMT2reco'),
-        'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm'),
+        'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm').replace('Smear', 'Nomin'),
     }
     for sample in samples.keys():
         if samples[sample]['isFastsim']:
@@ -312,7 +312,7 @@ for treeNuisance in treeNuisances:
 
 rateparameters = {
     'Topnorm' :  { 
-        'samples' : [ 'ttbar', 'tW' ],
+        'samples' : [ 'ttbar', 'tW', 'STtW' ],
         'subcut'  : '',
     },
     'WWnorm'  : {
@@ -320,12 +320,12 @@ rateparameters = {
         'subcut'  : '',
     },
     'NoJetRate_JetBack' : {
-        'samples' : [ 'ttbar', 'tW', 'ttW', 'ttZ' ],
+        'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
         'subcut'  : '_NoJet_',
         'limits'  : '[0.5,1.5]',
     },
     'JetRate_JetBack' : {
-        'samples'  : [ 'ttbar', 'tW', 'ttW', 'ttZ' ],
+        'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
         'subcut'   : '_NoTag_',
         'bondrate' : 'NoJetRate_JetBack',
     },
