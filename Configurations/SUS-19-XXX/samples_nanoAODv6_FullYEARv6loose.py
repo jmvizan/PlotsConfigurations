@@ -100,9 +100,6 @@ for treeNuisance in treeNuisances:
             treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
 
 #if 'ifca' in SITE or 'cloud' in SITE:
- 
-#treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace('recoNomin', 'recoSmear').replace('ctrlNomin', 'ctrlSmear')  
-#treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg  
 
 # Complex cut variables
 
