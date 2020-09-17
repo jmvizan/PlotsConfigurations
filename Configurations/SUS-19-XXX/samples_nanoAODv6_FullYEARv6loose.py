@@ -92,17 +92,17 @@ for treeNuisance in treeNuisances:
     if treeNuisance=='jer' and treeNuisances[treeNuisance]['name']!='JER':
         treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
         treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg
+        treeNuisanceDirs['jer']['FS']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
+        treeNuisanceDirs['jer']['FS']['Down'] = directorySig
     else:
         directoryBkgTemp = directoryBkg.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation/') 
+        directorySigTemp = directorySig.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation/') 
         if 'jetname' in treeNuisances[treeNuisance]:
-            directoryBkgTemp = directoryBkgTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation') 
+            directoryBkgTemp = directoryBkgTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation')
+            directorySigTemp = directorySigTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation') 
         for variation in [ 'Down', 'Up' ]:
             treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
-
-#if 'ifca' in SITE or 'cloud' in SITE:
- 
-#treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace('recoNomin', 'recoSmear').replace('ctrlNomin', 'ctrlSmear')  
-#treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg  
+            treeNuisanceDirs[treeNuisance]['FS'][variation]  = directorySigTemp.replace('variation', variation[:2])
 
 # Complex cut variables
 
