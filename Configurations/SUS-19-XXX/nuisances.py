@@ -308,6 +308,11 @@ for treeNuisance in treeNuisances:
             if len(nuisances[treeNuisance+mcType]['samples'].keys())==0:
                 del nuisances[treeNuisance+mcType]
 
+    if hasattr(opt, 'cardList'):
+        if treeNuisance+'MC' in nuisances and treeNuisance+'FS' in nuisances:
+            nuisances[treeNuisance+'MC']['samples'].update(nuisances[treeNuisance+'FS']['samples']) 
+            del nuisances[treeNuisance+'FS']
+
 ### rate parameters
 
 rateparameters = {
@@ -400,11 +405,11 @@ if 'ValidationRegion' in opt.tag:
 
     pass
     #for nuisance in nuisances:
-    #    #if 'kind' not in nuisances[nuisance]:
-    #    #    nuisanceToRemove.append(nuisance)
-    #    #elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
-    #    if 'jer' not in nuisance: # 
-    #        nuisanceToRemove.append(nuisance)
+        ##if 'kind' not in nuisances[nuisance]:
+        ##    nuisanceToRemove.append(nuisance)
+        ##elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
+        #if 'jer' not in nuisance: # 
+        #    nuisanceToRemove.append(nuisance)
 
 elif 'ControlRegion' in opt.tag or 'TwoLeptons' in opt.tag or 'Preselection' in opt.tag:
 
