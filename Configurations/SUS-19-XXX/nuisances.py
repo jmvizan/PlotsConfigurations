@@ -398,12 +398,13 @@ nuisanceToRemove = [ ]
 
 if 'ValidationRegion' in opt.tag:
 
-    for nuisance in nuisances:
-        #if 'kind' not in nuisances[nuisance]:
-        #    nuisanceToRemove.append(nuisance)
-        #elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
-        if 'jer' not in nuisance: # 
-            nuisanceToRemove.append(nuisance)
+    pass
+    #for nuisance in nuisances:
+    #    #if 'kind' not in nuisances[nuisance]:
+    #    #    nuisanceToRemove.append(nuisance)
+    #    #elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
+    #    if 'jer' not in nuisance: # 
+    #        nuisanceToRemove.append(nuisance)
 
 elif 'ControlRegion' in opt.tag or 'TwoLeptons' in opt.tag or 'Preselection' in opt.tag:
 
