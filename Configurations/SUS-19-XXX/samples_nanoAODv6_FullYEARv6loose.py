@@ -87,6 +87,7 @@ elif metnom=='Smear':
     treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True }
 
 treeNuisanceDirs = { }
+treeNuisanceSuffix = '__hadd' if  'cern' in SITE else ''
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
     if treeNuisance=='jer' and treeNuisances[treeNuisance]['name']!='JER':
@@ -95,8 +96,8 @@ for treeNuisance in treeNuisances:
         treeNuisanceDirs['jer']['FS']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
         treeNuisanceDirs['jer']['FS']['Down'] = directorySig
     else:
-        directoryBkgTemp = directoryBkg.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation/') 
-        directorySigTemp = directorySig.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation/') 
+        directoryBkgTemp = directoryBkg.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
+        directorySigTemp = directorySig.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
         if 'jetname' in treeNuisances[treeNuisance]:
             directoryBkgTemp = directoryBkgTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation')
             directorySigTemp = directorySigTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation') 
@@ -222,6 +223,8 @@ if '2017' in yeartag and 'EENoise' in opt.tag:
         VetoEENoise = '('+HTForwardSoft+'<40.)'
     elif 'EENoiseDPhiHard' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0)'
+    elif 'EENoiseDPhiSoftPt50' in opt.tag:
+        VetoEENoise = '(Sum$('+dPhieenoiseptmiss_pt50+'>0. && '+dPhieenoiseptmiss_pt50+'<0.96)==0)'
     elif 'EENoiseDPhiSoft' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_pt30+'>0. && '+dPhieenoiseptmiss_pt30+'<0.96)==0)'
     elif 'EENoiseDPhi' in opt.tag:
