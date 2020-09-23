@@ -27,16 +27,12 @@ SITE=os.uname()[1]
 if  'cern' in SITE :
     if '2016' in yeartag:
         treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
-        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
-        treeBaseDirSig  = '/eos/cms/store/user/scodella/SUSY/Nano/'
     elif '2017' in yeartag:
         treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-        treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-        treeBaseDirSig  = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
     elif '2018' in yeartag:
         treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
-        treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
-        treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
+    treeBaseDirMC   = treeBaseDirData
+    treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -87,6 +83,7 @@ elif metnom=='Smear':
     treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True }
 
 treeNuisanceDirs = { }
+treeNuisanceSuffix = '__hadd' if  'cern' in SITE else ''
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
     if treeNuisance=='jer' and treeNuisances[treeNuisance]['name']!='JER':
@@ -95,8 +92,8 @@ for treeNuisance in treeNuisances:
         treeNuisanceDirs['jer']['FS']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
         treeNuisanceDirs['jer']['FS']['Down'] = directorySig
     else:
-        directoryBkgTemp = directoryBkg.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation/') 
-        directorySigTemp = directorySig.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation/') 
+        directoryBkgTemp = directoryBkg.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
+        directorySigTemp = directorySig.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
         if 'jetname' in treeNuisances[treeNuisance]:
             directoryBkgTemp = directoryBkgTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation')
             directorySigTemp = directorySigTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation') 
