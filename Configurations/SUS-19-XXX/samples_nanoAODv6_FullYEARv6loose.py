@@ -27,16 +27,12 @@ SITE=os.uname()[1]
 if  'cern' in SITE :
     if '2016' in yeartag:
         treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
-        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
-        treeBaseDirSig  = '/eos/cms/store/user/scodella/SUSY/Nano/'
     elif '2017' in yeartag:
         treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-        treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-        treeBaseDirSig  = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
     elif '2018' in yeartag:
         treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
-        treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
-        treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
+    treeBaseDirMC   = treeBaseDirData
+    treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
