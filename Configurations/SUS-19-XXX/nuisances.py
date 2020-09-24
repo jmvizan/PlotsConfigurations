@@ -248,7 +248,7 @@ if '__susyMT2reco' not in directorySig:
         'kind'  : 'tree',
         'type'  : 'shape',
         'folderUp':   directorySig.replace('__susyMT2fast', '__susyMT2reco'),
-        'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm'),
+        'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm').replace('Smear', 'Nomin'),
     }
     for sample in samples.keys():
         if samples[sample]['isFastsim']:
@@ -308,11 +308,16 @@ for treeNuisance in treeNuisances:
             if len(nuisances[treeNuisance+mcType]['samples'].keys())==0:
                 del nuisances[treeNuisance+mcType]
 
+    if hasattr(opt, 'cardList'):
+        if treeNuisance+'MC' in nuisances and treeNuisance+'FS' in nuisances:
+            nuisances[treeNuisance+'MC']['samples'].update(nuisances[treeNuisance+'FS']['samples']) 
+            del nuisances[treeNuisance+'FS']
+
 ### rate parameters
 
 rateparameters = {
     'Topnorm' :  { 
-        'samples' : [ 'ttbar', 'tW' ],
+        'samples' : [ 'ttbar', 'tW', 'STtW' ],
         'subcut'  : '',
     },
     'WWnorm'  : {
@@ -320,12 +325,12 @@ rateparameters = {
         'subcut'  : '',
     },
     'NoJetRate_JetBack' : {
-        'samples' : [ 'ttbar', 'tW', 'ttW', 'ttZ' ],
+        'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
         'subcut'  : '_NoJet_',
         'limits'  : '[0.5,1.5]',
     },
     'JetRate_JetBack' : {
-        'samples'  : [ 'ttbar', 'tW', 'ttW', 'ttZ' ],
+        'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
         'subcut'   : '_NoTag_',
         'bondrate' : 'NoJetRate_JetBack',
     },
@@ -397,13 +402,14 @@ if hasattr(opt, 'inputFile'):
 nuisanceToRemove = [ ]  
 
 if 'ValidationRegion' in opt.tag:
-
-    for nuisance in nuisances:
-        #if 'kind' not in nuisances[nuisance]:
+    
+    pass
+    #for nuisance in nuisances:
+        ##if 'kind' not in nuisances[nuisance]:
+        ##    nuisanceToRemove.append(nuisance)
+        ##elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
+        #if 'jer' not in nuisance: # 
         #    nuisanceToRemove.append(nuisance)
-        #elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
-        if 'jer' not in nuisance: # 
-            nuisanceToRemove.append(nuisance)
 
 elif 'ControlRegion' in opt.tag or 'TwoLeptons' in opt.tag or 'Preselection' in opt.tag:
 

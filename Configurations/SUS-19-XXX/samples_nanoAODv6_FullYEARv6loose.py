@@ -27,16 +27,12 @@ SITE=os.uname()[1]
 if  'cern' in SITE :
     if '2016' in yeartag:
         treeBaseDirData = '/eos/cms/store/user/scodella/SUSY/Nano/'
-        treeBaseDirMC   = '/eos/cms/store/user/scodella/SUSY/Nano/'
-        treeBaseDirSig  = '/eos/cms/store/user/scodella/SUSY/Nano/'
     elif '2017' in yeartag:
         treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-        treeBaseDirMC   = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
-        treeBaseDirSig  = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
     elif '2018' in yeartag:
         treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
-        treeBaseDirMC   = '/eos/user/s/scodella/SUSY/Nano/'
-        treeBaseDirSig  = '/eos/user/s/scodella/SUSY/Nano/'
+    treeBaseDirMC   = treeBaseDirData
+    treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -55,12 +51,15 @@ elif '2018' in yeartag :
     ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6loose/hadd__susyGen__susyW__FSSusy2018v6loose__FSSusyCorr2018v6loose__FSSusyNomin2018v6loose'
     ProductionData = 'Run2018_102X_nAODv6_Full2018v6loose/DATASusy2018v6__hadd'
 
-regionName = '__susyMT2recoNomin/'
+metnom, metsmr = 'Nomin', 'Smear'
+if 'Smear' in opt.tag:
+    metnom, metsmr = 'Smear', 'Nomin'
 
+regionName = '__susyMT2reco'+metnom+'/'
 ctrltag = ''
 
 if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZ' in opt.tag or 'WZtoWW' in opt.tag or 'ttZ' in opt.tag or 'ZZ' in opt.tag:
-    regionName = '__susyMT2ctrlNomin/'
+    regionName = regionName.replace('reco', 'ctrl')
     if 'SameSign' in opt.tag: ctrltag = '_SameSign'
     if 'Fake'     in opt.tag: ctrltag = '_Fake'
     if 'WZ'       in opt.tag: ctrltag = '_WZ'
@@ -69,25 +68,38 @@ if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZ' in opt.tag or 'WZtoWW' in 
     if 'ZZ'       in opt.tag: ctrltag = '_ZZ'	
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
-directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco', 'fast')
-directoryData = treeBaseDirData + ProductionData + regionName
+directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
+directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
 
-##treeNuisances = { 'jesTotal'  : { 'name' : 'JES', 'year' : False, 'MCtoFS' : True }, 
-##                  'jer'       : { 'name' : 'JER', 'year' : False, 'MCtoFS' : True },
-##                  'unclustEn' : { 'name' : 'MET', 'year' : False, 'MCtoFS' : True }, }
-treeNuisances = { 'jer'  : { 'name' : 'Smear', 'year' : False, 'MCtoFS' : True } }
-#treeNuisances = { }
+treeNuisances = { }
+if metnom=='Nomin':
+    treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True }
+    treeNuisances['jesTotal']  = { 'name' : 'JES',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True }
+    treeNuisances['unclustEn'] = { 'name' : 'MET',                     'year' : False, 'MCtoFS' : True }
+elif metnom=='Smear':
+    #treeNuisances['jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'year' : False, 'MCtoFS' : True }
+    treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True }
+    treeNuisances['jesTotal']  = { 'name' : 'SJS',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True }
+    treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True }
+
 treeNuisanceDirs = { }
+treeNuisanceSuffix = '__hadd' if  'cern' in SITE else ''
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
-
-##if 'cern' in SITE :
-##    for treeNuisance in treeNuisances:
-##        for variation in [ 'Down', 'Up' ]:
-##            treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkg.replace('Nomin', treeNuisances[treeNuisance]['name']+variation)
- 
-treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace('recoNomin', 'recoSmear').replace('ctrlNomin', 'ctrlSmear')  
-treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg  
+    if treeNuisance=='jer' and treeNuisances[treeNuisance]['name']!='JER':
+        treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
+        treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg
+        treeNuisanceDirs['jer']['FS']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
+        treeNuisanceDirs['jer']['FS']['Down'] = directorySig
+    else:
+        directoryBkgTemp = directoryBkg.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
+        directorySigTemp = directorySig.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
+        if 'jetname' in treeNuisances[treeNuisance]:
+            directoryBkgTemp = directoryBkgTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation')
+            directorySigTemp = directorySigTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation') 
+        for variation in [ 'Down', 'Up' ]:
+            treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
+            treeNuisanceDirs[treeNuisance]['FS'][variation]  = directorySigTemp.replace('variation', variation[:2])
 
 # Complex cut variables
 
@@ -129,7 +141,6 @@ dPhieenoiseptmiss_pt30_norawcut = 'acos(cos(Jet_phi-ptmiss_phi))*(2.*((Jet_pt>30
 dPhieenoiseptmiss_pt15_norawcut = 'acos(cos(Jet_phi-ptmiss_phi))*(2.*((Jet_pt>15. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
 
 if "MET" in opt.tag:
-    print "this is MET"
     mTllptmiss = 'sqrt(2*'+pTll+'*MET_pt*(1.-cos('+phill+'-MET_phi)))'
     dPhillptmiss = 'acos(cos('+phill+'-MET_phi))'
     dPhilep0ptmiss = 'acos(cos(Lepton_phi['+lep0idx+']-MET_phi))'
