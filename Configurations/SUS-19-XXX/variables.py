@@ -112,6 +112,12 @@ elif 'VetoNoiseEE' in opt.tag:
                                      'fold'  : 1                                     #   fold overflow
                                     }
         
+    variables['dPhiEENoisePtMissPt50'] = { 'name'  : dPhieenoiseptmiss_pt50, #   variable name    
+                                           'range' : (  10,    0.,  3.2),    #   variable range
+                                           'xaxis' : dphijetptmiss,          #   x axis name
+                                           'fold'  : 1                       #   fold overflow
+                                          }
+    
     variables['dPhiEENoisePtMissPt30'] = { 'name'  : dPhieenoiseptmiss_pt30, #   variable name    
                                            'range' : (  10,    0.,  3.2),    #   variable range
                                            'xaxis' : dphijetptmiss,          #   x axis name
@@ -152,7 +158,7 @@ elif 'VetoNoiseEE' in opt.tag:
                                    'xaxis' : 'H_{T} forward' + gv, #   x axis name
                                    'fold'  : 1                     #   fold overflow
                                   }
-
+    
     ##clean version
     '''
     variables['jetRawPtEENoise_clean'] = { 'name'  : jetrawpteenoise_clean,                      #   variable name    

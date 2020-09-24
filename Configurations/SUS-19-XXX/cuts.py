@@ -114,7 +114,8 @@ if 'VetoNoiseEE' in opt.tag:
     EENoiseVeto0 = '(Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     EENoiseVeto1 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     EENoiseVeto2 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
-    #print "eee", bool('HTF' in opt.tag)
+    ptm = ' && ptmiss > 100. && ptmiss<=140'
+    if 'MET' in opt.tag: ptm = ' && MET_pt > 100 && MET_pt < 140 ' # currently unused
     if 'Data' in opt.sigset:
         cuts['Veto0_Tag']             = OC+' && '+EENoiseVeto0+' && '+bTagPass
         cuts['Veto0_Tag_highptmiss']  = OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagPass
@@ -129,7 +130,7 @@ if 'VetoNoiseEE' in opt.tag:
         cuts['Veto2_Veto']            = OC+' && '+EENoiseVeto2+' && '+bTagVeto
         cuts['Veto2_Veto_highptmiss'] = OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagVeto
         if 'HTF' in opt.tag:
-            cuts['Veto0_Tag_HTF']             = OC+' && '+EENoiseVeto0+' && '+bTagPass
+            cuts['Veto0_Tag_HTF']             = OC+' && '+EENoiseVeto0+' && '+ HTForward + '>=60. && '+bTagPass
             cuts['Veto0_Tag_highptmiss_HTF']  = OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagPass
             cuts['Veto1_Tag_HTF']             = OC+' && '+EENoiseVeto1+' && '+ HTForward + '>=60. && '+bTagPass
             cuts['Veto1_Tag_highptmiss_HTF']  = OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagPass
