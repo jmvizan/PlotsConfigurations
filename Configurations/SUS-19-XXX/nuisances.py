@@ -126,7 +126,7 @@ for scalefactor in btagSF:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
                 nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
     for cut in cuts.keys():
-        if ('1b' in scalefactor and '_Tag' in cut) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut)):
+        if ('1b' in scalefactor and ('_Tag' in cut or 'SS_' in cut or 'Fake' in cut)) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut or 'WZ_' in cut or 'WZtoWW_' in cut or 'ttZ' in cut or 'ZZ' in cut)):
             nuisances[scalefactor]['cuts'].append(cut)
 
 # pileup
