@@ -87,7 +87,7 @@ if __name__ == '__main__':
         allsend   = [sigset]
         keepsplit = True
 
-    shapes_fol  = "./Shapes/"+yearnm+'/log/'
+    shapes_fol  = "./Shapes/log/"+yearnm+'/'
     shapes_file = shapes_fol+tag+'_'+sigset+'.log'
     os.system('mkdir -p '+shapes_fol)
     allcomms= []
