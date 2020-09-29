@@ -51,6 +51,24 @@ if __name__ == '__main__':
         tag = args[2]
 
     #    tag=sys.argv[2]                                                                         
+    lastarg = len(args)-1
+    yearnm  = '-'.join(yearset)
+    hadd    = args[3]
+    sigset  = args[4]
+    queue   = ''
+    split   = ''
+    rmlog   = None
+    runopts = ['tomorrow','workday','gridui_sort', 'gridui_medium']
+    if 'rm' in args[lastarg]:
+        args[lastarg] = ''
+        rmlog = True
+    elif args[lastarg] in  runopts:
+        queue = args[lastarg]
+        split = args[lastarg-1]
+    else: split = args[lastarg]
+    print args
+
+    '''
     yearnm = '-'.join(yearset)
     hadd   = args[3]
     sigset = args[4]
@@ -60,7 +78,6 @@ if __name__ == '__main__':
     if 'rm' in args[len(args)-1]:
         args[len(args)-1] = ''
         rmlog = True
-
     if len(args)>5: 
         if args[5] in ['tomorrow','workday','gridui_sort']: 
             queue = args[5]
@@ -68,14 +85,13 @@ if __name__ == '__main__':
                 split = args[6]
         else:
             split  = args[5]
-    
+    '''
+
     keepsplit = False
     allsam  = None
-    bkgs    = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY']
+    bkgs    = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY', 'Higgs']
     bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY']
     smsend  = bkgsend+ ['Data']
-    for signal in sigset.split('__'):
-        print "bro",signal
 
     if        len(sigset.split('__'))>1 : allsend = sigset.split('__')
     elif           '.' in sigset        : allsend = readsamples(sigset)
