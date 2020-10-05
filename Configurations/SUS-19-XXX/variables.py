@@ -444,9 +444,25 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                           'CRbins' : [1, 4] 
                                       }
 
-            
+	    if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag:
 
-        #exit()
+
+                mt2llOptimHighBin = [0, 20, 40, 60, 80, 100, 160, 370, 500]                                                                                               
+
+                variables['mt2llOptimHigh'] = {   'name'  : mt2ll,                   #   variable name
+                                                  'range' : (mt2llOptimHighBin,[1]), # variable range
+                                                  'xaxis' : mt2 + pll + gv,          #   x axis name
+                                                  'fold'  : 1,                       #   fold overflow
+                                                  'CRbins' : [1, 4]                                                                                                                                                      }
+                mt2llOptimHighExtraBin = [0, 20, 40, 60, 80, 100, 160, 240, 370, 500]
+
+                variables['mt2llOptimHighExtra'] = {   'name'  : mt2ll,                        #   variable name
+                                                       'range' : (mt2llOptimHighExtraBin,[1]), # variable range
+                                                       'xaxis' : mt2 + pll + gv,               #   x axis name
+                                                       'fold'  : 1,                            #   fold overflow
+                                                       'CRbins' : [1, 4]
+                                                    }
+
     if 'StudyVisHT' in opt.tag:
  
         visht = sumLeptonPt+'+Sum$(CleanJet_pt)'

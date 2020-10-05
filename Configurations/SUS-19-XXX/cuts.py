@@ -111,24 +111,30 @@ if 'METFix' in opt.tag:
     
 if 'VetoNoiseEE' in opt.tag:
 
+    channelCut = OC 
+    if 'Zveto' in opt.tag:
+        channelCut += ' && ('+DF+' || '+SF+')'
+ 
     EENoiseVeto0 = '(Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     EENoiseVeto1 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     EENoiseVeto2 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
+    
     ptm = ' && ptmiss > 100. && ptmiss<=140'
     if 'MET' in opt.tag: ptm = ' && MET_pt > 100 && MET_pt < 140 ' # currently unused
+      
     if 'Data' in opt.sigset:
-        cuts['Veto0_Tag']             = OC+' && '+EENoiseVeto0+' && '+bTagPass
-        cuts['Veto0_Tag_highptmiss']  = OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagPass
-        cuts['Veto1_Tag']             = OC+' && '+EENoiseVeto1+' && '+bTagPass
-        cuts['Veto1_Tag_highptmiss']  = OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagPass
-        cuts['Veto2_Tag']             = OC+' && '+EENoiseVeto2+' && '+bTagPass
-        cuts['Veto2_Tag_highptmiss']  = OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagPass
-        cuts['Veto0_Veto']            = OC+' && '+EENoiseVeto0+' && '+bTagVeto
-        cuts['Veto0_Veto_highptmiss'] = OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagVeto
-        cuts['Veto1_Veto']            = OC+' && '+EENoiseVeto1+' && '+bTagVeto
-        cuts['Veto1_Veto_highptmiss'] = OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagVeto
-        cuts['Veto2_Veto']            = OC+' && '+EENoiseVeto2+' && '+bTagVeto
-        cuts['Veto2_Veto_highptmiss'] = OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+' && '+bTagVeto
+        cuts['Veto0_Tag']             = channelCut+' && '+EENoiseVeto0+' && '+bTagPass
+        cuts['Veto0_Tag_highptmiss']  = channelCut+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<140. && '+bTagPass
+        cuts['Veto1_Tag']             = channelCut+' && '+EENoiseVeto1+' && '+bTagPass
+        cuts['Veto1_Tag_highptmiss']  = channelCut+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<140. && '+bTagPass
+        cuts['Veto2_Tag']             = channelCut+' && '+EENoiseVeto2+' && '+bTagPass
+        cuts['Veto2_Tag_highptmiss']  = channelCut+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<140. && '+bTagPass
+        cuts['Veto0_Veto']            = channelCut+' && '+EENoiseVeto0+' && '+bTagVeto
+        cuts['Veto0_Veto_highptmiss'] = channelCut+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<140. && '+bTagVeto
+        cuts['Veto1_Veto']            = channelCut+' && '+EENoiseVeto1+' && '+bTagVeto
+        cuts['Veto1_Veto_highptmiss'] = channelCut+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<140. && '+bTagVeto
+        cuts['Veto2_Veto']            = channelCut+' && '+EENoiseVeto2+' && '+bTagVeto
+        cuts['Veto2_Veto_highptmiss'] = channelCut+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<140. && '+bTagVeto
         if 'HTF' in opt.tag:
             cuts['Veto0_Tag_HTF']             = OC+' && '+EENoiseVeto0+' && '+ HTForward + '>=60. && '+bTagPass
             cuts['Veto0_Tag_highptmiss_HTF']  = OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagPass
@@ -144,22 +150,19 @@ if 'VetoNoiseEE' in opt.tag:
             cuts['Veto2_Veto_highptmiss_HTF'] = OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140. && '+ HTForward + '>=60. && '+bTagVeto
         
     else: #if 'Backgrounds' in opt.sigset:
-        cuts['Veto0_Tag']             = '('+OC+' && '+EENoiseVeto0+')*'+btagWeight1tag
-        cuts['Veto0_Tag_highptmiss']  = '('+OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight1tag
-        cuts['Veto1_Tag']             = '('+OC+' && '+EENoiseVeto1+')*'+btagWeight1tag
-        cuts['Veto1_Tag_highptmiss']  = '('+OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight1tag
-        cuts['Veto2_Tag']             = '('+OC+' && '+EENoiseVeto2+')*'+btagWeight1tag
-        cuts['Veto2_Tag_highptmiss']  = '('+OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight1tag
-        cuts['Veto0_Veto']            = '('+OC+' && '+EENoiseVeto0+')*'+btagWeight0tag
-        cuts['Veto0_Veto_highptmiss'] = '('+OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight0tag
-        cuts['Veto1_Veto']            = '('+OC+' && '+EENoiseVeto1+')*'+btagWeight0tag
-        cuts['Veto1_Veto_highptmiss'] = '('+OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight0tag
-        cuts['Veto2_Veto']            = '('+OC+' && '+EENoiseVeto2+')*'+btagWeight0tag
-        cuts['Veto2_Veto_highptmiss'] = '('+OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+')*'+btagWeight0tag
+        cuts['Veto0_Tag']             = '('+channelCut+' && '+EENoiseVeto0+')*'+btagWeight1tag
+        cuts['Veto0_Tag_highptmiss']  = '('+channelCut+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<140.)*'+btagWeight1tag
+        cuts['Veto1_Tag']             = '('+channelCut+' && '+EENoiseVeto1+')*'+btagWeight1tag
+        cuts['Veto1_Tag_highptmiss']  = '('+channelCut+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<140.)*'+btagWeight1tag
+        cuts['Veto2_Tag']             = '('+channelCut+' && '+EENoiseVeto2+')*'+btagWeight1tag
+        cuts['Veto2_Tag_highptmiss']  = '('+channelCut+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<140.)*'+btagWeight1tag
+        cuts['Veto0_Veto']            = '('+channelCut+' && '+EENoiseVeto0+')*'+btagWeight0tag
+        cuts['Veto0_Veto_highptmiss'] = '('+channelCut+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<140.)*'+btagWeight0tag
+        cuts['Veto1_Veto']            = '('+channelCut+' && '+EENoiseVeto1+')*'+btagWeight0tag
+        cuts['Veto1_Veto_highptmiss'] = '('+channelCut+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<140.)*'+btagWeight0tag
+        cuts['Veto2_Veto']            = '('+channelCut+' && '+EENoiseVeto2+')*'+btagWeight0tag
+        cuts['Veto2_Veto_highptmiss'] = '('+channelCut+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<140.)*'+btagWeight0tag
         if 'HTF' in opt.tag:
-            #print "doing HTF"
-            #exit()
-
             cuts['Veto0_Tag_HTF']             = '('+OC+' && '+EENoiseVeto0+' && ' + HTForward + '>=60.'+')*'+btagWeight1tag
             cuts['Veto0_Tag_highptmiss_HTF']  = '('+OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')*'+btagWeight1tag
             cuts['Veto1_Tag_HTF']             = '('+OC+' && '+EENoiseVeto1+' && ' + HTForward + '>=60.' +')*'+btagWeight1tag
@@ -172,7 +175,6 @@ if 'VetoNoiseEE' in opt.tag:
             cuts['Veto1_Veto_highptmiss_HTF'] = '('+OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')*'+btagWeight0tag
             cuts['Veto2_Veto_HTF']            = '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '>=60.'+')*'+btagWeight0tag
             cuts['Veto2_Veto_highptmiss_HTF'] = '('+OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')*'+btagWeight0tag
-
 
 if 'DYchecks' in opt.tag:
     if 'nojets' in opt.tag:
@@ -253,18 +255,6 @@ if 'DYControlRegion' in opt.tag:
     DY = OC+' && '+LL+' && '+Zcut.replace('ZCUT',  '15.')
 
     if 'Data' in opt.sigset:
-        cuts['DY_ee'] = '(' + DY+' && '+EE+') && '+bTagVeto
-        cuts['DY_mm'] = '(' + DY+' && '+MM+') && '+bTagVeto
-
-    else: #if 'Backgrounds' in opt.sigset:
-        cuts['DY_ee'] = '(' + DY+' && '+EE+')*'+btagWeight0tag
-        cuts['DY_mm'] = '(' + DY+' && '+MM+')*'+btagWeight0tag
-
-if 'DYControlRegion' in opt.tag:
-
-    DY = OC+' && '+LL+' && '+Zcut.replace('ZCUT',  '15.')
-
-    if 'Data' in opt.sigset:
         cuts['DY_ee']     = '(' + DY+' && '+EE+') && '+bTagVeto
         cuts['DY_mm']     = '(' + DY+' && '+MM+') && '+bTagVeto
         cuts['DY_ee_jet'] = '(' + DY+' && '+EE+') && Alt$(CleanJet_pt[1],0)>=30. && '+bTagVeto
@@ -298,7 +288,6 @@ if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.t
         cuts['VR1_Veto_em']  = '(' + OC+' && '+DF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
         cuts['VR1_Tag_sf']   = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight1tag
         cuts['VR1_Veto_sf']  = '(' + OC+' && '+SF+' && ptmiss>=100 && ptmiss<140)*'+btagWeight0tag
-
 
 if 'LatinoControlRegion' in opt.tag:
 
@@ -398,15 +387,17 @@ if 'SameSignValidationRegion' in opt.tag:
         cuts['SS_ptmiss']           = SSM+' && ptmiss'+ctrltag+'>=0   && '                         +bTagPass
         cuts['SS_ptmiss-100to140']  = SS +' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+bTagPass
         cuts['SS_ptmiss-140']       = SS +' && ptmiss'+ctrltag+'>=140 && '                         +bTagPass
-        cuts['SS_ptmiss-140_plus']  = SSP+' && ptmiss'+ctrltag+'>=140 && '                         +bTagPass
-        cuts['SS_ptmiss-140_minus'] = SSM+' && ptmiss'+ctrltag+'>=140 && '                         +bTagPass
+        cuts['SS_ptmiss-160']       = SS +' && ptmiss'+ctrltag+'>=160 && '                         +bTagPass
+        cuts['SS_ptmiss-160_plus']  = SSP+' && ptmiss'+ctrltag+'>=160 && '                         +bTagPass
+        cuts['SS_ptmiss-160_minus'] = SSM+' && ptmiss'+ctrltag+'>=160 && '                         +bTagPass
 
     else:
         cuts['SS_ptmiss']            = '('+SSM+' && ptmiss'+ctrltag+'>=0  )*'+btagWeight1tag
         cuts['SS_ptmiss-100to140']   = '('+SS +' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)*'+btagWeight1tag
         cuts['SS_ptmiss-140']        = '('+SS +' && ptmiss'+ctrltag+'>=140)*'+btagWeight1tag
-        cuts['SS_ptmiss-140_plus']   = '('+SSP+' && ptmiss'+ctrltag+'>=140)*'+btagWeight1tag
-        cuts['SS_ptmiss-140_minus']  = '('+SSM+' && ptmiss'+ctrltag+'>=140)*'+btagWeight1tag
+        cuts['SS_ptmiss-160']        = '('+SS +' && ptmiss'+ctrltag+'>=160)*'+btagWeight1tag
+        cuts['SS_ptmiss-160_plus']   = '('+SSP+' && ptmiss'+ctrltag+'>=160)*'+btagWeight1tag
+        cuts['SS_ptmiss-160_minus']  = '('+SSM+' && ptmiss'+ctrltag+'>=160)*'+btagWeight1tag
 
 if 'FakeValidationRegion' in opt.tag:
     
@@ -467,10 +458,11 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
         if 'Data' in opt.sigset:
             cuts['ttZ']            = ttZselection.replace('METCUT',   '0') + ' && ' + bTagPass
             cuts['ttZ_ptmiss-140'] = ttZselection.replace('METCUT', '140') + ' && ' + bTagPass
-
+            cuts['ttZ_ptmiss-160'] = ttZselection.replace('METCUT', '160') + ' && ' + bTagPass
         else:
             cuts['ttZ']            = '(' + ttZselection.replace('METCUT',   '0') + ')*'+btagWeight1tag
             cuts['ttZ_ptmiss-140'] = '(' + ttZselection.replace('METCUT', '140') + ')*'+btagWeight1tag
+            cuts['ttZ_ptmiss-160'] = '(' + ttZselection.replace('METCUT', '160') + ')*'+btagWeight1tag
 
     elif 'ZZValidationRegion' in opt.tag:
 
@@ -479,10 +471,12 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
         if 'Data' in opt.sigset:
             cuts['ZZ']            = ZZselection.replace('METCUT',   '0') + ' && ' + bTagVeto
             cuts['ZZ_ptmiss-140'] = ZZselection.replace('METCUT', '140') + ' && ' + bTagVeto
+            cuts['ZZ_ptmiss-160'] = ZZselection.replace('METCUT', '160') + ' && ' + bTagVeto
 
         else:
             cuts['ZZ']            = '(' + ZZselection.replace('METCUT',   '0') + ')*'+btagWeight0tag
             cuts['ZZ_ptmiss-140'] = '(' + ZZselection.replace('METCUT', '140') + ')*'+btagWeight0tag
+            cuts['ZZ_ptmiss-160'] = '(' + ZZselection.replace('METCUT', '160') + ')*'+btagWeight0tag
 
 if 'DYValidationRegion' in opt.tag:
 
