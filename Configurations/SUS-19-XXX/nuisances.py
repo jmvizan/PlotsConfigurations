@@ -197,7 +197,8 @@ for sample in samples.keys():
 
 # mt2ll top and WW
 
-mt2llRegions = ['SR1_', 'SR2_', 'SR3_']
+### Update to new bins: add SR4_ and adjust mt2ll bins for high MT2
+mt2llRegions = ['SR1_', 'SR2_', 'SR3_'] # , 'SR4_']
 mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
 mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
 mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
@@ -401,27 +402,20 @@ if hasattr(opt, 'inputFile'):
 
 nuisanceToRemove = [ ]  
 
-if 'ValidationRegion' in opt.tag:
-    
-    pass
-    #for nuisance in nuisances:
-        ##if 'kind' not in nuisances[nuisance]:
-        ##    nuisanceToRemove.append(nuisance)
-        ##elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
-        #if 'jer' not in nuisance: # 
-        #    nuisanceToRemove.append(nuisance)
+if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag:
 
-elif 'ControlRegion' in opt.tag or 'TwoLeptons' in opt.tag or 'Preselection' in opt.tag:
+    if 'ctrl' in regionName and 'cern' in SITE : # JES and MET variations not available at cern for ctrl trees
+        for nuisance in nuisances:
+            if 'jesTotal' in nuisance or 'unclustEn' in nuisance: 
+                nuisanceToRemove.append(nuisance)
 
-    for nuisance in nuisances:
-        #if nuisance!='stat' and nuisance!='lumi': # example ...
-        if 'jer' not in nuisance: # 
-            nuisanceToRemove.append(nuisance)
-            
-elif 'SignalRegion' not in opt.tag:
+    else:
+        pass
+
+else:
 
     for nuisance in nuisances:
-        if 'lumi' not in nuisance: 
+        if nuisance!='stat' and nuisance!='lumi': # example ...
             nuisanceToRemove.append(nuisance)
 
 for nuisance in nuisanceToRemove:
