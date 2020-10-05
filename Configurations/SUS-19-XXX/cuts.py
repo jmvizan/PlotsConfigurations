@@ -2,8 +2,8 @@
 #
 
 massZ = '91.1876'
-vetoZ = 'fabs(mll-'+massZ+')>15.'
-Zcut  = 'fabs(mll-'+massZ+')<ZCUT'
+vetoZ = 'fabs(mll'+ctrltag+'-'+massZ+')>15.'
+Zcut  = 'fabs(mll'+ctrltag+'-'+massZ+')<ZCUT'
 SF    = LL+' && '+vetoZ  
 
 #cuts = {}
