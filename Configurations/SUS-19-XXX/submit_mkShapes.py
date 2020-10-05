@@ -18,7 +18,10 @@ def logtitle(filename,sigset):
     d2  = now.strftime("%d %B, %Y, at %H:%M:%S")
     f.write(d2+"\nCALCULATING LIMITS FOR:\t "+ sigset+"\n")
     f.close()
-
+def readsamples(sigset):
+    with open(sigset) as sigfile:
+        samples=sigfile.read().splitlines()
+    return samples
 
 if __name__ == '__main__':
     doDC=False
@@ -71,9 +74,14 @@ if __name__ == '__main__':
     bkgs    = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY']
     bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY']
     smsend  = bkgsend+ ['Data']
-    if 'backgrounds' in split.lower(): allsend = bkgsend
-    elif        'SM' in split        : allsend = smsend
-    elif       'all' in split.lower():
+    for signal in sigset.split('__'):
+        print "bro",signal
+
+    if        len(sigset.split('__'))>1 : allsend = sigset.split('__')
+    elif           '.' in sigset        : allsend = readsamples(sigset)
+    elif 'backgrounds' in split.lower() : allsend = bkgsend
+    elif          'SM' in split         : allsend = smsend
+    elif         'all' in split.lower() :
         all_sam = True
         #print bool(hadd=='0'), bool(sigset in 
         if hadd == '1' and "SM-" not in sigset and sigset not in smsend+["SM","Backgrounds"]: sigset="SM-"+sigset
@@ -87,7 +95,7 @@ if __name__ == '__main__':
         allsend   = [sigset]
         keepsplit = True
 
-    shapes_fol  = "./Shapes/"+yearnm+'/log/'
+    shapes_fol  = "./Shapes/log/"+yearnm+'/'
     shapes_file = shapes_fol+tag+'_'+sigset+'.log'
     os.system('mkdir -p '+shapes_fol)
     allcomms= []
