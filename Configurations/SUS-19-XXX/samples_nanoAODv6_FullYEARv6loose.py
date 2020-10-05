@@ -126,8 +126,6 @@ dPhill = 'acos(cos(Lepton_phi['+lep1idx+']-Lepton_phi['+lep0idx+']))'
 dEtall = 'Lepton_eta['+lep1idx+']-Lepton_eta['+lep0idx+']'
 dRll = 'sqrt('+dPhill+'*'+dPhill+'+'+dEtall+'*'+dEtall+')'
 ptmiss_phi = 'ptmiss_phi'+ctrltag
-if 'NoFix' in opt.tag:
-    ptmiss_phi = 'MET_phi'
 mTllptmiss = 'sqrt(2*'+pTll+'*ptmiss*(1.-cos('+phill+'-'+ptmiss_phi+')))'
 dPhillptmiss = 'acos(cos('+phill+'-'+ptmiss_phi+'))'
 dPhilep0ptmiss = 'acos(cos(Lepton_phi['+lep0idx+']-'+ptmiss_phi+'))'
@@ -208,14 +206,12 @@ METFilters_MC     = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter'
 METFilters_Data   = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter*Flag_eeBadScFilter'
 METFilters_FS     = METFilters_Common
 
-### HEM Issue in 2018
+### EE Noise in 2017 and HEM Issue in 2018
 
 VetoEENoise, VetoHEMdata, VetoHEMmc  = '1.', '1.', '1.'
 if '2017' in yeartag and 'EENoise' in opt.tag:
     VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
-    if 'EENoiseHT60' in opt.tag:
-        VetoEENoise = '('+HTForwardSoft+'<60.)'
-    elif 'EENoiseHT' in opt.tag:
+    if 'EENoiseHT' in opt.tag:
         VetoEENoise = '('+HTForwardSoft+'<40.)'
     elif 'EENoiseDPhiHard' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0)'
@@ -224,10 +220,11 @@ if '2017' in yeartag and 'EENoise' in opt.tag:
     elif 'EENoiseDPhiSoft' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_pt30+'>0. && '+dPhieenoiseptmiss_pt30+'<0.96)==0)'
     elif 'EENoiseDPhi' in opt.tag:
-        VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0 && Sum$('+dPhieenoiseptmiss_pt30+'>0. && '+dPhieenoiseptmiss_pt30+'<0.96)==0)'
+        VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0 && Sum$('+dPhieenoiseptmiss_pt50+'>0. && '+dPhieenoiseptmiss_pt50+'<0.96)==0)'
     if 'Veto' in opt.tag:
         #VetoEENoise = '(1. - '+VetoEENoise+')'
         VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
+
 elif '2018' in yeartag and 'HEM' in opt.tag:
     hemPtCut = '20.' if 'HEM20' in opt.tag else '30.' 
     VetoHEMele  = '(Sum$(Electron_pt>'+hemPtCut+' && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)==0)'
@@ -295,6 +292,8 @@ if '2018' in yeartag and 'HEM' in opt.tag:
     SFweightCommon += '*' + VetoHEMmc
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
+
+# Primary Vertex Reweighting
 
 if 'pu1sigma' in opt.tag: 
     SFweight = SFweight.replace('puWeight', 'puWeightUp')
@@ -603,6 +602,9 @@ for sample in samples:
     samples[sample]['isSignal']  = 0
     samples[sample]['isDATA']    = 0
     samples[sample]['isFastsim'] = 0
+    samples[sample]['suppressNegative'] = ['all']
+    samples[sample]['suppressNegativeNuisances'] = ['all']
+    samples[sample]['suppressZeroTreeNuisances'] = ['all']
 
 ### Data
 
@@ -640,7 +642,7 @@ exec(open('./signalMassPoints.py').read())
 for model in signalMassPoints:
     if model in opt.sigset:
 
-        isrObservable = 'njetISR' if ('T2' in model) else 'ptISR'
+        isrObservable = 'ptISR' if ('T2' not in model and '2016' in opt.tag) else 'njetISR'
 
         for massPoint in signalMassPoints[model]:
             if massPointInSignalSet(massPoint, opt.sigset):

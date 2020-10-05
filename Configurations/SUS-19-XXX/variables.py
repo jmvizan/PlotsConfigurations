@@ -386,9 +386,6 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                           'CRbins' : [1, 4] 
                                       }
 
-            
-
-        #exit()
     if 'StudyVisHT' in opt.tag:
  
         visht = sumLeptonPt+'+Sum$(CleanJet_pt)'
