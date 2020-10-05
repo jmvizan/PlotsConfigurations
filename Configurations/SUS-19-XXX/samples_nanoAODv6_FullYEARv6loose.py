@@ -83,7 +83,7 @@ elif metnom=='Smear':
     treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True }
 
 treeNuisanceDirs = { }
-treeNuisanceSuffix = '__hadd' if  'cern' in SITE else ''
+treeNuisanceSuffix = '' if  'ctrl' in regionName else '__hadd'
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
     if treeNuisance=='jer' and treeNuisances[treeNuisance]['name']!='JER':
@@ -145,10 +145,10 @@ HTForward     = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139))'
 HTForwardSoft = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && Jet_pt*(1.-Jet_rawFactor)<50.))'
 jetpteenoisedphi = '(Jet_pt*(2*(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && acos(cos(Jet_phi-'+ptmiss_phi+'))<0.96)-1))'
 
-OC =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])<0'
-SS =  nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])>0'
-SSP = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
-SSM = nTightLepton + '==2 && mll>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]>0 && Lepton_pdgId[1]>0'
+OC =  nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])<0'
+SS =  nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])>0'
+SSP = nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
+SSM = nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]>0 && Lepton_pdgId[1]>0'
 
 LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
 DF = 'fabs(Lepton_pdgId[0])!=fabs(Lepton_pdgId[1])'
@@ -404,14 +404,12 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     ttbarFlag = '_PSWeights' if ('2017' in yeartag) else ''
     samples['ttbar'] = {    'name'   : getSampleFiles(directoryBkg,'TTTo2L2Nu'+ttbarFlag,False,treePrefix),
                             'weight' : XSWeight+'*'+SFweight+'*'+centralTopPt ,
-                            'FilesPerJob' : 20 ,
                         }
 
     if 'btagefficiencies' in opt.tag:
 
         samples['T2tt'] = { 'name'   : getSampleFiles(directorySig,'T2tt__mStop-400to1200',False,treePrefix),
                             'weight' : XSWeight+'*'+SFweight ,
-                            'FilesPerJob' : 2 ,
                             }
 
     if 'btagefficiencies' not in opt.tag and 'Test' not in opt.tag:
@@ -420,7 +418,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         samples['STtW']    = {    'name'   :   getSampleFiles(directoryBkg,'ST_tW_antitop'+tWext,False,treePrefix) +
                                                getSampleFiles(directoryBkg,'ST_tW_top'+tWext,    False,treePrefix),
                                   'weight' : XSWeight+'*'+SFweight ,
-                                  'FilesPerJob' : 2 ,
                              }
 
         ttZToLLext = '_ext3' if ('2016' in yeartag) else ''
@@ -428,10 +425,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         samples['ttZ']   = {    'name'   :   getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZToLLext,False,treePrefix) + 
                                              getSampleFiles(directoryBkg,'TTZToQQ'         +ttZToQQext,False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
-                                'FilesPerJob' : 2 ,
-                                'suppressNegative':['all'],
-                                'suppressNegativeNuisances' :['all'],
-                                
                                 }
         
         ttWToLLext = ''
@@ -440,15 +433,11 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         samples['ttW']   = {    'name'   :   getSampleFiles(directoryBkg,'TTWJetsToLNu'+ttWToLLext,False,treePrefix) +
                                 getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix), 
                                 'weight' : XSWeight+'*'+SFweight ,
-                                'FilesPerJob' : 2 ,
-                                'suppressNegative':['all'],
-                                'suppressNegativeNuisances' :['all'],
                                 }
 
          
         samples['WW']    = {    'name'   :   getSampleFiles(directoryBkg,'WWTo2L2Nu',           False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
-                                'FilesPerJob' : 2 ,
         }
         if '2016' in yeartag : 
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluWWTo2L2Nu_MCFM',False,treePrefix) 
@@ -466,7 +455,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         WZext = '_ext1' if ('2018' in yeartag) else ''
         samples['WZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
-                                'FilesPerJob' : 2 ,
                                 }
 
         ZZext = ''
@@ -478,9 +466,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                               getSampleFiles(directoryBkg,'ggZZ2e2n',       False,treePrefix) +
                                               getSampleFiles(directoryBkg,'ggZZ2m2n',       False,treePrefix),
                                    'weight' : XSWeight+'*'+SFweight ,
-                                   'suppressNegative':['all'],
-                                   'suppressNegativeNuisances' :['all'],
-                                   'FilesPerJob' : 2 ,
                                  }
 
         DYM10ext = '_ext1' if ('2018' in yeartag) else ''
@@ -516,7 +501,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                    getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500'+DYMhighHT1200ext, False,treePrefix) +
                                    getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toInf'+DYMhighHT2500ext,  False,treePrefix) ,
                           'weight' : XSWeight+'*'+SFweight ,
-                          'FilesPerJob' : 40 ,
                         } 
         if '2016' in yeartag : 
             samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100',False,treePrefix)
@@ -536,17 +520,11 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125',                False,treePrefix) + 
                                              getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125',            False,treePrefix) ,
                                 'weight' : XSWeight+'*'+SFweight ,
-                                'suppressNegative':['all'],
-                                'suppressNegativeNuisances' :['all'],
-                                'FilesPerJob' : 2 ,
                                 }
 
         samples['VZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo2L2Q',False,treePrefix) + 
                                              getSampleFiles(directoryBkg,'ZZTo2L2Q',False,treePrefix),
-                                'weight' : XSWeight+'*'+SFweight ,
-                                'suppressNegative':['all'],
-                                'suppressNegativeNuisances' :['all'],
-                                'FilesPerJob' : 20 ,
+                                'weight' : XSWeight+'*'+SFweight
         }
         
         samples['VVV']   = {    'name'   :   getSampleFiles(directoryBkg,'WWW',False,treePrefix) + 
@@ -555,7 +533,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'ZZZ',False,treePrefix) +
                                              getSampleFiles(directoryBkg,'WWG',False,treePrefix),
                                 'weight' : XSWeight+'*'+SFweight ,
-                                'FilesPerJob' : 2 ,
                                 }
         
         if 'ZZ' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
@@ -567,21 +544,18 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        getSampleFiles(directoryBkg,'ggZZ4t',              False,treePrefix) +
                                        getSampleFiles(directoryBkg,'ggZZ2e2m',            False,treePrefix) +
                                        getSampleFiles(directoryBkg,'ggZZ2e2t',            False,treePrefix) +
-                                       #getSampleFiles(directoryBkg,'ggZZ2m2t',            False,treePrefix) +
+                                       getSampleFiles(directoryBkg,'ggZZ2m2t',            False,treePrefix) +
                                        getSampleFiles(directoryBkg,'VBFHToZZTo4L_M125',   False,treePrefix) +
                                        getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,treePrefix),
                                        'weight' : XSWeight+'*'+SFweight ,
-                                       'FilesPerJob' : 2 ,
+                                       'JobsPerSample' : 6,
                                    }
-	    if '2016' not in yeartag :
-                samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg,'ggZZ2m2t',False,treePrefix)
 
         if 'SameSignValidationRegion' in opt.tag:
     
             ttSemilepFlag = '_ext3' if ('2018' in yeartag) else ''
             samples['ttSemilep'] = { 'name'   : getSampleFiles(directoryBkg,'TTToSemiLeptonic'+ttSemilepFlag,False,treePrefix),
                                      'weight' : XSWeight+'*'+SFweight ,
-                                     'FilesPerJob' : 2 ,
                                     }
 
 if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
@@ -614,7 +588,6 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'weight' : METFilters_Data+'*'+VetoHEMdata+'*'+VetoEENoise, 
                            'weights' : [ ],
                            'isData': ['all'],
-                           'FilesPerJob' : 100 ,
                            'isSignal'  : 0,
                            'isDATA'    : 1, 
                            'isFastsim' : 0
@@ -632,8 +605,10 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 if hasattr(opt, 'batchSplit'):
     if 'AsMuchAsPossible' in opt.batchSplit : 
         for sample in samples:
-            ntrees = len(samples[sample]['name'])  
-            samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/3))
+            if 'FilesPerJob' not in samples[sample]:
+                ntrees = len(samples[sample]['name']) 
+                multFactor = 3 if 'JobsPerSample' not in samples[sample] else int(samples[sample]['JobsPerSample'])
+                samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/multFactor))
 
 ### Signals
 
