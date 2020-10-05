@@ -147,6 +147,7 @@ elif 'VetoNoiseEE' in opt.tag:
                                                    'xaxis' : dphijetptmiss,          #   x axis name
                                                    'fold'  : 1                       #   fold overflow
                                                   }
+
     variables['HTForwardSoft'] = { 'name'  : HTForwardSoft,             #   variable name    
                                    'range' : (  30,    0.,  300),       #   variable range
                                    'xaxis' : 'H_{T} forward soft' + gv, #   x axis name
@@ -158,58 +159,6 @@ elif 'VetoNoiseEE' in opt.tag:
                                    'xaxis' : 'H_{T} forward' + gv, #   x axis name
                                    'fold'  : 1                     #   fold overflow
                                   }
-    
-    ##clean version
-    '''
-    variables['jetRawPtEENoise_clean'] = { 'name'  : jetrawpteenoise_clean,                      #   variable name    
-                                     'range' : (  20, 0., 100.),                     #   variable range
-                                     'xaxis' : 'jet raw ' + pt + ' (EE Noise)' + gv, #   x axis name
-                                     'fold'  : 1                                     #   fold overflow
-                                    }
-        
-    variables['dPhiEENoisePtMissPt30_clean'] = { 'name'  : dPhieenoiseptmiss_pt30_clean, #   variable name    
-                                           'range' : (  10,    0.,  3.2),    #   variable range
-                                           'xaxis' : dphijetptmiss,          #   x axis name
-                                           'fold'  : 1                       #   fold overflow
-                                          }
-    
-    variables['dPhiEENoisePtMissPt15_clean'] = { 'name'  : dPhieenoiseptmiss_pt15_clean, #   variable name    
-                                           'range' : (  10,    0.,  3.2),    #   variable range
-                                           'xaxis' : dphijetptmiss,          #   x axis name
-                                           'fold'  : 1                       #   fold overflow
-                                          }
-
-    variables['dPhiEENoisePtMissHard_clean'] = { 'name'  : dPhieenoiseptmiss_hard_clean, #   variable name
-                                           'range' : (  10,    0.,  3.2),    #   variable range
-                                           'xaxis' : dphijetptmiss,          #   x axis name
-                                           'fold'  : 1                       #   fold overflow
-                                          }
-        
-    variables['dPhiEENoisePtMissPt30NoRawCut_clean'] = { 'name'  : dPhieenoiseptmiss_pt30_norawcut_clean, #   variable name    
-                                                   'range' : (  10,    0.,  3.2),    #   variable range
-                                                   'xaxis' : dphijetptmiss,          #   x axis name
-                                                   'fold'  : 1                       #   fold overflow
-                                                  }
-    
-    variables['dPhiEENoisePtMissPt15NoRawCut_clean'] = { 'name'  : dPhieenoiseptmiss_pt15_norawcut_clean, #   variable name    
-                                                   'range' : (  10,    0.,  3.2),    #   variable range
-                                                   'xaxis' : dphijetptmiss,          #   x axis name
-                                                   'fold'  : 1                       #   fold overflow
-                                                  }
-
-    variables['HTForwardSoft_clean'] = { 'name'  : HTForwardSoft_clean,             #   variable name    
-                                   'range' : (  30,    0.,  300),       #   variable range
-                                   'xaxis' : 'H_{T} forward soft' + gv, #   x axis name
-                                   'fold'  : 1                          #   fold overflow
-                                  }
-
-    variables['HTForward_clean']     = { 'name'  : HTForward_clean,            #   variable name    
-                                   'range' : (  30,    0.,  300),  #   variable range
-                                   'xaxis' : 'H_{T} forward' + gv, #   x axis name
-                                   'fold'  : 1                     #   fold overflow
-                                  }
-    '''
-
 
 elif 'HighPtMissOptimisationRegion' in opt.tag: 
     
@@ -249,8 +198,8 @@ elif 'btagefficiencies' in opt.tag:
                             'xaxis' : 'jet pseudorapodity',        #   x axis name
                             } 
                             
-if 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag or 'More' in opt.tag:
-    #exit()
+elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag or 'More' in opt.tag:
+
     variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
                                     'range' : (  40,    0.,  400.),    #   variable range
                                     'xaxis' : met + gv,                #   x axis name
@@ -380,7 +329,6 @@ if 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.
                                        'xaxis' : mt2 + pll + gv,         #   x axis name
                                        'fold'  : 1                       #   fold overflow
                                    }
-
    
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
