@@ -255,7 +255,7 @@ if '__susyMT2reco' not in directorySig:
         if samples[sample]['isFastsim']:
             nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
-### LHE weights
+### QCD scale
 
 # LHE scale variation weights (w_var / w_nominal)
 # [0] is muR=0.50000E+00 muF=0.50000E+00
@@ -268,19 +268,20 @@ if '__susyMT2reco' not in directorySig:
 # [7] is muR=0.20000E+01 muF=0.10000E+01
 # [8] is muR=0.20000E+01 muF=0.20000E+01
 
-#variations = ['LHEScaleWeight[%d]' % i for i in [0, 1, 3, 5, 7, 8]]
-"""
-nuisances['QCDscale'] = {
-    'name': 'QCDscale', # Scales correlated through the years?
-    #'kind': 'weight_envelope',
-    'kind': 'weight',
-    'type': 'shape',
-    'samples': { },
-}
-for sample in samples.keys():
-    if not samples[sample]['isDATA']:
-        nuisances['QCDscale']['samples'][sample] = [ 'LHEScaleWeight[8]', 'LHEScaleWeight[0]' ] 
-"""
+#scaleVariations = [ 'LHEScaleWeight[%d]' % i for i in [0, 1, 3, 5, 7, 8] ]
+
+#nuisances['QCDscale'] = {
+#    'name': 'QCDscale', # Scales correlated through the years?
+#    'kind': 'weight_envelope',
+#    'type': 'shape',
+#    'samples': { },
+#}
+#for sample in samples.keys():
+#    if not samples[sample]['isDATA']:
+#        nuisances['QCDscale']['samples'][sample] = scaleVariations
+
+### PDFs
+
 ### JES, JER and MET
 
 for treeNuisance in treeNuisances:
@@ -297,6 +298,8 @@ for treeNuisance in treeNuisances:
                 'name': treeNuisance+mcTypeName+yearCorr, 
                 'kind': 'tree',
                 'type': 'shape',
+                'OneSided' : treeNuisances[treeNuisance]['onesided'],
+                'synchronized' : False,
                 'samples': { },
                 'folderDown': treeNuisanceDirs[treeNuisance][mcType]['Down'],
                 'folderUp':   treeNuisanceDirs[treeNuisance][mcType]['Up'],
