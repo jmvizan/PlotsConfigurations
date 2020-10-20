@@ -73,14 +73,14 @@ directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', '
 
 treeNuisances = { }
 if metnom=='Nomin':
-    treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True }
-    treeNuisances['jesTotal']  = { 'name' : 'JES',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True }
-    treeNuisances['unclustEn'] = { 'name' : 'MET',                     'year' : False, 'MCtoFS' : True }
+    treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
+    treeNuisances['jesTotal']  = { 'name' : 'JES',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
+    treeNuisances['unclustEn'] = { 'name' : 'MET',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 elif metnom=='Smear':
-    #treeNuisances['jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'year' : False, 'MCtoFS' : True }
-    treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True }
-    treeNuisances['jesTotal']  = { 'name' : 'SJS',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True }
-    treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True }
+    #treeNuisances['jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
+    treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
+    treeNuisances['jesTotal']  = { 'name' : 'SJS',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
+    treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 
 treeNuisanceDirs = { }
 treeNuisanceSuffix = '' if  'ctrl' in regionName else '__hadd'
@@ -604,13 +604,13 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
 ### Files per job
 
-if hasattr(opt, 'batchSplit'):
-    if 'AsMuchAsPossible' in opt.batchSplit : 
-        for sample in samples:
-            if 'FilesPerJob' not in samples[sample]:
-                ntrees = len(samples[sample]['name']) 
-                multFactor = 3 if 'JobsPerSample' not in samples[sample] else int(samples[sample]['JobsPerSample'])
-                samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/multFactor))
+#if hasattr(opt, 'batchSplit'):
+    #if 'AsMuchAsPossible' in opt.batchSplit or 'Files' in opt.batchSplit: 
+for sample in samples:
+    if 'FilesPerJob' not in samples[sample]:
+        ntrees = len(samples[sample]['name']) 
+        multFactor = 6 if 'JobsPerSample' not in samples[sample] else int(samples[sample]['JobsPerSample'])
+        samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/multFactor))
 
 ### Signals
 
