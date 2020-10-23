@@ -255,7 +255,9 @@ if '__susyMT2reco' not in directorySig:
         if samples[sample]['isFastsim']:
             nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
-### QCD scale
+### QCD scale and PDFs
+
+exec(open('./theoryNormalizations'+year+'.py').read())
 
 # LHE scale variation weights (w_var / w_nominal)
 # [0] is muR=0.50000E+00 muF=0.50000E+00
@@ -268,20 +270,33 @@ if '__susyMT2reco' not in directorySig:
 # [7] is muR=0.20000E+01 muF=0.10000E+01
 # [8] is muR=0.20000E+01 muF=0.20000E+01
 
-#scaleVariations = [ 'LHEScaleWeight[%d]' % i for i in [0, 1, 3, 5, 7, 8] ]
+"""
+nuisances['qcdScale'] = {
+    'name': 'qcdScale', # Scales correlated through the years?
+    'kind': 'weight_envelope',
+    'type': 'shape',
+    'samples': { },
+}
+for sample in samples.keys():
+    if not samples[sample]['isDATA'] and theoryNormalizations[sample]['qcdScaleStatus']==3:
+        qcdScaleVariations = [ ] 
+        for i in [0, 1, 3, 5, 7, 8]:
+            qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
+        nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
 
-#nuisances['QCDscale'] = {
-#    'name': 'QCDscale', # Scales correlated through the years?
-#    'kind': 'weight_envelope',
-#    'type': 'shape',
-#    'samples': { },
-#}
-#for sample in samples.keys():
-#    if not samples[sample]['isDATA']:
-#        nuisances['QCDscale']['samples'][sample] = scaleVariations
-
-### PDFs
-
+nuisances['pdf'] = {
+    'name': 'pdf', # PDFs correlated through the years?
+    'kind': 'weight_envelope',
+    'type': 'shape',
+    'samples': { },
+}
+for sample in samples.keys():
+    if not samples[sample]['isDATA'] and not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
+        pdfVariations = [ ] 
+        for i in range(len(theoryNormalizations[sample]['pdf'])):                              
+            pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
+        nuisances['pdf']['samples'][sample] = pdfVariations
+"""
 ### JES, JER and MET
 
 for treeNuisance in treeNuisances:
