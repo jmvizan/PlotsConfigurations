@@ -253,8 +253,8 @@ XSWeight       = 'baseW*genWeight'
 
 if '2016' in opt.tag:
     LepRecoSF      = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
-    RecoWeight     = LepRecoSF.replace(LEPIDX. '0') + '*' + LepRecoSF.replace(LEPIDX. '1')
-else 
+    RecoWeight     = LepRecoSF.replace(LEPIDX, '0') + '*' + LepRecoSF.replace(LEPIDX, '1')
+else: 
     RecoWeight     = 'Lepton_RecoSF[0]*Lepton_RecoSF[1]'
 EleWeight      = ElectronSF+'_IdIsoSF[0]*'+ElectronSF+'_IdIsoSF[1]'
 MuoWeight      = MuonSF+'_IdIsoSF[0]*'+MuonSF+'_IdIsoSF[1]'
@@ -419,7 +419,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     if 'btagefficiencies' in opt.tag:
 
         samples['T2tt'] = { 'name'   : getSampleFiles(directorySig,'T2tt__mStop-400to1200',False,treePrefix),
-                            'weight' : XSWeight+'*'+SFweight ,
+                            'weight' : XSWeight+'*'+SFweightFS ,
                             }
 
     if 'btagefficiencies' not in opt.tag and 'Test' not in opt.tag:
