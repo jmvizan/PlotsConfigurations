@@ -258,9 +258,9 @@ EleWeightFS    = EleWeight.replace('IdIsoSF', 'FastSimSF')
 MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
 LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
 
-weightEle   = '('+EleWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
-weightMuo   = '('+MuoWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
-weightLep   = '('+LepWeight.replace('IdiIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
+weightEle   = '('+EleWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
+weightMuo   = '('+MuoWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
+weightLep   = '('+LepWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
 weightEleFS = weightEle.replace('IdIsoSF', 'FastSimSF')
 weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
 weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
