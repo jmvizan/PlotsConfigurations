@@ -83,7 +83,8 @@ elif metnom=='Smear':
     treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 
 treeNuisanceDirs = { }
-treeNuisanceSuffix = '' if  'ctrl' in regionName else '__hadd'
+#treeNuisanceSuffix = '' if  'ctrl' in regionName else '__hadd'
+treeNuisanceSuffix = '__hadd' if  'cern' in SITE else ''
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
     if treeNuisance=='jer' and treeNuisances[treeNuisance]['name']!='JER':
@@ -510,7 +511,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         else :
             addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO'+DYM10ext,  'LHE_HT<100.0')
         addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO'+DYM50ext, 'LHE_HT<70.0')
-        
+
         ggHWWgen = 'AMCNLO'  if ('2016' in yeartag) else ''
         ggHTText = '_newpmx' if ('2017' in yeartag) else ''
         samples['Higgs']   = {  'name'   :   getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix) + 
