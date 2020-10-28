@@ -49,11 +49,18 @@ if __name__ == '__main__':
         tag = 'StopSignalRegions'
     else:
         tag = args[2]
-
+    
     #    tag=sys.argv[2]                                                                         
     yearnm = '-'.join(yearset)
     hadd   = args[3]
     sigset = args[4]
+    
+    multi  = ''
+    print tag.lower()
+    if '_multi'        in tag.lower() : 
+        multi='Multi'
+        sigset=tag.split('_multi')[0]
+        print "running on multi"
     queue  = ''
     split  = ''
     rmlog  = None
@@ -75,8 +82,7 @@ if __name__ == '__main__':
     bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY']
     smsend  = bkgsend+ ['Data']
     for signal in sigset.split('__'):
-        print "bro",signal
-
+        print "sample:",signal
     if        len(sigset.split('__'))>1 : allsend = sigset.split('__')
     elif           '.' in sigset        : allsend = readsamples(sigset)
     elif 'backgrounds' in split.lower() : allsend = bkgsend
@@ -113,7 +119,7 @@ if __name__ == '__main__':
             else:
                 split = ''
         for year in yearset:
-            command = "./run_mkShapes.sh "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
+            command = "./run_mkShapes"+multi+".sh "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
             allcomms.append(command)
     print "Commands to be ran:"
     for comm in allcomms:

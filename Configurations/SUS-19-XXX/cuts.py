@@ -1,4 +1,3 @@
-
 #
 
 massZ = '91.1876'
@@ -280,7 +279,8 @@ if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.t
     if 'Data' in opt.sigset:
        btagWeight1tag = bTagPass
        btagWeight0tag = bTagVeto
-
+    print "im in here"
+    #exit()
     cuts['VR1_Tag_em']   = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight1tag }
     cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight0tag }
     cuts['VR1_Tag_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight1tag }
