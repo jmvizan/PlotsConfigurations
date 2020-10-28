@@ -251,6 +251,11 @@ XSWeight       = 'baseW*genWeight'
 
 # lepton weights
 
+if '2016' in opt.tag:
+    LepRecoSF      = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
+    RecoWeight     = LepRecoSF.replace(LEPIDX. '0') + '*' + LepRecoSF.replace(LEPIDX. '1')
+else 
+    RecoWeight     = 'Lepton_RecoSF[0]*Lepton_RecoSF[1]'
 EleWeight      = ElectronSF+'_IdIsoSF[0]*'+ElectronSF+'_IdIsoSF[1]'
 MuoWeight      = MuonSF+'_IdIsoSF[0]*'+MuonSF+'_IdIsoSF[1]'
 LepWeight      = EleWeight + '*' + MuoWeight
@@ -258,6 +263,7 @@ EleWeightFS    = EleWeight.replace('IdIsoSF', 'FastSimSF')
 MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
 LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
 
+weightReco  = '('+RecoWeight.replace('RecoSF', 'RecoSF_Syst')+')/('+RecoWeight+')'
 weightEle   = '('+EleWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
 weightMuo   = '('+MuoWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
 weightLep   = '('+LepWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
@@ -266,7 +272,8 @@ weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
 weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
 
 leptonSF = { 
-    #'trkreco'        : [ '1.', '1.' ], ->  no scale factor required
+    #'trkreco'         : [ '1.', '1.' ], ->  no scale factor required
+    'lepreco'         : [ weightReco.replace('Syst', 'Up'),   weightReco.replace('Syst', 'Down')   ],
     #'electronIdIso'   : [ weightEle.replace('Syst', 'Up'),   weightEle.replace('Syst', 'Down')   ],
     #'muonIdIso'       : [ weightMuo.replace('Syst', 'Up'),   weightMuo.replace('Syst', 'Down')   ],
     'leptonIdIso'     : [ weightLep.replace('Syst', 'Up'),   weightLep.replace('Syst', 'Down')   ], 
@@ -286,7 +293,7 @@ nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' 
 
 # global SF weights 
 
-SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight + '*' + nonpromptLepSF
+SFweightCommon = 'puWeight*' + TriggerEff + '*' + RecoWeight + '*' + LepWeight + '*' + nonpromptLepSF
 if '2016' in yeartag or '2017' in yeartag: 
     SFweightCommon += '*PrefireWeight'
 if '2017' in yeartag and 'EENoise' in opt.tag:
