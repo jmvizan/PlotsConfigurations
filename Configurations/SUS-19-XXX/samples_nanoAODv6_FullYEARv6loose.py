@@ -253,7 +253,7 @@ XSWeight       = 'baseW*genWeight'
 
 if '2016' in opt.tag:
     LepRecoSF      = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
-    RecoWeight     = LepRecoSF.replace(LEPIDX, '0') + '*' + LepRecoSF.replace(LEPIDX, '1')
+    RecoWeight     = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
 else: 
     RecoWeight     = 'Lepton_RecoSF[0]*Lepton_RecoSF[1]'
 EleWeight      = ElectronSF+'_IdIsoSF[0]*'+ElectronSF+'_IdIsoSF[1]'
