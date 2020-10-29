@@ -142,7 +142,7 @@ for sample in samples.keys():
         nuisances['pileup']['samples'][sample] = [ 'puWeightUp/puWeight', 'puWeightDown/puWeight' ] 
 
 # ECAL prefiring
-"""
+
 if '2016' in opt.tag or '2017' in opt.tag: 
     nuisances['prefiring']  = {
         'name'  : 'prefiring'+year, 
@@ -153,7 +153,7 @@ if '2016' in opt.tag or '2017' in opt.tag:
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
             nuisances['pileup']['samples'][sample] = [ 'PrefireWeight_Up/PrefireWeight', 'PrefireWeight_Down/PrefireWeight' ] 
-"""
+
 # nonprompt lepton rate
 
 nuisances['nonpromptLep']  = {
@@ -270,7 +270,6 @@ exec(open('./theoryNormalizations'+year+'.py').read())
 # [7] is muR=0.20000E+01 muF=0.10000E+01
 # [8] is muR=0.20000E+01 muF=0.20000E+01
 
-"""
 nuisances['qcdScale'] = {
     'name': 'qcdScale', # Scales correlated through the years?
     'kind': 'weight_envelope',
@@ -296,7 +295,7 @@ for sample in samples.keys():
         for i in range(len(theoryNormalizations[sample]['pdf'])):                              
             pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
         nuisances['pdf']['samples'][sample] = pdfVariations
-"""
+
 ### JES, JER and MET
 
 for treeNuisance in treeNuisances:
