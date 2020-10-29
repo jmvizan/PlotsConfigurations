@@ -126,7 +126,7 @@ for scalefactor in btagSF:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
                 nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
     for cut in cuts.keys():
-        if ('1b' in scalefactor and '_Tag' in cut) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut)):
+        if ('1b' in scalefactor and ('_Tag' in cut or 'SS_' in cut or 'Fake' in cut or 'ttZ' in cut)) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut or 'WZ_' in cut or 'WZtoWW_' in cut or 'ZZ' in cut or 'Zpeak' in cut)):
             nuisances[scalefactor]['cuts'].append(cut)
 
 # pileup
@@ -197,7 +197,8 @@ for sample in samples.keys():
 
 # mt2ll top and WW
 
-mt2llRegions = ['SR1_', 'SR2_', 'SR3_']
+### Update to new bins: add SR4_ and adjust mt2ll bins for high MT2
+mt2llRegions = ['SR1_', 'SR2_', 'SR3_'] # , 'SR4_']
 mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
 mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
 mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
@@ -254,7 +255,9 @@ if '__susyMT2reco' not in directorySig:
         if samples[sample]['isFastsim']:
             nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
-### LHE weights
+### QCD scale and PDFs
+
+exec(open('./theoryNormalizations'+year+'.py').read())
 
 # LHE scale variation weights (w_var / w_nominal)
 # [0] is muR=0.50000E+00 muF=0.50000E+00
@@ -267,18 +270,32 @@ if '__susyMT2reco' not in directorySig:
 # [7] is muR=0.20000E+01 muF=0.10000E+01
 # [8] is muR=0.20000E+01 muF=0.20000E+01
 
-#variations = ['LHEScaleWeight[%d]' % i for i in [0, 1, 3, 5, 7, 8]]
 """
-nuisances['QCDscale'] = {
-    'name': 'QCDscale', # Scales correlated through the years?
-    #'kind': 'weight_envelope',
-    'kind': 'weight',
+nuisances['qcdScale'] = {
+    'name': 'qcdScale', # Scales correlated through the years?
+    'kind': 'weight_envelope',
     'type': 'shape',
     'samples': { },
 }
 for sample in samples.keys():
-    if not samples[sample]['isDATA']:
-        nuisances['QCDscale']['samples'][sample] = [ 'LHEScaleWeight[8]', 'LHEScaleWeight[0]' ] 
+    if not samples[sample]['isDATA'] and theoryNormalizations[sample]['qcdScaleStatus']==3:
+        qcdScaleVariations = [ ] 
+        for i in [0, 1, 3, 5, 7, 8]:
+            qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
+        nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
+
+nuisances['pdf'] = {
+    'name': 'pdf', # PDFs correlated through the years?
+    'kind': 'weight_envelope',
+    'type': 'shape',
+    'samples': { },
+}
+for sample in samples.keys():
+    if not samples[sample]['isDATA'] and not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
+        pdfVariations = [ ] 
+        for i in range(len(theoryNormalizations[sample]['pdf'])):                              
+            pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
+        nuisances['pdf']['samples'][sample] = pdfVariations
 """
 ### JES, JER and MET
 
@@ -296,6 +313,8 @@ for treeNuisance in treeNuisances:
                 'name': treeNuisance+mcTypeName+yearCorr, 
                 'kind': 'tree',
                 'type': 'shape',
+                'OneSided' : treeNuisances[treeNuisance]['onesided'],
+                'synchronized' : False,
                 'samples': { },
                 'folderDown': treeNuisanceDirs[treeNuisance][mcType]['Down'],
                 'folderUp':   treeNuisanceDirs[treeNuisance][mcType]['Up'],
@@ -401,27 +420,20 @@ if hasattr(opt, 'inputFile'):
 
 nuisanceToRemove = [ ]  
 
-if 'ValidationRegion' in opt.tag:
-    
-    pass
-    #for nuisance in nuisances:
-        ##if 'kind' not in nuisances[nuisance]:
-        ##    nuisanceToRemove.append(nuisance)
-        ##elif nuisances[nuisance]['kind']!='tree' and 'pileup' not in nuisance:
-        #if 'jer' not in nuisance: # 
-        #    nuisanceToRemove.append(nuisance)
+if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag:
 
-elif 'ControlRegion' in opt.tag or 'TwoLeptons' in opt.tag or 'Preselection' in opt.tag:
+    if 'ctrl' in regionName and 'cern' in SITE : # JES and MET variations not available at cern for ctrl trees
+        for nuisance in nuisances:
+            if 'jesTotal' in nuisance or 'unclustEn' in nuisance: 
+                nuisanceToRemove.append(nuisance)
 
-    for nuisance in nuisances:
-        #if nuisance!='stat' and nuisance!='lumi': # example ...
-        if 'jer' not in nuisance: # 
-            nuisanceToRemove.append(nuisance)
-            
-elif 'SignalRegion' not in opt.tag:
+    else:
+        pass
+
+else:
 
     for nuisance in nuisances:
-        if 'lumi' not in nuisance: 
+        if nuisance!='stat' and nuisance!='lumi': # example ...
             nuisanceToRemove.append(nuisance)
 
 for nuisance in nuisanceToRemove:
