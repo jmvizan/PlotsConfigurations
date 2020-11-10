@@ -415,6 +415,17 @@ if hasattr(opt, 'inputFile'):
 
                     fileIn.Close()
 
+### Cleaning 
+
+nuisanceToRemove = [ ]
+for nuisance in nuisances:
+    if 'cuts' in nuisances[nuisance]:
+        if len(nuisances[nuisance]['cuts'])==0:
+            nuisanceToRemove.append(nuisance)
+
+for nuisance in nuisanceToRemove:
+    del nuisances[nuisance]
+
 ### Nasty tricks ...
 
 nuisanceToRemove = [ ]  
@@ -422,9 +433,10 @@ nuisanceToRemove = [ ]
 if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag:
 
     if 'ctrl' in regionName and 'cern' in SITE : # JES and MET variations not available at cern for ctrl trees
-        for nuisance in nuisances:
-            if 'jesTotal' in nuisance or 'unclustEn' in nuisance: 
-                nuisanceToRemove.append(nuisance)
+        if hasattr(opt, 'batchSplit'): # Remove only when running shapes, so can make shapes in gridui and plots in lxplus
+            for nuisance in nuisances:
+                if 'jesTotal' in nuisance or 'unclustEn' in nuisance: 
+                    nuisanceToRemove.append(nuisance)
 
     else:
         pass
