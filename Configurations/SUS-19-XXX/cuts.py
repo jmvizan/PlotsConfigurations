@@ -8,6 +8,7 @@ SF    = LL+' && '+vetoZ
 if 'Data' in opt.sigset:
     btagWeight1tag = bTagPass
     btagWeight0tag = bTagVeto
+    btagWeight2tag = b2TagPass
 
 #cuts = {}
 
@@ -287,6 +288,16 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
         cuts['ZZ']            = { 'expr' : '(' + ZZselection.replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
         cuts['ZZ_ptmiss-140'] = { 'expr' : '(' + ZZselection.replace('METCUT', '140') + ')', 'weight' : btagWeight0tag }
         cuts['ZZ_ptmiss-160'] = { 'expr' : '(' + ZZselection.replace('METCUT', '160') + ')', 'weight' : btagWeight0tag }
+
+if 'ttZNormalization' in opt.tag:
+
+    ttZcommon = nTightLepton+'>=3 && deltaMassZ_ctrltag<10. && '+ptmissNano+'>=METCUT && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>=20.'
+    ttZ3Lep = nLooseLepton+'==3 && '+ttZcommon.replace('_ctrltag', '_WZ')
+    ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ') 
+    ttZselectionLoose = '(('+ ttZ3Lep + ') || (' + ttZ4Lep + '))'   
+
+    cuts['ttZ_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
 
 if 'DYValidationRegion' in opt.tag:
 

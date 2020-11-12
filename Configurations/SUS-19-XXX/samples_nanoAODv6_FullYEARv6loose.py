@@ -190,11 +190,15 @@ btagWP += bTagWP
 
 bTagPass = '(leadingPtTagged_'+btagAlgo+bTagWP+'_1c>='+bTagPtCut+')' 
 bTagVeto = '!'+bTagPass
+b2TagPass = bTagPass.replace('leadingPt', 'trailingPt')
 
 btagWeight1tag = 'btagWeight_1tag_'+btagAlgo+bTagWP+'_1c'
 if 'pt25' in opt.tag: btagWeight1tag += '_Pt25'
 if 'pt30' in opt.tag: btagWeight1tag += '_Pt30'
 btagWeight0tag = '(1.-'+btagWeight1tag+')'
+btagWeight2tag = btagWeight1tag.replace('_1tag_', '_2tag_')
+
+ptmissNano = 'METFixEE2017_pt' if '2017' in yeartag else 'MET_pt'
 
 ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '
@@ -560,6 +564,10 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        'weight' : XSWeight+'*'+SFweight ,
                                        'JobsPerSample' : 6,
                                    }
+
+            for kZZvariable in [ 'kZZmass', 'kZZdphi', 'kZZpt' ]:
+                if kZZvariable in opt.tag:  
+                    addSampleWeight(samples,'ZZTo4L','ZZTo4L'+ZZ4Lext, kZZvariable.replace('kZZ', 'kZZ_'))
 
         if 'SameSignValidationRegion' in opt.tag:
     

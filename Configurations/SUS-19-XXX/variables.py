@@ -336,6 +336,13 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                        'xaxis' : mt2 + pll + gv,         #   x axis name
                                        'fold'  : overflow                #   fold overflow
                                    }
+
+elif 'ttZNormalization' in opt.tag:
+
+    variables['mll'] = {   'name'  : '90.',                #   variable name
+                           'range' : (  1,    80.,  100.), #   variable range
+                           'xaxis' : 'm' + pll + gv,       #   x axis name
+                       }
    
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
