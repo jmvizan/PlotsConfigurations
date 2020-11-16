@@ -320,6 +320,12 @@ if 'ttZNormalization' in opt.tag:
     ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ') 
     ttZselectionLoose = '(('+ ttZ3Lep + ') || (' + ttZ4Lep + '))'   
 
+    cuts['ttZ_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')', 'weight' : btagWeight2tag }
+  
+    cuts['ttZ_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+
     cuts['ttZ_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
     cuts['ttZ_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
 

@@ -368,7 +368,14 @@ elif 'ttZNormalization' in opt.tag:
                            'range' : (  1,    80.,  100.), #   variable range
                            'xaxis' : 'm' + pll + gv,       #   x axis name
                        }
-   
+  
+
+    variables['ptmiss'] = {  'name'  : ptmissNano,              #   variable name
+                             'range' : (  20,    0.,  400.),    #   variable range
+                             'xaxis' : met + gv,                #   x axis name
+                             'fold'  : overflow                 #   fold overflow
+                           }
+ 
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     mt2ll = 'mt2ll' + ctrltag
