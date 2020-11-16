@@ -109,6 +109,13 @@ if 'EleTightPOG' in opt.tag:
     ElectronWP = 'Lepton_isTightElectron_cutBasedTightPOG'
 MuonWP     = 'Lepton_isTightMuon_mediumRelIsoTight'
 
+if 'TriggerLatino' in opt.tag:
+    if '2016' in yeartag:
+        ElectronWP = 'Lepton_isTightElectron_cut_WP_Tight80X' #'Lepton_isTightElectron_mva_90p_Iso2016'
+        MuonWP     = 'Lepton_isTightMuon_cut_Tight80x'
+    elif '2017' in yeartag or '2018' in yeartag:
+        ElectronWP = 'Lepton_isTightElectron_cutFall17V2Iso_Tight' #'Lepton_isTightElectron_mvaFall17V2Iso_WP90'
+        MuonWP     = 'Lepton_isTightMuon_cut_Tight_HWWW'
 ElectronSF = ElectronWP.replace('isTightElectron', 'tightElectron')
 MuonSF     = MuonWP.replace('isTightMuon', 'tightMuon')
 
@@ -242,7 +249,7 @@ elif '2018' in yeartag and 'HEM' in opt.tag:
 
 ### Trigger Efficiencies
 
-TriggerEff = 'TriggerEffWeight_2l'
+TriggerEff = 'TriggerEffWeight_2l' if 'Trigger' not in opt.tag else '1.'
 
 if 'WZ' in opt.tag or 'ZZ' in opt.tag or 'ttZ' in opt.tag :
     TriggerEff = 'TriggerEffWeight_3l'
@@ -618,6 +625,42 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                 samples['DATA']['name'].append(iFile)
                 samples['DATA']['weights'].append(DataTrig[DataSet])
 
+if 'MET' in opt.sigset:
+
+    if 'cern' in SITE: 
+        print 'MET datasets not available on lxplus, please use gridui' 
+
+    metTriggers = 'Alt$(HLT_PFMET120_PFMHT120_IDTight, 0)==1'
+    if '2016' in yeartag: 
+        metTriggers += ' || Alt$(HLT_PFMET90_PFMHT90_IDTight, 0)==1'
+        metTriggers += ' || Alt$(HLT_PFMET100_PFMHT100_IDTight, 0)==1'
+        metTriggers += ' || Alt$(HLT_PFMET110_PFMHT110_IDTight, 0)==1'
+    elif '2017' in yeartag or '2018' in yeartag: 
+        metTriggers += ' || Alt$(HLT_PFMET120_PFMHT120_IDTight_PFHT60, 0)==1'
+
+    samples['DATA']  = {   'name': [ ] ,
+                           'weight' : METFilters_Data+'*'+VetoHEMdata+'*'+VetoEENoise,
+                           'weights' : [ ],
+                           'isData': ['all'],
+                           'isSignal'  : 0,
+                           'isDATA'    : 1,
+                           'isFastsim' : 0
+                       }
+
+    directoryMET = directoryData.split('__hadd')[0]+'__hadd/'
+    if 'TriggerLatino' in opt.tag: directoryMET = directoryMET.replace('DATASusy', 'DATALatino')
+
+    for Run in DataRun :
+        FileTarget = getSampleFiles(directoryMET,'MET_'+Run[1],True,treePrefix)
+        for iFile in FileTarget:
+            samples['DATA']['name'].append(iFile)
+            if 'Run2017B' in Run[1]:
+                samples['DATA']['weights'].append( '(Alt$(HLT_PFMET120_PFMHT120_IDTight, 0)==1 || Alt$(HLT_PFMET110_PFMHT110_IDTight, 0)==1)' )
+            elif 'Run2017C' in Run[1] or 'Run2017D' in Run[1] or 'Run2017E' in Run[1] or 'Run2017F' in Run[1]:
+                samples['DATA']['weights'].append( '(Alt$(HLT_PFMET120_PFMHT120_IDTight, 0)==1)' )
+            else:
+                samples['DATA']['weights'].append( '('+metTriggers+')' )
+            
 ### Files per job
 
 #if hasattr(opt, 'batchSplit'):

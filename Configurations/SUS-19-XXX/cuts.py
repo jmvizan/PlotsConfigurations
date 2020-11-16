@@ -23,6 +23,30 @@ if opt.tag=='btagefficiencies':
     cuts[btagAlgo+'_'+btagWP+'_c']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])==4 && '+jetTagSelection
     cuts[btagAlgo+'_'+btagWP+'_l']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])<4  && '+jetTagSelection
 
+if 'Trigger' in opt.tag:
+
+    OCT = OC.replace('mll>=20. && ', '') 
+
+    cuts['ee_denominator'] = OCT+' && '+EE
+    cuts['mm_denominator'] = OCT+' && '+MM  
+    cuts['em_denominator'] = OCT+' && '+DF
+
+    if 'MET' in opt.sigset:
+
+        cuts['ee_numerator_double'] = OCT+' && '+EE+' && Trigger_dblEl' 
+        cuts['mm_numerator_double'] = OCT+' && '+MM+' && Trigger_dblMu'
+        cuts['em_numerator_double'] = OCT+' && '+DF+' && Trigger_ElMu'
+
+        cuts['ee_numerator'] = OCT+' && '+EE+' && (Trigger_dblEl || Trigger_sngEl)'
+        cuts['mm_numerator'] = OCT+' && '+MM+' && (Trigger_dblMu || Trigger_sngMu)'
+        cuts['em_numerator'] = OCT+' && '+DF+' && (Trigger_ElMu  || Trigger_sngEl || Trigger_sngMu)'  
+
+    else:
+
+        cuts['ee_numerator'] = { 'expr' : OCT+' && '+EE, 'weight' : 'TriggerEffWeight_2l' }
+        cuts['mm_numerator'] = { 'expr' : OCT+' && '+MM, 'weight' : 'TriggerEffWeight_2l' }
+        cuts['em_numerator'] = { 'expr' : OCT+' && '+DF, 'weight' : 'TriggerEffWeight_2l' }
+
 if 'TwoLeptons' in opt.tag:
 
     cuts['TwoLep_em'] = OC+' && '+DF
@@ -290,8 +314,8 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
         cuts['ZZ_ptmiss-160'] = { 'expr' : '(' + ZZselection.replace('METCUT', '160') + ')', 'weight' : btagWeight0tag }
 
 if 'ttZNormalization' in opt.tag:
-
-    ttZcommon = nTightLepton+'>=3 && deltaMassZ_ctrltag<10. && '+ptmissNano+'>=METCUT && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>=20.'
+ 
+    ttZcommon = nTightLepton+'>=3 && deltaMassZ_ctrltag<10. && '+ptmissNano+'>=METCUT && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>='+bTagPtCut
     ttZ3Lep = nLooseLepton+'==3 && '+ttZcommon.replace('_ctrltag', '_WZ')
     ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ') 
     ttZselectionLoose = '(('+ ttZ3Lep + ') || (' + ttZ4Lep + '))'   
