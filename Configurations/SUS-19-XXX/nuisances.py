@@ -278,6 +278,8 @@ nuisances['qcdScale'] = {
 }
 for sample in samples.keys():
     if not samples[sample]['isDATA'] and theoryNormalizations[sample]['qcdScaleStatus']==3:
+        if '2017' in year and (sample=='VZ' or sample=='ttZ'): continue
+        if '2018' in year and (sample=='WZ' or sample=='ttW' or sample=='VZ'): continue
         qcdScaleVariations = [ ] 
         for i in [0, 1, 3, 5, 7, 8]:
             qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
@@ -291,6 +293,8 @@ nuisances['pdf'] = {
 }
 for sample in samples.keys():
     if not samples[sample]['isDATA'] and not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
+        if '2017' in year and (sample=='VZ' or sample=='ttZ'): continue
+        if '2018' in year and (sample=='WZ' or sample=='ttW' or sample=='VZ'): continue  
         pdfVariations = [ ] 
         for i in range(len(theoryNormalizations[sample]['pdf'])):                              
             pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
@@ -430,7 +434,7 @@ for nuisance in nuisanceToRemove:
 
 nuisanceToRemove = [ ]  
 
-if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag:
+if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag:
 
     if 'ctrl' in regionName and 'cern' in SITE : # JES and MET variations not available at cern for ctrl trees
         if hasattr(opt, 'batchSplit'): # Remove only when running shapes, so can make shapes in gridui and plots in lxplus
