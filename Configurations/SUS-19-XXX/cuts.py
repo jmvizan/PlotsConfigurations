@@ -315,17 +315,29 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
 if 'ttZNormalization' in opt.tag:
  
-    ttZcommon = nTightLepton+'>=3 && deltaMassZ_ctrltag<10. && '+ptmissNano+'>=METCUT && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>='+bTagPtCut
+    ttZcommon = nTightLepton+'>=3 && deltaMassZ_ctrltag<10. && ptmiss_ctrltag>=0. && '+ptmissNano+'>=METCUT && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>='+bTagPtCut
     ttZ3Lep = nLooseLepton+'==3 && '+ttZcommon.replace('_ctrltag', '_WZ')
     ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ') 
     ttZselectionLoose = '(('+ ttZ3Lep + ') || (' + ttZ4Lep + '))'   
 
+    cuts['ttZ_3Lep_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_3Lep_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')', 'weight' : btagWeight2tag }
+    cuts['ttZ_3Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_3Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+    cuts['ttZ_3Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_3Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+
+    cuts['ttZ_4Lep_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_4Lep_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')', 'weight' : btagWeight2tag }
+    cuts['ttZ_4Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_4Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+    cuts['ttZ_4Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_4Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+
     cuts['ttZ_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')', 'weight' : btagWeight1tag }
     cuts['ttZ_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')', 'weight' : btagWeight2tag }
-  
     cuts['ttZ_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
     cuts['ttZ_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
-
     cuts['ttZ_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
     cuts['ttZ_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
 
