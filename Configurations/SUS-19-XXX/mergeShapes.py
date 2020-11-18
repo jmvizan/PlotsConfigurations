@@ -92,7 +92,10 @@ if __name__ == '__main__':
 
     inFiles = [ ]
     for year in years:
-        inFiles.append([ ROOT.TFile(outFileName.replace('-'.join(years), year), 'READ') , year ])
+        inFileName = outFileName
+        if year!='2017': inFileName = inFileName.replace('EENoiseDPhi', '')
+        if year!='2018': inFileName = inFileName.replace('HEM', '')
+        inFiles.append([ ROOT.TFile(inFileName.replace('-'.join(years), year), 'READ') , year ])
 
     for cutName in cuts:
 
