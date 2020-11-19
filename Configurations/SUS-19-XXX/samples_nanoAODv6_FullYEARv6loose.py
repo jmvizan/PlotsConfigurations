@@ -206,6 +206,7 @@ btagWeight0tag = '(1.-'+btagWeight1tag+')'
 btagWeight2tag = btagWeight1tag.replace('_1tag_', '_2tag_')
 
 ptmissNano = 'METFixEE2017_pt' if '2017' in yeartag else 'MET_pt'
+ptmissPhiNano = ptmissNano.replace('_pt', '_phi')
 
 ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '

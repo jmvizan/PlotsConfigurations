@@ -369,8 +369,11 @@ elif 'ttZNormalization' in opt.tag:
                            'xaxis' : 'm' + pll + gv,       #   x axis name
                        }
   
+    ptmissTTZ = ptmissNano
+    if 'AddZ' in opt.tag:
+        ptmissTTZ = ptmissTTZ3Lep+'*('+nLooseLepton+'==3) + '+ptmissTTZ4Lep+'*('+nLooseLepton+'==4)'
 
-    variables['ptmiss'] = {  'name'  : ptmissNano,              #   variable name
+    variables['ptmiss'] = {  'name'  : ptmissTTZ,               #   variable name
                              'range' : (  20,    0.,  400.),    #   variable range
                              'xaxis' : met + gv,                #   x axis name
                              'fold'  : overflow                 #   fold overflow
