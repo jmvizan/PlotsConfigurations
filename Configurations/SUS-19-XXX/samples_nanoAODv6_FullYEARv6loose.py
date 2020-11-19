@@ -30,7 +30,7 @@ if  'cern' in SITE :
     elif '2017' in yeartag:
         treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
     elif '2018' in yeartag:
-        treeBaseDirData = '/eos/user/s/scodella/SUSY/Nano/' 
+        treeBaseDirData = '/eos/home-s/scodella/SUSY/Nano/' 
     treeBaseDirMC   = treeBaseDirData
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
 elif 'ifca' in SITE or 'cloud' in SITE:
