@@ -154,6 +154,13 @@ dPhieenoiseptmiss_pt15_norawcut = 'acos(cos(Jet_phi-'+ptmiss_phi+'))*(2.*((Jet_p
 HTForward     = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139))'
 HTForwardSoft = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && Jet_pt*(1.-Jet_rawFactor)<50.))'
 jetpteenoisedphi = '(Jet_pt*(2*(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && acos(cos(Jet_phi-'+ptmiss_phi+'))<0.96)-1))'
+
+ptmissNano = 'METFixEE2017_pt' if '2017' in yeartag else 'MET_pt'
+ptmissPhiNano = ptmissNano.replace('_pt', '_phi')
+
+metx_ttZ3Lep = '('+ptmissNano+'*cos('+ptmissPhiNano+')+Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])*((Lepton_pdgId['+lep0idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+'])*((Lepton_pdgId['+lep1idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep2idx+']*cos(Lepton_phi['+lep2idx+']))'
+mety_ttZ3Lep = '('+ptmissNano+'*sin('+ptmissPhiNano+')+Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])*((Lepton_pdgId['+lep0idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+'])*((Lepton_pdgId['+lep1idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep2idx+']*sin(Lepton_phi['+lep2idx+']))'
+ptmiss_ttZ3Lep = 'sqrt('+metx_ttZ3Lep+'*'+metx_ttZ3Lep+'+'+mety_ttZ3Lep+'*'+mety_ttZ3Lep+')'
  
 OC =  nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])<0'
 SS =  nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])>0'
@@ -204,9 +211,6 @@ if 'pt25' in opt.tag: btagWeight1tag += '_Pt25'
 if 'pt30' in opt.tag: btagWeight1tag += '_Pt30'
 btagWeight0tag = '(1.-'+btagWeight1tag+')'
 btagWeight2tag = btagWeight1tag.replace('_1tag_', '_2tag_')
-
-ptmissNano = 'METFixEE2017_pt' if '2017' in yeartag else 'MET_pt'
-ptmissPhiNano = ptmissNano.replace('_pt', '_phi')
 
 ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '

@@ -371,7 +371,7 @@ elif 'ttZNormalization' in opt.tag:
   
     ptmissTTZ = ptmissNano
     if 'AddZ' in opt.tag:
-        ptmissTTZ = ptmissTTZ3Lep+'*('+nLooseLepton+'==3) + '+ptmissTTZ4Lep+'*('+nLooseLepton+'==4)'
+        ptmissTTZ = ptmiss_ttZ3Lep+'*('+nLooseLepton+'==3) + ptmiss_ttZ*('+nLooseLepton+'==4)'
 
     variables['ptmiss'] = {  'name'  : ptmissTTZ,               #   variable name
                              'range' : (  20,    0.,  400.),    #   variable range

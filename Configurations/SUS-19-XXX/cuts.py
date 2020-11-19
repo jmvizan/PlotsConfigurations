@@ -319,9 +319,7 @@ if 'ttZNormalization' in opt.tag:
     ptmissTTZ3Lep = ptmissNano
     ptmissTTZ4Lep = ptmissNano  
     if 'AddZ' in opt.tag:
-        metx = '('+ptmissNano+'*cos('+ptmissPhiNano+')+Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])*((Lepton_pdgId['+lep0idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+'])*((Lepton_pdgId['+lep1idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep2idx+']*cos(Lepton_phi['+lep2idx+']))'
-        mety = '('+ptmissNano+'*sin('+ptmissPhiNano+')+Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])*((Lepton_pdgId['+lep0idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+'])*((Lepton_pdgId['+lep1idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep2idx+']*sin(Lepton_phi['+lep2idx+']))'
-        ptmissTTZ3Lep = 'sqrt('+metx+'*'+metx+'+'+mety+'*'+mety+')'
+        ptmissTTZ3Lep = ptmiss_ttZ3Lep 
         ptmissTTZ4Lep = 'ptmiss_ttZ'
     ttZ3Lep = nLooseLepton+'==3 && '+ttZcommon.replace('_ctrltag', '_WZ' )+' && '+ptmissTTZ3Lep+'>=METCUT'
     ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ')+' && '+ptmissTTZ4Lep+'>=METCUT' 
