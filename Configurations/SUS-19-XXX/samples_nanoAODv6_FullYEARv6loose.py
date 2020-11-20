@@ -58,14 +58,14 @@ if 'Smear' in opt.tag:
 regionName = '__susyMT2reco'+metnom+'/'
 ctrltag = ''
 
-if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZ' in opt.tag or 'WZtoWW' in opt.tag or 'ttZ' in opt.tag or 'ZZ' in opt.tag:
+if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZVal' in opt.tag or 'WZtoWW' in opt.tag or 'ttZ' in opt.tag or 'ZZVal' in opt.tag:
     regionName = regionName.replace('reco', 'ctrl')
     if 'SameSign' in opt.tag: ctrltag = '_SameSign'
     if 'Fake'     in opt.tag: ctrltag = '_Fake'
-    if 'WZ'       in opt.tag: ctrltag = '_WZ'
+    if 'WZVal'    in opt.tag: ctrltag = '_WZ'
     if 'WZtoWW'   in opt.tag: ctrltag = '_WZtoWW'
     if 'ttZ'      in opt.tag: ctrltag = '_ttZ'
-    if 'ZZ'       in opt.tag: ctrltag = '_ZZ'	
+    if 'ZZVal'    in opt.tag: ctrltag = '_ZZ'	
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
@@ -593,7 +593,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
         
-        if 'ZZ' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
+        if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
             
             ZZ4Lext = '_ext2' if ('2018' in yeartag) else '_ext1'
             samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo4L'+ZZ4Lext, False,treePrefix) + 
