@@ -51,32 +51,30 @@ for sample in samples.keys():
 
 # background cross section and scale factor uncertainties
 
-if 'SignalRegions' in opt.tag:
-    for background in normBackgrounds:
-        if background in samples:
+for background in normBackgroundNuisances:
+    if background in samples:
 
-            scalefactorFromData = True
+        scalefactorFromData = False
 
-            for region in normBackgrounds[background]:
-                nuisancename = 'norm'+background+region
-                scalefactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
-                scalefactorerror = normBackgrounds[background][region]['scalefactor'][scalefactor]
-                nuisances[nuisancename]  = {
-                    'name'    : nuisancename+year, 
-                    'samples' : { background : str(1.+float(scalefactorerror)/float(scalefactor)) },
-                    'cuts'    : normBackgrounds[background][region]['cuts'], 
-                    'type'    : 'lnN',
-                }
-                if region=='all' and scalefactor=='1.00':
-                    scalefactorFromData = False
+        for region in normBackgroundNuisances[background]:
+            nuisancename = normBackgroundNuisances[background][region]['name']
+            nuisances[nuisancename]  = {
+                'name'    : nuisancename+year, 
+                'samples' : normBackgroundNuisances[background][region]['samples'],
+                'cuts'    : normBackgroundNuisances[background][region]['cuts'], 
+                'type'    : normBackgroundNuisances[background][region]['type'],
+            }
+            if 'kind' in normBackgroundNuisances[background][region]:
+                nuisances[nuisancename]['kind'] = normBackgroundNuisances[background][region]['kind']
+            scalefactorFromData = normBackgroundNuisances[background][region]['scalefactorFromData']  
 
-            if scalefactorFromData:
+        if scalefactorFromData:
             
-                if background in nuisances['lumi']['samples']:
-                    del nuisances['lumi']['samples'][background]
+            if background in nuisances['lumi']['samples']:
+                del nuisances['lumi']['samples'][background]
             
-                if background in nuisances['trigger']['samples']:
-                    del nuisances['trigger']['samples'][background]
+            if background in nuisances['trigger']['samples']:
+                del nuisances['trigger']['samples'][background]
 
 ### shapes
 
