@@ -468,7 +468,7 @@ if ('SignalRegions' in opt.tag or 'BackSF' in opt.tag) and normBackgrounds is no
             for region in normBackgrounds[background]:
 
                 cutList = [ ]
-                if 'cuts' not in normBackgroundNuisances[background][region]:
+                if 'cuts' not in normBackgrounds[background][region]:
                     cutList = cuts.keys()
                 else:
                     for cut in cuts:
