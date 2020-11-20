@@ -456,54 +456,67 @@ try:
 except NameError:
     normBackgrounds = None
    
-if 'SignalRegions' in opt.tag and normBackgrounds is not None:
+normBackgroundNuisances = { }
+
+if ('SignalRegions' in opt.tag or 'BackSF' in opt.tag) and normBackgrounds is not None:
         
     for background in normBackgrounds:
         if background in samples:
+
+            normBackgroundNuisances[background] = { }
+
             for region in normBackgrounds[background]:
-                
-                selections = [ ] 
 
-                regionScaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
-
-                for selection in normBackgrounds[background][region]['selections']:
-
-                    usedSelection = False
-
+                cutList = [ ]
+                if 'cuts' not in normBackgrounds[background][region]:
+                    cutList = cuts.keys()
+                else:
                     for cut in cuts:
-                        if selection=='_All' or selection in cut: 
-                            normBackgrounds[background][region]['cuts'].append(cut)
-                            usedSelection = True
+                        for cutsegment in normBackgrounds[background][region]['cuts']:
+                            if cutsegment in cut:
+                                cutList.append(cut)
+                                break
 
-                    if usedSelection:
+                if len(cutList)>0:
 
-                        selections.append(selection)
+                    scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
 
-                        #if float(regionScaleFactor)!=1.:
-                        #
-                        #    selectionCut = normBackgrounds[background][region]['selections'][selection]
-                        #    selectionWeight = '(!'+selectionCut+')+'+selectionCut+'*'+regionScaleFactor
-                        #    samples[background]['weight'] += '*('+selectionWeight+')'
-                
-                if selections and float(regionScaleFactor)!=1.:
+                    normBackgroundNuisances[background][region] = { }
 
-                    regionCut = '1.'
+                    normBackgroundNuisances[background][region]['name'] = 'norm'+background+region 
+                    normBackgroundNuisances[background][region]['cuts'] = cutList
+                    normBackgroundNuisances[background][region]['scalefactorFromData'] = False if (region=='all' and scaleFactor=='1.00') else True
 
-                    if len(selections)==1:
-                        regionCut = normBackgrounds[background][region]['selections'][selections[0]]
+            for region in normBackgrounds[background]:    
+                if region in normBackgroundNuisances[background]:
+
+                    scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]  
+                    scaleFactorError = normBackgrounds[background][region]['scalefactor'][scaleFactor]
+                    scaleFactorRelativeError = float(scaleFactorError)/float(scaleFactor)                    
+
+                    regionCut = normBackgrounds[background][region]['selection']
+                    regionWeight = scaleFactor if regionCut=='1.' else '((!'+regionCut+')+('+regionCut+')*'+scaleFactor+')'
+
+                    nuisanceType = 'lnN'
+                    for cut in normBackgroundNuisances[background][region]['cuts']:
+                        for otherregion in normBackgroundNuisances[background]:
+                            if otherregion!=region and cut in normBackgroundNuisances[background][otherregion]['cuts']:
+                                nuisanceType = 'shape'
+
+                    samples[background]['weight'] += '*'+regionWeight
+                    normBackgroundNuisances[background][region]['type'] = nuisanceType
+
+                    if nuisanceType=='lnN':
+
+                        normBackgroundNuisances[background][region]['samples'] = { background : str(1.+scaleFactorRelativeError) }
+                      
                     else:
-                        if '_Tag' in selections and '_NoTag' in selections and '_NoJet' not in selections:
-                            regionCut = 'nCleanJet>=1'
-                        elif '_Tag' in selections and '_Veto' in selections:
-                            regionCut = '1.'
 
-                    # Patches for ZZ veto
-                    if '_Tag' in selections and '_Veto' not in selections and '_NoTag' not in selections:
-                        regionCut = 'nCleanJet>=1'
-                    if '_Veto' in selections and '_Tag' not in selections:
-                        regionCut = 'nCleanJet==0'
-                        regionScaleFactor = normBackgrounds[background]['nojet']['scalefactor'].keys()[0]
+                        regionWeightUp   = '((!'+regionCut+')+('+regionCut+')*'+str(1.+scaleFactorRelativeError)+')'
+                        regionWeightDown = '((!'+regionCut+')+('+regionCut+')*'+str(1.-scaleFactorRelativeError)+')' 
 
-                    regionWeight = '(!'+regionCut+')+('+regionCut+')*'+regionScaleFactor
-                    samples[background]['weight'] += '*('+regionWeight+')'
-                    
+                        samples[background]['kind'] = 'weight'
+                        normBackgroundNuisances[background][region]['samples'] = { background : [ regionWeightUp, regionWeightDown ] }
+
+
+

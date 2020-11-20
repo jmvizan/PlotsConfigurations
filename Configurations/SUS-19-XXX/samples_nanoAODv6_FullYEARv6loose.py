@@ -338,25 +338,57 @@ if 'PVw' in opt.tag:
 
 # background cross section uncertainties and normalization scale factors
 
-normBackgrounds = {
-    #'ttbar'     : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
-    'STtW'      : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
-    #'WW'        : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
-    'ttW'       : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
-    'Higgs'     : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } }, 
-    'VZ'        : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
-    'VVV'       : { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
-    'WZ'        : { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
-    'ttZ'       : { 'all'   : { 'scalefactor' : { '1.44' : '0.36' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
-    'ZZTo2L2Nu' : { 'nojet' : { 'scalefactor' : { '0.74' : '0.19' }, 'cuts' : [], 'selections' : { '_NoJet' : '(nCleanJet==0)' } },  
-               	    'notag' : { 'scalefactor' : { '1.21' : '0.17' }, 'cuts' : [], 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
-                                                                                                   '_Tag'   : '(leadingPtTagged>=20.)'  } },   
-                    'veto'  : { 'scalefactor' : { '1.06' : '0.12' }, 'cuts' : [], 'selections' : { '_Veto'  : '(leadingPtTagged<20.)' } }, }, 
-    'DY'        : { 'nojet' : { 'scalefactor' : { '1.00' : '1.00' }, 'cuts' : [], 'selections' : { '_NoJet' : '(nCleanJet==0)' } },
-                    'notag' : { 'scalefactor' : { '1.00' : '0.32' }, 'cuts' : [], 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
-                                                                                                   '_Tag'   : '(leadingPtTagged>=20.)',
-                                                                                                   '_Veto'  : '(leadingPtTagged<20.)' } }, },
-}
+normBackgrounds = {}
+
+normBackgrounds['STtW']      = { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selection' : '1.' } }
+normBackgrounds['ttW']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
+normBackgrounds['Higgs']     = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
+normBackgrounds['VZ']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
+normBackgrounds['VVV']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
+
+if '2016' in yeartag:
+    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
+    normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.29' : '0.28' }, 'selection' : '1.' } }
+    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.00' : '0.27' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
+                                     'notag' : { 'scalefactor' : { '1.12' : '0.20' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
+                                     #'veto'  : { 'scalefactor' : { '1.08' : '0.16' }, 'cuts' : [ '_Veto' ],                   'selection' : '(leadingPtTagged<20.)' }, 
+                                   }
+
+elif '2017' in yeartag:
+    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
+    normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.45' : '0.27' }, 'selection' : '1.' } }
+    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.74' : '0.22' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },  
+                                     'notag' : { 'scalefactor' : { '0.84' : '0.16' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
+                                     #'veto'  : { 'scalefactor' : { '0.81' : '0.13' }, 'cuts' : [ '_Veto' ],                   'selection' : '(leadingPtTagged<20.)' },
+                                   }
+
+elif '2018' in yeartag:
+    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
+    normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.43' : '0.22' }, 'selection' : '1.' } }
+    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.95' : '0.20' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
+                                     'notag' : { 'scalefactor' : { '0.75' : '0.13' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
+                                     #'veto'  : { 'scalefactor' : { '0.81' : '0.11' }, 'cuts' : [ '_Veto' ],                   'selection' : '(leadingPtTagged<20.)' },
+                                   }
+if 'BackSF' in opt.tag: 
+    if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag:
+        normBackgrounds['ZZTo2L2Nu']['nojet']['cuts'].append('ptmiss-160')
+        normBackgrounds['ZZTo2L2Nu']['notag']['cuts'].append('ptmiss-160')
+        normBackgrounds['ZZTo4L'] = normBackgrounds['ZZTo2L2Nu']
+
+### SUS-17-010 --> nomulti style
+#normBackgrounds = {
+#    'STtW'      : { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+#    'WZ'        : { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+#    'ttZ'       : { 'all'   : { 'scalefactor' : { '1.44' : '0.36' }, 'cuts' : [], 'selections' : { '_All'   : '1.' } } },
+#    'ZZTo2L2Nu' : { 'nojet' : { 'scalefactor' : { '0.74' : '0.19' }, 'cuts' : [], 'selections' : { '_NoJet' : '(nCleanJet==0)' } },  
+#               	    'notag' : { 'scalefactor' : { '1.21' : '0.17' }, 'cuts' : [], 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
+#                                                                                                   '_Tag'   : '(leadingPtTagged>=20.)'  } },   
+#                    'veto'  : { 'scalefactor' : { '1.06' : '0.12' }, 'cuts' : [], 'selections' : { '_Veto'  : '(leadingPtTagged<20.)' } }, }, 
+#    'DY'        : { 'nojet' : { 'scalefactor' : { '1.00' : '1.00' }, 'cuts' : [], 'selections' : { '_NoJet' : '(nCleanJet==0)' } },
+#                    'notag' : { 'scalefactor' : { '1.00' : '0.32' }, 'cuts' : [], 'selections' : { '_NoTag' : '((nCleanJet>=1)*(leadingPtTagged<20.))',
+#                                                                                                   '_Tag'   : '(leadingPtTagged>=20.)',
+#                                                                                                   '_Veto'  : '(leadingPtTagged<20.)' } }, },
+#}
 
 # top pt reweighting
 
