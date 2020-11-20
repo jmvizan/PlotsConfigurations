@@ -515,7 +515,7 @@ if ('SignalRegions' in opt.tag or 'BackSF' in opt.tag) and normBackgrounds is no
                         regionWeightUp   = '((!'+regionCut+')+('+regionCut+')*'+str(1.+scaleFactorRelativeError)+')'
                         regionWeightDown = '((!'+regionCut+')+('+regionCut+')*'+str(1.-scaleFactorRelativeError)+')' 
 
-                        samples[background]['kind'] = 'weight'
+                        normBackgroundNuisances[background][region]['kind'] = 'weight'
                         normBackgroundNuisances[background][region]['samples'] = { background : [ regionWeightUp, regionWeightDown ] }
 
 

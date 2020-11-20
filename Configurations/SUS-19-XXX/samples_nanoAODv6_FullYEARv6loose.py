@@ -371,9 +371,13 @@ elif '2018' in yeartag:
                                    }
 if 'BackSF' in opt.tag: 
     if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag:
-        normBackgrounds['ZZTo2L2Nu']['nojet']['cuts'].append('ptmiss-160')
-        normBackgrounds['ZZTo2L2Nu']['notag']['cuts'].append('ptmiss-160')
+        normBackgrounds['ZZTo2L2Nu']['nojet']['cuts'] = [ 'ptmiss-160' ]
+        normBackgrounds['ZZTo2L2Nu']['notag']['cuts'] = [ 'ptmiss-160' ]
+        normBackgrounds['ZZTo2L2Nu']['nojet']['selection'] = '(nCleanJet==0 && ptmiss'+ctrltag+'>=160.)'
+        normBackgrounds['ZZTo2L2Nu']['notag']['selection'] = '(nCleanJet>=1 && ptmiss'+ctrltag+'>=160.)'
         normBackgrounds['ZZTo4L'] = normBackgrounds['ZZTo2L2Nu']
+        normBackgrounds['ttZ']['all']['cuts'] = [ 'ptmiss-160' ] 
+        normBackgrounds['ttZ']['all']['selection'] = '(ptmiss'+ctrltag+'>=160.)'
 
 ### SUS-17-010 --> nomulti style
 #normBackgrounds = {
