@@ -281,6 +281,8 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
     if 'WZValidationRegion' in opt.tag:
 
+        cuts['WZ_3Lep']             = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
+        cuts['WZ_3LepZ']            = { 'expr' : '(' + WZselection.replace('ZCUT',  '15.').replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3Lep_ptmiss-140']  = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT', '140') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3LepZ_ptmiss-140'] = { 'expr' : '(' + WZselection.replace('ZCUT',  '15.').replace('METCUT', '140') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3Lep_ptmiss-160']  = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT', '160') + ')', 'weight' : btagWeight0tag }
@@ -288,6 +290,8 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
     elif 'WZtoWWValidationRegion' in opt.tag:
 
+        cuts['WZtoWW_Zcut10']            = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag }
+        cuts['WZtoWW_Zcut15']            = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut10_ptmiss-140'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','140')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut15_ptmiss-140'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','140')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut10_ptmiss-160'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','160')+')', 'weight' : btagWeight0tag }

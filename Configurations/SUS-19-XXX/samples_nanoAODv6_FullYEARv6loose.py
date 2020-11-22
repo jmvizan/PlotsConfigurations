@@ -256,7 +256,7 @@ elif '2018' in yeartag and 'HEM' in opt.tag:
 
 TriggerEff = 'TriggerEffWeight_2l' if 'Trigger' not in opt.tag else '1.'
 
-if 'WZ' in opt.tag or 'ZZ' in opt.tag or 'ttZ' in opt.tag :
+if 'WZtoWW' in opt.tag or 'WZVal' in opt.tag or 'ZZVal' in opt.tag or 'ttZ' in opt.tag :
     TriggerEff = 'TriggerEffWeight_3l'
 
 ### MC weights
@@ -349,26 +349,53 @@ normBackgrounds['VVV']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }
 if '2016' in yeartag:
     normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
     normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.29' : '0.28' }, 'selection' : '1.' } }
-    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.00' : '0.27' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
-                                     'notag' : { 'scalefactor' : { '1.12' : '0.20' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
-                                     #'veto'  : { 'scalefactor' : { '1.08' : '0.16' }, 'cuts' : [ '_Veto' ],                   'selection' : '(leadingPtTagged<20.)' }, 
+    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.13' : '0.31' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
+                                     'notag' : { 'scalefactor' : { '1.25' : '0.23' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
                                    }
+    if 'kZZmass' in opt.tag:
+        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '1.00' : '0.27' }
+        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.12' : '0.20' }
+        #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '1.08' : '0.16' }
+    elif 'kZZpt' in opt.tag:
+        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.91' : '0.25' }
+        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.85' : '0.16' }
+    elif 'kZZdphi' in opt.tag: 
+        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '1.00' : '0.27' } 
+        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.13' : '0.21' } 
 
 elif '2017' in yeartag:
     normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
     normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.45' : '0.27' }, 'selection' : '1.' } }
-    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.74' : '0.22' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },  
-                                     'notag' : { 'scalefactor' : { '0.84' : '0.16' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
-                                     #'veto'  : { 'scalefactor' : { '0.81' : '0.13' }, 'cuts' : [ '_Veto' ],                   'selection' : '(leadingPtTagged<20.)' },
+    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.83' : '0.25' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },  
+                                     'notag' : { 'scalefactor' : { '0.94' : '0.18' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
                                    }
-
+    if 'kZZmass' in opt.tag:
+        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' }
+        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.84' : '0.16' }
+        #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '0.81' : '0.13' }
+    elif 'kZZpt' in opt.tag: 
+        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.68' : '0.20' }
+        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.66' : '0.12' }
+    elif 'kZZdphi' in opt.tag:
+        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' } 
+        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.86' : '0.16' }        
 elif '2018' in yeartag:
     normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
     normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.43' : '0.22' }, 'selection' : '1.' } }
-    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.95' : '0.20' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
-                                     'notag' : { 'scalefactor' : { '0.75' : '0.13' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
-                                     #'veto'  : { 'scalefactor' : { '0.81' : '0.11' }, 'cuts' : [ '_Veto' ],                   'selection' : '(leadingPtTagged<20.)' },
+    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.08' : '0.23' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
+                                     'notag' : { 'scalefactor' : { '0.83' : '0.14' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
                                    }
+    if 'kZZmass' in opt.tag:   
+        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.95' : '0.20' }
+        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.75' : '0.13' }
+        #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '0.81' : '0.11' }
+    elif 'kZZpt' in opt.tag:
+        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.88' : '0.19' }
+        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.58' : '0.10' }
+    elif 'kZZdphi' in opt.tag:
+        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.96' : '0.20' }
+        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.76' : '0.13' }
+
 if 'BackSF' in opt.tag: 
     if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag:
         normBackgrounds['ZZTo2L2Nu']['nojet']['cuts'] = [ 'ptmiss-160' ]
