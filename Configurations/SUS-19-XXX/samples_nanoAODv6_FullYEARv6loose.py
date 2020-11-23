@@ -301,7 +301,11 @@ leptonSF = {
 # nonprompt lepton rate
 
 #nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.50', 'rateDown' : '0.50' } 
-nonpromptLep = { 'rate' : '1.08', 'rateUp' : '1.29', 'rateDown' : '0.87' } 
+#nonpromptLep = { 'rate' : '1.08', 'rateUp' : '1.29', 'rateDown' : '0.87' } 
+if '2016' in yeartag:   nonpromptLep = { 'rate' : '1.23', 'rateUp' : '1.31', 'rateDown' : '1.16' } 
+elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.48', 'rateUp' : '1.62', 'rateDown' : '1.37' } 
+elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.30', 'rateUp' : '1.36', 'rateDown' : '1.21' } 
+    
 promptLeptons = 'Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]'
 nonpromptLepSF      = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rate']      + ')'
 nonpromptLepSF_Up   = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateUp']    + ')'
@@ -347,7 +351,8 @@ normBackgrounds['VZ']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }
 normBackgrounds['VVV']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
 
 if '2016' in yeartag:
-    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
+    #normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
+    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.08' }, 'selection' : '1.' } }
     normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.29' : '0.28' }, 'selection' : '1.' } }
     normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.13' : '0.31' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
                                      'notag' : { 'scalefactor' : { '1.25' : '0.23' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
@@ -364,7 +369,8 @@ if '2016' in yeartag:
         normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.13' : '0.21' } 
 
 elif '2017' in yeartag:
-    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
+    #normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
+    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '1.04' : '0.08' }, 'selection' : '1.' } }
     normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.45' : '0.27' }, 'selection' : '1.' } }
     normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.83' : '0.25' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },  
                                      'notag' : { 'scalefactor' : { '0.94' : '0.18' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
@@ -380,7 +386,8 @@ elif '2017' in yeartag:
         normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' } 
         normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.86' : '0.16' }        
 elif '2018' in yeartag:
-    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
+    #normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
+    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.06' }, 'selection' : '1.' } }
     normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.43' : '0.22' }, 'selection' : '1.' } }
     normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.08' : '0.23' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
                                      'notag' : { 'scalefactor' : { '0.83' : '0.14' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
