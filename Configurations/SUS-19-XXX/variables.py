@@ -369,8 +369,11 @@ elif 'ttZNormalization' in opt.tag:
                            'xaxis' : 'm' + pll + gv,       #   x axis name
                        }
   
+    ptmissTTZ = ptmissNano
+    if 'AddZ' in opt.tag:
+        ptmissTTZ = ptmiss_ttZ3Lep+'*('+nLooseLepton+'==3) + ptmiss_ttZ*('+nLooseLepton+'==4)'
 
-    variables['ptmiss'] = {  'name'  : ptmissNano,              #   variable name
+    variables['ptmiss'] = {  'name'  : ptmissTTZ,               #   variable name
                              'range' : (  20,    0.,  400.),    #   variable range
                              'xaxis' : met + gv,                #   x axis name
                              'fold'  : overflow                 #   fold overflow
@@ -438,8 +441,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                           'CRbins' : [1, 4] 
                                       }
 
-	    if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag:
-
+	    if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag:
 
                 mt2llOptimHighBin = [0, 20, 40, 60, 80, 100, 160, 370, 500]                                                                                               
 

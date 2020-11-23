@@ -285,6 +285,8 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
     if 'WZValidationRegion' in opt.tag:
 
+        cuts['WZ_3Lep']             = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
+        cuts['WZ_3LepZ']            = { 'expr' : '(' + WZselection.replace('ZCUT',  '15.').replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3Lep_ptmiss-140']  = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT', '140') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3LepZ_ptmiss-140'] = { 'expr' : '(' + WZselection.replace('ZCUT',  '15.').replace('METCUT', '140') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3Lep_ptmiss-160']  = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT', '160') + ')', 'weight' : btagWeight0tag }
@@ -292,6 +294,8 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
     elif 'WZtoWWValidationRegion' in opt.tag:
 
+        cuts['WZtoWW_Zcut10']            = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag }
+        cuts['WZtoWW_Zcut15']            = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut10_ptmiss-140'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','140')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut15_ptmiss-140'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','140')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut10_ptmiss-160'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','160')+')', 'weight' : btagWeight0tag }
@@ -318,20 +322,51 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
         cuts['ZZ_ptmiss-160'] = { 'expr' : '(' + ZZselection.replace('METCUT', '160') + ')', 'weight' : btagWeight0tag }
 
 if 'ttZNormalization' in opt.tag:
- 
-    ttZcommon = nTightLepton+'>=3 && deltaMassZ_ctrltag<10. && '+ptmissNano+'>=METCUT && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>='+bTagPtCut
-    ttZ3Lep = nLooseLepton+'==3 && '+ttZcommon.replace('_ctrltag', '_WZ')
-    ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ') 
+
+    ttZcommon = nTightLepton+'>=3 && deltaMassZ_ctrltag<10. && deltaMassZ_ctrltag>=0. && ptmiss_ctrltag>=0. && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>='+bTagPtCut
+    ptmissTTZ3Lep = ptmissNano
+    ptmissTTZ4Lep = ptmissNano  
+    if 'AddZ' in opt.tag:
+        ptmissTTZ3Lep = ptmiss_ttZ3Lep 
+        ptmissTTZ4Lep = 'ptmiss_ttZ'
+    ttZ3Lep = nLooseLepton+'==3 && '+ttZcommon.replace('_ctrltag', '_WZ' )+' && '+ptmissTTZ3Lep+'>=METCUT'
+    ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ')+' && '+ptmissTTZ4Lep+'>=METCUT' 
     ttZselectionLoose = '(('+ ttZ3Lep + ') || (' + ttZ4Lep + '))'   
 
-    cuts['ttZ_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')', 'weight' : btagWeight1tag }
-    cuts['ttZ_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')', 'weight' : btagWeight2tag }
-  
+    cuts['ttZ_3Lep_loose']                = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')' }
+    cuts['ttZ_3Lep_loose1tag']            = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
+    cuts['ttZ_3Lep_loose2tag']            = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
+    cuts['ttZ_3Lep_ptmiss-100_loose']     = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')' }  
+    cuts['ttZ_3Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_3Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+    cuts['ttZ_3Lep_ptmiss-160_loose']     = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')' }  
+    cuts['ttZ_3Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_3Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+
+    cuts['ttZ_4Lep_loose']                = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')' }  
+    cuts['ttZ_4Lep_loose1tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
+    cuts['ttZ_4Lep_loose2tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
+    cuts['ttZ_4Lep_ptmiss-100_loose']     = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')' }
+    cuts['ttZ_4Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_4Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+    cuts['ttZ_4Lep_ptmiss-160_loose']     = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')' }
+    cuts['ttZ_4Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+    cuts['ttZ_4Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+
+    cuts['ttZ_loose']                = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')' } 
+    cuts['ttZ_loose1tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
+    cuts['ttZ_loose2tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
+    cuts['ttZ_ptmiss-100_loose']     = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')' } 
     cuts['ttZ_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
     cuts['ttZ_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
-
+    cuts['ttZ_ptmiss-160_loose']     = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')' }
     cuts['ttZ_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
     cuts['ttZ_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+
+    btagweightmixtag = '(('+btagWeight2tag+')*('+nLooseLepton+'==3) + ('+btagWeight1tag+')*('+nLooseLepton+'==4))'
+    cuts['ttZ_loosemixtag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagweightmixtag } 
+    cuts['ttZ_ptmiss-100_loosemixtag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagweightmixtag }
+    cuts['ttZ_ptmiss-160_loosemixtag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagweightmixtag }
 
 if 'DYValidationRegion' in opt.tag:
 
@@ -429,54 +464,67 @@ try:
 except NameError:
     normBackgrounds = None
    
-if 'SignalRegions' in opt.tag and normBackgrounds is not None:
+normBackgroundNuisances = { }
+
+if ('SignalRegions' in opt.tag or 'BackSF' in opt.tag) and normBackgrounds is not None:
         
     for background in normBackgrounds:
         if background in samples:
+
+            normBackgroundNuisances[background] = { }
+
             for region in normBackgrounds[background]:
-                
-                selections = [ ] 
 
-                regionScaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
-
-                for selection in normBackgrounds[background][region]['selections']:
-
-                    usedSelection = False
-
+                cutList = [ ]
+                if 'cuts' not in normBackgrounds[background][region]:
+                    cutList = cuts.keys()
+                else:
                     for cut in cuts:
-                        if selection=='_All' or selection in cut: 
-                            normBackgrounds[background][region]['cuts'].append(cut)
-                            usedSelection = True
+                        for cutsegment in normBackgrounds[background][region]['cuts']:
+                            if cutsegment in cut:
+                                cutList.append(cut)
+                                break
 
-                    if usedSelection:
+                if len(cutList)>0:
 
-                        selections.append(selection)
+                    scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
 
-                        #if float(regionScaleFactor)!=1.:
-                        #
-                        #    selectionCut = normBackgrounds[background][region]['selections'][selection]
-                        #    selectionWeight = '(!'+selectionCut+')+'+selectionCut+'*'+regionScaleFactor
-                        #    samples[background]['weight'] += '*('+selectionWeight+')'
-                
-                if selections and float(regionScaleFactor)!=1.:
+                    normBackgroundNuisances[background][region] = { }
 
-                    regionCut = '1.'
+                    normBackgroundNuisances[background][region]['name'] = 'norm'+background+region 
+                    normBackgroundNuisances[background][region]['cuts'] = cutList
+                    normBackgroundNuisances[background][region]['scalefactorFromData'] = False if (region=='all' and scaleFactor=='1.00') else True
 
-                    if len(selections)==1:
-                        regionCut = normBackgrounds[background][region]['selections'][selections[0]]
+            for region in normBackgrounds[background]:    
+                if region in normBackgroundNuisances[background]:
+
+                    scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]  
+                    scaleFactorError = normBackgrounds[background][region]['scalefactor'][scaleFactor]
+                    scaleFactorRelativeError = float(scaleFactorError)/float(scaleFactor)                    
+
+                    regionCut = normBackgrounds[background][region]['selection']
+                    regionWeight = scaleFactor if regionCut=='1.' else '((!'+regionCut+')+('+regionCut+')*'+scaleFactor+')'
+
+                    nuisanceType = 'lnN'
+                    for cut in normBackgroundNuisances[background][region]['cuts']:
+                        for otherregion in normBackgroundNuisances[background]:
+                            if otherregion!=region and cut in normBackgroundNuisances[background][otherregion]['cuts']:
+                                nuisanceType = 'shape'
+
+                    samples[background]['weight'] += '*'+regionWeight
+                    normBackgroundNuisances[background][region]['type'] = nuisanceType
+
+                    if nuisanceType=='lnN':
+
+                        normBackgroundNuisances[background][region]['samples'] = { background : str(1.+scaleFactorRelativeError) }
+                      
                     else:
-                        if '_Tag' in selections and '_NoTag' in selections and '_NoJet' not in selections:
-                            regionCut = 'nCleanJet>=1'
-                        elif '_Tag' in selections and '_Veto' in selections:
-                            regionCut = '1.'
 
-                    # Patches for ZZ veto
-                    if '_Tag' in selections and '_Veto' not in selections and '_NoTag' not in selections:
-                        regionCut = 'nCleanJet>=1'
-                    if '_Veto' in selections and '_Tag' not in selections:
-                        regionCut = 'nCleanJet==0'
-                        regionScaleFactor = normBackgrounds[background]['nojet']['scalefactor'].keys()[0]
+                        regionWeightUp   = '((!'+regionCut+')+('+regionCut+')*'+str(1.+scaleFactorRelativeError)+')'
+                        regionWeightDown = '((!'+regionCut+')+('+regionCut+')*'+str(1.-scaleFactorRelativeError)+')' 
 
-                    regionWeight = '(!'+regionCut+')+('+regionCut+')*'+regionScaleFactor
-                    samples[background]['weight'] += '*('+regionWeight+')'
-                    
+                        normBackgroundNuisances[background][region]['kind'] = 'weight'
+                        normBackgroundNuisances[background][region]['samples'] = { background : [ regionWeightUp, regionWeightDown ] }
+
+
+

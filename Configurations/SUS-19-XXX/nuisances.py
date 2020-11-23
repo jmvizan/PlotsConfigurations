@@ -51,32 +51,30 @@ for sample in samples.keys():
 
 # background cross section and scale factor uncertainties
 
-if 'SignalRegions' in opt.tag:
-    for background in normBackgrounds:
-        if background in samples:
+for background in normBackgroundNuisances:
+    if background in samples:
 
-            scalefactorFromData = True
+        scalefactorFromData = False
 
-            for region in normBackgrounds[background]:
-                nuisancename = 'norm'+background+region
-                scalefactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
-                scalefactorerror = normBackgrounds[background][region]['scalefactor'][scalefactor]
-                nuisances[nuisancename]  = {
-                    'name'    : nuisancename+year, 
-                    'samples' : { background : str(1.+float(scalefactorerror)/float(scalefactor)) },
-                    'cuts'    : normBackgrounds[background][region]['cuts'], 
-                    'type'    : 'lnN',
-                }
-                if region=='all' and scalefactor=='1.00':
-                    scalefactorFromData = False
+        for region in normBackgroundNuisances[background]:
+            nuisancename = normBackgroundNuisances[background][region]['name']
+            nuisances[nuisancename]  = {
+                'name'    : nuisancename+year, 
+                'samples' : normBackgroundNuisances[background][region]['samples'],
+                'cuts'    : normBackgroundNuisances[background][region]['cuts'], 
+                'type'    : normBackgroundNuisances[background][region]['type'],
+            }
+            if 'kind' in normBackgroundNuisances[background][region]:
+                nuisances[nuisancename]['kind'] = normBackgroundNuisances[background][region]['kind']
+            scalefactorFromData = normBackgroundNuisances[background][region]['scalefactorFromData']  
 
-            if scalefactorFromData:
+        if scalefactorFromData:
             
-                if background in nuisances['lumi']['samples']:
-                    del nuisances['lumi']['samples'][background]
+            if background in nuisances['lumi']['samples']:
+                del nuisances['lumi']['samples'][background]
             
-                if background in nuisances['trigger']['samples']:
-                    del nuisances['trigger']['samples'][background]
+            if background in nuisances['trigger']['samples']:
+                del nuisances['trigger']['samples'][background]
 
 ### shapes
 
@@ -126,7 +124,7 @@ for scalefactor in btagSF:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
                 nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
     for cut in cuts.keys():
-        if ('1b' in scalefactor and ('_Tag' in cut or 'SS_' in cut or 'Fake' in cut or 'ttZ' in cut)) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut or 'WZ_' in cut or 'WZtoWW_' in cut or 'ZZ' in cut or 'Zpeak' in cut)):
+        if ('1b' in scalefactor and ('_Tag' in cut or 'SS_' in cut or 'Fake' in cut or 'ttZValidation' in cut or '1tag' in cut or '2tag' in cut)) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut or 'WZ_' in cut or 'WZtoWW_' in cut or 'ZZ' in cut or 'Zpeak' in cut)):
             nuisances[scalefactor]['cuts'].append(cut)
 
 # pileup
@@ -198,10 +196,26 @@ for sample in samples.keys():
 # mt2ll top and WW
 
 ### Update to new bins: add SR4_ and adjust mt2ll bins for high MT2
-mt2llRegions = ['SR1_', 'SR2_', 'SR3_'] # , 'SR4_']
-mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
-mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
-mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
+mt2llRegions = ['SR1_', 'SR2_', 'SR3_']
+if 'Optim' in opt.tag and 'Ptm' in opt.tag:
+    mt2llRegions.append('_SR4')
+
+if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
+    mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
+    mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
+    mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
+elif 'High' in opt.tag and 'Extra' in opt.tag:
+    mt2llBins = ['Bin6', 'Bin7', 'Bin8', 'Bin9' ]
+    mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']    
+    mt2llSystematics = [0.20, 0.30, 0.30, 0.30] # placeholders
+elif 'High' in opt.tag:
+    mt2llBins = ['Bin6', 'Bin7', 'Bin8' ]     
+    mt2llEdges = ['100.', '160.', '370.', '999999999.']
+    mt2llSystematics = [0.20, 0.30, 0.30] # placeholders     
+else:
+    mt2llBins = ['Bin6', 'Bin7' ]
+    mt2llEdges = ['100.', '160.', '999999999.']
+    mt2llSystematics = [0.20, 0.30] # placeholders            
 
 for mt2llregion in mt2llRegions: 
     for mt2llbin in range(len(mt2llBins)):
