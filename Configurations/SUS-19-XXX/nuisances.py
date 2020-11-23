@@ -451,11 +451,12 @@ nuisanceToRemove = [ ]
 if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag:
 
     if 'ctrl' in regionName and 'cern' in SITE : # JES and MET variations not available at cern for ctrl trees
+        
         if hasattr(opt, 'batchSplit'): # Remove only when running shapes, so can make shapes in gridui and plots in lxplus
             for nuisance in nuisances:
                 if 'jesTotal' in nuisance or 'unclustEn' in nuisance: 
                     nuisanceToRemove.append(nuisance)
-
+        
     else:
         pass
 

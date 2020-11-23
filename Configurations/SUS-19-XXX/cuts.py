@@ -260,20 +260,20 @@ if 'WWValidationRegion' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
 if 'SameSignValidationRegion' in opt.tag:
 
     cuts['SS_ptmiss']            = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=0  )', 'weight' : btagWeight1tag }
-    cuts['SS_ptmiss-100to140']   = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : btagWeight1tag }
-    cuts['SS_ptmiss-140']        = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=140)', 'weight' : btagWeight1tag }
-    cuts['SS_ptmiss-160']        = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
-    cuts['SS_ptmiss-160_plus']   = { 'expr' : '('+SSP+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
-    cuts['SS_ptmiss-160_minus']  = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
+    cuts['SS_ptmiss_100to140']   = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : btagWeight1tag }
+    cuts['SS_ptmiss_140']        = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=140)', 'weight' : btagWeight1tag }
+    cuts['SS_ptmiss_160']        = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
+    cuts['SS_ptmiss_160_plus']   = { 'expr' : '('+SSP+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
+    cuts['SS_ptmiss_160_minus']  = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
 
 if 'FakeValidationRegion' in opt.tag:
     
     Fake = LepId2of3 + ' && ' + OCT
 
     cuts['Fake']                   = { 'expr' : '('+Fake+' && ptmiss'+ctrltag+'>=0  )', 'weight' : btagWeight1tag }
-    cuts['Fake_ptmiss-100to140']   = { 'expr' : '('+Fake+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : btagWeight1tag }
-    cuts['Fake_ptmiss-140']        = { 'expr' : '('+Fake+' && ptmiss'+ctrltag+'>=140)', 'weight' : btagWeight1tag }
-    cuts['Fake_ptmiss-160']        = { 'expr' : '('+Fake+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
+    cuts['Fake_ptmiss_100to140']   = { 'expr' : '('+Fake+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : btagWeight1tag }
+    cuts['Fake_ptmiss_140']        = { 'expr' : '('+Fake+' && ptmiss'+ctrltag+'>=140)', 'weight' : btagWeight1tag }
+    cuts['Fake_ptmiss_160']        = { 'expr' : '('+Fake+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
 
 if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
