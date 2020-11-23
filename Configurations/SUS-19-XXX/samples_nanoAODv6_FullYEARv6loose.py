@@ -351,7 +351,6 @@ normBackgrounds['VZ']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }
 normBackgrounds['VVV']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
 
 if '2016' in yeartag:
-    #normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
     normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.08' }, 'selection' : '1.' } }
     normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.29' : '0.28' }, 'selection' : '1.' } }
     normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.13' : '0.31' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
@@ -369,7 +368,6 @@ if '2016' in yeartag:
         normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.13' : '0.21' } 
 
 elif '2017' in yeartag:
-    #normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
     normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '1.04' : '0.08' }, 'selection' : '1.' } }
     normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.45' : '0.27' }, 'selection' : '1.' } }
     normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.83' : '0.25' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },  
@@ -385,8 +383,8 @@ elif '2017' in yeartag:
     elif 'kZZdphi' in opt.tag:
         normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' } 
         normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.86' : '0.16' }        
+
 elif '2018' in yeartag:
-    #normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.97' : '0.09' }, 'selection' : '1.' } }
     normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.06' }, 'selection' : '1.' } }
     normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.43' : '0.22' }, 'selection' : '1.' } }
     normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.08' : '0.23' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
@@ -412,6 +410,8 @@ if 'BackSF' in opt.tag:
         normBackgrounds['ZZTo4L'] = normBackgrounds['ZZTo2L2Nu']
         normBackgrounds['ttZ']['all']['cuts'] = [ 'ptmiss-160' ] 
         normBackgrounds['ttZ']['all']['selection'] = '(ptmiss'+ctrltag+'>=160.)'
+        normBackgrounds['WZ']['all']['cuts'] = [ 'ptmiss-160' ]
+        normBackgrounds['WZ']['all']['selection'] = '(ptmiss'+ctrltag+'>=160.)'
 
 ### SUS-17-010 --> nomulti style
 #normBackgrounds = {
