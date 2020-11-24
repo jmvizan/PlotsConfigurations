@@ -204,6 +204,31 @@ elif 'btagefficiencies' in opt.tag:
                             'range' : ([0.,0.2,0.4,0.8,1.2,1.6,2.0,2.5],[1]),  #   variable range
                             'xaxis' : 'jet pseudorapodity',        #   x axis name
                             } 
+
+elif 'Trigger' in opt.tag:
+
+    variables['Leptonpt1pt2']  = {  'name'  : 'Lepton_pt[1]:Lepton_pt[0]',                                         #   variable name  
+                                    'range' : ([20, 25, 30, 40, 50, 70, 100, 150],[20, 25, 30, 40, 50, 70, 100, 150]), #   variable range
+                                    'xaxis' : '2D pt',                                                             #   x axis name
+                                    'fold'  : overflow                                                             #   fold overflow
+                                   } 
+
+    variables['Lepton1pteta']  = {  'name'  : 'Lepton_eta[0]:Lepton_pt[0]',                                        #   variable name
+                                    'range' : ([20, 25, 30, 40, 50, 70, 100, 150, 300],[-2.4, -0.8, 0, 0.8, 2.4]), #   variable range
+                                    'xaxis' : '2D eta:#pt'                                                         #   x axis name
+                                  }
+
+    #variables['Lepton1pt']     = {  'name'  : 'Lepton_pt[0]',                                                      #   variable name 
+    #                                'range' : ([20, 25, 30, 40, 50, 70, 100, 150, 300],[1]),                       #   variable range    
+    #                                'xaxis' : '1D pt',                                                             #   x axis name
+    #                                'fold'  : overflow                                                             #   fold overflow
+    #                              }
+                                    
+    #variables['Lepton1eta']    = {  'name'  : 'Lepton_eta[0]',                                                     #   variable name
+    #                                'range' : ([-2.4, -0.8, 0, 0.8, 2.4][1]),                                      #   variable range   
+    #                                'xaxis' : '1D eta',                                                            #   x axis name
+    #                                'fold'  : 0                                                                    #   fold overflow
+    #                              }
                             
 elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag or 'More' in opt.tag:
 
@@ -336,7 +361,24 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                        'xaxis' : mt2 + pll + gv,         #   x axis name
                                        'fold'  : overflow                #   fold overflow
                                    }
-   
+
+elif 'ttZNormalization' in opt.tag:
+
+    variables['mll'] = {   'name'  : '90.',                #   variable name
+                           'range' : (  1,    80.,  100.), #   variable range
+                           'xaxis' : 'm' + pll + gv,       #   x axis name
+                       }
+  
+    ptmissTTZ = ptmissNano
+    if 'AddZ' in opt.tag:
+        ptmissTTZ = ptmiss_ttZ3Lep+'*('+nLooseLepton+'==3) + ptmiss_ttZ*('+nLooseLepton+'==4)'
+
+    variables['ptmiss'] = {  'name'  : ptmissTTZ,               #   variable name
+                             'range' : (  20,    0.,  400.),    #   variable range
+                             'xaxis' : met + gv,                #   x axis name
+                             'fold'  : overflow                 #   fold overflow
+                           }
+ 
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     mt2ll = 'mt2ll' + ctrltag
@@ -393,19 +435,18 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
             mt2llOptimBin = [0, 20, 40, 60, 80, 100, 160, 220]
 
             variables['mt2llOptim'] = {   'name'  : mt2ll,                  #   variable name    
-                                          'range' : (mt2llOptimBin,[1]),    # variable range
+                                          'range' : (mt2llOptimBin,[1]),    #   variable range
                                           'xaxis' : mt2 + pll + gv,         #   x axis name
                                           'fold'  : overflow,               #   fold overflow
                                           'CRbins' : [1, 4] 
                                       }
 
-	    if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag:
-
+	    if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag:
 
                 mt2llOptimHighBin = [0, 20, 40, 60, 80, 100, 160, 370, 500]                                                                                               
 
                 variables['mt2llOptimHigh'] = {   'name'  : mt2ll,                   #   variable name
-                                                  'range' : (mt2llOptimHighBin,[1]), # variable range
+                                                  'range' : (mt2llOptimHighBin,[1]), #   variable range
                                                   'xaxis' : mt2 + pll + gv,          #   x axis name
                                                   'fold'  : overflow,                #   fold overflow
                                                   'CRbins' : [1, 4]                                                                                                                                                      }

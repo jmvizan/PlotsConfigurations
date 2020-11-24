@@ -79,7 +79,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     groupPlot['ttSemilep']  = {
         'nameHR' : 't#bar{t} Semilep.',
         'isSignal' : 0,
-        'color': 401,   # kYellow+1
+        'color': 4,# used to be 401,   # kYellow+1
         'samples'  : ['ttSemilep'] 
     }
         
