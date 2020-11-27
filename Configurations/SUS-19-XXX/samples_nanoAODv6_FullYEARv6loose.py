@@ -23,6 +23,7 @@ treePrefix= 'nanoLatino_'
 ### Directories
   
 SITE=os.uname()[1]
+if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
 if  'cern' in SITE :
     if '2016' in yeartag:
