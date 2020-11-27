@@ -495,6 +495,12 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                         'fold'  : overflow                 #   fold overflow
                                      }
 
+        variables['ptmissSR']     = {  'name'  : 'ptmiss'+ctrltag,        #   variable name    
+                                        'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]), #   variable range
+                                        'xaxis' : met + gv,                #   x axis name
+                                        'fold'  : overflow                 #   fold overflow
+                                     }
+
         if 'DYValidationRegion' in opt.tag:   
 
             variables['deltaPhiLep']   = {  'name'  : dPhill,                  #   variable name    
@@ -509,7 +515,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                             'fold'  : overflow                 #   fold overflow
                                          } 
 
-        if 'ZZValidationRegion' in opt.tag: 
+        if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag: 
     
             variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name    
                                             'range' : (  6,    0.,     6.),    #   variable range
