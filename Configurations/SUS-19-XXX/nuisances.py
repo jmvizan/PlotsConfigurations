@@ -292,7 +292,7 @@ nuisances['qcdScale'] = {
 }
 for sample in samples.keys():
     if not samples[sample]['isDATA'] and theoryNormalizations[sample]['qcdScaleStatus']==3:
-        if '2016' in year and (sample=='Higgs' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue
+        if '2016' in year and (sample=='Higgs' or sample=='ttZ' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue
         if '2017' in year and (sample=='VZ' or sample=='ttZ'): continue
         if '2018' in year and (sample=='WZ' or sample=='ttW' or sample=='VZ'): continue
         qcdScaleVariations = [ ] 
