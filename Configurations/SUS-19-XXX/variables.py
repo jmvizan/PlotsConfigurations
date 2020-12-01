@@ -402,7 +402,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
     mt2ll = 'mt2ll' + ctrltag
 
     if 'FitCRttZ' in opt.tag: # this is not really right, but it's just for normalization
-        mt2ll = 'mt2ll_WZtoWW*('+nLooseLepton+'==3) + mt2ll_ttZ*('+nLooseLepton+'==4)
+        mt2ll = 'mt2ll_WZtoWW*('+nLooseLepton+'==3) + mt2ll_ttZ*('+nLooseLepton+'==4)'
 
     if 'FakeValidationRegion' in opt.tag:
         mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'
