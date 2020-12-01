@@ -475,8 +475,8 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
             crcut = cut.replace('SR', 'CR')
 
             exprCR = cuts[cut]['expr']
-            exprCR = exprCR.relace(' && '+DF, '')
-            exprCR = exprCR.relace(' && '+SF, '')
+            exprCR = exprCR.replace(' && '+DF, '')
+            exprCR = exprCR.replace(' && '+SF, '')
 
             if '_Tag_' in cut and ('FitCRttZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
                 
