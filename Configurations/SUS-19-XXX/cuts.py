@@ -496,7 +496,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
 
             elif '_Tag_' not in cut and ('FitCRZZ' in opt.tag or hasattr(opt, 'outputDirDatacard')): 
 
-                exprCR = exprCR.replace(OC,  + ' && deltaMassZ_ZZ<15. && ptmiss>=0.')
+                exprCR = exprCR.replace(OC, nLooseLepton+'==4 && ' + nTightLepton + '>=3 && deltaMassZ_ZZ<15. && ptmiss>=0.')
                 exprCR = exprCR.replace('ptmiss>', 'ptmiss_ZZ>')
                 exprCR = exprCR.replace('ptmiss<', 'ptmiss_ZZ<')                  
                 exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_ZZ')
