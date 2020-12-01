@@ -371,7 +371,7 @@ elif 'ttZNormalization' in opt.tag:
   
     ptmissTTZ = ptmissNano
     if 'AddZ' in opt.tag:
-        ptmissTTZ = ptmiss_ttZ3Lep+'*('+nLooseLepton+'==3) + ptmiss_ttZ*('+nLooseLepton+'==4)'
+        ptmissTTZ = ptmiss_ttZLoose
 
     variables['ptmiss'] = {  'name'  : ptmissTTZ,               #   variable name
                              'range' : (  20,    0.,  400.),    #   variable range
@@ -379,7 +379,6 @@ elif 'ttZNormalization' in opt.tag:
                              'fold'  : overflow                 #   fold overflow
                            }
  
-
     variables['ptmissSR'] = {  'name'  : ptmissTTZ,             #   variable name
                                'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]), #   variable range
                                'xaxis' : met + gv,                #   x axis name
@@ -401,6 +400,9 @@ elif 'ttZNormalization' in opt.tag:
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     mt2ll = 'mt2ll' + ctrltag
+
+    if 'FitCRttZ' in opt.tag: # this is not really right, but it's just for normalization
+        mt2ll = 'mt2ll_WZtoWW*('+nLooseLepton+'==3) + mt2ll_ttZ*('+nLooseLepton+'==4)
 
     if 'FakeValidationRegion' in opt.tag:
         mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'

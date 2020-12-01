@@ -317,52 +317,59 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
         cuts['ZZ_ptmiss-140'] = { 'expr' : '(' + ZZselection.replace('METCUT', '140') + ')', 'weight' : btagWeight0tag }
         cuts['ZZ_ptmiss-160'] = { 'expr' : '(' + ZZselection.replace('METCUT', '160') + ')', 'weight' : btagWeight0tag }
 
-if 'ttZNormalization' in opt.tag:
+if 'ttZNormalization' in opt.tag or 'FitCRttZ' in opt.tag:
 
-    ttZcommon = nTightLepton+'>=3 && deltaMassZ_ctrltag<10. && deltaMassZ_ctrltag>=0. && ptmiss_ctrltag>=0. && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>='+bTagPtCut
+    ttZcommon = 'deltaMassZ_ctrltag<10. && deltaMassZ_ctrltag>=0. && ptmiss_ctrltag>=0.'
+    if 'Z15' in opt.tag:
+        ttZcommon = ttZcommon.replace('deltaMassZ_ctrltag<10.', 'deltaMassZ_ctrltag<15.')
+    ttZ3Lep = nLooseLepton+'==3 && '+ttZcommon.replace('_ctrltag', '_WZtoWW' )
+    ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ')
     ptmissTTZ3Lep = ptmissNano
-    ptmissTTZ4Lep = ptmissNano  
+    ptmissTTZ4Lep = ptmissNano
     if 'AddZ' in opt.tag:
         ptmissTTZ3Lep = ptmiss_ttZ3Lep 
         ptmissTTZ4Lep = 'ptmiss_ttZ'
-    ttZ3Lep = nLooseLepton+'==3 && '+ttZcommon.replace('_ctrltag', '_WZ' )+' && '+ptmissTTZ3Lep+'>=METCUT'
-    ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ')+' && '+ptmissTTZ4Lep+'>=METCUT' 
-    ttZselectionLoose = '(('+ ttZ3Lep + ') || (' + ttZ4Lep + '))'   
-
-    cuts['ttZ_3Lep_loose']                = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')' }
-    cuts['ttZ_3Lep_loose1tag']            = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
-    cuts['ttZ_3Lep_loose2tag']            = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
-    cuts['ttZ_3Lep_ptmiss-100_loose']     = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')' }  
-    cuts['ttZ_3Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
-    cuts['ttZ_3Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
-    cuts['ttZ_3Lep_ptmiss-160_loose']     = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')' }  
-    cuts['ttZ_3Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
-    cuts['ttZ_3Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
-
-    cuts['ttZ_4Lep_loose']                = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')' }  
-    cuts['ttZ_4Lep_loose1tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
-    cuts['ttZ_4Lep_loose2tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
-    cuts['ttZ_4Lep_ptmiss-100_loose']     = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')' }
-    cuts['ttZ_4Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
-    cuts['ttZ_4Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
-    cuts['ttZ_4Lep_ptmiss-160_loose']     = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')' }
-    cuts['ttZ_4Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
-    cuts['ttZ_4Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
-
-    cuts['ttZ_loose']                = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')' } 
-    cuts['ttZ_loose1tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
-    cuts['ttZ_loose2tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
-    cuts['ttZ_ptmiss-100_loose']     = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')' } 
-    cuts['ttZ_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
-    cuts['ttZ_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
-    cuts['ttZ_ptmiss-160_loose']     = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')' }
-    cuts['ttZ_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
-    cuts['ttZ_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
-
+    if 'FitCRttZ' not in opt.tag:
+        ttZ3Lep += ' && '+ptmissTTZ3Lep+'>=METCUT'
+        ttZ4Lep += ' && '+ptmissTTZ4Lep+'>=METCUT'
+    ttZselectionLoose = nTightLepton+'>=3 && (('+ ttZ3Lep + ') || (' + ttZ4Lep + ')) && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>='+bTagPtCut   
     btagweightmixtag = '(('+btagWeight2tag+')*('+nLooseLepton+'==3) + ('+btagWeight1tag+')*('+nLooseLepton+'==4))'
-    cuts['ttZ_loosemixtag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagweightmixtag } 
-    cuts['ttZ_ptmiss-100_loosemixtag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagweightmixtag }
-    cuts['ttZ_ptmiss-160_loosemixtag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagweightmixtag }
+
+    if 'ttZNormalization' in opt.tag:
+
+        cuts['ttZ_3Lep_loose']                = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')' }
+        cuts['ttZ_3Lep_loose1tag']            = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
+        cuts['ttZ_3Lep_loose2tag']            = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
+        cuts['ttZ_3Lep_ptmiss-100_loose']     = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')' }  
+        cuts['ttZ_3Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_3Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+        cuts['ttZ_3Lep_ptmiss-160_loose']     = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')' }  
+        cuts['ttZ_3Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_3Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+
+        cuts['ttZ_4Lep_loose']                = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')' }  
+        cuts['ttZ_4Lep_loose1tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
+        cuts['ttZ_4Lep_loose2tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
+        cuts['ttZ_4Lep_ptmiss-100_loose']     = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')' }
+        cuts['ttZ_4Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_4Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+        cuts['ttZ_4Lep_ptmiss-160_loose']     = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')' }
+        cuts['ttZ_4Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_4Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+
+        cuts['ttZ_loose']                = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')' } 
+        cuts['ttZ_loose1tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
+        cuts['ttZ_loose2tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
+        cuts['ttZ_ptmiss-100_loose']     = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')' } 
+        cuts['ttZ_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+        cuts['ttZ_ptmiss-160_loose']     = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')' }
+        cuts['ttZ_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+
+        cuts['ttZ_loosemixtag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagweightmixtag } 
+        cuts['ttZ_ptmiss-100_loosemixtag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagweightmixtag }
+        cuts['ttZ_ptmiss-160_loosemixtag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagweightmixtag }
 
 if 'DYValidationRegion' in opt.tag:
 
@@ -452,17 +459,71 @@ if 'SignalRegion' in opt.tag:
             cuts[SR+'_Veto_em']  = { 'expr' : '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+vetocut+')', 'weight' : btagWeight0tag }
             cuts[SR+'_Veto_sf']  = { 'expr' : '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+vetocut+')', 'weight' : btagWeight0tag }
     
+# Add cuts for control regions to be added in the fit
 
-# apply background scale factors
+if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'FitCRZZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
+
+    crcuts = { } 
+    cutToRemove = [ ] 
+
+    for cut in cuts:
+        if 'SR' in cut:
+
+            if not hasattr(opt, 'outputDirDatacard'):
+                cutToRemove.append(cut)
+
+            crcut = cut.replace('SR', 'CR')
+
+            exprCR = cuts[cut]['expr']
+            exprCR = exprCR.relace(' && '+DF, '')
+            exprCR = exprCR.relace(' && '+SF, '')
+
+            if '_Tag_' in cut and ('FitCRttZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
+                
+                exprCR = exprCR.replace('ptmiss>', ptmiss_ttZLoose+'>')
+                exprCR = exprCR.replace('ptmiss<', ptmiss_ttZLoose+'<')
+                exprCR = exprCR.replace('ptmiss_phi', ptmiss_phi_ttZLoose)
+                exprCR = exprCR.replace(OC, ttZselectionLoose)
+                weightCR = btagweightmixtag
+
+            elif '_Tag_' not in cut and ('FitCRWZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
+            
+                exprCR = exprCR.replace(OC, nLooseLepton+'==3 && ' + nTightLepton + '==3 && deltaMassZ_WZ<10. && ptmiss>=0.')
+                exprCR = exprCR.replace('ptmiss>', 'ptmiss_WZ>')
+                exprCR = exprCR.replace('ptmiss<', 'ptmiss_WZ<')
+                exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_WZ')
+                weightCR = cuts[cut]['weight']
+
+            elif '_Tag_' not in cut and ('FitCRZZ' in opt.tag or hasattr(opt, 'outputDirDatacard')): 
+
+                exprCR = exprCR.replace(OC,  + ' && deltaMassZ_ZZ<15. && ptmiss>=0.')
+                exprCR = exprCR.replace('ptmiss>', 'ptmiss_ZZ>')
+                exprCR = exprCR.replace('ptmiss<', 'ptmiss_ZZ<')                  
+                exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_ZZ')
+                weightCR = cuts[cut]['weight']
+
+            else: 
+                continue
+
+            if crcut not in crcuts: # avoiding double counting from em and sf channels
+                crcuts[crcut] = { 'expr' : exprCR, 'weight' : weightCR }
+           
+    for cut in cutToRemove:
+        del cuts[cut]
+
+    for cut in crcuts:
+        cuts[cut] = crcuts[cut]
+
+# Apply background scale factors
  
 try:
     normBackgrounds
 except NameError:
     normBackgrounds = None
-   
+
 normBackgroundNuisances = { }
 
-if ('SignalRegions' in opt.tag or 'BackSF' in opt.tag) and normBackgrounds is not None:
+if normBackgrounds is not None:
         
     for background in normBackgrounds:
         if background in samples:
