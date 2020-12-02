@@ -165,15 +165,15 @@ if 'Data' not in opt.sigset: # 2016 and 2018 data do not have pt_nom, but it's e
     elif metnom=='Smear': ptmissNano += '_jer'
 ptmissPhiNano = ptmissNano.replace('_pt', '_phi')
 
-ptxLep = 'Lepton_pt[lepidx_WZtoWW]*cos(Lepton_phi[lepidx_WZtoWW])'
-ptyLep = 'Lepton_pt[lepidx_WZtoWW]*sin(Lepton_phi[lepidx_WZtoWW])'
-chrLep = '((Lepton_pdgId[lepidx_WZtoWW]*Lepton_pdgId[lep2idx_WZtoWW])<0)'
+ptxLep = 'Lepton_pt[abs(lepidx_WZtoWW)]*cos(Lepton_phi[abs(lepidx_WZtoWW)])'
+ptyLep = 'Lepton_pt[abs(lepidx_WZtoWW)]*sin(Lepton_phi[abs(lepidx_WZtoWW)])'
+chrLep = '((Lepton_pdgId[abs(lepidx_WZtoWW)]*Lepton_pdgId[abs(lep2idx_WZtoWW)])<0)'
 metx_ttZ3Lep = '(ptmiss_WZtoWW*cos(ptmiss_phi_WZtoWW)+'+ptxLep.replace('lepidx', 'lep0idx')+'*'+chrLep.replace('lepidx', 'lep0idx')+'+'+ptxLep.replace('lepidx', 'lep1idx')+'*'+chrLep.replace('lepidx', 'lep1idx')+')' 
 mety_ttZ3Lep = '(ptmiss_WZtoWW*sin(ptmiss_phi_WZtoWW)+'+ptyLep.replace('lepidx', 'lep0idx')+'*'+chrLep.replace('lepidx', 'lep0idx')+'+'+ptyLep.replace('lepidx', 'lep1idx')+'*'+chrLep.replace('lepidx', 'lep1idx')+')'
 ptmiss_ttZ3Lep = 'sqrt('+metx_ttZ3Lep+'*'+metx_ttZ3Lep+'+'+mety_ttZ3Lep+'*'+mety_ttZ3Lep+')'
 ptmiss_phi_ttZ3Lep = 'atan2('+mety_ttZ3Lep+', '+metx_ttZ3Lep+')' 
-ptmiss_ttZLoose = '('+ptmiss_ttZ3Lep+'*('+nLooseLepton+'==3) + ptmiss_ttZ*('+nLooseLepton+'==4))'
-ptmiss_phi_ttZLoose = '('+ptmiss_phi_ttZ3Lep+'*('+nLooseLepton+'==3) + ptmiss_phi_ttZ*('+nLooseLepton+'==4))'
+ptmiss_ttZLoose = '('+ptmiss_ttZ3Lep+'*(ptmiss_WZtoWW>=0.) + ptmiss_ttZ*(ptmiss_ttZ>=0.))'
+ptmiss_phi_ttZLoose = '('+ptmiss_phi_ttZ3Lep+'*(ptmiss_WZtoWW>=0.) + ptmiss_phi_ttZ*(ptmiss_ttZ>=0.))'
  
 OC =  nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])<0'
 SS =  nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])>0'
