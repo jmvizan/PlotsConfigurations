@@ -68,6 +68,8 @@ if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZVal' in opt.tag or 'WZtoWW' 
     if 'WZtoWW'   in opt.tag: ctrltag = '_WZtoWW'
     if 'ttZ'      in opt.tag: ctrltag = '_ttZ'
     if 'ZZVal'    in opt.tag: ctrltag = '_ZZ'
+    if 'FitCRWZ'  in opt.tag: ctrltag = '_WZ'
+    if 'FitCRZZ'  in opt.tag: ctrltag = '_ZZ'
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
@@ -166,8 +168,8 @@ ptmissPhiNano = ptmissNano.replace('_pt', '_phi')
 ptxLep = 'Lepton_pt[lepidx_WZtoWW]*cos(Lepton_phi[lepidx_WZtoWW])'
 ptyLep = 'Lepton_pt[lepidx_WZtoWW]*sin(Lepton_phi[lepidx_WZtoWW])'
 chrLep = '((Lepton_pdgId[lepidx_WZtoWW]*Lepton_pdgId[lep2idx_WZtoWW])<0)'
-metx_ttZ3Lep = '(ptmiss_WZtoWW*cos(ptmiss_phi_WZtoWW)+'+ptxLep.replace('lepidx', 'lep0idx')+'*'+chrLep.replace('lepidx', 'lep0idx')+ptxLep.replace('lepidx', 'lep1idx')+'*'+chrLep.replace('lepidx', 'lep1idx')+')' 
-mety_ttZ3Lep = '(ptmiss_WZtoWW*sin(ptmiss_phi_WZtoWW)+'+ptyLep.replace('lepidx', 'lep0idx')+'*'+chrLep.replace('lepidx', 'lep0idx')+ptyLep.replace('lepidx', 'lep1idx')+'*'+chrLep.replace('lepidx', 'lep1idx')+')'
+metx_ttZ3Lep = '(ptmiss_WZtoWW*cos(ptmiss_phi_WZtoWW)+'+ptxLep.replace('lepidx', 'lep0idx')+'*'+chrLep.replace('lepidx', 'lep0idx')+'+'+ptxLep.replace('lepidx', 'lep1idx')+'*'+chrLep.replace('lepidx', 'lep1idx')+')' 
+mety_ttZ3Lep = '(ptmiss_WZtoWW*sin(ptmiss_phi_WZtoWW)+'+ptyLep.replace('lepidx', 'lep0idx')+'*'+chrLep.replace('lepidx', 'lep0idx')+'+'+ptyLep.replace('lepidx', 'lep1idx')+'*'+chrLep.replace('lepidx', 'lep1idx')+')'
 ptmiss_ttZ3Lep = 'sqrt('+metx_ttZ3Lep+'*'+metx_ttZ3Lep+'+'+mety_ttZ3Lep+'*'+mety_ttZ3Lep+')'
 ptmiss_phi_ttZ3Lep = 'atan2('+mety_ttZ3Lep+', '+metx_ttZ3Lep+')' 
 ptmiss_ttZLoose = '('+ptmiss_ttZ3Lep+'*('+nLooseLepton+'==3) + ptmiss_ttZ*('+nLooseLepton+'==4))'
