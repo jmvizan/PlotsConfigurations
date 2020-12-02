@@ -339,14 +339,14 @@ for treeNuisance in treeNuisances:
                 'folderUp':   treeNuisanceDirs[treeNuisance][mcType]['Up'],
             }
             for sample in samples.keys():
-                if not samples[sample]['isDATA']:
+                if not samples[sample]['isDATA'] and not ('NoDY' in opt.tag and treeNuisance=='jer' and '2017' in year and sample=='DY'):
                     if (mcType=='MC' and not samples[sample]['isFastsim']) or (mcType=='FS' and samples[sample]['isFastsim']):
                         nuisances[treeNuisance+mcType]['samples'][sample] = ['1.', '1.']
 
             if len(nuisances[treeNuisance+mcType]['samples'].keys())==0:
                 del nuisances[treeNuisance+mcType]
 
-    if hasattr(opt, 'cardList'):
+    if hasattr(opt, 'cardList') and treeNuisances[treeNuisance]['MCtoFS']:
         if treeNuisance+'MC' in nuisances and treeNuisance+'FS' in nuisances:
             nuisances[treeNuisance+'MC']['samples'].update(nuisances[treeNuisance+'FS']['samples']) 
             del nuisances[treeNuisance+'FS']
