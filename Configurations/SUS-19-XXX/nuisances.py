@@ -356,39 +356,58 @@ for treeNuisance in treeNuisances:
 rateparameters = {
     'Topnorm' :  { 
         'samples' : [ 'ttbar', 'tW', 'STtW' ],
-        'subcut'  : '',
+        'subcuts' : [ '' ],
     },
     'WWnorm'  : {
         'samples' : [ 'WW' ],
-        'subcut'  : '',
+        'subcuts' : [ '' ],
     },
     'NoJetRate_JetBack' : {
         'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
-        'subcut'  : '_NoJet_',
+        'subcuts' : [ '_NoJet_' ],
         'limits'  : '[0.5,1.5]',
     },
     'JetRate_JetBack' : {
         'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
-        'subcut'   : '_NoTag_',
+        'subcuts'  : [ '_NoTag_' ],
         'bondrate' : 'NoJetRate_JetBack',
     },
     'NoJetRate_DibosonBack' : {
         'samples' : [ 'WW', 'WZ' ],
-        'subcut'  : '_NoJet_',
+        'subcuts' : [ '_NoJet_' ],
         'limits'  : '[0.7,1.3]'
     },
     'JetRate_DibosonBack' : {
         'samples' : [ 'WW', 'WZ' ],
-        'subcut'  : '_NoTag_',
+        'subcuts' : [ '_NoTag_' ],
         'bondrate' : 'NoJetRate_DibosonBack',
     },
 }
 
-if hasattr(opt, 'inputFile'):
+if 'FitCR' in opt.tag:
+    backgroundCRs = { 'ttZ' : { 'samples' : [ 'ttZ' ],
+                                'regions' : { '_Tag_' : '' }, },
+                      'WZ'  : { 'samples' : [ 'WZ' ],  
+                                'regions' : { '_Veto_' : [ '' ] , '_NoTag_' : [ '_NoTag_', '_Tag_' ], '_NoJet_' : [ '_NoJet_' ] }, },
+                      'ZZ'  : { 'samples' : [ 'ZZTo2L2Nu', 'ZZTo4L' ],
+                                'regions' : { '_Veto_' : [ '' ] , '_NoTag_' : [ '_NoTag_', '_Tag_' ], '_NoJet_' : [ '_NoJet_' ] }, },
+                    }
+    for controlregion in backgroundCRs:
+        for sample in backgroundCRs[controlregion]['samples']:
+            for rateparam in rateparameters.keys():
+                if sample in rateparameters[rateparam]['samples']: 
+                    rateparameters[rateparam]['samples'].remove(sample)
+        for region in backgroundCRs[controlregion]['regions']: 
+            rateparameters['CR'+region+controlregion] = { }
+            rateparameters['CR'+region+controlregion]['samples'] = backgroundCRs[controlregion]['samples']
+            rateparameters['CR'+region+controlregion]['subcuts'] = backgroundCRs[controlregion]['regions'][region]
+            rateparameters['CR'+region+controlregion]['limits'] = '[0.5,1.5]'
+
+if hasattr(opt, 'outputDirDatacard'):
     for mt2llregion in mt2llRegions: 
         for rateparam in rateparameters: 
             
-            rateparamname = rateparam + '_' + mt2llregion
+            rateparamname = rateparam + mt2llregion
             
             for sample in rateparameters[rateparam]['samples']:
 
@@ -405,9 +424,10 @@ if hasattr(opt, 'inputFile'):
                     nuisances[sample+rateparamname]['limits'] = rateparameters[rateparam]['limits'] 
                     
                 for cut in cuts.keys():
-                    if mt2llregion in cut and rateparameters[rateparam]['subcut'] in  cut:
-
-                        nuisances[sample+rateparamname]['cuts'].append(cut)
+                    if mt2llregion in cut or (mt2llregion.replace('SR', 'CR') in cut and rateparam.split('_')[2]==cut.split('_')[2]):
+                        for subcut in rateparameters[rateparam]['subcuts']:
+                            if subcut in cut:
+                                nuisances[sample+rateparamname]['cuts'].append(cut)
                         
                 if 'bondrate' in rateparameters[rateparam].keys():
                                 

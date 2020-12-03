@@ -486,7 +486,6 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace('ptmiss<', ptmiss_ttZLoose+'<')
                 exprCR = exprCR.replace(OC, ttZselectionLoose)
                 crcuts[crcut.replace('_sf', '_ttZ')] = { 'expr' : exprCR, 'weight' : btagweightmixtag }
-                print '######', crcut.replace('_sf', '_ttZ'), exprCR
 
             if '_Tag_' not in cut and ('FitCRWZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
              
@@ -495,7 +494,6 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace('ptmiss<', 'ptmiss_WZ<')
                 exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_WZ')
                 crcuts[crcut.replace('_sf', '_WZ')] = { 'expr' : exprCR, 'weight' : cuts[cut]['weight'] }
-                print '######', crcut.replace('_sf', '_WZ'), exprCR  
 
             if '_Tag_' not in cut and ('FitCRZZ' in opt.tag or hasattr(opt, 'outputDirDatacard')): 
 
@@ -503,8 +501,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace('ptmiss>', 'ptmiss_ZZ>')
                 exprCR = exprCR.replace('ptmiss<', 'ptmiss_ZZ<')                  
                 exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_ZZ')
-                crcuts[crcut.replace('_sf', '_ZZ')] = { 'expr' : exprCR, 'weight' : cuts[cut]['weight'] }
-                print '######', crcut.replace('_sf', '_ZZ'), exprCR  
+                crcuts[crcut.replace('_sf', '_ZZ')] = { 'expr' : exprCR, 'weight' : cuts[cut]['weight'] } 
 
     for cut in cutToRemove:
         del cuts[cut]
