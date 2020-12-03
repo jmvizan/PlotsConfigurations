@@ -347,25 +347,25 @@ if 'ttZNormalization' in opt.tag or 'FitCRttZ' in opt.tag:
         #cuts['ttZ_3Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
         #cuts['ttZ_3Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ3Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
 
-        cuts['ttZ_4Lep_loose']                = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')' }  
-        cuts['ttZ_4Lep_loose1tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
-        cuts['ttZ_4Lep_loose2tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
+        #cuts['ttZ_4Lep_loose']                = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')' }  
+        #cuts['ttZ_4Lep_loose1tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
+        #cuts['ttZ_4Lep_loose2tag']            = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
         #cuts['ttZ_4Lep_ptmiss-100_loose']     = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')' }
-        cuts['ttZ_4Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
-        cuts['ttZ_4Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+        #cuts['ttZ_4Lep_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+        #cuts['ttZ_4Lep_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
         #cuts['ttZ_4Lep_ptmiss-160_loose']     = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')' }
-        cuts['ttZ_4Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
-        cuts['ttZ_4Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+        #cuts['ttZ_4Lep_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+        #cuts['ttZ_4Lep_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZ4Lep.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
 
-        cuts['ttZ_loose']                = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')' } 
-        cuts['ttZ_loose1tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
-        cuts['ttZ_loose2tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
+        #cuts['ttZ_loose']                = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')' } 
+        #cuts['ttZ_loose1tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight1tag }
+        #cuts['ttZ_loose2tag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagWeight2tag }
         #cuts['ttZ_ptmiss-100_loose']     = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')' } 
-        cuts['ttZ_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
-        cuts['ttZ_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
+        #cuts['ttZ_ptmiss-100_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight1tag }
+        #cuts['ttZ_ptmiss-100_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagWeight2tag }
         #cuts['ttZ_ptmiss-160_loose']     = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')' }
-        cuts['ttZ_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
-        cuts['ttZ_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
+        #cuts['ttZ_ptmiss-160_loose1tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+        #cuts['ttZ_ptmiss-160_loose2tag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagWeight2tag }
 
         cuts['ttZ_loosemixtag']            = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '0') + ')',   'weight' : btagweightmixtag } 
         cuts['ttZ_ptmiss-100_loosemixtag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagweightmixtag }
@@ -467,10 +467,12 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
     cutToRemove = [ ] 
 
     for cut in cuts:
-        if 'SR' in cut and '_sf' in cut: # Use sf channel to avoid double counting
+        if 'SR' in cut:
 
             if not hasattr(opt, 'outputDirDatacard'):
                 cutToRemove.append(cut)
+
+            if '_em' in cut: continue # Use only sf channel to avoid double counting
 
             crcut = cut.replace('SR', 'CR')
             exprcut = cuts[cut]['expr']
@@ -484,6 +486,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace('ptmiss<', ptmiss_ttZLoose+'<')
                 exprCR = exprCR.replace(OC, ttZselectionLoose)
                 crcuts[crcut.replace('_sf', '_ttZ')] = { 'expr' : exprCR, 'weight' : btagweightmixtag }
+                print '######', crcut.replace('_sf', '_ttZ'), exprCR
 
             if '_Tag_' not in cut and ('FitCRWZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
              
@@ -492,6 +495,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace('ptmiss<', 'ptmiss_WZ<')
                 exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_WZ')
                 crcuts[crcut.replace('_sf', '_WZ')] = { 'expr' : exprCR, 'weight' : cuts[cut]['weight'] }
+                print '######', crcut.replace('_sf', '_WZ'), exprCR  
 
             if '_Tag_' not in cut and ('FitCRZZ' in opt.tag or hasattr(opt, 'outputDirDatacard')): 
 
@@ -500,6 +504,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace('ptmiss<', 'ptmiss_ZZ<')                  
                 exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_ZZ')
                 crcuts[crcut.replace('_sf', '_ZZ')] = { 'expr' : exprCR, 'weight' : cuts[cut]['weight'] }
+                print '######', crcut.replace('_sf', '_ZZ'), exprCR  
 
     for cut in cutToRemove:
         del cuts[cut]
