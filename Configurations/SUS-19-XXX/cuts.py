@@ -567,7 +567,9 @@ if normBackgrounds is not None:
                             if otherregion!=region and cut in normBackgroundNuisances[background][otherregion]['cuts']:
                                 nuisanceType = 'shape'
 
-                    samples[background]['weight'] += '*'+regionWeight
+                    if normBackgroundNuisances[background][region]['scalefactorFromData']:
+                        samples[background]['weight'] += '*'+regionWeight
+
                     normBackgroundNuisances[background][region]['type'] = nuisanceType
 
                     if nuisanceType=='lnN':
