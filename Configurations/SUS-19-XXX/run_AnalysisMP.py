@@ -74,7 +74,7 @@ if __name__ == '__main__':
     if doDC: print " datacards:\n", cmdDatacards
     else: print "datacards are not made"
     os.system('cd '+ SUS19+ '; '+cmsenv+';'+ cmdDatacards +command)
-    if doDC and '-' in yearset:
+    if doDC:
         for year in yearset.split('-'):
             for masspoint in sigset.split(','):
                 os.system('cd '+SUS19+'; rm -r ./Datacards/'+year+'/'+tag+'/'+masspoint)
