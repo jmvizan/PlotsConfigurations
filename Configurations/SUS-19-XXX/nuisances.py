@@ -289,6 +289,7 @@ nuisances['qcdScale'] = {
     'kind': 'weight_envelope',
     'type': 'shape',
     'samples': { },
+    'cuts' : [ ], 
 }
 for sample in samples.keys():
     if not samples[sample]['isDATA'] and theoryNormalizations[sample]['qcdScaleStatus']==3:
@@ -305,6 +306,7 @@ nuisances['pdf'] = {
     'kind': 'weight_envelope',
     'type': 'shape',
     'samples': { },
+    'cuts' : [ ],
 }
 for sample in samples.keys():
     if not samples[sample]['isDATA'] and not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
@@ -315,6 +317,11 @@ for sample in samples.keys():
         for i in range(len(theoryNormalizations[sample]['pdf'])):                              
             pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
         nuisances['pdf']['samples'][sample] = pdfVariations
+
+for cut in cuts:
+    if 'SR' in cut.split('_')[0]:
+        nuisances['qcdScale']['cuts'].append(cut)
+        nuisances['pdf']['cuts'].append(cut)
 
 ### JES, JER and MET
 
@@ -386,32 +393,48 @@ rateparameters = {
 
 if 'FitCR' in opt.tag:
     backgroundCRs = { 'ttZ' : { 'samples' : [ 'ttZ' ],
-                                'regions' : { '_Tag_' : '' }, },
+                                'regions' : { '_Tag_' : [ '_NoTag_', '_Veto_', '_Tag_' ] }, },
                       'WZ'  : { 'samples' : [ 'WZ' ],  
-                                'regions' : { '_Veto_' : [ '' ] , '_NoTag_' : [ '_NoTag_', '_Tag_' ], '_NoJet_' : [ '_NoJet_' ] }, },
+                                'regions' : { '_Veto_' : [ '_Veto_', '_Tag_' ] , '_NoTag_' : [ '_NoTag_', '_Tag_' ], '_NoJet_' : [ '_NoJet_' ] }, },
                       'ZZ'  : { 'samples' : [ 'ZZTo2L2Nu', 'ZZTo4L' ],
-                                'regions' : { '_Veto_' : [ '' ] , '_NoTag_' : [ '_NoTag_', '_Tag_' ], '_NoJet_' : [ '_NoJet_' ] }, },
+                                'regions' : { '_Veto_' : [ '_Veto_', '_Tag_' ] , '_NoTag_' : [ '_NoTag_', '_Tag_' ], '_NoJet_' : [ '_NoJet_' ] }, },
                     }
     for controlregion in backgroundCRs:
         for sample in backgroundCRs[controlregion]['samples']:
             for rateparam in rateparameters.keys():
                 if sample in rateparameters[rateparam]['samples']: 
                     rateparameters[rateparam]['samples'].remove(sample)
-        for region in backgroundCRs[controlregion]['regions']: 
-            rateparameters['CR'+region+controlregion] = { }
-            rateparameters['CR'+region+controlregion]['samples'] = backgroundCRs[controlregion]['samples']
-            rateparameters['CR'+region+controlregion]['subcuts'] = backgroundCRs[controlregion]['regions'][region]
-            rateparameters['CR'+region+controlregion]['limits'] = '[0.5,1.5]'
+        for region in backgroundCRs[controlregion]['regions']:
+            useRegion = False
+            for cut in cuts:
+                if region in cut:
+                    useRegion = True
+                    continue
+            if useRegion:
+                rateparameters['CR'+region+controlregion] = { }
+                rateparameters['CR'+region+controlregion]['samples'] = backgroundCRs[controlregion]['samples']
+                rateparameters['CR'+region+controlregion]['subcuts'] = backgroundCRs[controlregion]['regions'][region]
+                rateparameters['CR'+region+controlregion]['limits'] = '[0.3,1.7]'
 
 if hasattr(opt, 'outputDirDatacard'):
     for mt2llregion in mt2llRegions: 
         for rateparam in rateparameters: 
             
-            rateparamname = rateparam + mt2llregion
+            if 'CR_' in rateparam:
+                useControlRegion = False            
+                for cut in cuts:
+                    if mt2llregion in cut and rateparam.split('_')[1]==cut.split('_')[1]:
+                        useControlRegion = True
+                        continue
+                if not useControlRegion: continue
+
+            rateparamname = rateparam + '_' + mt2llregion
             
             for sample in rateparameters[rateparam]['samples']:
 
                 if sample not in samples: continue # backward compatibility for background names
+
+                isControlSample = True if ('isControlSample' in samples[sample] and samples[sample]['isControlSample']==1) else False
 
                 nuisances[sample+rateparamname]  = {
                     'name'  : rateparamname+year,
@@ -424,7 +447,7 @@ if hasattr(opt, 'outputDirDatacard'):
                     nuisances[sample+rateparamname]['limits'] = rateparameters[rateparam]['limits'] 
                     
                 for cut in cuts.keys():
-                    if mt2llregion in cut or (mt2llregion.replace('SR', 'CR') in cut and rateparam.split('_')[2]==cut.split('_')[2]):
+                    if (mt2llregion in cut and not isControlSample) or (mt2llregion.replace('SR', 'CR') in cut and 'CR_' in rateparam and rateparam.split('_')[2]==cut.split('_')[2]):
                         for subcut in rateparameters[rateparam]['subcuts']:
                             if subcut in cut:
                                 nuisances[sample+rateparamname]['cuts'].append(cut)
@@ -442,8 +465,8 @@ if hasattr(opt, 'outputDirDatacard'):
                         for variable in variables.keys():
 
                             histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
-                            cutB = rateparameters[rateparam]['subcut']
-                            cutA = rateparameters[rateparameters[rateparam]['bondrate']]['subcut']
+                            cutB = rateparameters[rateparam]['subcuts'][0]
+                            cutA = rateparameters[rateparameters[rateparam]['bondrate']]['subcuts'][0]
                             histoA = fileIn.Get(cut.replace(cutB, cutA)+'/'+variable+'/histo_'+sample)
                             yieldB = '%-.4f' % histoB.Integral()
                             yieldA = '%-.4f' % histoA.Integral()

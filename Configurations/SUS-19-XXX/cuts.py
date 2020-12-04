@@ -481,6 +481,10 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
 
             if '_Tag_' in cut and ('FitCRttZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
 
+                if hasattr(opt, 'outputDirDatacard'): # Ugly, but in this case these variables are not used
+                    ttZselectionLoose = ''
+                    btagweightmixtag = '1.'
+
                 exprCR = exprcut.replace('ptmiss_phi', ptmiss_phi_ttZLoose)
                 exprCR = exprCR.replace('ptmiss>', ptmiss_ttZLoose+'>')
                 exprCR = exprCR.replace('ptmiss<', ptmiss_ttZLoose+'<')

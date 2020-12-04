@@ -654,15 +654,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and hasattr(opt, 'outputDirDatacard')):
             
             ZZ4Lext = '_ext2' if ('2018' in yeartag) else '_ext1'
-            samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo4L'+ZZ4Lext, False,treePrefix) + 
-                                       getSampleFiles(directoryBkg,'ggZZ4e',              False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ4m',              False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ4t',              False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ2e2m',            False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ2e2t',            False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ2m2t',            False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'VBFHToZZTo4L_M125',   False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,treePrefix),
+            samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'+ZZ4Lext, False,treePrefix) + 
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4e',              False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4m',              False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4t',              False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2m',            False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2t',            False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2m2t',            False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'VBFHToZZTo4L_M125',   False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'GluGluHToZZTo4L_M125',False,treePrefix),
                                        'weight' : XSWeight+'*'+SFweight ,
                                        'JobsPerSample' : 6,
                                        'isControlSample' : 1,
