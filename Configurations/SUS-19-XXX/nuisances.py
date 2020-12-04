@@ -150,7 +150,7 @@ if '2016' in opt.tag or '2017' in opt.tag:
     }
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
-            nuisances['pileup']['samples'][sample] = [ 'PrefireWeight_Up/PrefireWeight', 'PrefireWeight_Down/PrefireWeight' ] 
+            nuisances['prefiring']['samples'][sample] = [ 'PrefireWeight_Up/PrefireWeight', 'PrefireWeight_Down/PrefireWeight' ] 
 
 # nonprompt lepton rate
 
@@ -195,10 +195,12 @@ for sample in samples.keys():
 
 # mt2ll top and WW
 
-### Update to new bins: add SR4_ and adjust mt2ll bins for high MT2
-mt2llRegions = ['SR1_', 'SR2_', 'SR3_']
-if 'Optim' in opt.tag and 'Ptm' in opt.tag:
-    mt2llRegions.append('_SR4')
+### Update to new bins: get SR from cuts and adjust mt2ll bins for high MT2
+mt2llRegions = [ ]
+for cut in cuts:
+    ptmissCut = cut.split('_')[0]+'_'
+    if 'SR' in ptmissCut and ptmissCut not in mt2llRegions:
+        mt2llRegions.append(ptmissCut)
 
 if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
     mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
@@ -293,9 +295,10 @@ nuisances['qcdScale'] = {
 }
 for sample in samples.keys():
     if not samples[sample]['isDATA'] and theoryNormalizations[sample]['qcdScaleStatus']==3:
-        if '2016' in year and (sample=='Higgs' or sample=='ttZ' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue
-        if '2017' in year and (sample=='VZ' or sample=='ttZ'): continue
-        if '2018' in year and (sample=='WZ' or sample=='ttW' or sample=='VZ'): continue
+        if hasattr(opt, 'outputDirDatacard'):
+            if '2016' in year and (sample=='Higgs' or sample=='ttZ' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue
+            if '2017' in year and (sample=='VZ' or sample=='ttZ'): continue
+            if '2018' in year and (sample=='WZ' or sample=='ttW' or sample=='VZ'): continue
         qcdScaleVariations = [ ] 
         for i in [0, 1, 3, 5, 7, 8]:
             qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
@@ -310,9 +313,10 @@ nuisances['pdf'] = {
 }
 for sample in samples.keys():
     if not samples[sample]['isDATA'] and not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
-        if '2016' in year and (sample=='ttW' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue
-        if '2017' in year and (sample=='VZ' or sample=='ttZ'): continue
-        if '2018' in year and (sample=='WZ' or sample=='ttW' or sample=='VZ'): continue  
+        if hasattr(opt, 'outputDirDatacard'):
+            if '2016' in year and (sample=='ttW' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue
+            if '2017' in year and (sample=='VZ' or sample=='ttZ'): continue
+            if '2018' in year and (sample=='WZ' or sample=='ttW' or sample=='VZ'): continue  
         pdfVariations = [ ] 
         for i in range(len(theoryNormalizations[sample]['pdf'])):                              
             pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
