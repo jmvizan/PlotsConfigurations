@@ -418,7 +418,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
     elif 'Optim' in opt.tag and 'MT2' in opt.tag:
         if 'High' in opt.tag:
             
-            if 'extrabin' in opt.tag:
+            if 'Extrabin' in opt.tag:
                 variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
                                                  'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
                                                  'xaxis' : mt2 + pll + gv,         #   x axis name
