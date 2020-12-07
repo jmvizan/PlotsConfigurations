@@ -7,7 +7,7 @@ fi
 intag=$2
 
 addCR=0
-if [[ $intag == *'FitCR'* ]]; the
+if [[ $intag == *'FitCR'* ]]; then
     addCR=1
 fi
 
@@ -41,7 +41,7 @@ for year in "${yearlist[@]}"; do
             echo "$outfile exists already."
         else
 
-            sigset=$intag
+            sigtag=$intag
             if [ $addCR == '1' ]; then
                 sigset=''
                 sigtag="${intag/FitCR/$sigset}"
