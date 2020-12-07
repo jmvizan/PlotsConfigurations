@@ -202,22 +202,25 @@ for cut in cuts:
     if 'SR' in ptmissCut and ptmissCut not in mt2llRegions:
         mt2llRegions.append(ptmissCut)
 
-if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
-    mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
-    mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
-    mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
-elif 'High' in opt.tag and 'Extra' in opt.tag:
-    mt2llBins = ['Bin6', 'Bin7', 'Bin8', 'Bin9' ]
-    mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']    
-    mt2llSystematics = [0.20, 0.30, 0.30, 0.30] # placeholders
-elif 'High' in opt.tag:
-    mt2llBins = ['Bin6', 'Bin7', 'Bin8' ]     
-    mt2llEdges = ['100.', '160.', '370.', '999999999.']
-    mt2llSystematics = [0.20, 0.30, 0.30] # placeholders     
-else:
-    mt2llBins = ['Bin6', 'Bin7' ]
-    mt2llEdges = ['100.', '160.', '999999999.']
-    mt2llSystematics = [0.20, 0.30] # placeholders            
+mt2llBins = [ ]
+mt2llNuisances = False
+if not hasattr(opt, 'outputDirDatacard') or mt2llNuisances:
+    if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
+        mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
+        mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
+        mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
+    elif 'High' in opt.tag and 'Extra' in opt.tag:
+        mt2llBins = ['Bin6', 'Bin7', 'Bin8', 'Bin9' ]
+        mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']    
+        mt2llSystematics = [0.20, 0.30, 0.30, 0.30] # placeholders
+    elif 'High' in opt.tag:
+        mt2llBins = ['Bin6', 'Bin7', 'Bin8' ]     
+        mt2llEdges = ['100.', '160.', '370.', '999999999.']
+        mt2llSystematics = [0.20, 0.30, 0.30] # placeholders     
+    else:
+        mt2llBins = ['Bin6', 'Bin7' ]
+        mt2llEdges = ['100.', '160.', '999999999.']
+        mt2llSystematics = [0.20, 0.30] # placeholders            
 
 for mt2llregion in mt2llRegions: 
     for mt2llbin in range(len(mt2llBins)):
