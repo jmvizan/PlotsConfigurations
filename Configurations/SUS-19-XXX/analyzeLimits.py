@@ -24,8 +24,6 @@ def roundBin(bincontent):
         return round(bincontent, 0)
 
 def takeBinsAverage(histo, xb, yb, stepX, stepY, checkEmpties = True):
-    #print "INSIDE THE AVERAGE BINNING THINGY", stepX, stepY, xb, yb,
-    #print histo.GetBinContent(xb+stepX, yb+stepY)==0., histo.GetBinContent(xb-stepX, yb-stepY)==0.
     if checkEmpties:
         if histo.GetBinContent(xb+stepX, yb+stepY)==0. or histo.GetBinContent(xb-stepX, yb-stepY)==0.:
             return 0.
@@ -817,7 +815,7 @@ def getMassScanContour(outputFileName, histo):
 
             x.append(massX)
             y.append(massY)
-            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.) or ('T2bW' in outputFileName and massX-massY<80.) or ('TChipmSlepSnu' in outputFileName and massX-massY<50.) or ('TChipmWW' in outputFileName and massX-massY<10.):
+            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.) or ('T2bW' in outputFileName and massX-massY<170.) or ('TChipmSlepSnu' in outputFileName and massX-massY<50.) or ('TChipmWW' in outputFileName and massX-massY<10.):
                 z.append(3.)
             else: 
                 minZ = min(minZ, histo.GetBinContent(xb, yb))
