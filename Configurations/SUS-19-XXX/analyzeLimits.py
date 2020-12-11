@@ -81,8 +81,7 @@ def fillEmptyBins(sigset, histo):
                     else:
                         if(massX-massY<=150): massYStep=25
                         else: massYStep= 50
-                    #massYStep = 25 if (massX-massY<=300. or massY<100.) else 50
-                    binStep = int(massXStep/25.)#12.5)
+                    binStep = int(massXStep/25.)
                     
                     if massX%massXStep==0 and massY%massYStep==0:
                         if massX==850 :print massX, massY, massYStep, massXStep, binStep
@@ -677,7 +676,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
     limitType = 'blind' if (limitOption=='Blind') else 'expected'
     for model in signalMassPoints:
         if model in sigset:
-            print model, modelHistogramSettings.keys()
             if model in modelHistogramSettings.keys():
                 histogramSettings = modelHistogramSettings[model]
                 for process in SUSYCrossSections:
@@ -819,7 +817,7 @@ def getMassScanContour(outputFileName, histo):
 
             x.append(massX)
             y.append(massY)
-            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.) or ('TChipmSlepSnu' in outputFileName and massX-massY<50.) or ('TChipmWW' in outputFileName and massX-massY<10.):
+            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.) or ('T2bW' in outputFileName and massX-massY<80.) or ('TChipmSlepSnu' in outputFileName and massX-massY<50.) or ('TChipmWW' in outputFileName and massX-massY<10.):
                 z.append(3.)
             else: 
                 minZ = min(minZ, histo.GetBinContent(xb, yb))
