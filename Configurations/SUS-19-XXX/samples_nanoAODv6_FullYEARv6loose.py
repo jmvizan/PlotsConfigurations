@@ -75,6 +75,8 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
 
+removeZeros = 1 if 'StatZero' in opt.tag else 0
+
 treeNuisances = { }
 if metnom=='Nomin':
     treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
