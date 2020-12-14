@@ -410,7 +410,7 @@ if 'SignalRegion' in opt.tag:
             jetscutSR2  = visht+'>=100'
 
     splitjets=False  
-    if 'CharginoSignalRegions' in opt.tag or 'VisHT' in opt.tag: splitjets=True
+    if 'CharginoSignalRegions' in opt.tag or 'TChipmWWSignalRegions' in opt.tag or 'VisHT' in opt.tag: splitjets=True
 
     ptmiss_cuts={"SR1": ' && ptmiss>=140 && ptmiss<200 ',
                  "SR2": ' && ptmiss>=200 && ptmiss<300 ',
@@ -420,6 +420,8 @@ if 'SignalRegion' in opt.tag:
                      "SR2": ' && ptmiss>=220 && ptmiss<280 ',
                      "SR3": ' && ptmiss>=280 && ptmiss<380 ',
                      "SR4": ' && ptmiss>=380 '}
+        if 'TChipmWWSignalRegions' in opt.tag:
+            ptmiss_cuts['SR1'] = ptmiss_cuts['SR1'].replace('ptmiss>=160', 'ptmiss>=140')
 
     for SR in ptmiss_cuts:
 
