@@ -46,6 +46,7 @@ if __name__ == '__main__':
     parser.add_option('--maxsignallines'    , dest='maxsignallines'    , help='Maximum number of lines for signals'      , default=5)
     parser.add_option('--minsignalyields'   , dest='minsignalyields'   , help='Minimal signal yields for tables'         , default=0.6)
     parser.add_option('--minsignalsig'      , dest='minsignalsig'      , help='Minimal signal significance for tables'   , default=0.5)
+
     # read default parsing options as well
     hwwtools.addOptions(parser)
     hwwtools.loadOptDefaults(parser)
