@@ -195,6 +195,47 @@ signalMassPoints['TSlepSlepRH'] = {}
 signalMassPoints['TSeleSeleRH'] = {}
 signalMassPoints['TSmuoSmuoRH'] = {}
 
+import math
+from LatinoAnalysis.NanoGardener.framework.samples.susyCrossSections import SUSYCrossSections
+def getTSlepSlepCrossSection(susyModel, susyMass):
+
+    susyProcess = susyModel.replace('TSelectronSelectron', 'Slepton').replace('TSmuonSmuon', 'Slepton')
+
+    isusyMass = int(susyMass)
+
+    if str(isusyMass) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
+
+        return float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['value'])
+
+    else: # Try to extrapolate
+
+        if isusyMass<=400: step = 20
+        elif isusyMass<=440: step = 40
+        elif isusyMass<=500: step = 60
+        elif isusyMass<=1000: step = 100
+        else: step = -1
+
+        isusyMass1 = step*(isusyMass/step)
+        isusyMass2 = step*(isusyMass/step+1)
+
+        if step==60:
+            isusyMass1 =  440
+            isusyMass2 =  500
+        elif isusyMass>1000:
+            isusyMass1 =  900
+            isusyMass2 = 1000
+
+        if str(isusyMass1) in SUSYCrossSections[susyProcess]['massPoints'].keys() and str(isusyMass2) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
+
+            susyXsec1 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass1)]['value'])
+            susyXsec2 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass2)]['value'])
+
+            slope = -math.log(susyXsec2/susyXsec1)/(isusyMass2-isusyMass1)
+            return susyXsec1*math.exp(-slope*(isusyMass-isusyMass1))
+
+    print 'getCrossSection ERROR: cross section not available for', susyProcess, 'at mass =', susyMass, ', exiting'
+    exit()
+
 for mSlep in range( 100, 1301, 25):
     datasetName = 'TSlepSlep'
     lspStep = 10
@@ -216,10 +257,14 @@ for mSlep in range( 100, 1301, 25):
         massPointName = '_mS-' + str(mSlep) + '_mX-' + str(mLSP)
         massPointCut = 'susyMSlepton>=' + str(mSlep) + '-4 && susyMSlepton<=' + str(mSlep) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2'
 
+        xSecSlepLH = str(getTSlepSlepCrossSection('TSelectronSelectronLH', str(mSlep)))
+        xSecSlepRH = str(getTSlepSlepCrossSection('TSelectronSelectronRH', str(mSlep)))
+        xSecCorrection = '(('+xSecSlepLH+'*(susyIDprompt<=1000016)+'+xSecSlepRH+'*(susyIDprompt>=2000000))/Xsec)'
+
         for sleptonModel in [ 'TSlepSlep', 'TSlepSlepLH', 'TSeleSeleLH', 'TSmuoSmuoLH', 'TSlepSlepRH', 'TSeleSeleRH', 'TSmuoSmuoRH' ]:
             signalMassPoints[sleptonModel][sleptonModel+massPointName] = { }
             signalMassPoints[sleptonModel][sleptonModel+massPointName]['massPointDataset'] = datasetName
-            signalMassPoints[sleptonModel][sleptonModel+massPointName]['massPointCut'] = '(' + massPointCut
+            signalMassPoints[sleptonModel][sleptonModel+massPointName]['massPointCut'] = xSecCorrection+'*(' + massPointCut
                 
         signalMassPoints['TSlepSlep']  ['TSlepSlep'+massPointName]  ['massPointCut'] += ')'
         signalMassPoints['TSlepSlepLH']['TSlepSlepLH'+massPointName]['massPointCut'] += ' && susyIDprompt<=1000016)'
@@ -228,4 +273,5 @@ for mSlep in range( 100, 1301, 25):
         signalMassPoints['TSlepSlepRH']['TSlepSlepRH'+massPointName]['massPointCut'] += ' && susyIDprompt>=2000000)'
         signalMassPoints['TSeleSeleRH']['TSeleSeleRH'+massPointName]['massPointCut'] += ' && susyIDprompt==2000011)'
         signalMassPoints['TSmuoSmuoRH']['TSmuoSmuoRH'+massPointName]['massPointCut'] += ' && susyIDprompt==2000013)'
+
 
