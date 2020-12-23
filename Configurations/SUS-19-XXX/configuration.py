@@ -35,3 +35,7 @@ structureFile = 'structure.py'
 
 # nuisances file for mkDatacards and for mkShape
 nuisancesFile = 'nuisances.py'
+
+# aliases file 
+aliasesFile = 'aliases.py'
+

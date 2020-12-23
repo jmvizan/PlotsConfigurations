@@ -3,15 +3,21 @@
 ### general parameters
 if '2016' in opt.tag : 
     year = '_2016'
-    lumi_uncertainty    = '1.025'
+    lumi_uncertainty     = '1.025'
+    lumi_uncertainty_unc = '1.022'
+    lumi_uncertainty_cor = '1.012' 
     trigger_uncertainty = '1.020'
 elif '2017' in opt.tag : 
     year = '_2017'
-    lumi_uncertainty = '1.023'
+    lumi_uncertainty     = '1.023'
+    lumi_uncertainty_unc = '1.020'
+    lumi_uncertainty_cor = '1.011'
     trigger_uncertainty = '1.020'
 elif '2018' in opt.tag : 
     year = '_2018'
-    lumi_uncertainty = '1.025'
+    lumi_uncertainty     = '1.025'
+    lumi_uncertainty_unc = '1.015'                                                                                                       
+    lumi_uncertainty_cor = '1.020'
     trigger_uncertainty = '1.020'
 
 ### nuisances = {}
@@ -30,14 +36,38 @@ nuisances['stat']  = {
 
 # luminosity -> https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#TabLum
 
-nuisances['lumi']  = {
-               'name'  : 'lumi_13TeV'+year,
-               'samples'  : { },
-               'type'  : 'lnN',
-}
-for sample in samples.keys():
-    if not samples[sample]['isDATA']:
-        nuisances['lumi']  ['samples'][sample] = lumi_uncertainty 
+split_lumi = False
+
+if not split_lumi:
+
+    nuisances['lumi']  = {
+                   'name'  : 'lumi_13TeV'+year,
+                   'samples'  : { },
+                   'type'  : 'lnN',
+                   'lumisyst' : lumi_uncertainty
+    }
+
+else:
+
+    nuisances['lumi_unc']  = {
+                   'name'  : 'lumi_13TeV'+year,
+                   'samples'  : { },
+                   'type'  : 'lnN',
+                   'lumisyst' : lumi_uncertainty_unc
+    }
+
+    nuisances['lumi_cor']  = {
+                   'name'  : 'lumi_13TeV',
+                   'samples'  : { },
+                   'type'  : 'lnN',
+                   'lumisyst' : lumi_uncertainty_cor
+    }
+
+for lumitype in [ 'lumi', 'lumi_unc', 'lumi_cor' ]:
+    if lumitype in nuisances:
+        for sample in samples.keys():
+            if not samples[sample]['isDATA']:
+                nuisances[lumitype]['samples'][sample] = nuisances[lumitype]['lumisyst']
 
 # trigger
 
@@ -71,9 +101,11 @@ for background in normBackgroundNuisances:
 
         if scalefactorFromData:
             
-            if background in nuisances['lumi']['samples']:
-                del nuisances['lumi']['samples'][background]
-            
+            for lumitype in [ 'lumi', 'lumi_cor', 'lumi_unc' ]:
+                if lumitype in nuisances:
+                    if background in nuisances[lumitype]['samples']:
+                        del nuisances[lumitype]['samples'][background]
+ 
             if background in nuisances['trigger']['samples']:
                 del nuisances['trigger']['samples'][background]
 
@@ -86,13 +118,14 @@ for scalefactor in leptonSF:
     nuisances[scalefactor]  = {
         'name'  : scalefactor+year,
         'samples'  : { },
-        'kind'  : 'weight',
-        'type'  : 'shape',
     }
+    nuisances[scalefactor]['type'] = leptonSF[scalefactor]['type']   
+    if leptonSF[scalefactor]['type']=='shape':
+        nuisances[scalefactor]['kind'] = 'weight'   
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
+                nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]['weight']
 
 # b-tagging scale factors
 

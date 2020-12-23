@@ -75,7 +75,7 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
 
-removeZeros = 1 if 'StatZero' in opt.tag else 0
+removeZeros = 1 #if 'StatZero' in opt.tag else 0
 
 treeNuisances = { }
 if metnom=='Nomin':
@@ -303,14 +303,15 @@ weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
 weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
 
 leptonSF = { 
-    #'trkreco'         : [ '1.', '1.' ], ->  no scale factor required
-    'lepreco'         : [ weightReco.replace('Syst', 'Up'),   weightReco.replace('Syst', 'Down')   ],
-    #'electronIdIso'   : [ weightEle.replace('Syst', 'Up'),   weightEle.replace('Syst', 'Down')   ],
-    #'muonIdIso'       : [ weightMuo.replace('Syst', 'Up'),   weightMuo.replace('Syst', 'Down')   ],
-    'leptonIdIso'     : [ weightLep.replace('Syst', 'Up'),   weightLep.replace('Syst', 'Down')   ], 
-    #'electronIdIsoFS' : [ weightEleFS.replace('Syst', 'Up'), weightEleFS.replace('Syst', 'Down') ],
-    #'muonIdIsoFS'     : [ weightMuoFS.replace('Syst', 'Up'), weightMuoFS.replace('Syst', 'Down') ],
-    'leptonIdIsoFS'   : [ weightLepFS.replace('Syst', 'Up'), weightLepFS.replace('Syst', 'Down') ], 
+    #'trkreco'         : { 'type' : 'shape', 'weight' : [ '1.', '1.' ] }, ->  no scale factor required
+    'lepreco'         : { 'type' : 'shape', 'weight' : [ weightReco.replace('Syst', 'Up'), weightReco.replace('Syst', 'Down') ] },
+    #'electronIdIso'   : { 'type' : 'shape', 'weight' : [ weightEle.replace('Syst', 'Up'), weightEle.replace('Syst', 'Down') ] },
+    #'muonIdIso'       : { 'type' : 'shape', 'weight' : [ weightMuo.replace('Syst', 'Up'), weightMuo.replace('Syst', 'Down') ] },
+    'leptonIdIso'     : { 'type' : 'shape', 'weight' : [ weightLep.replace('Syst', 'Up'), weightLep.replace('Syst', 'Down') ] }, 
+    #'electronIdIsoFS' : { 'type' : 'shape', 'weight' : [ weightEleFS.replace('Syst', 'Up'), weightEleFS.replace('Syst', 'Down') ] },
+    #'muonIdIsoFS'     : { 'type' : 'shape', 'weight' : [ weightMuoFS.replace('Syst', 'Up'), weightMuoFS.replace('Syst', 'Down') ] },
+    #'leptonIdIsoFS'   : { 'type' : 'shape', 'weight' : [ weightLepFS.replace('Syst', 'Up'), weightLepFS.replace('Syst', 'Down') ] }, 
+    'leptonIdIsoFS'   : { 'type' : 'lnN', 'weight' : '1.04' },   
 }
 
 # nonprompt lepton rate
