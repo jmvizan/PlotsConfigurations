@@ -23,6 +23,7 @@ if __name__ == '__main__':
     parser.add_option('--years'             , dest='years'             , help='Year to be processed. Default: all'       , default='all')
     parser.add_option('--fileset'           , dest='fileset'           , help='Fileset with the shapes'                  , default='')
     parser.add_option('--skipBOnlyFit'      , dest='skipBOnlyFit'      , help='Skip B only fit'                          , default=False, action='store_true')
+    parser.add_option('--saveCovMatrix'     , dest='saveCovMatrix'     , help='Save overall covariance matrix'           , default=False, action='store_true')
     parser.add_option('--nododatacards'     , dest='nododatacards'     , help='Do not make datacaards'                   , default=False, action='store_true')
  
     # read default parsing options as well
@@ -80,7 +81,8 @@ if __name__ == '__main__':
     maxFitCommand += 'cd ' + outputDir + ' ; '
 
     skipBOnlyFit = '--skipBOnlyFit' if opt.skipBOnlyFit else ''
-    maxFitCommand += 'combine -M FitDiagnostics --saveShapes --saveWithUncertainties ' + skipBOnlyFit + ' -n ' + tag + ' ' + outputDir+'datacardFinal.txt'
+    saveCovMatrix = ' --saveOverallShapes' if opt.saveCovMatrix else ''
+    maxFitCommand += 'combine -M FitDiagnostics --saveShapes --saveWithUncertainties ' + skipBOnlyFit + saveCovMatrix + ' -n ' + tag + ' ' + outputDir+'datacardFinal.txt'
  
     os.system(maxFitCommand)
 
