@@ -75,7 +75,8 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
 
-removeZeros = 1 #if 'StatZero' in opt.tag else 0
+#removeZeros = 1 #if 'StatZero' in opt.tag else 0
+removeZeros = 0 if 'NoStat0' in opt.tag else 1
 
 treeNuisances = { }
 if metnom=='Nomin':
@@ -362,6 +363,8 @@ if 'PVw' in opt.tag:
 ### Special weights
 
 # background cross section uncertainties and normalization scale factors
+
+isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit')
 
 normBackgrounds = {}
 
@@ -657,7 +660,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
         
-        if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and hasattr(opt, 'outputDirDatacard')):
+        if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot):
             
             ZZ4Lext = '_ext2' if ('2018' in yeartag) else '_ext1'
             samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'+ZZ4Lext, False,treePrefix) + 

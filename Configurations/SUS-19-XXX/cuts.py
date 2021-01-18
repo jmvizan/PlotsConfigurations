@@ -463,7 +463,7 @@ if 'SignalRegion' in opt.tag:
     
 # Add cuts for control regions to be added in the fit
 
-if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'FitCRZZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
+if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'FitCRZZ' in opt.tag or isDatacardOrPlot):
 
     crcuts = { } 
     cutToRemove = [ ] 
@@ -471,7 +471,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
     for cut in cuts:
         if 'SR' in cut:
 
-            if not hasattr(opt, 'outputDirDatacard'):
+            if not isDatacardOrPlot:
                 cutToRemove.append(cut)
 
             if '_em' in cut: continue # Use only sf channel to avoid double counting
@@ -481,9 +481,9 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
             exprcut = exprcut.replace(' && '+DF, '')
             exprcut = exprcut.replace(' && '+SF, '')
 
-            if '_Tag_' in cut and ('FitCRttZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
+            if '_Tag_' in cut and ('FitCRttZ' in opt.tag or isDatacardOrPlot):
 
-                if hasattr(opt, 'outputDirDatacard'): # Ugly, but in this case these variables are not used
+                if isDatacardOrPlot: # Ugly, but in this case these variables are not used
                     ttZselectionLoose = ''
                     btagweightmixtag = '1.'
 
@@ -493,7 +493,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace(OC, ttZselectionLoose)
                 crcuts[crcut.replace('_sf', '_ttZ')] = { 'expr' : exprCR, 'weight' : btagweightmixtag }
 
-            if '_Tag_' not in cut and ('FitCRWZ' in opt.tag or hasattr(opt, 'outputDirDatacard')):
+            if '_Tag_' not in cut and ('FitCRWZ' in opt.tag or isDatacardOrPlot):
              
                 exprCR = exprcut.replace(OC, nLooseLepton+'==3 && ' + nTightLepton + '==3 && deltaMassZ_WZ<10. && ptmiss_WZ>=0.')
                 exprCR = exprCR.replace('ptmiss>', 'ptmiss_WZ>')
@@ -501,7 +501,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_WZ')
                 crcuts[crcut.replace('_sf', '_WZ')] = { 'expr' : exprCR, 'weight' : cuts[cut]['weight'] }
 
-            if '_Tag_' not in cut and ('FitCRZZ' in opt.tag or hasattr(opt, 'outputDirDatacard')): 
+            if '_Tag_' not in cut and ('FitCRZZ' in opt.tag or isDatacardOrPlot): 
 
                 exprCR = exprcut.replace(OC, nLooseLepton+'==4 && ' + nTightLepton + '>=3 && deltaMassZ_ZZ<15. && ptmiss_ZZ>=0.')
                 exprCR = exprCR.replace('ptmiss>', 'ptmiss_ZZ>')
@@ -514,6 +514,40 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
 
     for cut in crcuts:
         cuts[cut] = crcuts[cut]
+
+# For postfit plots
+
+if hasattr(opt, 'postFit'):
+    if opt.postFit!='n':
+        if opt.tag!=opt.inputFile.split('/')[2]+opt.inputFile.split('/')[3]:
+            
+            cutList = [ ]
+            for cut in cuts.keys(): cutList.append(cut)
+
+            yearcut = '_'+opt.tag.replace(opt.inputFile.split('/')[3], '')
+
+            for cut in cutList:
+
+                cuts[cut+yearcut] = { }
+                for key in cuts[cut]: 
+                    cuts[cut+yearcut][key] = cuts[cut][key]
+            
+                del cuts[cut]
+
+# For structure and plot cfg files
+
+if 'SignalRegion' in opt.tag:
+
+    for sample in samples:
+
+        cutToRemove = [ ]
+
+        for cut in cuts:
+            if ('SR' in cut and 'isControlSample' in samples[sample] and samples[sample]['isControlSample']==1) or ('CR' in cut and samples[sample]['isSignal']==1):
+                cutToRemove.append(cut)
+
+        if len(cutToRemove)>0:
+            samples[sample]['removeFromCuts'] = cutToRemove
 
 # Apply background scale factors
  

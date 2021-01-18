@@ -40,15 +40,15 @@ else
 	FILESET=$SIGSET
         NORM='None'
     elif [ $# -eq 4 ]; then
-        if [ $4 == 'Norm' ] || [ $4 == 'CRnorm' ]; then 
+        if [ $4 == 'Norm' ] || [ $4 == 'CRnorm' ] || [ $4 == 'PreFit' ] || [ $4 == 'PostFit' ] || [ $4 == 'PostFitS' ]; then 
 	    NORM=$4
-	    FILESET='SM'
+	    FILESET=$SIGSET
 	else
 	    NORM='None'
 	    FILESET=$4
 	fi
     else
-        if [ $4 == 'Norm' ] || [ $4 == 'CRnorm' ]; then 
+        if [ $4 == 'Norm' ] || [ $4 == 'CRnorm' ] || [ $4 == 'PreFit' ] || [ $4 == 'PostFit' ] || [ $4 == 'PostFitS' ]; then 
 	    NORM=$4
 	    FILESET=$5
 	else
@@ -58,41 +58,65 @@ else
     fi
 fi
 
-mkdir -p ./Plots/$YEAR/$TAG
+PLOTDIR=./Plots/$YEAR/$TAG
+mkdir -p $PLOTDIR
+
+cp ./Plots/index.php ./Plots/$YEAR/
+cp ./Plots/index.php $PLOTDIR/
 
 NUISANCES=nuisances.py
-if [[ $YEAR == *'-'* ]]; then
+if [[ $NORM == *'PreFit'* ]] || [[ $NORM == *'PostFit'* ]]; then
+    ./mergeShapesPostFit.py --years=$YEAR --tag=$TAG --masspoint=$SIGSET --postFit=$NORM
+elif [[ $YEAR == *'-'* ]]; then
     ./mergeShapes.py --years=$YEAR --tag=$TAG --sigset=$SIGSET --saveNuisances
     NUISANCES=nuisances_${YEAR}_${TAG}_${SIGSET}.py
 fi
 
 if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
     if [ $NORM == 'Norm' ]; then
-	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedDistributions=1 --nuisancesFile=None --showIntegralLegend=1
+	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedDistributions=1 --nuisancesFile=None --showIntegralLegend=1
     elif [ $NORM == 'CRnorm' ]; then
-	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedCRratio=1 --nuisancesFile=$NUISANCES
+	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedCRratio=1 --nuisancesFile=$NUISANCES
+    elif [[ $NORM == *'PreFit'* ]] || [[ $NORM == *'PostFit'* ]]; then
+        IFS=- read -ra YEARLIST <<< $YEAR
+        if [[ $YEAR == *'-'* ]]; then
+            YEARLIST+=( $YEAR )
+        fi
+        for FITYEAR in "${YEARLIST[@]}"; do
+            PLOTDIR=./Plots/$YEAR/$NORM$TAG
+            CLEANDIR=$PLOTDIR
+            mkdir -p $PLOTDIR
+            cp ./Plots/index.php $PLOTDIR/
+            if [[ $YEAR == *'-'* ]]; then
+                PLOTDIR=./Plots/$YEAR/$NORM$TAG/$FITYEAR
+                CLEANDIR=./Plots/$YEAR/$NORM$TAG/*/
+                mkdir -p $PLOTDIR
+                cp ./Plots/index.php $PLOTDIR/
+            fi
+            mkPlot.py --pycfg=configuration.py --tag=$FITYEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_$NORM${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --postFit=p --showDataVsBkgOnly --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=None
+        done
+        PLOTDIR=$CLEANDIR
     else
-	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=$NUISANCES  #--fileFormats='png,root,C'
+	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=$NUISANCES  #--plotSmearVariation=1 #--fileFormats='png,root,C'
     fi
 else 
-    mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=./Plots/$YEAR/$TAG --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None --showIntegralLegend=1
+    mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None --showIntegralLegend=1
 fi 
 
-if [[ $YEAR == *'-'* ]]; then # To keep clean
+if [[ $YEAR == *'-'* ]] && [[ $NORM != *'Fit'* ]]; then # To keep clean
     rm nuisances_${YEAR}_${TAG}_${SIGSET}.py
 fi
 
-cp ./Plots/index.php ./Plots/$YEAR/
-cp ./Plots/index.php ./Plots/$YEAR/$TAG/
-
-if [ $# -lt 5 ]; then
+if [ $# -lt 6 ]; then
+    
     if [[ $SIGSET == 'SM'* ]]; then  
-	rm ./Plots/$YEAR/$TAG/c_*
-	rm ./Plots/$YEAR/$TAG/log_c_*
+	rm $PLOTDIR/c_*
+	rm $PLOTDIR/log_c_*
     else
-	rm ./Plots/$YEAR/$TAG/cratio_*
-	rm ./Plots/$YEAR/$TAG/log_cratio_*
+	rm $PLOTDIR/cratio_*
+	rm $PLOTDIR/log_cratio_*
     fi
-    rm ./Plots/$YEAR/$TAG/cdifference*
-    rm ./Plots/$YEAR/$TAG/log_cdifference*
+    rm $PLOTDIR/cdifference*
+    rm $PLOTDIR/log_cdifference*
 fi
+
