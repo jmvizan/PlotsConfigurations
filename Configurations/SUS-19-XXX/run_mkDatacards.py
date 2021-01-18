@@ -41,6 +41,7 @@ exec(open('./signalMassPoints.py').read())
 years = yearset.split('-')
 
 inputtag = tag.replace('StatZero', '')
+inputtag = tag.replace('NoStat0', '')
 
 for year in years:
     os.system('mkdir -p ./Datacards/'+year+'/'+tag)
