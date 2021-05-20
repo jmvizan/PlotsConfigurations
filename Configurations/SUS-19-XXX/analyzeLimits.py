@@ -475,7 +475,7 @@ def fillEmptyBins(sigset, histo):
     elif 'TSlepSlep' in sigset:
 
         binWidth = int(histo.GetXaxis().GetBinWidth(1))        
-        dMmin = 50. # There are points at lower dM, but we are not sensitive
+        dMmin = 10#50. # There are points at lower dM, but we are not sensitive
 
         # First deal with missing fits ...
         for xb in range(1, histo.GetNbinsX()+1):
@@ -815,7 +815,7 @@ def getMassScanContour(outputFileName, histo):
 
             x.append(massX)
             y.append(massY)
-            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.) or ('T2bW' in outputFileName and massX-massY<170.) or ('TChipmSlepSnu' in outputFileName and massX-massY<50.) or ('TChipmWW' in outputFileName and massX-massY<10.):
+            if histo.GetBinContent(xb, yb)==0 or ('T2tt' in outputFileName and massX-massY<80.) or ('T2bW' in outputFileName and massX-massY<170.) or ('TChipmSlepSnu' in outputFileName and massX-massY<50.) or ('TChipmWW' in outputFileName and massX-massY<10.) or ('TSlepSlep' in outputFileName and massX-massY<50.):
                 z.append(3.)
             else: 
                 minZ = min(minZ, histo.GetBinContent(xb, yb))

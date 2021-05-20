@@ -222,13 +222,26 @@ ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
 
 ### MET Filters # Still as EOY production, check if there will be an update later TODO
+METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter*Flag_BadPFMuonDzFilter' 
+# Flag_EcalDeadCellTriggerPrimitiveFilter doens't have the name flag in 2016 but I am guessing it's a typo
+#  Bad Charged Hadron Filter ("Flag_BadChargedCandidateFilter") in the three years but not recommended, so i skipped it.
 
-METFilters_Common = 'Flag_goodVertices*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'
-if '2017' in opt.tag or '2018' in opt.tag :
-    METFilters_Common += '*Flag_ecalBadCalibFilterV2'
-METFilters_MC     = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter'
-METFilters_Data   = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter*Flag_eeBadScFilter'
+if   '2016' in opt.tag:
+    MetFilters_Common += '*Flag_HBHENoiseIsoFilter'
+elif '2017' in opt.tag or '2018' in opt.tag :
+    MetFilters_Common += '*Flag_BadPFMuonDzFilter'
+    if 'noisyhits' in opt.tag: METFilters_Common += '*Flag_hfNoisyHitsFilter'
+METFilters_MC     = METFilters_Common
+METFilters_Data   = METFilters_Common + '*Flag_eeBadScFilter'
 METFilters_FS     = METFilters_Common
+
+
+#METFilters_Common = 'Flag_goodVertices*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'
+#if '2017' in opt.tag or '2018' in opt.tag :
+#    METFilters_Common += '*Flag_ecalBadCalibFilterV2'
+#METFilters_MC     = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter'
+#METFilters_Data   = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter*Flag_eeBadScFilter'
+#METFilters_FS     = METFilters_Common
 
 ### EE Noise in 2017 and HEM Issue in 2018
 
