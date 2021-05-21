@@ -221,14 +221,17 @@ ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTag
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
 
-### MET Filters # Still as EOY production, check if there will be an update later TODO
+### MET Filters # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#UL_data (checked on may20)
+METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter*Flag_BadPFMuonDzFilter' 
 
-METFilters_Common = 'Flag_goodVertices*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'
 if '2017' in opt.tag or '2018' in opt.tag :
-    METFilters_Common += '*Flag_ecalBadCalibFilterV2'
-METFilters_MC     = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter'
-METFilters_Data   = METFilters_Common + '*Flag_globalSuperTightHalo2016Filter*Flag_eeBadScFilter'
+    MetFilters_Common += '*Flag_ecalBadCalibFilter'
+    if 'noisyhits' in opt.tag: METFilters_Common += '*Flag_hfNoisyHitsFilter'
+METFilters_MC     = METFilters_Common
+METFilters_Data   = METFilters_Common + '*Flag_eeBadScFilter'
 METFilters_FS     = METFilters_Common
+
+
 
 ### EE Noise in 2017 and HEM Issue in 2018
 

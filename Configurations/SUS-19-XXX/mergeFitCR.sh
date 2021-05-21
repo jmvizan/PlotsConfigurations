@@ -58,7 +58,6 @@ for year in "${yearlist[@]}"; do
 
             ttztag="${intag/FitCR/FitCRttZ}"
             ttzfile=./Shapes/$year/$ttztag/plots_${ttztag}_SM.root
-
             if [ $addCR == '1' ]; then    
                 ../../../LatinoAnalysis//Tools/scripts/haddfast --compress $outfile $infile $sigfile $wzfile $zzfile $ttzfile
             else
