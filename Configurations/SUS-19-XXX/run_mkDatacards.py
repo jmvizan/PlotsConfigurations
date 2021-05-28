@@ -40,10 +40,13 @@ exec(open('./signalMassPoints.py').read())
 
 years = yearset.split('-')
 
+inputtag = tag.replace('StatZero', '')
+inputtag = tag.replace('NoStat0', '')
+
 for year in years:
     os.system('mkdir -p ./Datacards/'+year+'/'+tag)
     for model in signalMassPoints:
         if model in sigset:
             for massPoint in signalMassPoints[model]:
                 if massPointInSignalSet(massPoint, sigset):
-                    os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+tag+'/'+massPoint+' --inputFile=./Shapes/'+year+'/'+tag+'/plots_'+tag+'_'+fileset+'.root') 
+                    os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+tag+'/'+massPoint+' --inputFile=./Shapes/'+year+'/'+inputtag+'/plots_'+inputtag+'_'+fileset+'.root') 

@@ -3,15 +3,21 @@
 ### general parameters
 if '2016' in opt.tag : 
     year = '_2016'
-    lumi_uncertainty    = '1.025'
+    lumi_uncertainty     = '1.025'
+    lumi_uncertainty_unc = '1.022'
+    lumi_uncertainty_cor = '1.012' 
     trigger_uncertainty = '1.020'
 elif '2017' in opt.tag : 
     year = '_2017'
-    lumi_uncertainty = '1.023'
+    lumi_uncertainty     = '1.023'
+    lumi_uncertainty_unc = '1.020'
+    lumi_uncertainty_cor = '1.011'
     trigger_uncertainty = '1.020'
 elif '2018' in opt.tag : 
     year = '_2018'
-    lumi_uncertainty = '1.025'
+    lumi_uncertainty     = '1.025'
+    lumi_uncertainty_unc = '1.015'                                                                                                       
+    lumi_uncertainty_cor = '1.020'
     trigger_uncertainty = '1.020'
 
 ### nuisances = {}
@@ -22,6 +28,7 @@ nuisances['stat']  = {
               'type'  : 'auto',   # Use the following if you want to apply the automatic combine MC stat nuisances.
               'maxPoiss'  : '10',     # Number of threshold events for Poisson modelling
               'includeSignal'  : '1', # Include MC stat nuisances on signal processes (1=True, 0=False)
+              'removeZeros' : removeZeros,
               'samples' : {}
              }
 
@@ -29,14 +36,38 @@ nuisances['stat']  = {
 
 # luminosity -> https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#TabLum
 
-nuisances['lumi']  = {
-               'name'  : 'lumi_13TeV'+year,
-               'samples'  : { },
-               'type'  : 'lnN',
-}
-for sample in samples.keys():
-    if not samples[sample]['isDATA']:
-        nuisances['lumi']  ['samples'][sample] = lumi_uncertainty 
+split_lumi = False
+
+if not split_lumi:
+
+    nuisances['lumi']  = {
+                   'name'  : 'lumi_13TeV'+year,
+                   'samples'  : { },
+                   'type'  : 'lnN',
+                   'lumisyst' : lumi_uncertainty
+    }
+
+else:
+
+    nuisances['lumi_unc']  = {
+                   'name'  : 'lumi_13TeV'+year,
+                   'samples'  : { },
+                   'type'  : 'lnN',
+                   'lumisyst' : lumi_uncertainty_unc
+    }
+
+    nuisances['lumi_cor']  = {
+                   'name'  : 'lumi_13TeV',
+                   'samples'  : { },
+                   'type'  : 'lnN',
+                   'lumisyst' : lumi_uncertainty_cor
+    }
+
+for lumitype in [ 'lumi', 'lumi_unc', 'lumi_cor' ]:
+    if lumitype in nuisances:
+        for sample in samples.keys():
+            if not samples[sample]['isDATA']:
+                nuisances[lumitype]['samples'][sample] = nuisances[lumitype]['lumisyst']
 
 # trigger
 
@@ -70,9 +101,11 @@ for background in normBackgroundNuisances:
 
         if scalefactorFromData:
             
-            if background in nuisances['lumi']['samples']:
-                del nuisances['lumi']['samples'][background]
-            
+            for lumitype in [ 'lumi', 'lumi_cor', 'lumi_unc' ]:
+                if lumitype in nuisances:
+                    if background in nuisances[lumitype]['samples']:
+                        del nuisances[lumitype]['samples'][background]
+ 
             if background in nuisances['trigger']['samples']:
                 del nuisances['trigger']['samples'][background]
 
@@ -85,13 +118,14 @@ for scalefactor in leptonSF:
     nuisances[scalefactor]  = {
         'name'  : scalefactor+year,
         'samples'  : { },
-        'kind'  : 'weight',
-        'type'  : 'shape',
     }
+    nuisances[scalefactor]['type'] = leptonSF[scalefactor]['type']   
+    if leptonSF[scalefactor]['type']=='shape':
+        nuisances[scalefactor]['kind'] = 'weight'   
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]
+                nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]['weight']
 
 # b-tagging scale factors
 
@@ -202,22 +236,25 @@ for cut in cuts:
     if 'SR' in ptmissCut and ptmissCut not in mt2llRegions:
         mt2llRegions.append(ptmissCut)
 
-if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
-    mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
-    mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
-    mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
-elif 'High' in opt.tag and 'Extra' in opt.tag:
-    mt2llBins = ['Bin6', 'Bin7', 'Bin8', 'Bin9' ]
-    mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']    
-    mt2llSystematics = [0.20, 0.30, 0.30, 0.30] # placeholders
-elif 'High' in opt.tag:
-    mt2llBins = ['Bin6', 'Bin7', 'Bin8' ]     
-    mt2llEdges = ['100.', '160.', '370.', '999999999.']
-    mt2llSystematics = [0.20, 0.30, 0.30] # placeholders     
-else:
-    mt2llBins = ['Bin6', 'Bin7' ]
-    mt2llEdges = ['100.', '160.', '999999999.']
-    mt2llSystematics = [0.20, 0.30] # placeholders            
+mt2llBins = [ ]
+mt2llNuisances = False
+if not hasattr(opt, 'outputDirDatacard') or mt2llNuisances:
+    if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
+        mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
+        mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
+        mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
+    elif 'High' in opt.tag and 'Extra' in opt.tag:
+        mt2llBins = ['Bin6', 'Bin7', 'Bin8', 'Bin9' ]
+        mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']    
+        mt2llSystematics = [0.20, 0.30, 0.30, 0.30] # placeholders
+    elif 'High' in opt.tag:
+        mt2llBins = ['Bin6', 'Bin7', 'Bin8' ]     
+        mt2llEdges = ['100.', '160.', '370.', '999999999.']
+        mt2llSystematics = [0.20, 0.30, 0.30] # placeholders     
+    else:
+        mt2llBins = ['Bin6', 'Bin7' ]
+        mt2llEdges = ['100.', '160.', '999999999.']
+        mt2llSystematics = [0.20, 0.30] # placeholders            
 
 for mt2llregion in mt2llRegions: 
     for mt2llbin in range(len(mt2llBins)):

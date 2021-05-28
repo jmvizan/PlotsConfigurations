@@ -4,6 +4,7 @@ legend['lumi'] = 'L = '+str(opt.lumi)+'/fb'
 legend['sqrt'] = '#sqrt{s} = 13 TeV'
 
 sl  = '#font[12]{l}'
+sllatex = '\\font[12]{l}'
 
 # groupPlot = {}
 # 
@@ -15,6 +16,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     groupPlot['ttbar']  = {
         'nameHR' : 't#bar{t}',
+        'nameLatex' : '\\ttbar',
         'isSignal' : 0,
         'color': 400,   # kYellow
         'samples'  : ['ttbar'] 
@@ -22,6 +24,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     groupPlot['WW']  = {
         'nameHR' : 'WW',
+        'nameLatex' : '\\WW',
         'isSignal' : 0,
         'color': 851,    # kAzure-9
         'samples'  : ['WW'] 
@@ -29,6 +32,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     groupPlot['tW']  = {
         'nameHR' : 'tW',
+        'nameLatex' : '\\tW',
         'isSignal' : 0,
         'color': 403,   # kYellow+3
         'samples'  : ['STtW', 'tW'] 
@@ -36,6 +40,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     groupPlot['DY']  = {
         'nameHR' : 'Drell-Yan',
+        'nameLatex' : '\\DY',
         'isSignal' : 0,
         'color': 418,    # kGreen+2
         'samples'  : ['DY'] 
@@ -43,6 +48,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     groupPlot['ZZ']  = {
         'nameHR' : 'ZZ (#rightarrow 2' + sl + '2#nu)',
+        'nameLatex' : '\\ZZ ($\\to 2\\ell 2\\nu$)',
         'isSignal' : 0,
         'color': 803,   # kOrange+3
         'samples'  : ['ZZTo2L2Nu', 'ZZ'] 
@@ -50,6 +56,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     groupPlot['ttZ']  = {
         'nameHR' : 't#bar{t}Z',
+        'nameLatex' : '\\ttZ',
         'isSignal' : 0,
         'color': 802,   # kOrange+2
         'samples'  : ['ttZ'] 
@@ -57,6 +64,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     groupPlot['WZ']  = {
         'nameHR' : 'WZ (#rightarrow 3' + sl + ')',
+        'nameLatex' : '\\WZ ($\\to 3\\ell\\nu$)',
         'isSignal' : 0,
         'color': 798,    # kOrange-2
         'samples'  : ['WZ'] 
@@ -71,6 +79,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     groupPlot['ZZTo4L'] = {
         'nameHR' : 'ZZ (#rightarrow 4' + sl +')',
+        'nameLatex' : '\\ZZ ($\\to 4\\ell$)',
         'isSignal' : 0,
         'color': 49,
         'samples' : ['ZZTo4L']
@@ -78,6 +87,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     groupPlot['ttSemilep']  = {
         'nameHR' : 't#bar{t} Semilep.',
+        'nameLatex' : '\\ttbar Semilep.',
         'isSignal' : 0,
         'color': 4,# used to be 401,   # kYellow+1
         'samples'  : ['ttSemilep'] 
@@ -92,6 +102,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['DY']  = {  
         'nameHR' : 'Drell-Yan',
+        'nameLatex' : '\\DY',
         'color': 418,    # kGreen+2
         'isSignal' : 0,
         'isData'   : 0, 
@@ -100,6 +111,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['ZZTo2L2Nu'] = { 
         'nameHR' : 'ZZ (#rightarrow 2' + sl + '2#nu)',
+        'nameLatex' : '\\ZZ ($\\to 2\\ell 2\\nu$)',
         'color'    : 803,   # kOrange+3
         'isSignal' : 0,
         'isData'   : 0,
@@ -108,6 +120,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['ttZ'] = { 
         'nameHR' : 't#bar{t}Z',
+        'nameLatex' : '\\ttZ',
         'color'    : 802,   # kOrange+2
         'isSignal' : 0,
         'isData'   : 0,
@@ -116,6 +129,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['WZ']  = {
         'nameHR' : 'WZ (#rightarrow 3' + sl + ')',  
+        'nameLatex' : '\\WZ ($\\to 3\\ell\\nu$)',
         'color': 798,    # kOrange-2
         'isSignal' : 0,
         'isData'   : 0,
@@ -124,6 +138,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['WW']  = {  
         'nameHR' : 'WW',
+        'nameLatex' : '\\WW',
         'color': 851,    # kAzure-9
         'isSignal' : 0,
         'isData'   : 0,
@@ -132,6 +147,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['STtW'] = {
         'nameHR' : 'tW',
+        'nameLatex' : '\\tW',
         'color': 403,   # kYellow+3
         'isSignal' : 0,
         'isData'   : 0 ,
@@ -140,6 +156,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['ttbar'] = {   
         'nameHR' : 't#bar{t}',
+        'nameLatex' : '\\ttbar',
         'color': 400,   # kYellow
         'isSignal' : 0,
         'isData'   : 0 ,
@@ -148,6 +165,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['ttSemilep'] = {   
         'nameHR' : 't#bar{t} Semilep.',
+        'nameLatex' : '$\\ttbar Semilep.',
         'color': 401,   # kYellow+1
         'isSignal' : 0,
         'isData'   : 0 ,
@@ -156,6 +174,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['ttW'] = { 
         'nameHR' : 't#bar{t}W',
+        'nameLatex' : '\\ttW',
         'color'    : 394, #  kYellow-6
         'isSignal' : 0,
         'isData'   : 0,
@@ -164,6 +183,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['VZ'] = { 
         'nameHR' : 'VZ (#rightarrow 2' + sl + '2q)',
+        'nameLatex' : '\\VZ ($\\to 2\\ell 2\\Pq$)',
         'color'    : 394, #  kYellow-6
         'isSignal' : 0,
         'isData'   : 0,
@@ -172,6 +192,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         
     plot['VVV'] = { 
         'nameHR' : 'VVV',
+        'nameLatex' : '\\VVV',   
         'color'    : 394, #  kYellow-6
         'isSignal' : 0,
         'isData'   : 0,
@@ -179,7 +200,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     }
 
     plot['Higgs'] = { 
-        'nameHR' : 'H #rightarrow WW',
+        'nameHR' : 'H #rightarrow WW/#tau#tau',
+        'nameLatex' : '$\\PH\\to \\WW /\\tautau$',
         'color'    : 394, #  kYellow-6
         'isSignal' : 0,
         'isData'   : 0,
@@ -188,6 +210,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     plot['ZZTo4L'] = {   
         'nameHR' : 'ZZ (#rightarrow 4' + sl +')',
+        'nameHR' : '\\ZZ ($\\to 4\ell$)',
         'color': 49,   
         'isSignal' : 0,
         'isData'   : 0 ,
@@ -234,17 +257,27 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
 # Signal  
 
-signalColor = 1
+signalColor = 1 if opt.postFit=='n' else 880 # kViolet
+
+LSP = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}'
+CHR = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}'
+STP = '#tilde{t}'
 
 for model in signalMassPoints:
     if model in opt.sigset:
         for massPoint in signalMassPoints[model]:
             if massPointInSignalSet(massPoint, opt.sigset):
 
-                massPointName = massPoint.replace('_mS-', ' m_{#stop}=').replace('_mC-', ' m_{#X^\pm}=').replace('_mX-', ' m_{#X^0}=')
+                massPointName = massPoint.replace('_mS-', ' m_{'+STP+'}=').replace('_mC-', ' m_{'+CHR+'}=').replace('_mX-', ' m_{'+LSP+'}=')
+                massPointNameLatex = massPoint.replace('_mS-', ' \\invM{\\PSQtDo}=').replace('_mC-', ' \\invM{\\PSGcpmDo}=').replace('_mX-', ', \\invM{\\PSGczDo}=')
+                #massPointNameLatex = massPointNameLatex.replace('TChipmSlepSnu', '\\PSGcpmDo\\PSGcpmDo, \\TChipmDecay,') 
+                #massPointNameLatex = massPointNameLatex.replace('T2tt', '\\PSQtDo\\PASQtDo, \\PSQtDo\\to\\PQt\\PSGczDo,')
+                massPointNameLatex = massPointNameLatex.replace('TChipmSlepSnu', '').replace('T2tt', '')
+                massPointNameLatex = '\\ensuremath{'+massPointNameLatex+'}'              
 
                 plot[massPoint]  = { 
                     'nameHR' : massPointName,
+                    'nameLatex' : massPointNameLatex,
                     'color': signalColor,  
                     'isSignal' : 1,
                     'isData'   : 0,
@@ -253,6 +286,7 @@ for model in signalMassPoints:
 
                 groupPlot[massPoint]  = {
                     'nameHR' : massPointName,
+                    'nameLatex' : massPointNameLatex,
                     'isSignal' : 1,
                     'color': signalColor,  
                     'samples'  : [massPoint], 
@@ -260,4 +294,16 @@ for model in signalMassPoints:
                 }
                 
                 signalColor += 1
-                
+
+for group in groupPlot:
+    cutToRemoveFromGroup = [ ]
+    for cut in cuts:
+        samplesInCut = [ ]
+        for sample in groupPlot[group]['samples']:
+            if not ('removeFromCuts' in samples[sample] and cut in samples[sample]['removeFromCuts']):
+                samplesInCut.append(sample)
+        if len(samplesInCut)==0:
+            cutToRemoveFromGroup.append(cut)
+    if len(cutToRemoveFromGroup)>0:
+        groupPlot[group]['removeFromCuts'] = cutToRemoveFromGroup
+        

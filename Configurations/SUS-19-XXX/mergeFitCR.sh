@@ -6,11 +6,12 @@ fi
 
 intag=$2
 
-if [[ $intag != *'FitCR'* ]]; then
-    echo 'Wrong input tag' $intag
+addCR=0
+if [[ $intag == *'FitCR'* ]]; then
+    addCR=1
 fi
 
-sample='SM'
+sample=''
 if [ $# -gt 2 ]; then
     sample=$3
 fi
@@ -32,17 +33,22 @@ for year in "${yearlist[@]}"; do
 
     if [ $year == '2016' ] || [ $year == '2017' ] || [ $year == '2018' ]; then
 
-        filename=./Shapes/$year/$intag/plots_${intag}_SM-${sample}
+        filename=./Shapes/$year/$intag/plots_${intag}
 
         # Check if tag was already merged
-        backupfile=${filename}_backout.root
-        if test -f "$backupfile"; then
-            echo "$backupfile exists already."
+        outfile=${filename}_SM-$sample.root
+        if test -f "$outfile"; then
+            echo "$outfile exists already."
         else
 
-            outfile=${filename}_merge.root
+            sigtag=$intag
+            if [ $addCR == '1' ]; then
+                sigset=''
+                sigtag="${intag/FitCR/$sigset}"
+            fi
+            sigfile=./Shapes/$year/$sigtag/plots_${sigtag}_$sample.root
 
-            infile=${filename}.root
+            infile=${filename}_SM.root
         
             wztag="${intag/FitCR/FitCRWZ}"
             wzfile=./Shapes/$year/$wztag/plots_${wztag}_SM.root
@@ -52,11 +58,11 @@ for year in "${yearlist[@]}"; do
 
             ttztag="${intag/FitCR/FitCRttZ}"
             ttzfile=./Shapes/$year/$ttztag/plots_${ttztag}_SM.root
-
-            ../../../LatinoAnalysis//Tools/scripts/haddfast --compress $outfile $infile $wzfile $zzfile $ttzfile
-
-            mv $infile  $backupfile
-            mv $outfile $infile
+            if [ $addCR == '1' ]; then    
+                ../../../LatinoAnalysis//Tools/scripts/haddfast --compress $outfile $infile $sigfile $wzfile $zzfile $ttzfile
+            else
+                ../../../LatinoAnalysis//Tools/scripts/haddfast --compress $outfile $infile $sigfile 
+            fi
 
         fi
 
