@@ -23,6 +23,7 @@ treePrefix= 'nanoLatino_'
 ### Directories
   
 SITE=os.uname()[1]
+if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
 if  'cern' in SITE :
     if '2016' in yeartag:
@@ -59,14 +60,16 @@ if 'Smear' in opt.tag:
 regionName = '__susyMT2reco'+metnom+'/'
 ctrltag = ''
 
-if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZVal' in opt.tag or 'WZtoWW' in opt.tag or 'ttZ' in opt.tag or 'ZZVal' in opt.tag:
+if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZVal' in opt.tag or 'WZtoWW' in opt.tag or 'ttZ' in opt.tag or 'ZZVal' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag:
     regionName = regionName.replace('reco', 'ctrl')
     if 'SameSign' in opt.tag: ctrltag = '_SameSign'
     if 'Fake'     in opt.tag: ctrltag = '_Fake'
     if 'WZVal'    in opt.tag: ctrltag = '_WZ'
     if 'WZtoWW'   in opt.tag: ctrltag = '_WZtoWW'
     if 'ttZ'      in opt.tag: ctrltag = '_ttZ'
-    if 'ZZVal'    in opt.tag: ctrltag = '_ZZ'	
+    if 'ZZVal'    in opt.tag: ctrltag = '_ZZ'
+    if 'FitCRWZ'  in opt.tag: ctrltag = '_WZ'
+    if 'FitCRZZ'  in opt.tag: ctrltag = '_ZZ'
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
@@ -157,11 +160,20 @@ HTForwardSoft = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && Jet_pt
 jetpteenoisedphi = '(Jet_pt*(2*(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && acos(cos(Jet_phi-'+ptmiss_phi+'))<0.96)-1))'
 
 ptmissNano = 'METFixEE2017_pt' if '2017' in yeartag else 'MET_pt'
+if 'Data' not in opt.sigset: # 2016 and 2018 data do not have pt_nom, but it's equal to pt as the JEC in central production were the final ones
+    if metnom=='Nomin': ptmissNano += '_nom'
+    elif metnom=='Smear': ptmissNano += '_jer'
 ptmissPhiNano = ptmissNano.replace('_pt', '_phi')
 
-metx_ttZ3Lep = '('+ptmissNano+'*cos('+ptmissPhiNano+')+Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])*((Lepton_pdgId['+lep0idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+'])*((Lepton_pdgId['+lep1idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep2idx+']*cos(Lepton_phi['+lep2idx+']))'
-mety_ttZ3Lep = '('+ptmissNano+'*sin('+ptmissPhiNano+')+Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])*((Lepton_pdgId['+lep0idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+'])*((Lepton_pdgId['+lep1idx+']*Lepton_pdgId['+lep2idx+'])<0)+Lepton_pt['+lep2idx+']*sin(Lepton_phi['+lep2idx+']))'
+ptxLep = 'Lepton_pt[abs(lepidx_WZtoWW)]*cos(Lepton_phi[abs(lepidx_WZtoWW)])'
+ptyLep = 'Lepton_pt[abs(lepidx_WZtoWW)]*sin(Lepton_phi[abs(lepidx_WZtoWW)])'
+chrLep = '((Lepton_pdgId[abs(lepidx_WZtoWW)]*Lepton_pdgId[abs(lep2idx_WZtoWW)])<0)'
+metx_ttZ3Lep = '(ptmiss_WZtoWW*cos(ptmiss_phi_WZtoWW)+'+ptxLep.replace('lepidx', 'lep0idx')+'*'+chrLep.replace('lepidx', 'lep0idx')+'+'+ptxLep.replace('lepidx', 'lep1idx')+'*'+chrLep.replace('lepidx', 'lep1idx')+')' 
+mety_ttZ3Lep = '(ptmiss_WZtoWW*sin(ptmiss_phi_WZtoWW)+'+ptyLep.replace('lepidx', 'lep0idx')+'*'+chrLep.replace('lepidx', 'lep0idx')+'+'+ptyLep.replace('lepidx', 'lep1idx')+'*'+chrLep.replace('lepidx', 'lep1idx')+')'
 ptmiss_ttZ3Lep = 'sqrt('+metx_ttZ3Lep+'*'+metx_ttZ3Lep+'+'+mety_ttZ3Lep+'*'+mety_ttZ3Lep+')'
+ptmiss_phi_ttZ3Lep = 'atan2('+mety_ttZ3Lep+', '+metx_ttZ3Lep+')' 
+ptmiss_ttZLoose = '('+ptmiss_ttZ3Lep+'*(ptmiss_WZtoWW>=0.) + ptmiss_ttZ*(ptmiss_ttZ>=0.))'
+ptmiss_phi_ttZLoose = '('+ptmiss_phi_ttZ3Lep+'*(ptmiss_WZtoWW>=0.) + ptmiss_phi_ttZ*(ptmiss_ttZ>=0.))'
  
 OC =  nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])<0'
 SS =  nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && (Lepton_pdgId[0]*Lepton_pdgId[1])>0'
@@ -257,7 +269,7 @@ elif '2018' in yeartag and 'HEM' in opt.tag:
 
 TriggerEff = 'TriggerEffWeight_2l' if 'Trigger' not in opt.tag else '1.'
 
-if 'WZtoWW' in opt.tag or 'WZVal' in opt.tag or 'ZZVal' in opt.tag or 'ttZ' in opt.tag :
+if 'WZtoWW' in opt.tag or 'WZVal' in opt.tag or 'ZZVal' in opt.tag or 'ttZ' in opt.tag or 'FitCRZZ' in opt.tag or 'FitCRWZ' in opt.tag:
     TriggerEff = 'TriggerEffWeight_3l'
 
 ### MC weights
@@ -350,74 +362,79 @@ if 'PVw' in opt.tag:
 
 normBackgrounds = {}
 
-normBackgrounds['STtW']      = { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selection' : '1.' } }
-normBackgrounds['ttW']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
-normBackgrounds['Higgs']     = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
-normBackgrounds['VZ']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
-normBackgrounds['VVV']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
+if 'SignalRegions' in opt.tag or 'BackSF' in opt.tag:
 
-if '2016' in yeartag:
-    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.08' }, 'selection' : '1.' } }
-    normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.29' : '0.28' }, 'selection' : '1.' } }
-    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.13' : '0.31' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
-                                     'notag' : { 'scalefactor' : { '1.25' : '0.23' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
-                                   }
-    if 'kZZmass' in opt.tag:
-        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '1.00' : '0.27' }
-        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.12' : '0.20' }
-        #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '1.08' : '0.16' }
-    elif 'kZZpt' in opt.tag:
-        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.91' : '0.25' }
-        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.85' : '0.16' }
-    elif 'kZZdphi' in opt.tag: 
-        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '1.00' : '0.27' } 
-        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.13' : '0.21' } 
+    normBackgrounds['STtW']      = { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selection' : '1.' } }
+    normBackgrounds['ttW']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
+    normBackgrounds['Higgs']     = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
+    normBackgrounds['VZ']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
+    normBackgrounds['VVV']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
+    normBackgrounds['DY']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
 
-elif '2017' in yeartag:
-    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '1.04' : '0.08' }, 'selection' : '1.' } }
-    normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.45' : '0.27' }, 'selection' : '1.' } }
-    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.83' : '0.25' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },  
-                                     'notag' : { 'scalefactor' : { '0.94' : '0.18' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
-                                   }
-    if 'kZZmass' in opt.tag:
-        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' }
-        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.84' : '0.16' }
-        #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '0.81' : '0.13' }
-    elif 'kZZpt' in opt.tag: 
-        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.68' : '0.20' }
-        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.66' : '0.12' }
-    elif 'kZZdphi' in opt.tag:
-        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' } 
-        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.86' : '0.16' }        
+    if 'FitCR' not in opt.tag:
 
-elif '2018' in yeartag:
-    normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.06' }, 'selection' : '1.' } }
-    normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.43' : '0.22' }, 'selection' : '1.' } }
-    normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.08' : '0.23' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
-                                     'notag' : { 'scalefactor' : { '0.83' : '0.14' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
-                                   }
-    if 'kZZmass' in opt.tag:   
-        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.95' : '0.20' }
-        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.75' : '0.13' }
-        #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '0.81' : '0.11' }
-    elif 'kZZpt' in opt.tag:
-        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.88' : '0.19' }
-        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.58' : '0.10' }
-    elif 'kZZdphi' in opt.tag:
-        normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.96' : '0.20' }
-        normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.76' : '0.13' }
+        if '2016' in yeartag:
+            normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.08' }, 'selection' : '1.' } }
+            normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.29' : '0.28' }, 'selection' : '1.' } }
+            normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.13' : '0.31' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
+                                             'notag' : { 'scalefactor' : { '1.25' : '0.23' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
+                                           }
+            if 'kZZmass' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '1.00' : '0.27' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.12' : '0.20' }
+                #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '1.08' : '0.16' }
+            elif 'kZZpt' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.91' : '0.25' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.85' : '0.16' }
+            elif 'kZZdphi' in opt.tag: 
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '1.00' : '0.27' } 
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.13' : '0.21' } 
 
-if 'BackSF' in opt.tag: 
-    if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag:
-        normBackgrounds['ZZTo2L2Nu']['nojet']['cuts'] = [ 'ptmiss-160' ]
-        normBackgrounds['ZZTo2L2Nu']['notag']['cuts'] = [ 'ptmiss-160' ]
-        normBackgrounds['ZZTo2L2Nu']['nojet']['selection'] = '(nCleanJet==0 && ptmiss'+ctrltag+'>=160.)'
-        normBackgrounds['ZZTo2L2Nu']['notag']['selection'] = '(nCleanJet>=1 && ptmiss'+ctrltag+'>=160.)'
-        normBackgrounds['ZZTo4L'] = normBackgrounds['ZZTo2L2Nu']
-        normBackgrounds['ttZ']['all']['cuts'] = [ 'ptmiss-160' ] 
-        normBackgrounds['ttZ']['all']['selection'] = '(ptmiss'+ctrltag+'>=160.)'
-        normBackgrounds['WZ']['all']['cuts'] = [ 'ptmiss-160' ]
-        normBackgrounds['WZ']['all']['selection'] = '(ptmiss'+ctrltag+'>=160.)'
+        elif '2017' in yeartag:
+            normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '1.04' : '0.08' }, 'selection' : '1.' } }
+            normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.45' : '0.27' }, 'selection' : '1.' } }
+            normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.83' : '0.25' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },  
+                                             'notag' : { 'scalefactor' : { '0.94' : '0.18' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
+                                           }
+            if 'kZZmass' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.84' : '0.16' }
+                #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '0.81' : '0.13' }
+            elif 'kZZpt' in opt.tag: 
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.68' : '0.20' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.66' : '0.12' }
+            elif 'kZZdphi' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' } 
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.86' : '0.16' }        
+
+        elif '2018' in yeartag:
+            normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.06' }, 'selection' : '1.' } }
+            normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.43' : '0.22' }, 'selection' : '1.' } }
+            normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.08' : '0.23' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
+                                             'notag' : { 'scalefactor' : { '0.83' : '0.14' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
+                                           }
+            if 'kZZmass' in opt.tag:   
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.95' : '0.20' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.75' : '0.13' }
+                #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '0.81' : '0.11' }
+            elif 'kZZpt' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.88' : '0.19' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.58' : '0.10' }
+            elif 'kZZdphi' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.96' : '0.20' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.76' : '0.13' }
+
+        if 'BackSF' in opt.tag: 
+            if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['cuts'] = [ 'ptmiss-160' ]
+                normBackgrounds['ZZTo2L2Nu']['notag']['cuts'] = [ 'ptmiss-160' ]
+                normBackgrounds['ZZTo2L2Nu']['nojet']['selection'] = '(nCleanJet==0 && ptmiss'+ctrltag+'>=160.)'
+                normBackgrounds['ZZTo2L2Nu']['notag']['selection'] = '(nCleanJet>=1 && ptmiss'+ctrltag+'>=160.)'
+                normBackgrounds['ZZTo4L'] = normBackgrounds['ZZTo2L2Nu']
+                normBackgrounds['ttZ']['all']['cuts'] = [ 'ptmiss-160' ] 
+                normBackgrounds['ttZ']['all']['selection'] = '(ptmiss'+ctrltag+'>=160.)'
+                normBackgrounds['WZ']['all']['cuts'] = [ 'ptmiss-160' ]
+                normBackgrounds['WZ']['all']['selection'] = '(ptmiss'+ctrltag+'>=160.)'
 
 ### SUS-17-010 --> nomulti style
 #normBackgrounds = {
@@ -637,20 +654,21 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
         
-        if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
+        if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and hasattr(opt, 'outputDirDatacard')):
             
             ZZ4Lext = '_ext2' if ('2018' in yeartag) else '_ext1'
-            samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg,'ZZTo4L'+ZZ4Lext, False,treePrefix) + 
-                                       getSampleFiles(directoryBkg,'ggZZ4e',              False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ4m',              False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ4t',              False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ2e2m',            False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ2e2t',            False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'ggZZ2m2t',            False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'VBFHToZZTo4L_M125',   False,treePrefix) +
-                                       getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125',False,treePrefix),
+            samples['ZZTo4L']   = {    'name'   :   getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'+ZZ4Lext, False,treePrefix) + 
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4e',              False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4m',              False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4t',              False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2m',            False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2t',            False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2m2t',            False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'VBFHToZZTo4L_M125',   False,treePrefix) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'GluGluHToZZTo4L_M125',False,treePrefix),
                                        'weight' : XSWeight+'*'+SFweight ,
                                        'JobsPerSample' : 6,
+                                       'isControlSample' : 1,
                                    }
 
             for kZZvariable in [ 'kZZmass', 'kZZdphi', 'kZZpt' ]:
@@ -662,6 +680,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             ttSemilepFlag = '_ext3' if ('2018' in yeartag) else ''
             samples['ttSemilep'] = { 'name'   : getSampleFiles(directoryBkg,'TTToSemiLeptonic'+ttSemilepFlag,False,treePrefix),
                                      'weight' : XSWeight+'*'+SFweight ,
+                                     'isControlSample' : 1,
                                     }
 
 if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
