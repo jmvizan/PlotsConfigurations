@@ -27,8 +27,16 @@ if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'ce
 
 if  'cern' in SITE :
     print 'nanoAODv8 trees not available yet on cern'
+    exit()
+elif 'ifca' in SITE or 'cloud' in SITE:
+    treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+
 
 if '2016' in yeartag :
+    print "2016 samples not yet available"
+    exit()
     ProductionMC   = 'Summer20UL16_106X_nAODv8_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8__MCSusyNomin2016v8'
     ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
     ProductionData = 'Run2016_106X_nAODv8_Full2016v8/DATASusy2016v8__hadd'
@@ -225,7 +233,7 @@ ISRCutMC   = '&& '+ISRCut
 METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter*Flag_BadPFMuonDzFilter' 
 
 if '2017' in opt.tag or '2018' in opt.tag :
-    MetFilters_Common += '*Flag_ecalBadCalibFilter'
+    METFilters_Common += '*Flag_ecalBadCalibFilter'
     if 'noisyhits' in opt.tag: METFilters_Common += '*Flag_hfNoisyHitsFilter'
 METFilters_MC     = METFilters_Common
 METFilters_Data   = METFilters_Common + '*Flag_eeBadScFilter'
