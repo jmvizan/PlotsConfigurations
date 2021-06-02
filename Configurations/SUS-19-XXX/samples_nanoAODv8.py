@@ -198,8 +198,8 @@ OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
 
 MET_significance = 'MET_significance'
 
-btagAlgo = 'btagDeepB'
-bTagWP = 'M'
+btagAlgo = 'deepcsv'
+bTagWP = '_M'
 bTagPtCut  = '20.'
 if 'pt25' in opt.tag: bTagPtCut  = '25.' 
 if 'pt30' in opt.tag: bTagPtCut  = '30.' 
@@ -230,7 +230,7 @@ ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
 
 ### MET Filters # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#UL_data (checked on may20)
-METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter*Flag_BadPFMuonDzFilter' 
+METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'#*Flag_BadPFMuonDzFilter' #TO BEREADDED WHEN AVAILABLE 
 
 if '2017' in opt.tag or '2018' in opt.tag :
     METFilters_Common += '*Flag_ecalBadCalibFilter'
