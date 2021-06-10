@@ -81,12 +81,12 @@ if [ $BATCH == True ]; then
     mkShapesMulti.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$TAG/$SPLIT --doBatch=True --batchQueue=$QUEUE --batchSplit=$SPLIT  #--nuisancesFile=None
 else
     rm -f ./Shapes/$YEAR/$TAG/$SPLIT/*_temp*.root
-    mkdir -p ./Shapes/$YEAR/$TAG/Samples
     mkShapesMulti.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --treeName=Events --outputDir=./Shapes/$YEAR/$TAG/$SPLIT --batchSplit=$SPLIT --doHadd=True --doNotCleanup
     if [[ "$SIGSET" == "Backgrounds"* && "$SIGSET" != "Backgrounds-"*  && "$SIGSET" != "Backgrounds" ]] || [[ "$SIGSET" == "Data" ]]; then
 	ONLYSAMPLE=${SIGSET#Backgrounds}
 	if [ "$ONLYSAMPLE" == "Data" ]; then
 	    ONLYSAMPLE="DATA"
+	    mkdir -p ./Shapes/$YEAR/$TAG/Samples
 	fi
 	mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR${TAG}_$SIGSET.root ./Shapes/$YEAR/$TAG/Samples/plots_$YEAR${TAG}_ALL_${ONLYSAMPLE}.root
     else

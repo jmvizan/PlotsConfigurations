@@ -705,16 +705,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                 if DataSet != v1v2sample: continue
                 for v1v2run in v1v2samples[v1v2sample]:
                     if v1v2run in Run[1]: datasetName = datasetName.replace('-v1', '-v2') 
-            #Old part
-            '''
-            if DataSet=='SingleMuon':
-                print "before", datasetName, Run[1]
-                if 'Run2017E' in Run[1] or 'Run2017F' in Run[1]: 
-                    print "im in", 
-                    datasetName = datasetName.replace('-v1', '-v2')
-                print "after", datasetName
-            if DataSet=='DoubleMuon' and 'Run2018B' in Run[1]: datasetName = datasetName.replace('-v1', '-v2')
-            '''
+            
             FileTarget = getSampleFiles(directoryData,datasetName,True,treePrefix)
             for iFile in FileTarget:
                 samples['DATA']['name'].append(iFile)
