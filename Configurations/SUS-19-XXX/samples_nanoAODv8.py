@@ -201,8 +201,9 @@ OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
 
 MET_significance = 'MET_significance'
 
-btagAlgo = 'deepcsv'
-bTagWP = '_M'
+btagAlgo   = 'deepcsv'
+btagDisc   = 'btagDeepB'
+bTagWP     = '_M'
 bTagPtCut  = '20.'
 if 'pt25' in opt.tag: bTagPtCut  = '25.' 
 if 'pt30' in opt.tag: bTagPtCut  = '30.' 
