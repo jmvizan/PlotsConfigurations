@@ -201,8 +201,9 @@ OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
 
 MET_significance = 'METFixEE2017_significance' if '2017' in yeartag else 'MET_significance'
 
-btagAlgo = 'btagDeepB'
-bTagWP = 'M'
+btagAlgo   = 'btagDeepB'
+btagDisc   = 'btagDeepB'
+bTagWP     = 'M'
 bTagPtCut  = '20.'
 if 'pt25' in opt.tag: bTagPtCut  = '25.' 
 if 'pt30' in opt.tag: bTagPtCut  = '30.' 
