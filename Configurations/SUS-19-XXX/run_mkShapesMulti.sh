@@ -40,7 +40,8 @@ else
 	if [[ "$HOSTNAME" = *"ifca"* ]]; then
 	    QUEUE=gridui_sort
 	else
-	    QUEUE=testmatch
+	    QUEUE=longlunch
+#testmatch
 	fi
 	DOHADD=False
 	KEEPINPUT=False
@@ -87,6 +88,7 @@ else
 	if [ "$ONLYSAMPLE" == "Data" ]; then
 	    ONLYSAMPLE="DATA"
 	fi
+	mkdir -p ./Shapes/$YEAR/$TAG/Samples
 	mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR${TAG}_$SIGSET.root ./Shapes/$YEAR/$TAG/Samples/plots_$YEAR${TAG}_ALL_${ONLYSAMPLE}.root
     else
 	mv ./Shapes/$YEAR/$TAG/$SPLIT/plots_$YEAR${TAG}_$SIGSET.root ./Shapes/$YEAR/$TAG/plots_${TAG}_${SIGSET}.root 

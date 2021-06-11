@@ -26,8 +26,11 @@ SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
 if  'cern' in SITE :
-    print 'nanoAODv8 trees not available yet on cern'
-    exit()
+    treeBaseDirSig  = '/eos/home-p/pmatorra/Samples/Nano/UL/'
+    treeBaseDirMC   = '/eos/home-p/pmatorra/Samples/Nano/UL/'
+    treeBaseDirData = '/eos/home-p/pmatorra/Samples/Nano/UL/'
+    print 'most nanoAODv8 trees not available yet on cern'
+    #exit()
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -198,8 +201,9 @@ OCT = '('+C2+'*'+T0+'*'+T1+'+'+C1+'*'+T0+'*'+T2+'+'+C0+'*'+T1+'*'+T2+')<0'
 
 MET_significance = 'MET_significance'
 
-btagAlgo = 'btagDeepB'
-bTagWP = 'M'
+btagAlgo   = 'deepcsv'
+btagDisc   = 'btagDeepB'
+bTagWP     = '_M'
 bTagPtCut  = '20.'
 if 'pt25' in opt.tag: bTagPtCut  = '25.' 
 if 'pt30' in opt.tag: bTagPtCut  = '30.' 
@@ -230,7 +234,7 @@ ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
 
 ### MET Filters # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#UL_data (checked on may20)
-METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter*Flag_BadPFMuonDzFilter' 
+METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'#*Flag_BadPFMuonDzFilter' #TO BEREADDED WHEN AVAILABLE 
 
 if '2017' in opt.tag or '2018' in opt.tag :
     METFilters_Common += '*Flag_ecalBadCalibFilter'
@@ -690,12 +694,19 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'isDATA'    : 1, 
                            'isFastsim' : 0
                        }
-
+    v1v2samples = { "SingleMuon"     : ["Run2017E","Run2017F"],
+                    "SingleElectron" : ["Run2017E"],
+                    "DoubleMuon"     : ["Run2018B"]
+              }
+    
     for Run in DataRun :
         for DataSet in DataSets :
             datasetName = DataSet+'_'+Run[1]
-            if DataSet=='SingleMuon' and 'Run2017F' in Run[1]: datasetName = datasetName.replace('-v1', '-v2')
-            if DataSet=='DoubleMuon' and 'Run2018B' in Run[1]: datasetName = datasetName.replace('-v1', '-v2')
+            for v1v2sample in v1v2samples:
+                if DataSet != v1v2sample: continue
+                for v1v2run in v1v2samples[v1v2sample]:
+                    if v1v2run in Run[1]: datasetName = datasetName.replace('-v1', '-v2') 
+            
             FileTarget = getSampleFiles(directoryData,datasetName,True,treePrefix)
             for iFile in FileTarget:
                 samples['DATA']['name'].append(iFile)
