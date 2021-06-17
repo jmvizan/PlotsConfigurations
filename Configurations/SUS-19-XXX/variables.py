@@ -8,22 +8,23 @@ sll  = '#font[12]{ll}'
 pll  = '('+sll+')'
 mt2  = '#font[50]{m}_{T2}'
 ptll = pt+'^{'+sll+'}'
-dphill = '#Delta#phi(lep1,lep2)'
-dphillptmiss = '#Delta#phi('+sll+','+met+')'
+dphill           = '#Delta#phi(lep1,lep2)'
+dphillptmiss     = '#Delta#phi('+sll+','+met+')'
 dphiminlepptmiss = '#Delta#phi^{min}(lep,'+met+')'
-dphijetptmiss  = '#Delta#phi(jet,'+met+')'
-dphijet0ptmiss = '#Delta#phi(lead. jet,'+met+')'
-dphijet1ptmiss = '#Delta#phi(trai. jet,'+met+')'
-drll = '#Delta R(lep1,lep2)'
+dphijetptmiss    = '#Delta#phi(jet,'+met+')'
+dphijet0ptmiss   = '#Delta#phi(lead. jet,'+met+')'
+dphijet1ptmiss   = '#Delta#phi(trai. jet,'+met+')'
+drll       = '#Delta R(lep1,lep2)'
 mtllptmiss = '#font[50]{m}_{T}('+sll+','+met+')'
 
 # Complex variables
 sumLeptonPt = 'Lepton_pt['+lep0idx+']+Lepton_pt['+lep1idx+']'
 deltaMET    = 'MET_pt     - GenMET_pt' 
 deltaMETFix = 'METFixEE2017_pt - GenMET_pt'
-nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagAlgo+'[CleanJet_jetIdx]>='+bTagCut+')'
-# variables = {}
 
+nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')'
+# variables = {}
+#exit()
 ## mkShape
 #overflow  = 1
 #underflow = 2
