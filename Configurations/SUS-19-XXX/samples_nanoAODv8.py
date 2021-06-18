@@ -209,19 +209,21 @@ if 'pt25' in opt.tag: bTagPtCut  = '25.'
 if 'pt30' in opt.tag: bTagPtCut  = '30.' 
 bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
 if '2016' in yeartag: 
-    bTagCut = '0.6321'
+    bTagCut = '0.6321' # To be updated for UL
     btagWP  = '2016'
 elif '2017' in yeartag: 
-    bTagCut = '0.4941'
+    bTagCut = '0.4506'
     btagWP  = '2017'
 elif '2018' in yeartag: 
-    bTagCut = '0.4184'
+    bTagCut = '0.4168'
     btagWP  = '2018'
 btagWP += bTagWP
 
-bTagPass = '(leadingPtTagged_'+btagAlgo+bTagWP+'_1c>='+bTagPtCut+')' 
+#bTagPass = '(leadingPtTagged_'+btagAlgo+bTagWP+'_1c>='+bTagPtCut+')'
+bTagPass = '(Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')>=1)' 
 bTagVeto = '!'+bTagPass
-b2TagPass = bTagPass.replace('leadingPt', 'trailingPt')
+#b2TagPass = bTagPass.replace('leadingPt', 'trailingPt')
+b2TagPass = '(Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')>=2)'
 
 btagWeight1tag = 'btagWeight_1tag_'+btagAlgo+bTagWP+'_1c'
 if 'pt25' in opt.tag: btagWeight1tag += '_Pt25'
