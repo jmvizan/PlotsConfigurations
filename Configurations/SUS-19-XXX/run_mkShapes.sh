@@ -38,7 +38,7 @@ else
     if [ $# == 2 ] || [ $3 == '0' ] || [ $3 == 'shapes' ]; then
 	BATCH=True
 	if [[ "$HOSTNAME" = *"ifca"* ]]; then
-	    QUEUE=gridui_sort
+	    QUEUE=cms_high
 	else
 	    QUEUE=testmatch
 	fi
@@ -61,7 +61,7 @@ else
 	if [ $# -lt 5 ]; then
 	    SPLIT='Samples'
 	else
-	    if [ $5 == 'tomorrow' ] || [ $5 == 'workday' ] || [ $5 == 'gridui_medium' ] ; then
+	    if [ $5 == 'tomorrow' ] || [ $5 == 'workday' ] || [ $5 == 'cms_med' ] || [ $5 == 'cms_main' ] ; then
 		QUEUE=$5
 		if [ $# -lt 6 ]; then
 		    SPLIT='Samples'

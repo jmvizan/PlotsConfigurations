@@ -58,7 +58,7 @@ if __name__ == '__main__':
     queue   = ''
     split   = ''
     rmlog   = None
-    runopts = ['tomorrow','workday','gridui_sort', 'gridui_medium']
+    runopts = ['tomorrow','workday','cms_high','cms_med','cms_main']
     if 'rm' in args[lastarg]:
         args[lastarg] = ''
         rmlog = True
@@ -86,7 +86,7 @@ if __name__ == '__main__':
         args[len(args)-1] = ''
         rmlog = True
     if len(args)>5: 
-        if args[5] in ['tomorrow','workday','gridui_sort']: 
+        if args[5] in ['tomorrow','workday','cms_high','cms_med','cms_main']: 
             queue = args[5]
             if len(args)>6: 
                 split = args[6]
