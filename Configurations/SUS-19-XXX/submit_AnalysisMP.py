@@ -9,7 +9,7 @@ nMPs    = 3
 server  = os.uname()[1]
 flavour = "\"workday\""
 if 'ifca' in server.lower():
-    flavour = "gridui_sort"
+    flavour = "cms_high"
 #write header to logfile
 def logtitle(filename,sigset):
     if(os.path.exists(filename) is False):  print "creating log file"
@@ -315,7 +315,7 @@ for ijob,job in enumerate(jobs):
     if gridui is True:
         arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)
         gridnm    = gridfol+argsigset
-        gridcomm  = 'sbatch -o '+gridnm+'.out -e '+gridnm+'.err --qos=gridui_sort --partition=cloudcms '+gridnm+'.sh>'+gridnm+'.jid'
+        gridcomm  = 'sbatch -o '+gridnm+'.out -e '+gridnm+'.err --qos=cms_high --partition=cloudcms '+gridnm+'.sh>'+gridnm+'.jid'
         f2 = open(gridnm+".sh","w+")
         f2.write("#!/bin/bash")
         f2.write("\npython run_AnalysisMP.py "+arguments)
