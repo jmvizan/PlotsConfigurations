@@ -65,16 +65,16 @@ for year in yearlist:
       #Generate dictionaries with variables and cuts
       variables = {}
       samples   = {}
-      cuts      = {}
-      os.system("echo 'KKKKK'") 
+      cuts      = {} 
       exec(open('samples_nanoAODv8.py').read())
       exec(open('variables.py').read())
       exec(open('cuts.py').read())
+
       try:
         os
       except NameError:
         import os
-      os.system("echo 'RRRRRRRRRRRRRRRRRRr'")
+
       #if "Control" not in tag: continue
       #tweaks         = all_info[tag]["tweaks"]
       #for tweak in tweaks:
@@ -96,7 +96,7 @@ for year in yearlist:
       hfileV6 = TFile(hfileV6nm)
       for region in ControlRegions:
         #folloc  = year+"/"+tag+"/"+tweak+"/"+region+"/"
-        folloc  = year+"/"+tag+"/"+region+"/"
+        folloc  = year+"/"+tag+"/"+region+"/"+process+"/"
         #thisfol = "Figures/"+folloc
         webloc  = compweb+folloc
         os.system("mkdir -p " + webloc)
