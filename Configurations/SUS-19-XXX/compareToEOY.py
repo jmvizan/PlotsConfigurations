@@ -54,6 +54,8 @@ compweb = web+"CompareToEOY/"
 os.system("mkdir -p " + compweb)
 
 doTest  = opt.test
+sameFolder = False
+if "pmatorra" in  os.getenv('USER'): sameFolder = True
 
 for year in yearlist:
   for tag in taglist:
@@ -75,6 +77,8 @@ for year in yearlist:
       except NameError:
         import os
 
+      print "same folder", sameFolder
+
       #if "Control" not in tag: continue
       #tweaks         = all_info[tag]["tweaks"]
       #for tweak in tweaks:
@@ -87,8 +91,12 @@ for year in yearlist:
       #for year in all_info[tag]["years"]:
       #hfileV8nm  = "Data/plots_"+year+tag+tweak+"V8_ALL_DATA.root"
       #hfileV6nm  = "Data/plots_"+year+tag+tweak+"V6_ALL_DATA.root"
-      hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
-      hfileV6nm  = EOYArea + hfileV8nm
+      if sameFolder is True :
+          hfileV8nm  = "Shapes/"+year+"/"+tag+"_V8/Samples/plots_"+year+tag+"_V8_ALL_"+process+".root"
+          hfileV6nm  = "Shapes/"+year+"/"+tag+"_V6/Samples/plots_"+year+tag+"_V6_ALL_"+process+".root"
+      else:
+          hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
+          hfileV6nm  = EOYArea + hfileV8nm
       #missV8     = fileismissing(hfileV8nm)
       #missV6     = fileismissing(hfileV6nm)
       #if missV8 or missV6: continue
