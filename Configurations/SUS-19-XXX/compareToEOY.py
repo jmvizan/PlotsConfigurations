@@ -77,8 +77,7 @@ for year in yearlist:
       except NameError:
         import os
 
-      print "same folder", sameFolder
-
+      
       #if "Control" not in tag: continue
       #tweaks         = all_info[tag]["tweaks"]
       #for tweak in tweaks:
