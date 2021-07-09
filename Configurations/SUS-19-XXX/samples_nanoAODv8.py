@@ -530,7 +530,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     if 'btagefficiencies' not in opt.tag and 'Test' not in opt.tag:
     
         tWext = '' # TODO missing 
-        samples['STtW']    = {    'name'   :   getSampleFiles(directoryBkg,'ST_tW_top_nohad'+tWext,False,treePrefix) ,#+
+        samples['STtW']    = {    'name'   :   getSampleFiles(directoryBkg,'ST_tW_top_nohad'+tWext,False,treePrefix) +
                                                getSampleFiles(directoryBkg,'ST_tW_antitop_nohad'+tWext,    False,treePrefix),
                                   'weight' : XSWeight+'*'+SFweight ,
                              }
@@ -543,8 +543,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 }
         
         ttWToLLext = '' # TODO missing 2016
-        samples['ttW']   = {    'name'   :   getSampleFiles(directoryBkg,'TTWJetsToLNu'+ttWToLLext,False,treePrefix) ,#+
-                                             getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix), # TODO missing 
+        samples['ttW']   = {    'name'   :   getSampleFiles(directoryBkg,'TTWJetsToLNu'+ttWToLLext,False,treePrefix) +
+                                             getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix), 
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
 
