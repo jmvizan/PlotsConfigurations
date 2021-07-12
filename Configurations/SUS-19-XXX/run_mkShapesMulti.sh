@@ -75,7 +75,6 @@ else
 	fi
     fi
 fi
-
 mkdir -p ./Shapes/$YEAR/$TAG/$SPLIT
 
 if [ $BATCH == True ]; then
