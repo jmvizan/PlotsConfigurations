@@ -252,7 +252,7 @@ VetoEENoise, VetoHEMdata, VetoHEMmc  = '1.', '1.', '1.'
 if '2017' in yeartag and 'EENoise' in opt.tag:
     VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
     if 'EENoiseHT' in opt.tag:
-        VetoEENoise = '('+HTForwardSoft+'<40.)'
+        VetoEENoise = '('+HTForwardSoft+'<60.)'
     elif 'EENoiseDPhiHard' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0)'
     elif 'EENoiseDPhiSoftPt50' in opt.tag:
@@ -261,9 +261,9 @@ if '2017' in yeartag and 'EENoise' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_pt30+'>0. && '+dPhieenoiseptmiss_pt30+'<0.96)==0)'
     elif 'EENoiseDPhi' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0 && Sum$('+dPhieenoiseptmiss_pt50+'>0. && '+dPhieenoiseptmiss_pt50+'<0.96)==0)'
-    if 'Veto' in opt.tag:
-        #VetoEENoise = '(1. - '+VetoEENoise+')'
-        VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
+    #if 'Veto' in opt.tag:
+    #    #VetoEENoise = '(1. - '+VetoEENoise+')'
+    #    VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
 
 elif '2018' in yeartag and 'HEM' in opt.tag:
     hemPtCut = '20.' if 'HEM20' in opt.tag else '30.' 
