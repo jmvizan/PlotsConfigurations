@@ -108,6 +108,9 @@ for treeNuisance in treeNuisances:
         for variation in [ 'Down', 'Up' ]:
             treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
             treeNuisanceDirs[treeNuisance]['FS'][variation]  = directorySigTemp.replace('variation', variation[:2])
+    if 'EOY' in opt.sigset:
+        treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL17_106X_nAODv8', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv8', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL17_106X_nAODv8', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv8', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
 
 # Complex cut variables
 
@@ -250,7 +253,7 @@ METFilters_MC     = METFilters_Common
 METFilters_Data   = METFilters_Common + '*Flag_eeBadScFilter'
 METFilters_FS     = METFilters_Common
 
-if 'EOY' in opt.segset:
+if 'EOY' in opt.sigset:
     METFilters_Common = 'Flag_goodVertices*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'
     if '2017' in opt.tag or '2018' in opt.tag :
         METFilters_Common += '*Flag_ecalBadCalibFilterV2'
@@ -583,7 +586,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                    + getSampleFiles(directoryBkg,'GluGluToWWToTNEN',False,treePrefix) \
                                    + getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,treePrefix) \
                                    + getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix)
-        else '2018' in yeartag and 'EOY' in opt.tag:
+        elif '2018' in yeartag and 'EOY' in opt.tag:
             samples['EOYGluGlu']    = {  'name'   :   getSampleFiles(directoryBkgEOY,'GluGluToWWToENEN',False,treePrefix) +
                                                       getSampleFiles(directoryBkgEOY,'GluGluToWWToENMN',False,treePrefix) +
                                                       getSampleFiles(directoryBkgEOY,'GluGluToWWToENTN',False,treePrefix) +
@@ -593,8 +596,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                                       getSampleFiles(directoryBkgEOY,'GluGluToWWToTNEN',False,treePrefix) +
                                                       getSampleFiles(directoryBkgEOY,'GluGluToWWToTNMN',False,treePrefix) +
                                                       getSampleFiles(directoryBkgEOY,'GluGluToWWToTNTN',False,treePrefix),
-                                      'weight' : XSWeight+'*'+SFweight ,
-                                         }
+                                         'weight' : XSWeight+'*'+SFweight ,
+                                        }
 
         #WZext = '_ext1' if ('2018' in yeartag) else ''
         #samples['WZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix),
@@ -650,7 +653,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         if '2018' in yeartag:
             samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125',             False,treePrefix)
 
-        if 'EOY' in opt.tagi:
+        if 'EOY' in opt.tag:
             ggHWWgen = 'AMCNLO'  if ('2016' in yeartag) else ''
             samples['EOYH']   = {  'name'   :   getSampleFiles(directoryBkgEOY,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix) +
                                                 getSampleFiles(directoryBkgEOY,'VBFHToWWTo2L2Nu_M125',               False,treePrefix) +
@@ -669,7 +672,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        'weight' : XSWeight+'*'+SFweight
                                    }
             if '2018' in yeartag:
-                samples['VVV']['name'] += getSampleFiles(directoryBkgEOY,'WWG'     ,False,treePrefix) # Since it's missing in UL 2018
+                samples['EOYQQ']['name'] += getSampleFiles(directoryBkgEOY,'WWG'     ,False,treePrefix) # Since it's missing in UL 2018
         
         WZZext = '_ext1' if '2018' in yeartag else ''
         samples['VVV']   = {    'name'   :   getSampleFiles(directoryBkg,'WWW',False,treePrefix) + 
@@ -740,6 +743,11 @@ if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrou
     for sample in samples:
         if 'Veto' in opt.sigset:
             if sample in opt.sigset:
+                sampleToRemove.append(sample)
+            if 'EOY' in sample: 
+                sampleToRemove.append(sample)
+        elif 'EOY' in opt.sigset:
+            if 'EOY' not in sample:
                 sampleToRemove.append(sample)
         elif 'Backgrounds'+sample!= opt.sigset:
             sampleToRemove.append(sample)
