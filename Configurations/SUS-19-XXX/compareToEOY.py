@@ -90,14 +90,25 @@ for year in yearlist:
       #for year in all_info[tag]["years"]:
       #hfileV8nm  = "Data/plots_"+year+tag+tweak+"V8_ALL_DATA.root"
       #hfileV6nm  = "Data/plots_"+year+tag+tweak+"V6_ALL_DATA.root"
+      if "SM" in process:
+          Samfol = '/'
+          All    = '_'
+          yearnm = ''
+          process = "DATA"
+          procnm  = "SM"
+      else:
+          Samfol = '/Samples/'
+          All    = '_ALL_'
+          yearnm = year
+          procnm = process
       if sameFolder is True :
-          hfileV8nm  = "Shapes/"+year+"/"+tag+"_V8/Samples/plots_"+year+tag+"_V8_ALL_"+process+".root"
-          hfileV6nm  = "Shapes/"+year+"/"+tag+"_V6/Samples/plots_"+year+tag+"_V6_ALL_"+process+".root"
+          hfileV8nm  = "Shapes/"+year+"/"+tag+"_V8"+Samfol+"plots_"+yearnm+tag+"_V8"+All+procnm+".root"
+          hfileV6nm  = "Shapes/"+year+"/"+tag+"_V6"+Samfol+"plots_"+yearnm+tag+"_V6"+All+procnm+".root"
       else:
           hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
           hfileV6nm  = EOYArea + hfileV8nm
-      hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
-      hfileV6nm  = EOYArea + hfileV8nm.replace('VetoNoiseEE', 'VetoNoiseEEMET')
+      #hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
+      #hfileV6nm  = EOYArea + hfileV8nm.replace('VetoNoiseEE', 'VetoNoiseEEMET')
       #missV8     = fileismissing(hfileV8nm)
       #missV6     = fileismissing(hfileV6nm)
       #if missV8 or missV6: continue
