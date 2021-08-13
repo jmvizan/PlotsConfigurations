@@ -53,7 +53,10 @@ else:
 compweb = web+"CompareToEOY/"
 os.system("mkdir -p " + compweb)
 
-doTest  = opt.test
+doTest = False
+if len(sys.argv)>4:
+    print "do Test"
+    doTest  = True
 sameFolder = False
 if "pmatorra" in  os.getenv('USER'): sameFolder = True
 
@@ -90,12 +93,12 @@ for year in yearlist:
       #for year in all_info[tag]["years"]:
       #hfileV8nm  = "Data/plots_"+year+tag+tweak+"V8_ALL_DATA.root"
       #hfileV6nm  = "Data/plots_"+year+tag+tweak+"V6_ALL_DATA.root"
-      if "SM" in process:
-          Samfol = '/'
-          All    = '_'
-          yearnm = ''
-          process = "DATA"
-          procnm  = "SM"
+      if "_" in process:
+          Samfol  = '/'
+          All     = '_'
+          yearnm  = ''
+          procnm  = process.split("_")[0]
+          process = process.split("_")[1]
       else:
           Samfol = '/Samples/'
           All    = '_ALL_'
@@ -107,15 +110,13 @@ for year in yearlist:
       else:
           hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
           hfileV6nm  = EOYArea + hfileV8nm
-      #hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
-      #hfileV6nm  = EOYArea + hfileV8nm.replace('VetoNoiseEE', 'VetoNoiseEEMET')
-      #missV8     = fileismissing(hfileV8nm)
-      #missV6     = fileismissing(hfileV6nm)
-      #if missV8 or missV6: continue
+
+      missV8     = fileismissing(hfileV8nm)
+      missV6     = fileismissing(hfileV6nm)
+      if missV8 or missV6: exit()
       hfileV8 = TFile(hfileV8nm)
       hfileV6 = TFile(hfileV6nm)
       for region in ControlRegions:
-        #folloc  = year+"/"+tag+"/"+tweak+"/"+region+"/"
         folloc  = year+"/"+tag+"/"+region+"/"+process+"/"
         #thisfol = "Figures/"+folloc
         webloc  = compweb+folloc
@@ -144,9 +145,16 @@ for year in yearlist:
             doLogX = True
           figbase = tag+"_"+year+"_"+region+"_"+var
           #os.system("mkdir -p "+thisfol)
-          legend  = TLegend(0.6,0.8,0.88,0.88);
-          histoV8 = hfileV8.Get(region+"/"+var+"/histo_"+process)
-          histoV6 = hfileV6.Get(region+"/"+var+"/histo_"+process)
+          legend     = TLegend(0.6,0.8,0.88,0.88);
+          histoV8    = hfileV8.Get(region+"/"+var+"/histo_"+process)
+          histoV6    = hfileV6.Get(region+"/"+var+"/histo_"+process)
+          histoRatio = histoV8.Clone("histoRatio")
+          legRatio   = TLegend(0.6,0.8,0.88,0.88);
+          legRatio.AddEntry(histoRatio, region+"V8/v6loose")
+          histoRatio.Divide(histoV6)
+          histoRatio.Draw()
+          legRatio.Draw()
+          c1.SaveAs(webloc+"ratio_"+figbase+".png")
           legend.AddEntry(histoV8, region+"V8     " )
           legend.AddEntry(histoV6, region+"V6loose" )
           histoV6.SetTitle(region+"-"+var+" "+year)
