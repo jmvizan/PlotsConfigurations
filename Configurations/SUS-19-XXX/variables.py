@@ -24,13 +24,13 @@ deltaMETFix = 'METFixEE2017_pt - GenMET_pt'
 
 nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')'
 # variables = {}
-#exit()
-## mkShape
-#overflow  = 1
-#underflow = 2
-## mkShapeMulti
-overflow  = 2
-underflow = 1
+
+if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'): ## mkShape
+    overflow  = 1
+    underflow = 2
+else: ## mkShapeMulti
+    overflow  = 2
+    underflow = 1
 
 if 'Test' in opt.tag: 
     
