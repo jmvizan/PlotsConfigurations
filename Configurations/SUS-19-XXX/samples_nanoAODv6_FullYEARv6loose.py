@@ -21,6 +21,8 @@ print 'Value of lumi set to', opt.lumi
 treePrefix= 'nanoLatino_'
 
 ### Directories
+
+recoFlag = ''
   
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'

@@ -22,6 +22,8 @@ treePrefix= 'nanoLatino_'
 
 ### Directories
 
+recoFlag = '_UL'
+
 skipTreesCheck = False
   
 SITE=os.uname()[1]

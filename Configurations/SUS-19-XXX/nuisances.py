@@ -310,7 +310,7 @@ if '__susyMT2reco' not in directorySig:
 
 ### QCD scale and PDFs
 
-exec(open('./theoryNormalizations'+year+'.py').read())
+exec(open('./theoryNormalizations/theoryNormalizations'+recoFlag+year+'.py').read())
 
 # LHE scale variation weights (w_var / w_nominal)
 # [0] is muR=0.50000E+00 muF=0.50000E+00
