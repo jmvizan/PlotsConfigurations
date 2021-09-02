@@ -258,6 +258,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         plot['EOYQQ']     = plot['VZ']
         plot['EOYGluGlu'] = plot['WW']
 
+    # Backward compatibility for background names
     plot['tW']  = plot['STtW']
     plot['ZZ']  = plot['ZZTo2L2Nu']
     plot['HWW'] = plot['Higgs']
