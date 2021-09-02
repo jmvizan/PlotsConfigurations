@@ -21,9 +21,9 @@ print 'Value of lumi set to', opt.lumi
 treePrefix= 'nanoLatino_'
 
 ### Directories
- 
+
 skipTreesCheck = False
- 
+  
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
@@ -159,6 +159,8 @@ dPhiMinlepptmiss = 'TMath::Min('+dPhilep0ptmiss+','+dPhilep1ptmiss+')'
 dPhijet0ptmiss = 'acos(cos(CleanJet_phi[0]-'+ptmiss_phi+'))'
 dPhijet1ptmiss = 'acos(cos(CleanJet_phi[1]-'+ptmiss_phi+'))'
 jetrawpteenoise = '(Jet_pt*(1.-Jet_rawFactor)*(2*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)-1))'
+njeteenoise   = 'Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)'
+njeteenoise30 = 'Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && Jet_pt*(1.-Jet_rawFactor)<30.)'
 jetpteenoise = '(Jet_pt*(2*(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)-1))'
 dPhieenoiseptmiss_pt30 = 'acos(cos(Jet_phi-'+ptmiss_phi+'))*(2.*((Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
 dPhieenoiseptmiss_pt50 = 'acos(cos(Jet_phi-'+ptmiss_phi+'))*(2.*((Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
@@ -168,6 +170,8 @@ dPhieenoiseptmiss_pt30_norawcut = 'acos(cos(Jet_phi-'+ptmiss_phi+'))*(2.*((Jet_p
 dPhieenoiseptmiss_pt15_norawcut = 'acos(cos(Jet_phi-'+ptmiss_phi+'))*(2.*((Jet_pt>15. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
 HTForward     = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139))'
 HTForwardSoft = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && Jet_pt*(1.-Jet_rawFactor)<50.))'
+HTRawForward  = 'Sum$(Jet_pt*(1.-Jet_rawFactor)*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139))'
+HTRawForwardSoft = 'Sum$(Jet_pt*(1.-Jet_rawFactor)*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && Jet_pt*(1.-Jet_rawFactor)<50.))'
 jetpteenoisedphi = '(Jet_pt*(2*(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && acos(cos(Jet_phi-'+ptmiss_phi+'))<0.96)-1))'
 
 ptmissNano = 'MET_pt'
@@ -271,7 +275,10 @@ if 'EOY' in opt.sigset:
 VetoEENoise, VetoHEMdata, VetoHEMmc  = '1.', '1.', '1.'
 if '2017' in yeartag and 'EENoise' in opt.tag:
     VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
-    if 'EENoiseHT' in opt.tag:
+    if 'EENoise30' in opt.tag:
+        #VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<30. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
+        VetoEENoise = '('+njeteenoise30+'==0)'
+    elif 'EENoiseHT' in opt.tag:
         VetoEENoise = '('+HTForwardSoft+'<60.)'
     elif 'EENoiseDPhiHard' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0)'
@@ -340,7 +347,7 @@ leptonSF = {
     'leptonIdIsoFS'   : { 'type' : 'lnN', 'weight' : '1.04' },   
 }
 
-# nonprompt lepton rate
+# nonprompt lepton rate TODO: update to UL values
 
 #nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.50', 'rateDown' : '0.50' } 
 #nonpromptLep = { 'rate' : '1.08', 'rateUp' : '1.29', 'rateDown' : '0.87' } 
@@ -369,21 +376,6 @@ if '2018' in yeartag and 'HEM' in opt.tag:
     SFweightCommon += '*' + VetoHEMmc
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
-
-# Primary Vertex Reweighting
-
-if 'pu1sigma' in opt.tag: 
-    SFweight = SFweight.replace('puWeight', 'puWeightUp')
-elif 'pu2sigma' in opt.tag:
-    SFweight = SFweight.replace('puWeight', '(2.*(puWeightUp-puWeight)+puWeight)')	
-
-if 'PVw' in opt.tag:
-    if '2016' in yeartag:
-        SFweight += '*((1./0.97916503)*((1.11250e+00)+(1.69184e-02)*PV_npvs+(-1.30092e-03)*PV_npvs*PV_npvs+(-1.99571e-05)*PV_npvs*PV_npvs*PV_npvs+(1.10773e-06)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
-    elif '2017' in yeartag: 
-        SFweight += '*((1./1.0028780)*((8.05485e-01)+(-2.30668e-02)*PV_npvs+(2.62330e-03)*PV_npvs*PV_npvs+(-7.65300e-05)*PV_npvs*PV_npvs*PV_npvs+(7.54356e-07)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
-    elif '2018' in yeartag: 
-        SFweight += '*((1./0.95395364)*((9.48824e-01)+(-3.22506e-02)*PV_npvs+(3.42005e-03)*PV_npvs*PV_npvs+(-1.42342e-04)*PV_npvs*PV_npvs*PV_npvs+(2.03952e-06)*PV_npvs*PV_npvs*PV_npvs*PV_npvs))'
     
 ### Special weights
 
@@ -591,7 +583,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                    + getSampleFiles(directoryBkg,'GluGluToWWToTNEN',False,treePrefix,skipTreesCheck) \
                                    + getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,treePrefix,skipTreesCheck) \
                                    + getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix,skipTreesCheck)
-        elif '2018' in yeartag and 'EOY' in opt.tag:
+        if '2018' in opt.tag and 'EOY' in opt.tag:
             samples['EOYGluGlu']    = {  'name'   :   getSampleFiles(directoryBkgEOY,'GluGluToWWToENEN',False,treePrefix,skipTreesCheck) +
                                                       getSampleFiles(directoryBkgEOY,'GluGluToWWToENMN',False,treePrefix,skipTreesCheck) +
                                                       getSampleFiles(directoryBkgEOY,'GluGluToWWToENTN',False,treePrefix,skipTreesCheck) +
@@ -604,10 +596,12 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                          'weight' : XSWeight+'*'+SFweight ,
                                         }
 
-        #WZext = '_ext1' if ('2018' in yeartag) else ''
-        #samples['WZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix,skipTreesCheck),
-        #                        'weight' : XSWeight+'*'+SFweight ,
-        #                        }
+        WZext = '_mllmin01' # placeholder TODO: change it when final datasets available
+        samples['WZ']    = {    'name'   :   getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix,skipTreesCheck),
+                                'weight' : XSWeight+'*'+SFweight ,
+                                }
+        if '_mllmin01' in WZext:
+            addSampleWeight(samples,'WZ','WZTo3LNu'+WZext, '4.42965/(58.59*0.601644)') # Wrong gridpack: mll>4 not mll>0.1
 
         ZZext = ''
         samples['ZZTo2L2Nu']  = {  'name'   : getSampleFiles(directoryBkg,'ZZTo2L2Nu'+ZZext,False,treePrefix,skipTreesCheck) +
@@ -615,6 +609,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                               getSampleFiles(directoryBkg,'ggZZ2m2n',       False,treePrefix,skipTreesCheck),  
                                    'weight' : XSWeight+'*'+SFweight ,
                                  }
+        addSampleWeight(samples,'ZZTo2L2Nu','ZZTo2L2Nu', '9.738e-01/6.008e-01') # From GenXSecAnalyzer: EOY mll>40 / UL mll>4
 
         # TODO missing HT binned samples
         DYM10ext = ''
@@ -648,29 +643,28 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         samples['Higgs']   = {  'name'   :   getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'+ggHTText,      False,treePrefix,skipTreesCheck) +
         #                                     getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix,skipTreesCheck) + 
         #                                     getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125',               False,treePrefix,skipTreesCheck) + 
-                                             getSampleFiles(directoryBkg,'VBFHToTauTau_M125',                  False,treePrefix,skipTreesCheck) ,# + 
+                                             getSampleFiles(directoryBkg,'VBFHToTauTau_M125',                  False,treePrefix,skipTreesCheck) + 
         #                                     getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck) +  
-        #                                     getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125',             False,treePrefix,skipTreesCheck) + 
+                                             getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125',             False,treePrefix,skipTreesCheck) ,#+ 
         #                                     getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125',                False,treePrefix,skipTreesCheck) + 
         #                                     getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125',            False,treePrefix,skipTreesCheck) ,
                                 'weight' : XSWeight+'*'+SFweight ,
                                }
         if '2018' in yeartag:
-            samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125',             False,treePrefix,skipTreesCheck)
+            samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125',            False,treePrefix,skipTreesCheck) 
 
         if 'EOY' in opt.tag:
             ggHWWgen = 'AMCNLO'  if ('2016' in yeartag) else ''
             samples['EOYH']   = {  'name'   :   getSampleFiles(directoryBkgEOY,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix,skipTreesCheck) +
                                                 getSampleFiles(directoryBkgEOY,'VBFHToWWTo2L2Nu_M125',               False,treePrefix,skipTreesCheck) +
                                                 getSampleFiles(directoryBkgEOY,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck) +
-                                                getSampleFiles(directoryBkgEOY,'HWminusJ_HToWW_M125',                False,treePrefix,skipTreesCheck) +
-                                                getSampleFiles(directoryBkgEOY,'HWminusJ_HToTauTau_M125',            False,treePrefix,skipTreesCheck) ,
+                                                getSampleFiles(directoryBkgEOY,'HWminusJ_HToWW_M125',                False,treePrefix,skipTreesCheck) ,
                                    'weight' : XSWeight+'*'+SFweight ,
                                  }
             if '2017' in yeartag:
-                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWplusJ_HToTauTau_M125',             False,treePrefix,skipTreesCheck)
+                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWminusJ_HToTauTau_M125',            False,treePrefix,skipTreesCheck)
 
-        # TODO missing UL VV
+        # TODO missing UL VZ
         if 'EOY' in opt.tag:
             samples['EOYQQ']    = {    'name'   :   getSampleFiles(directoryBkgEOY,'WZTo2L2Q',False,treePrefix,skipTreesCheck) + 
                                                     getSampleFiles(directoryBkgEOY,'ZZTo2L2Q',False,treePrefix,skipTreesCheck) ,
@@ -693,11 +687,11 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot):
             
             ZZ4Lext = '' # TODO missing
-            samples['ZZTo4L']   = {    'name'   :   #getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'+ZZ4Lext, False,treePrefix,skipTreesCheck) + 
+            samples['ZZTo4L']   = {    'name'  :    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2m',            False,treePrefix,skipTreesCheck) +
+                                                    #getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'+ZZ4Lext, False,treePrefix,skipTreesCheck) + 
             #                                        getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4e',              False,treePrefix,skipTreesCheck) +
             #                                        getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4m',              False,treePrefix,skipTreesCheck) +
             #                                        getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4t',              False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2m',            False,treePrefix,skipTreesCheck) +
             #                                        getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2t',            False,treePrefix,skipTreesCheck) +
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2m2t',            False,treePrefix,skipTreesCheck),# +
             #                                        getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'VBFHToZZTo4L_M125',   False,treePrefix,skipTreesCheck) +
@@ -721,7 +715,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                             'isControlSample' : 1,
                                         }
                 if '2017' in yeartag:
-                    samples['EOYZZ4L']['name'] += getSampleFiles(directoryBkgEOY.replace('reco', 'ctrl'),'ZZTo4L'+ZZ4Lext, False,treePrefix,skipTreesCheck)
+                    samples['EOYZZ4L']['name'] += getSampleFiles(directoryBkgEOY.replace('reco', 'ctrl'),'ZZTo4L_newpmx', False,treePrefix,skipTreesCheck)
                 elif '2018' in yeartag:
                     samples['EOYZZ4L']['name'] += getSampleFiles(directoryBkgEOY.replace('reco', 'ctrl'),'ggZZ4e',              False,treePrefix,skipTreesCheck)
                     samples['EOYZZ4L']['name'] += getSampleFiles(directoryBkgEOY.replace('reco', 'ctrl'),'ggZZ4m',              False,treePrefix,skipTreesCheck)
@@ -733,13 +727,13 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 if kZZvariable in opt.tag:  
                     addSampleWeight(samples,'ZZTo4L','ZZTo4L'+ZZ4Lext, kZZvariable.replace('kZZ', 'kZZ_'))
 
-        if 'SameSignValidationRegion' in opt.tag:
+        #if 'SameSignValidationRegion' in opt.tag:
     
-            ttSemilepFlag = ''
-            samples['ttSemilep'] = { 'name'   : getSampleFiles(directoryBkg,'TTToSemiLeptonic'+ttSemilepFlag,False,treePrefix,skipTreesCheck),
-                                     'weight' : XSWeight+'*'+SFweight ,
-                                     'isControlSample' : 1,
-                                    }
+        ttSemilepFlag = ''
+        samples['ttSemilep'] = { 'name'   : getSampleFiles(directoryBkg,'TTToSemiLeptonic'+ttSemilepFlag,False,treePrefix,skipTreesCheck),
+                                 'weight' : XSWeight+'*'+SFweight ,
+                                 #'isControlSample' : 1,
+                                }
 
 if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
 

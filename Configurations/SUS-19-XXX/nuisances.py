@@ -331,7 +331,9 @@ nuisances['qcdScale'] = {
     'cuts' : [ ], 
 }
 for sample in samples.keys():
-    if 'EOY' in sample: continue
+    if not samples[sample]['isDATA'] and sample not in theoryNormalizations:
+        print 'Nuisance warning: not qcdScaleStatus in theoryNormalizations for', sample
+        continue
     if not samples[sample]['isDATA'] and theoryNormalizations[sample]['qcdScaleStatus']==3:
         if hasattr(opt, 'outputDirDatacard'):
             if '2016' in year and (sample=='Higgs' or sample=='ttZ' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue
@@ -350,7 +352,9 @@ nuisances['pdf'] = {
     'cuts' : [ ],
 }
 for sample in samples.keys():
-    if 'EOY' in sample: continue
+    if not samples[sample]['isDATA'] and not samples[sample]['isFastsim'] and sample not in theoryNormalizations:
+        print 'Nuisance warning: not pdfStatus in theoryNormalizations for', sample
+        continue
     if not samples[sample]['isDATA'] and not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
         if hasattr(opt, 'outputDirDatacard'):
             if '2016' in year and (sample=='ttW' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue

@@ -27,7 +27,16 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameLatex' : '\\WW',
         'isSignal' : 0,
         'color': 851,    # kAzure-9
-        'samples'  : ['WW', 'EOYGluGlu'] 
+        'samples'  : ['WW'] 
+    }
+
+    groupPlot['EOYWW']  = {
+        'nameHR' : 'EOY WW',
+        'nameLatex' : 'EOY \\WW',
+        'isSignal' : 0,
+        'color': 851,    # kAzure-9
+        'fill' : 3005,
+        'samples'  : ['EOYGluGlu']
     }
 
     groupPlot['tW']  = {
@@ -69,30 +78,56 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'color': 798,    # kOrange-2
         'samples'  : ['WZ'] 
     }
-        
+     
     groupPlot['Others']  = {  
         'nameHR' : 'Minor bkg.',
         'isSignal' : 0,
         'color': 394, #  kYellow-6
-        'samples'  : ['ttW', 'VVV', 'Higgs', 'VZ', 'HWW', 'EOYQQ', 'EOYH']
+        'samples'  : ['ttW', 'VVV', 'Higgs', 'VZ', 'HWW']
     }
-    
+
+    groupPlot['EOYOthers']  = {
+        'nameHR' : 'EOY Minor bkg.',
+        'isSignal' : 0,
+        'color': 394, #  kYellow-6
+        'fill' : 3005,
+        'samples'  : ['EOYQQ', 'EOYH']
+    }
+  
     groupPlot['ZZTo4L'] = {
         'nameHR' : 'ZZ (#rightarrow 4' + sl +')',
         'nameLatex' : '\\ZZ ($\\to 4\\ell$)',
         'isSignal' : 0,
         'color': 49,
-        'samples' : ['ZZTo4L', 'EOYZZ4L']
+        'samples' : ['ZZTo4L']
     }
 
-    groupPlot['ttSemilep']  = {
-        'nameHR' : 't#bar{t} Semilep.',
-        'nameLatex' : '\\ttbar Semilep.',
+    groupPlot['EOYZZTo4L'] = {
+        'nameHR' : 'EOY ZZ (#rightarrow 4' + sl +')',
+        'nameLatex' : 'EOY \\ZZ ($\\to 4\\ell$)',
         'isSignal' : 0,
-        'color': 4,# used to be 401,   # kYellow+1
-        'samples'  : ['ttSemilep'] 
+        'color': 49,
+        'fill' : 3005,
+        'samples' : ['EOYZZ4L']
     }
-        
+
+    if 'SameSignValidationRegion' in opt.tag:
+
+        groupPlot['ttSemilep']  = {
+            'nameHR' : 't#bar{t} Semilep.',
+            'nameLatex' : '\\ttbar Semilep.',
+            'isSignal' : 0,
+            'color': 4,# used to be 401,   # kYellow+1
+            'samples'  : ['ttSemilep'] 
+        }
+
+        groupPlot['ttbar']['nameHR'] += ' Dilep.'
+        groupPlot['ttbar']['nameLatex'] += ' Dilep.'
+ 
+    else:
+
+        groupPlot['ttbar']['samples'].extend(['ttSemilep'])
+
 #plot = {}
 
 # keys here must match keys in samples.py    
@@ -223,10 +258,9 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         plot['EOYQQ']     = plot['VZ']
         plot['EOYGluGlu'] = plot['WW']
 
-# Backward compatibility for background names
-plot['tW']  = plot['STtW']
-plot['ZZ']  = plot['ZZTo2L2Nu']
-plot['HWW'] = plot['Higgs']
+    plot['tW']  = plot['STtW']
+    plot['ZZ']  = plot['ZZTo2L2Nu']
+    plot['HWW'] = plot['Higgs']
 
 sampleToRemoveFromPlot = [ ] 
 

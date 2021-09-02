@@ -38,7 +38,7 @@ else
     if [ $# == 2 ] || [ $3 == '0' ] || [ $3 == 'shapes' ]; then
 	BATCH=True
 	if [[ "$HOSTNAME" = *"ifca"* ]]; then
-	    QUEUE=cms_med
+	    QUEUE=cms_main
 	else
 	    QUEUE=testmatch
 	fi
@@ -61,7 +61,7 @@ else
 	if [ $# -lt 5 ]; then
 	    SPLIT='Samples'
 	else
-	    if [ $5 == 'tomorrow' ] || [ $5 == 'workday' ] || [ $5 == 'cms_high' ] || [ $5 == 'cms_main' ] ; then
+	    if [ $5 == 'tomorrow' ] || [ $5 == 'workday' ] || [ $5 == 'cms_high' ] || [ $5 == 'cms_med' ] ; then
 		QUEUE=$5
 		if [ $# -lt 6 ]; then
 		    SPLIT='Samples'
