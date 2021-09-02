@@ -114,11 +114,23 @@ elif 'DYchecks' in opt.tag:
 
 elif 'VetoNoiseEE' in opt.tag:
 
-    variables['jetRawPtEENoise'] = { 'name'  : jetrawpteenoise,                      #   variable name    
-                                     'range' : (  20, 0., 100.),                     #   variable range
-                                     'xaxis' : 'jet raw ' + pt + ' (EE Noise)' + gv, #   x axis name
-                                     'fold'  : overflow                              #   fold overflow
-                                    }
+    variables['njeteenoise']          = { 'name'  : njeteenoise,                          #   variable name
+                                          'range' : (  5, 0., 5.),                        #   variable range
+                                          'xaxis' : 'Number of EE Noise jets',            #   x axis name
+                                          'fold'  : overflow                              #   fold overflow
+                                          }
+
+    variables['njeteenoise30']        = { 'name'  : njeteenoise30,                         #   variable name
+                                          'range' : (  5, 0., 5.),                         #   variable range
+                                          'xaxis' : 'Number of EE Noise jets (raw-pt<30)', #   x axis name
+                                          'fold'  : overflow                               #   fold overflow
+                                          }
+
+    variables['jetRawPtEENoise']       = { 'name'  : jetrawpteenoise,                      #   variable name    
+                                           'range' : (  20, 0., 100.),                     #   variable range
+                                           'xaxis' : 'jet raw ' + pt + ' (EE Noise)' + gv, #   x axis name
+                                           'fold'  : overflow                              #   fold overflow
+                                          }
         
     variables['dPhiEENoisePtMissPt50'] = { 'name'  : dPhieenoiseptmiss_pt50, #   variable name    
                                            'range' : (  10,    0.,  3.2),    #   variable range
@@ -167,6 +179,18 @@ elif 'VetoNoiseEE' in opt.tag:
                                    'xaxis' : 'H_{T} forward' + gv, #   x axis name
                                    'fold'  : overflow              #   fold overflow
                                   }
+
+    variables['HTRawForwardSoft'] = { 'name'  : HTRawForwardSoft,              #   variable name
+                                      'range' : (  30,    0.,  300),           #   variable range
+                                      'xaxis' : 'H_{T} raw forward soft' + gv, #   x axis name
+                                      'fold'  : overflow                       #   fold overflow
+                                     }
+
+    variables['HTRawForward']     = { 'name'  : HTRawForward,             #   variable name
+                                      'range' : (  30,    0.,  300),      #   variable range
+                                      'xaxis' : 'H_{T} raw forward' + gv, #   x axis name
+                                      'fold'  : overflow                  #   fold overflow
+                                      }
 
 elif 'HighPtMissOptimisationRegion' in opt.tag: 
     
