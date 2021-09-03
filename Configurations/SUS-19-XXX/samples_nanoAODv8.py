@@ -82,8 +82,8 @@ directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', '
 
 directoryBkgEOY = directoryBkg.replace('Summer20UL17_106X_nAODv8', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv8', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')   
 
-#removeZeros = 1 #if 'StatZero' in opt.tag else 0
-removeZeros = 0 if 'NoStat0' in opt.tag else 1
+removeZeros = 1 if 'StatZero' in opt.tag else 0
+#removeZeros = 0 if 'NoStat0' in opt.tag else 1
 
 treeNuisances = { }
 if metnom=='Nomin':
@@ -395,6 +395,7 @@ if 'SignalRegions' in opt.tag or 'BackSF' in opt.tag:
     normBackgrounds['VZ']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
     normBackgrounds['VVV']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
     normBackgrounds['DY']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
+    normBackgrounds['ttSemilep'] = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
 
     if 'FitCR' not in opt.tag:
 
