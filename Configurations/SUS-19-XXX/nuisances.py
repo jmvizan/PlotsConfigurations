@@ -310,7 +310,7 @@ if '__susyMT2reco' not in directorySig:
 
 ### QCD scale and PDFs
 
-exec(open('./theoryNormalizations'+year+'.py').read())
+exec(open('./theoryNormalizations/theoryNormalizations'+recoFlag+year+'.py').read())
 
 # LHE scale variation weights (w_var / w_nominal)
 # [0] is muR=0.50000E+00 muF=0.50000E+00
@@ -330,17 +330,6 @@ nuisances['qcdScale'] = {
     'samples': { },
     'cuts' : [ ], 
 }
-for sample in samples.keys():
-    if 'EOY' in sample: continue
-    if not samples[sample]['isDATA'] and theoryNormalizations[sample]['qcdScaleStatus']==3:
-        if hasattr(opt, 'outputDirDatacard'):
-            if '2016' in year and (sample=='Higgs' or sample=='ttZ' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue
-            if '2017' in year and (sample=='VZ' or sample=='ttZ'): continue
-            if '2018' in year and (sample=='WZ' or sample=='ttW' or sample=='VZ'): continue
-        qcdScaleVariations = [ ] 
-        for i in [0, 1, 3, 5, 7, 8]:
-            qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
-        nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
 
 nuisances['pdf'] = {
     'name': 'pdf', # PDFs correlated through the years?
@@ -349,17 +338,22 @@ nuisances['pdf'] = {
     'samples': { },
     'cuts' : [ ],
 }
+
 for sample in samples.keys():
-    if 'EOY' in sample: continue
-    if not samples[sample]['isDATA'] and not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
-        if hasattr(opt, 'outputDirDatacard'):
-            if '2016' in year and (sample=='ttW' or sample=='VZ' or sample=='TChipmSlepSnu_mC-325_mX-150'): continue
-            if '2017' in year and (sample=='VZ' or sample=='ttZ'): continue
-            if '2018' in year and (sample=='WZ' or sample=='ttW' or sample=='VZ'): continue  
-        pdfVariations = [ ] 
-        for i in range(len(theoryNormalizations[sample]['pdf'])):                              
-            pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
-        nuisances['pdf']['samples'][sample] = pdfVariations
+    if not samples[sample]['isDATA']:
+        if sample not in theoryNormalizations:
+             print 'Nuisance warning:', sample, 'not in theoryNormalizations'
+             continue
+        if theoryNormalizations[sample]['qcdScaleStatus']==3:
+            qcdScaleVariations = [ ]
+            for i in [0, 1, 3, 5, 7, 8]:
+                qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
+            nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
+        if not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
+            pdfVariations = [ ] 
+            for i in range(len(theoryNormalizations[sample]['pdf'])):                              
+                pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
+            nuisances['pdf']['samples'][sample] = pdfVariations
 
 for cut in cuts:
     if 'SR' in cut.split('_')[0]:
