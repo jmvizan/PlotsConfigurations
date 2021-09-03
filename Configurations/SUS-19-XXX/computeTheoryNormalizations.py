@@ -33,7 +33,7 @@ if __name__ == '__main__':
     else:
         year = opt.year
     
-    opt.tag = year
+    opt.tag = year+'TheoryNormalizations'
 
     samples = { }
 
