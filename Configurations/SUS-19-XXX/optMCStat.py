@@ -16,7 +16,7 @@ if __name__ == '__main__':
     parser.add_option('--sigset'         , dest='sigset'         , help='Signal samples [SM]'                       , default='SM')
     parser.add_option('--inputDir'       , dest='inputDir'       , help='Input directory'                           , default='./Shapes')
     parser.add_option('--verbose'        , dest='verbose'        , help='Activate print for debugging'              , default=False, action='store_true')
-    parser.add_option('--statcorr'       , dest='verbose'        , help='Apply statistical corrections'             , default=False, action='store_true')
+    parser.add_option('--statcorr'       , dest='statcorr'       , help='Apply statistical corrections'             , default=False, action='store_true')
     # read default parsing options as well
     hwwtools.addOptions(parser)
     hwwtools.loadOptDefaults(parser)
@@ -116,10 +116,28 @@ if __name__ == '__main__':
                                         statCorr = 1.
                                         if opt.statcorr:
                                             if samples[sample]['isSignal']:
-                                                
+                                                mx = float(sample.split('_')[1].split('-')[1])
+                                                my = float(sample.split('_')[2].split('-')[1])  
+                                                if 'T2tt' in sample:
+                                                    if mx>=350:
+                                                        statCorr = pow(min(1.+(mx-300.)/100.,4.), 2)
+                                                if 'TChipmSlepSnu' in sample:
+                                                    if mx-my<=175:
+                                                        statCorr = max((int((175.-(mx-my))/25.)-max(int((my-250.)/25.),0)+4),1)
+                                                if 'TChipmWW' in sample:
+                                                    statCorr = 2.
+                                                    if mx-my<=150:
+                                                        fk = min(int((225.-(mx-my))/25.), 5)
+                                                        if mx>=350.-25.*fk:
+                                                           fk = max(fk-int((mx-(350.-25.*fk))/25.+1),2)
+                                                        statCorr = fk
+                                                if 'TSlepSlep' in sample:
+                                                    if mx-my<=100:
+                                                        mye = my if mx-my>=50. else mx-25
+                                                        statCorr = max((math.ceil((100.-(mx-mye))/25.)-max(int((mye-350.)/25.),0)+2),1)
                                         for ib in range(1, nBins+1):
                                             sampleYields[sampleName][cutName]['bin'+str(ib)]['value'] += tmpHisto.GetBinContent(ib)
-                                            sampleYields[sampleName][cutName]['bin'+str(ib)]['squaredError'] += tmpHisto.GetBinError(ib)*tmpHisto.GetBinError(ib)*statCorr
+                                            sampleYields[sampleName][cutName]['bin'+str(ib)]['squaredError'] += tmpHisto.GetBinError(ib)*tmpHisto.GetBinError(ib)/statCorr
 
                                         gotSamples.extend([sample])
 
