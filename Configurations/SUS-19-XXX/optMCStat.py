@@ -16,6 +16,7 @@ if __name__ == '__main__':
     parser.add_option('--sigset'         , dest='sigset'         , help='Signal samples [SM]'                       , default='SM')
     parser.add_option('--inputDir'       , dest='inputDir'       , help='Input directory'                           , default='./Shapes')
     parser.add_option('--verbose'        , dest='verbose'        , help='Activate print for debugging'              , default=False, action='store_true')
+    parser.add_option('--statcorr'       , dest='verbose'        , help='Apply statistical corrections'             , default=False, action='store_true')
     # read default parsing options as well
     hwwtools.addOptions(parser)
     hwwtools.loadOptDefaults(parser)
@@ -112,9 +113,13 @@ if __name__ == '__main__':
 
                                         sampleName = sample if samples[sample]['isSignal'] else 'backgrounds'
  
+                                        statCorr = 1.
+                                        if opt.statcorr:
+                                            if samples[sample]['isSignal']:
+                                                
                                         for ib in range(1, nBins+1):
                                             sampleYields[sampleName][cutName]['bin'+str(ib)]['value'] += tmpHisto.GetBinContent(ib)
-                                            sampleYields[sampleName][cutName]['bin'+str(ib)]['squaredError'] += tmpHisto.GetBinError(ib)*tmpHisto.GetBinError(ib)
+                                            sampleYields[sampleName][cutName]['bin'+str(ib)]['squaredError'] += tmpHisto.GetBinError(ib)*tmpHisto.GetBinError(ib)*statCorr
 
                                         gotSamples.extend([sample])
 
@@ -198,7 +203,8 @@ if __name__ == '__main__':
     outputDir = './Plots/optMCStat/'
     os.system('mkdir -p ' + outputDir)
     os.system('cp Plots/index.php ' + outputDir)
-    plotCanvas.Print(outputDir+opt.sigset.replace('SM-','')+'_'+year+'.png')
+    statcorr = '_statCorr' if opt.statcorr else ''
+    plotCanvas.Print(outputDir+opt.sigset.replace('SM-','')+'_'+year+statcorr+'.png')
 
 
 
