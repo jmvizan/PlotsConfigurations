@@ -22,6 +22,7 @@ sumLeptonPt = 'Lepton_pt['+lep0idx+']+Lepton_pt['+lep1idx+']'
 deltaMET    = 'MET_pt     - GenMET_pt' 
 deltaMETFix = 'METFixEE2017_pt - GenMET_pt'
 
+njetscut = 'Sum$(CleanJet_pt>='+jetPtCut+')'
 nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')'
 # variables = {}
 
@@ -263,9 +264,9 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                     'fold'  : overflow                 #   fold overflow
                                 }
     
-    variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name    
+    variables['njets']         = {  'name'  : 'njetscut',              #   variable name    
                                     'range' : (  6,    0.,     6.),    #   variable range
-                                    'xaxis' : 'number of jets',        #   x axis name
+                                    'xaxis' : 'number of jets ('+pt+'>'+jetPtCut+gv+')',        #   x axis name
                                     'fold'  : overflow                 #   fold overflow
                                 }
     
