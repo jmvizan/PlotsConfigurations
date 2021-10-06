@@ -115,8 +115,6 @@ if __name__ == '__main__':
  
                 for sample in samples:
                     globalScale = { '2016' : 1., '2017' : 1., '2018' : 1. }
-                    if sample=='WZ' and 'WZtoWW_Zcut10_ptmiss-160' in cutName:
-                        globalScale = { '2016' : 1., '2017' : 1.26, '2018' : 1.02 }
                     for nuisance in allnuisances:
                         if (sample in allnuisances[nuisance]['samples'] or nuisance=='stat') and ('cuts' not in allnuisances[nuisance] or cutName in allnuisances[nuisance]['cuts']):   
 
@@ -144,7 +142,7 @@ if __name__ == '__main__':
                                     if indir[0].GetListOfKeys().Contains(shapeVar):
                                         tmpHisto = indir[0].Get(shapeVar)
                                         tmpHisto.SetDirectory(0)   
-                                        tmpHisto.Scale(globalScale[indir[1]])
+                                        if globalScale[indir[1]]!=1.: tmpHisto.Scale(globalScale[indir[1]])
 
                                     else:
 
@@ -157,7 +155,7 @@ if __name__ == '__main__':
                                         else:
                                             tmpHisto = indir[0].Get(shapeName)
                                             tmpHisto.SetDirectory(0)
-                                            tmpHisto.Scale(globalScale[indir[1]])
+                                            if globalScale[indir[1]]!=1.: tmpHisto.Scale(globalScale[indir[1]])
 
                                         if opt.verbose: print sample, nuisance,  var, tmpHisto.Integral()
                                         if allnuisances[nuisance]['type']=='lnN' or 'waslnN' in allnuisances[nuisance]:
