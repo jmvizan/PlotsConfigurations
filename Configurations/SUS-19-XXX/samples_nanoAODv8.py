@@ -633,7 +633,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         ggHTText = ''
         samples['Higgs']   = {  'name'   :   getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'+ggHTText,      False,treePrefix,skipTreesCheck) +
         #                                     getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix,skipTreesCheck) + 
-        #                                     getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125',               False,treePrefix,skipTreesCheck) + 
+                                             getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125',               False,treePrefix,skipTreesCheck) + 
                                              getSampleFiles(directoryBkg,'VBFHToTauTau_M125',                  False,treePrefix,skipTreesCheck) + 
         #                                     getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck) +  
                                              getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125',             False,treePrefix,skipTreesCheck) + 
@@ -642,14 +642,18 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                                }
 
+        if '2017' in yeartag :
+            samples['Higgs']['name'] += getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix,skipTreesCheck)
+
         if 'EOY' in opt.tag:
             ggHWWgen = 'AMCNLO'  if ('2016' in yeartag) else ''
-            samples['EOYH']   = {  'name'   :   getSampleFiles(directoryBkgEOY,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix,skipTreesCheck) +
-                                                getSampleFiles(directoryBkgEOY,'VBFHToWWTo2L2Nu_M125',               False,treePrefix,skipTreesCheck) +
-                                                getSampleFiles(directoryBkgEOY,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck) +
+            samples['EOYH']   = {  'name'   :   getSampleFiles(directoryBkgEOY,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck) +
                                                 getSampleFiles(directoryBkgEOY,'HWminusJ_HToWW_M125',                False,treePrefix,skipTreesCheck) ,
                                    'weight' : XSWeight+'*'+SFweight ,
                                  }
+
+            if '2018' in yeartag :
+                samples['Higgs']['name'] += getSampleFiles(directoryBkgEOY,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix,skipTreesCheck)
 
         # TODO missing UL VZ
         if 'EOY' in opt.tag:
