@@ -68,7 +68,7 @@ if __name__ == '__main__':
     else: split = args[lastarg]
     print args
 
-    '''
+    
     yearnm = '-'.join(yearset)
     hadd   = args[3]
     sigset = args[4]
@@ -92,7 +92,7 @@ if __name__ == '__main__':
                 split = args[6]
         else:
             split  = args[5]
-    '''
+    
 
     keepsplit = False
     allsam  = None
