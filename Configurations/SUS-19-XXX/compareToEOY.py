@@ -68,7 +68,7 @@ for year in yearlist:
       variables = {}
       samples   = {}
       cuts      = {} 
-      exec(open('samples_nanoAODv8.py').read())
+      exec(open('samples_nanoAODv6_FullYEARv6loose.py').read())
       exec(open('variables.py').read())
       exec(open('cuts.py').read())
 
@@ -88,6 +88,7 @@ for year in yearlist:
       #    ControlRegions += extraCRs
       #    variables       = VetoNoiseEEvars
       #for year in all_info[tag]["years"]:
+      '''
       #hfileV8nm  = "Data/plots_"+year+tag+tweak+"V8_ALL_DATA.root"
       #hfileV6nm  = "Data/plots_"+year+tag+tweak+"V6_ALL_DATA.root"
       if sameFolder is True :
@@ -98,8 +99,12 @@ for year in yearlist:
           hfileV6nm  = EOYArea + hfileV8nm
       hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
       hfileV6nm  = EOYArea + hfileV8nm.replace('VetoNoiseEE', 'VetoNoiseEEMET')
+      '''
 
-
+      #hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
+      hfileV8nm  = "Shapes/"+year+"/"+tag+"/plots_"+tag+"_SM.root"
+      hfileV6nm  = EOYArea + hfileV8nm.replace('VetoNoiseEE', 'VetoNoiseEEMET').replace('DYControlRegionSmearEENoiseHTHEMEOY', 'DYControlRegionSmearHEM').replace('TopControlRegionSmearEENoiseHTHEMEOY', 'TopControlRegionSmearEENoiseDPhiHEM')
+      if year=='2017': hfileV6nm = hfileV6nm.replace("EOY", "")
       #missV8     = fileismissing(hfileV8nm)
       #missV6     = fileismissing(hfileV6nm)
       #if missV8 or missV6: continue
@@ -138,8 +143,8 @@ for year in yearlist:
           legend  = TLegend(0.6,0.8,0.88,0.88);
           histoV8 = hfileV8.Get(region+"/"+var+"/histo_"+process)
           histoV6 = hfileV6.Get(region+"/"+var+"/histo_"+process)
-          legend.AddEntry(histoV8, region+"V8     " )
-          legend.AddEntry(histoV6, region+"V6loose" )
+          legend.AddEntry(histoV8, region+"V8 " )
+          legend.AddEntry(histoV6, region+"V6 " )
           histoV6.SetTitle(region+"-"+var+" "+year)
           histoV6.GetXaxis().SetTitle(var)
           histoV6.GetYaxis().SetTitle("Events")

@@ -110,34 +110,34 @@ if 'VetoNoiseEE' in opt.tag:
     EENoiseVeto1 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     EENoiseVeto2 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     
-    ptm = ' && ptmiss > 100. && ptmiss<=140'
-    if 'MET' in opt.tag: ptm = ' && MET_pt > 100 && MET_pt < 140 ' # currently unused
+    ptm = ' ptmiss>=100. && ptmiss<140 '
+    if 'MET' in opt.tag: ptm = ' && MET_pt>=100 && MET_pt<140 '
       
     cuts['Veto0_Tag']             = { 'expr' : '('+channelCut+' && '+EENoiseVeto0+')', 'weight' : btagWeight1tag }
-    cuts['Veto0_Tag_highptmiss']  = { 'expr' : '('+channelCut+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<140.)', 'weight' : btagWeight1tag }
+    cuts['Veto0_Tag_highptmiss']  = { 'expr' : '('+channelCut+' && '+EENoiseVeto0+' && '+ptm+')', 'weight' : btagWeight1tag }
     cuts['Veto1_Tag']             = { 'expr' : '('+channelCut+' && '+EENoiseVeto1+')', 'weight' : btagWeight1tag }
-    cuts['Veto1_Tag_highptmiss']  = { 'expr' : '('+channelCut+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<140.)', 'weight' : btagWeight1tag }
+    cuts['Veto1_Tag_highptmiss']  = { 'expr' : '('+channelCut+' && '+EENoiseVeto1+' && '+ptm+')', 'weight' : btagWeight1tag }
     cuts['Veto2_Tag']             = { 'expr' : '('+channelCut+' && '+EENoiseVeto2+')', 'weight' : btagWeight1tag }
-    cuts['Veto2_Tag_highptmiss']  = { 'expr' : '('+channelCut+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<140.)', 'weight' : btagWeight1tag }
+    cuts['Veto2_Tag_highptmiss']  = { 'expr' : '('+channelCut+' && '+EENoiseVeto2+' && '+ptm+')', 'weight' : btagWeight1tag }
     cuts['Veto0_Veto']            = { 'expr' : '('+channelCut+' && '+EENoiseVeto0+')', 'weight' : btagWeight0tag }
-    cuts['Veto0_Veto_highptmiss'] = { 'expr' : '('+channelCut+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<140.)', 'weight' : btagWeight0tag }
+    cuts['Veto0_Veto_highptmiss'] = { 'expr' : '('+channelCut+' && '+EENoiseVeto0+' && '+ptm+')', 'weight' : btagWeight0tag }
     cuts['Veto1_Veto']            = { 'expr' : '('+channelCut+' && '+EENoiseVeto1+')', 'weight' : btagWeight0tag }
-    cuts['Veto1_Veto_highptmiss'] = { 'expr' : '('+channelCut+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<140.)', 'weight' : btagWeight0tag }
+    cuts['Veto1_Veto_highptmiss'] = { 'expr' : '('+channelCut+' && '+EENoiseVeto1+' && '+ptm+')', 'weight' : btagWeight0tag }
     cuts['Veto2_Veto']            = { 'expr' : '('+channelCut+' && '+EENoiseVeto2+')', 'weight' : btagWeight0tag }
-    cuts['Veto2_Veto_highptmiss'] = { 'expr' : '('+channelCut+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<140.)', 'weight' : btagWeight0tag }
+    cuts['Veto2_Veto_highptmiss'] = { 'expr' : '('+channelCut+' && '+EENoiseVeto2+' && '+ptm+')', 'weight' : btagWeight0tag }
     if 'HTF' in opt.tag:
         cuts['Veto0_Tag_HTF']             = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight1tag }
-        cuts['Veto0_Tag_highptmiss_HTF']  = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight1tag }
+        cuts['Veto0_Tag_highptmiss_HTF']  = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight1tag }
         cuts['Veto1_Tag_HTF']             = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && ' + HTForward + '>=60.' +')', 'weight' : btagWeight1tag }
-        cuts['Veto1_Tag_highptmiss_HTF']  = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight1tag }
+        cuts['Veto1_Tag_highptmiss_HTF']  = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight1tag }
         cuts['Veto2_Tag_HTF']             = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight1tag }
-        cuts['Veto2_Tag_highptmiss_HTF']  = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight1tag }
+        cuts['Veto2_Tag_highptmiss_HTF']  = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight1tag }
         cuts['Veto0_Veto_HTF']            = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
-        cuts['Veto0_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
+        cuts['Veto0_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
         cuts['Veto1_Veto_HTF']            = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
-        cuts['Veto1_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
+        cuts['Veto1_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
         cuts['Veto2_Veto_HTF']            = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
-        cuts['Veto2_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ptmiss>=100. && ptmiss<=140.'+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
+        cuts['Veto2_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
 
 if 'DYchecks' in opt.tag:
 
@@ -210,6 +210,11 @@ if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.t
     cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight0tag }
     cuts['VR1_Tag_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight1tag }
     cuts['VR1_Veto_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight0tag }
+
+    cuts['VR1_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && nCleanJet>0', 'weight' : btagWeight0tag }
+    cuts['VR1_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && nCleanJet>0', 'weight' : btagWeight0tag }
+    cuts['VR1_NoJet_em']  = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && nCleanJet==0', 'weight' : btagWeight0tag }
+    cuts['VR1_NoJet_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && nCleanJet==0', 'weight' : btagWeight0tag }
 
 if 'LatinoControlRegion' in opt.tag:
 
@@ -514,6 +519,25 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
 
     for cut in crcuts:
         cuts[cut] = crcuts[cut]
+
+# To keep track of mkShapes without Multi
+
+if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):
+
+    cutList = [ ]
+    for cut in cuts.keys(): cutList.append(cut)
+
+    for cut in cutList:
+
+        if 'expr' in cuts[cut]:
+	    expr = cuts[cut]['expr']	
+            del cuts[cut]['expr']
+
+            if 'weight' in cuts[cut]:
+                expr = '('+expr+')*'+cuts[cut]['weight']
+                del cuts[cut]['weight']
+
+        cuts[cut] = expr
 
 # For postfit plots
 

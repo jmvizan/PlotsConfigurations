@@ -41,7 +41,7 @@ if __name__ == '__main__':
     localnuisancesFile = opt.nuisancesFile.replace('.py', '_'+'-'.join(years)+'_'+opt.tag+'_'+opt.sigset+'.py')
 
     localtag = opt.tag
-    opt.tag = years[0] + localtag
+    opt.tag = '-'.join(years) + localtag
  
     samples = {}
     if os.path.exists(opt.samplesFile) :
@@ -93,8 +93,8 @@ if __name__ == '__main__':
     inFiles = [ ]
     for year in years:
         inFileName = outFileName
-        if year!='2017': inFileName = inFileName.replace('EENoiseDPhi', '')
-        if year!='2018': inFileName = inFileName.replace('HEM', '')
+        #if year!='2017': inFileName = inFileName.replace('EENoiseDPhi', '')
+        #if year!='2018': inFileName = inFileName.replace('HEM', '')
         inFiles.append([ ROOT.TFile(inFileName.replace('-'.join(years), year), 'READ') , year ])
 
     for cutName in cuts:
@@ -114,6 +114,7 @@ if __name__ == '__main__':
                     inDirs.append([ infile[0].Get(folderName), infile[1] ])
  
                 for sample in samples:
+                    globalScale = { '2016' : 1., '2017' : 1., '2018' : 1. }
                     for nuisance in allnuisances:
                         if (sample in allnuisances[nuisance]['samples'] or nuisance=='stat') and ('cuts' not in allnuisances[nuisance] or cutName in allnuisances[nuisance]['cuts']):   
 
@@ -135,15 +136,26 @@ if __name__ == '__main__':
                                  
                                 shapeVar = shapeName if nuisance=='stat' else shapeName + '_' + allnuisances[nuisance]['name'] + var
                                  
+ 
                                 for idir, indir in enumerate(inDirs):
 
                                     if indir[0].GetListOfKeys().Contains(shapeVar):
                                         tmpHisto = indir[0].Get(shapeVar)
                                         tmpHisto.SetDirectory(0)   
+                                        if globalScale[indir[1]]!=1.: tmpHisto.Scale(globalScale[indir[1]])
 
                                     else:
-                                        tmpHisto = indir[0].Get(shapeName)
-                                        tmpHisto.SetDirectory(0)
+
+                                        if 'EOY' in shapeName and not indir[0].GetListOfKeys().Contains(shapeName):
+                                            for idir2, indir2 in enumerate(inDirs):
+                                                if indir2[0].GetListOfKeys().Contains(shapeName):
+                                                    tmpHisto = indir2[0].Get(shapeName)
+                                                    tmpHisto.SetDirectory(0)
+                                                    tmpHisto.Reset()
+                                        else:
+                                            tmpHisto = indir[0].Get(shapeName)
+                                            tmpHisto.SetDirectory(0)
+                                            if globalScale[indir[1]]!=1.: tmpHisto.Scale(globalScale[indir[1]])
 
                                         if opt.verbose: print sample, nuisance,  var, tmpHisto.Integral()
                                         if allnuisances[nuisance]['type']=='lnN' or 'waslnN' in allnuisances[nuisance]:

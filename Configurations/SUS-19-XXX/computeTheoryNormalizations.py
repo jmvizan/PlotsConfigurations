@@ -33,7 +33,7 @@ if __name__ == '__main__':
     else:
         year = opt.year
     
-    opt.tag = year
+    opt.tag = year+'TheoryNormalizations'
 
     samples = { }
 
@@ -61,6 +61,7 @@ if __name__ == '__main__':
             genWeight = 0.
             qcdWeights, pdfWeights = [ ], [ ] 
 
+            underscore = ''
             expectedPdfWeights = expectedMinPdfWeights
 	    pdfWeightWarning = False
             lastnLHEPdfSumw_ = -999
@@ -69,80 +70,86 @@ if __name__ == '__main__':
 
                 chain.GetEntry(ev)
 
-                if hasattr(chain, 'nLHEPdfSumw_'):
-                    if ev>0 and lastnLHEPdfSumw_!=chain.nLHEPdfSumw_ and not pdfWeightWarning:
+                if hasattr(chain, 'nLHEPdfSumw_'): underscore = '_'
+
+                if hasattr(chain, 'nLHEPdfSumw'+underscore):
+                    if ev>0 and lastnLHEPdfSumw_!=getattr(chain, 'nLHEPdfSumw'+underscore) and not pdfWeightWarning:
                         if opt.verbose>=2:
                             print 'Warning', sam_k, 'trees have different PDF sets'
                         pdfWeightWarning = True
-                    expectedPdfWeights = max(expectedPdfWeights, chain.nLHEPdfSumw_)
-                    lastnLHEPdfSumw_ = chain.nLHEPdfSumw_
+                    expectedPdfWeights = max(expectedPdfWeights, getattr(chain, 'nLHEPdfSumw'+underscore))
+                    lastnLHEPdfSumw_ = getattr(chain, 'nLHEPdfSumw'+underscore)
 
             for ev in range(chain.GetEntries()):
 
                 chain.GetEntry(ev)
 
-                if not hasattr(chain, 'genEventSumw_'):
+                if not hasattr(chain, 'genEventSumw'+underscore):
                     if opt.verbose>=2:
                         print 'Error:', sam_k, ' tree does not have gen event weight information'
                     qcdStatus = 0
                     pdfStatus = 0
                     break
 
-                if not hasattr(chain, 'nLHEScaleSumw_'):
+                if not hasattr(chain, 'nLHEScaleSumw'+underscore):
                     if opt.verbose>=2:
                         print 'Error:', sam_k, ' tree does not have qcd scale information'
 	            qcdStatus = 0
                 
-                if not hasattr(chain, 'nLHEPdfSumw_'):
-                    if opt.verbose>=2:                                                                                                          print 'Error:', sam_k, 'tree does not have pdf scale information'
+                if not hasattr(chain, 'nLHEPdfSumw'+underscore):
+                    if opt.verbose>=2:     
+                        print 'Error:', sam_k, 'tree does not have pdf scale information'
                     pdfStatus = 0
 
-                genWeight += chain.genEventSumw_
+                genWeight += getattr(chain, 'genEventSumw'+underscore)
 
                 LHECentralSumw = -1.
 
-                if qcdStatus and (chain.nLHEScaleSumw_==0 or chain.nLHEScaleSumw_==expectedScaleWeights): 
+                if qcdStatus and (getattr(chain, 'nLHEScaleSumw'+underscore)==0 or getattr(chain, 'nLHEScaleSumw'+underscore)==expectedScaleWeights): 
 
                     if ev==0:
                         for iqcd in range(expectedScaleWeights):
                             qcdWeights.append(0.)
 
-                    if chain.nLHEScaleSumw_==expectedScaleWeights:
+                    if getattr(chain, 'nLHEScaleSumw'+underscore)==expectedScaleWeights:
 
-                        LHECentralSumw = chain.LHEScaleSumw_[4]
+                        LHECentralSumw = chain.LHEScaleSumw_[4] if underscore=='_' else chain.LHEScaleSumw[4]
 
-                        for iqcd in range(chain.nLHEScaleSumw_):
-                            qcdWeights[iqcd] += chain.LHEScaleSumw_[iqcd]/LHECentralSumw*chain.genEventSumw_
+                        for iqcd in range(getattr(chain, 'nLHEScaleSumw'+underscore)):
+                            eventWeight = chain.LHEScaleSumw_[iqcd] if underscore=='_' else chain.LHEScaleSumw[iqcd]
+                            qcdWeights[iqcd] += eventWeight/LHECentralSumw*getattr(chain, 'genEventSumw'+underscore)
  
                     else: 
 
-                        for iqcd in range(expectedScaleWeights):                                                                                                   qcdWeights[iqcd] += chain.genEventSumw_
- 
+                        for iqcd in range(expectedScaleWeights):   
+                            qcdWeights[iqcd] += getattr(chain, 'genEventSumw'+underscore)
+  
                         qcdStatus = 1
 
                 else: 
                     qcdStatus = 0
 
-		if pdfStatus and (chain.nLHEPdfSumw_==0 or chain.nLHEPdfSumw_>=expectedMinPdfWeights):  
+		if pdfStatus and (getattr(chain, 'nLHEPdfSumw'+underscore)==0 or getattr(chain, 'nLHEPdfSumw'+underscore)>=expectedMinPdfWeights):  
                                                 
                     if ev==0: 
                         for ipdf in range(expectedPdfWeights):
                             pdfWeights.append(0.)
 
-                    if chain.nLHEPdfSumw_>=expectedMinPdfWeights and LHECentralSumw>0.:
+                    if getattr(chain, 'nLHEPdfSumw'+underscore)>=expectedMinPdfWeights and LHECentralSumw>0.:
                        
                         for ipdf in range(expectedPdfWeights):
-                            if ipdf<chain.nLHEPdfSumw_:
-                                pdfWeights[ipdf] += chain.LHEPdfSumw_[ipdf]/LHECentralSumw*chain.genEventSumw_
+                            if ipdf<getattr(chain, 'nLHEPdfSumw'+underscore):
+                                eventWeight = chain.LHEPdfSumw_[ipdf] if underscore=='_' else chain.LHEPdfSumw[ipdf]
+                                pdfWeights[ipdf] += eventWeight/LHECentralSumw*getattr(chain, 'genEventSumw'+underscore)
                             else:
-                                pdfWeights[ipdf] += chain.genEventSumw_
+                                pdfWeights[ipdf] += getattr(chain, 'genEventSumw'+underscore)
                                 if pdfStatus>2:
                                     pdfStatus = 2
 
                     else:
 
                         for ipdf in range(expectedPdfWeights):
-                            pdfWeights[ipdf] += chain.genEventSumw_
+                            pdfWeights[ipdf] += getattr(chain, 'genEventSumw'+underscore)
 
                         pdfStatus = 1
 
@@ -155,7 +162,8 @@ if __name__ == '__main__':
             theoryNormalizations[sam_k]['pdfStatus'] = pdfStatus
 
             if qcdStatus:
-                for iqcd in range(len(qcdWeights)):                                                                                                        qcdWeights[iqcd] /= genWeight
+                for iqcd in range(len(qcdWeights)):                                                                                                       
+                    qcdWeights[iqcd] /= genWeight
                 theoryNormalizations[sam_k]['qcdScale'] = qcdWeights   
             elif opt.verbose:                                                     
                 print 'Error: no qcd scale weights for sample', sam_k
@@ -164,7 +172,8 @@ if __name__ == '__main__':
                 for ipdf in range(len(pdfWeights)):
                     pdfWeights[ipdf] /= genWeight
                 theoryNormalizations[sam_k]['pdf'] = pdfWeights
-            elif opt.verbose:                                                                                                             print 'Error: no pdf weights for sample', sam_k
+            elif opt.verbose:                           
+                print 'Error: no pdf weights for sample', sam_k
 
         else: # Signal samples
 
@@ -213,7 +222,7 @@ if __name__ == '__main__':
             else:
                 print 'Error: no qcd scale weights for sample', sam_k 
                   
-    with open('./theoryNormalizations_'+opt.year+'_'+opt.sigset+'.py', 'w') as file:
+    with open('./theoryNormalizations/theoryNormalizations'+recoFlag+'_'+opt.year+'_'+opt.sigset+'.py', 'w') as file:
         if opt.sigset=='Backgrounds':
             file.write('theoryNormalizations = { }\n\n')
         for sample in theoryNormalizations:

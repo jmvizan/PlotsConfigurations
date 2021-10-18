@@ -22,15 +22,16 @@ sumLeptonPt = 'Lepton_pt['+lep0idx+']+Lepton_pt['+lep1idx+']'
 deltaMET    = 'MET_pt     - GenMET_pt' 
 deltaMETFix = 'METFixEE2017_pt - GenMET_pt'
 
+njetscut = 'Sum$(CleanJet_pt>='+jetPtCut+')'
 nbjets = 'Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')'
 # variables = {}
-#exit()
-## mkShape
-#overflow  = 1
-#underflow = 2
-## mkShapeMulti
-overflow  = 2
-underflow = 1
+
+if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'): ## mkShape
+    overflow  = 1
+    underflow = 2
+else: ## mkShapeMulti
+    overflow  = 2
+    underflow = 1
 
 if 'Test' in opt.tag: 
     
@@ -114,11 +115,23 @@ elif 'DYchecks' in opt.tag:
 
 elif 'VetoNoiseEE' in opt.tag:
 
-    variables['jetRawPtEENoise'] = { 'name'  : jetrawpteenoise,                      #   variable name    
-                                     'range' : (  20, 0., 100.),                     #   variable range
-                                     'xaxis' : 'jet raw ' + pt + ' (EE Noise)' + gv, #   x axis name
-                                     'fold'  : overflow                              #   fold overflow
-                                    }
+    variables['njeteenoise']          = { 'name'  : njeteenoise,                          #   variable name
+                                          'range' : (  5, 0., 5.),                        #   variable range
+                                          'xaxis' : 'Number of EE Noise jets',            #   x axis name
+                                          'fold'  : overflow                              #   fold overflow
+                                          }
+
+    variables['njeteenoise30']        = { 'name'  : njeteenoise30,                         #   variable name
+                                          'range' : (  5, 0., 5.),                         #   variable range
+                                          'xaxis' : 'Number of EE Noise jets (raw-pt<30)', #   x axis name
+                                          'fold'  : overflow                               #   fold overflow
+                                          }
+
+    variables['jetRawPtEENoise']       = { 'name'  : jetrawpteenoise,                      #   variable name    
+                                           'range' : (  20, 0., 100.),                     #   variable range
+                                           'xaxis' : 'jet raw ' + pt + ' (EE Noise)' + gv, #   x axis name
+                                           'fold'  : overflow                              #   fold overflow
+                                          }
         
     variables['dPhiEENoisePtMissPt50'] = { 'name'  : dPhieenoiseptmiss_pt50, #   variable name    
                                            'range' : (  10,    0.,  3.2),    #   variable range
@@ -167,6 +180,18 @@ elif 'VetoNoiseEE' in opt.tag:
                                    'xaxis' : 'H_{T} forward' + gv, #   x axis name
                                    'fold'  : overflow              #   fold overflow
                                   }
+
+    variables['HTRawForwardSoft'] = { 'name'  : HTRawForwardSoft,              #   variable name
+                                      'range' : (  30,    0.,  300),           #   variable range
+                                      'xaxis' : 'H_{T} raw forward soft' + gv, #   x axis name
+                                      'fold'  : overflow                       #   fold overflow
+                                     }
+
+    variables['HTRawForward']     = { 'name'  : HTRawForward,             #   variable name
+                                      'range' : (  30,    0.,  300),      #   variable range
+                                      'xaxis' : 'H_{T} raw forward' + gv, #   x axis name
+                                      'fold'  : overflow                  #   fold overflow
+                                      }
 
 elif 'HighPtMissOptimisationRegion' in opt.tag: 
     
@@ -239,9 +264,9 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                     'fold'  : overflow                 #   fold overflow
                                 }
     
-    variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name    
+    variables['njets']         = {  'name'  : 'njetscut',              #   variable name    
                                     'range' : (  6,    0.,     6.),    #   variable range
-                                    'xaxis' : 'number of jets',        #   x axis name
+                                    'xaxis' : 'number of jets ('+pt+'>'+jetPtCut+gv+')',        #   x axis name
                                     'fold'  : overflow                 #   fold overflow
                                 }
     
