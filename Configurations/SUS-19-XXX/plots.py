@@ -27,7 +27,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameLatex' : '\\WW',
         'isSignal' : 0,
         'color': 851,    # kAzure-9
-        'samples'  : ['WW'] 
+        'samples'  : ['WW', 'EOYGluGlu'] 
     }
 
     groupPlot['tW']  = {
@@ -74,7 +74,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameHR' : 'Minor bkg.',
         'isSignal' : 0,
         'color': 394, #  kYellow-6
-        'samples'  : ['ttW', 'VVV', 'Higgs', 'VZ', 'HWW']
+        'samples'  : ['ttW', 'VVV', 'Higgs', 'VZ', 'HWW', 'EOYQQ', 'EOYH']
     }
     
     groupPlot['ZZTo4L'] = {
@@ -82,7 +82,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameLatex' : '\\ZZ ($\\to 4\\ell$)',
         'isSignal' : 0,
         'color': 49,
-        'samples' : ['ZZTo4L']
+        'samples' : ['ZZTo4L', 'EOYZZ4L']
     }
 
     groupPlot['ttSemilep']  = {
@@ -216,6 +216,12 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'isData'   : 0 ,
         'scale'    : 1.0
     }
+
+    if 'EOY' in opt.tag:
+        plot['EOYZZ4L']   = plot['ZZTo4L']
+        plot['EOYH']      = plot['Higgs']
+        plot['EOYQQ']     = plot['VZ']
+        plot['EOYGluGlu'] = plot['WW']
 
 # Backward compatibility for background names
 plot['tW']  = plot['STtW']

@@ -96,6 +96,10 @@ for year in yearlist:
       else:
           hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
           hfileV6nm  = EOYArea + hfileV8nm
+      hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
+      hfileV6nm  = EOYArea + hfileV8nm.replace('VetoNoiseEE', 'VetoNoiseEEMET')
+
+
       #missV8     = fileismissing(hfileV8nm)
       #missV6     = fileismissing(hfileV6nm)
       #if missV8 or missV6: continue
@@ -139,6 +143,7 @@ for year in yearlist:
           histoV6.SetTitle(region+"-"+var+" "+year)
           histoV6.GetXaxis().SetTitle(var)
           histoV6.GetYaxis().SetTitle("Events")
+          histoV8.SetMinimum(0.5)
           gPad.SetLogy(doLogY)
           GetRanges(histoV6, histoV8)
           if "ptll" in var: histoV6.GetXaxis().SetRangeUser(0,500)
