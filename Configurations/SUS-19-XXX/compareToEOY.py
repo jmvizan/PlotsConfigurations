@@ -48,7 +48,95 @@ processlist = processes.split('-')
 
 if 'WWW' in os.environ:
   web = os.environ["WWW"]
-else:region
+else:
+  web = './Plots/'
+compweb = web+"CompareToEOY/"
+os.system("mkdir -p " + compweb)
+
+doTest = False
+if len(sys.argv)>4:
+    print "do Test"
+    doTest  = True
+sameFolder = False
+if "pmatorra" in  os.getenv('USER'): sameFolder = True
+
+for year in yearlist:
+  for tag in taglist:
+    opt.tag = year + tag
+    for process in processlist:
+      process = process.replace('Data', 'DATA')
+      opt.sigset = 'Data' if process=='DATA' else 'Backgrounds'+process
+      
+      #Generate dictionaries with variables and cuts
+      variables = {}
+      samples   = {}
+      cuts      = {} 
+      exec(open('samples_nanoAODv8.py').read())
+      exec(open('variables.py').read())
+      exec(open('cuts.py').read())
+
+      try:
+        os
+      except NameError:
+        import os
+
+      
+      #if "Control" not in tag: continue
+      #tweaks         = all_info[tag]["tweaks"]
+      #for tweak in tweaks:
+      #variables      = all_info[tag]["variables"]
+      #ControlRegions = all_info[tag]["ControlRegions"]
+      ControlRegions = cuts.keys()
+      #if "VetoNoiseEE" in tweak :
+      #    ControlRegions += extraCRs
+      #    variables       = VetoNoiseEEvars
+      #for year in all_info[tag]["years"]:
+      #hfileV8nm  = "Data/plots_"+year+tag+tweak+"V8_ALL_DATA.root"
+      #hfileV6nm  = "Data/plots_"+year+tag+tweak+"V6_ALL_DATA.root"
+      if "_" in process:
+          Samfol  = '/'
+          All     = '_'
+          yearnm  = ''
+          procnm  = process.split("_")[0]
+          process = process.split("_")[1]
+      else:
+          Samfol = '/Samples/'
+          All    = '_ALL_'
+          yearnm = year
+          procnm = process
+      if sameFolder is True :
+          hfileV8nm  = "Shapes/"+year+"/"+tag+"_V8"+Samfol+"plots_"+yearnm+tag+"_V8"+All+procnm+".root"
+          hfileV6nm  = "Shapes/"+year+"/"+tag+"_V6"+Samfol+"plots_"+yearnm+tag+"_V6"+All+procnm+".root"
+      else:
+          hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
+          hfileV6nm  = EOYArea + hfileV8nm
+
+      missV8     = fileismissing(hfileV8nm)
+      missV6     = fileismissing(hfileV6nm)
+      if missV8 or missV6: exit()
+      hfileV8 = TFile(hfileV8nm)
+      hfileV6 = TFile(hfileV6nm)
+      for region in ControlRegions:
+        folloc  = year+"/"+tag+"/"+region+"/"+process+"/"
+        #thisfol = "Figures/"+folloc
+        webloc  = compweb+folloc
+        os.system("mkdir -p " + webloc)
+        otherfol = ''
+        for folsplit in folloc.split('/'):
+          otherfol += folsplit+'/'
+          if folsplit =='': continue
+          os.system('cp '+web+'index.php ' + compweb+otherfol)
+        nplots  = 0
+        for var in variables:
+          if nplots>0 and doTest: continue
+          cr_i  = hfileV8.cd(region)
+          var_i = gDirectory.cd(var)
+          if cr_i is False:
+            print "something's wrong with", year+tag, "region", region
+            exit()
+            continue
+          if var_i is False:
+            print "something's wrong with", region
             continue
           doLogY  = False
           doLogX  = False
