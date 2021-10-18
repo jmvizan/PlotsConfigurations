@@ -295,7 +295,7 @@ if '2017' in yeartag and 'EENoise' in opt.tag:
     elif 'EENoiseDPhi' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0 && Sum$('+dPhieenoiseptmiss_pt50+'>0. && '+dPhieenoiseptmiss_pt50+'<0.96)==0)'
     #if 'Veto' in opt.tag:
-    #    #VetoEENoise = '(1. - '+VetoEENoise+')'
+        #VetoEENoise = '(1. - '+VetoEENoise+')'
     #    VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
 
 elif '2018' in yeartag and 'HEM' in opt.tag:
