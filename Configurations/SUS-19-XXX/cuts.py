@@ -103,7 +103,7 @@ if 'METFix' in opt.tag:
     cuts['METFixEE_high_mm_Tag']  = { 'expr' : '('+OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight1tag }
     cuts['METFixEE_high_sf_Tag']  = { 'expr' : '('+OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight1tag }
     
-if 'VetoNoiseEE' in opt.tag and not 'More' in opt.tag:
+if 'VetoNoiseEE' in opt.tag:
 
     channelCut = OC 
     if 'Zveto' in opt.tag:
@@ -114,8 +114,7 @@ if 'VetoNoiseEE' in opt.tag and not 'More' in opt.tag:
     EENoiseVeto2 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     
     ptm = ' ptmiss>=100. && ptmiss<140 '
-    if 'MET' in opt.tag: 
-        ptm = ' && MET_pt>=100 && MET_pt<140 '
+    if 'MET' in opt.tag: ptm = ptm.replace('ptmiss', 'MET_pt')
 
     if 'Zpeak' not in opt.tag:      
         cuts['Veto0_Tag']             = { 'expr' : '('+channelCut+' && '+EENoiseVeto0+')', 'weight' : btagWeight1tag }
