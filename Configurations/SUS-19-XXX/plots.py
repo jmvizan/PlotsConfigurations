@@ -29,7 +29,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'color': 851,    # kAzure-9
         'samples'  : ['WW'] 
     }
-
+    
     groupPlot['EOYWW']  = {
         'nameHR' : 'EOY WW',
         'nameLatex' : 'EOY \\WW',
@@ -338,9 +338,11 @@ for model in signalMassPoints:
 
 for group in groupPlot:
     cutToRemoveFromGroup = [ ]
+    print samples.keys(), groupPlot[group]['samples']
     for cut in cuts:
         samplesInCut = [ ]
         for sample in groupPlot[group]['samples']:
+            if "EOY" in sample: continue
             if not ('removeFromCuts' in samples[sample] and cut in samples[sample]['removeFromCuts']):
                 samplesInCut.append(sample)
         if len(samplesInCut)==0:

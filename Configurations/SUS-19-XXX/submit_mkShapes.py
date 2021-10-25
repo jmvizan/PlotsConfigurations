@@ -68,17 +68,18 @@ if __name__ == '__main__':
     else: split = args[lastarg]
     print args
 
+    if "amap" in split.lower(): split = "AsMuchAsPossible"
     
     yearnm = '-'.join(yearset)
     hadd   = args[3]
     sigset = args[4]
     
-    multi  = ''
+    multi  = 'Multi'
     print tag.lower()
-    if '_multi'        in tag.lower() : 
-        multi='Multi'
-        sigset=tag.split('_multi')[0]
-        print "running on multi"
+    if '_notmulti' in tag.lower() : 
+        multi=''
+        sigset=tag.split('_notmulti')[0]
+        print "not running on multi"
     queue  = ''
     split  = ''
     rmlog  = None
@@ -145,7 +146,6 @@ if __name__ == '__main__':
         
     if len(allcomms)>1: confirm()
     
-    #exit()
     for comm in allcomms:
         print comm
         os.system(comm+" 2>&1 | tee -a "+shapes_file)
