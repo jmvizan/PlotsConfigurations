@@ -59,9 +59,13 @@ else
 fi
 
 PLOTDIR=./Plots/$YEAR/$TAG
+if [[ $SIGSET != 'SM' ]]; then
+    PLOTDIR=./Plots/$YEAR/${TAG}/$SIGSET
+fi
 mkdir -p $PLOTDIR
 
 cp ./Plots/index.php ./Plots/$YEAR/
+cp ./Plots/index.php ./Plots/$YEAR/${TAG}/
 cp ./Plots/index.php $PLOTDIR/
 
 NUISANCES=nuisances.py
@@ -97,7 +101,7 @@ if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
         done
         PLOTDIR=$CLEANDIR
     else
-	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=$NUISANCES  #--plotSmearVariation=1 #--fileFormats='png,root,C'
+	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --showDataVsBkgOnly --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=$NUISANCES  #--plotSmearVariation=1 #--fileFormats='png,root,C'
     fi
 else 
     mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None --showIntegralLegend=1

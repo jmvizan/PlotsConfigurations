@@ -222,9 +222,10 @@ bTagPtCut  = '20.'
 if 'EOY' in opt.sigset:
     btagAlgo   = 'btagDeepB'
     bTagWP     = 'M'
-if 'pt25' in opt.tag: bTagPtCut  = '25.' 
-if 'pt30' in opt.tag: bTagPtCut  = '30.' 
-jetPtCut = bTagPtCut
+#if 'pt25' in opt.tag: bTagPtCut  = '25.' 
+#if 'pt30' in opt.tag: bTagPtCut  = '30.' 
+jetPtCut = '20.'
+if 'pt30' in opt.tag: jetPtCut = '30.'
 bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
 if '2016' in yeartag: 
     bTagCut = '0.6321' # To be updated for UL
