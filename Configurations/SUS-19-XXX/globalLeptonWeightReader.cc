@@ -64,7 +64,7 @@ GlobalLeptonWeightReader::GlobalLeptonWeightReader(char const* fileNameMuo,  cha
   rootFileMuo = new TFile(fileNameMuo_);
   rootFileEle = new TFile(fileNameEle_);
   histMuoGlobalLeptonWeightReader = (TH2F*)rootFileMuo->Get(histName_);
-  histEleGlobalLeptonWeightReader = (TH2F*)rootFileEle->Get(histName_);
+  histEleGlobalLeptonWeightReader = (TH2F*)rootFileEle->Get(histName_); 
 }
 
 double
@@ -81,7 +81,6 @@ void GlobalLeptonWeightReader::bindTree_(multidraw::FunctionLibrary& _library) {
 }
 
 void GlobalLeptonWeightReader::setValues() {
-
   globalLeptonWeightReader.clear();
   float globalLeptonWeight = 1.;
   for (int ilep = 0; ilep<2; ilep++) {  
@@ -93,17 +92,18 @@ void GlobalLeptonWeightReader::setValues() {
     } else {
       globalLeptonWeight *= this->GetBinContent4Weight(histMuoGlobalLeptonWeightReader, lepPt, lepEta, 0);
     }
+    std::cout<<"ID:"<<lepId<<", weight: "<<globalLeptonWeight<<", pt "<<lepPt<<", eta: "<< lepEta<< std::endl;
   }
   globalLeptonWeightReader.push_back(globalLeptonWeight);
 
 }
 
 double GlobalLeptonWeightReader::GetBinContent4Weight(TH2* hist, double valx, double valy, double sys){
-
   double xmin=hist->GetXaxis()->GetXmin();
   double xmax=hist->GetXaxis()->GetXmax();
   double ymin=hist->GetYaxis()->GetXmin();
   double ymax=hist->GetYaxis()->GetXmax();
+  
   if(xmin>=0) valx=fabs(valx);
   if(valx<xmin) valx=xmin+0.001;
   if(valx>xmax) valx=xmax-0.001;

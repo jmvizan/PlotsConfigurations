@@ -66,10 +66,7 @@ if __name__ == '__main__':
         queue = args[lastarg]
         split = args[lastarg-1]
     else: split = args[lastarg]
-    print args
 
-    if "amap" in split.lower(): split = "AsMuchAsPossible"
-    
     yearnm = '-'.join(yearset)
     hadd   = args[3]
     sigset = args[4]
@@ -94,6 +91,7 @@ if __name__ == '__main__':
         else:
             split  = args[5]
     
+    if "amap" in split.lower(): split = "AsMuchAsPossible"
 
     keepsplit = False
     allsam  = None
