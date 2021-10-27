@@ -342,7 +342,6 @@ for group in groupPlot:
     for cut in cuts:
         samplesInCut = [ ]
         for sample in groupPlot[group]['samples']:
-            if "EOY" in sample: continue
             if not ('removeFromCuts' in samples[sample] and cut in samples[sample]['removeFromCuts']):
                 samplesInCut.append(sample)
         if len(samplesInCut)==0:

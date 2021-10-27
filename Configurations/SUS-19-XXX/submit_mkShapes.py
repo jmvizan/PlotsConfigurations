@@ -96,7 +96,7 @@ if __name__ == '__main__':
     keepsplit = False
     allsam  = None
     bkgs    = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY', 'Higgs']
-    bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY']
+    bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY', 'BackgroundsEOY']
     smsend  = bkgsend+ ['Data']
     for signal in sigset.split('__'):
         print "sample:",signal
@@ -131,7 +131,7 @@ if __name__ == '__main__':
         if hadd =='1' and 'Veto' in samsend: continue
         #if hadd =='0' and all_sam is True and  : continue
         if keepsplit is False:
-            if samsend in smsend and 'Veto' not in samsend:
+            if samsend in smsend and 'Veto' not in samsend and 'EOY' not in samsend:
                 split = 'AsMuchAsPossible'
             else:
                 split = ''

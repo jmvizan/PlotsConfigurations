@@ -21,21 +21,23 @@ for sample in samples:
 
 
 if "UL" in recoFlag:
-    GlobalElectronScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag+'/AdditionalSF_'+yeartag+'Ele.root'
-    GlobalMuonScaleFactorFile     = os.getenv('PWD')+'/Data/'+yeartag+'/AdditionalSF_'+yeartag+'Muon.root'
-    aliases['globalLeptonWeight'] = {
-        'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/globalLeptonWeightReader.cc+' ],
-        'class': 'GlobalLeptonWeightReader',
-        'args': ( GlobalMuonScaleFactorFile , GlobalElectronScaleFactorFile, "hSFDataMC_central" ),
-        'samples': [ ]
-    }
-    for sample in samples:
-        if "doweights" in opt.tag.lower() and not samples[sample]['isDATA']:
-            print "im doing weighting"
-            
-            aliases['globalLeptonWeight']['samples'].append(sample)
-            samples[sample]['weight'] = samples[sample]['weight'].replace(MuoWeight, MuoWeight+'*globalLeptonWeight')
-            samples[sample]['weight'] = samples[sample]['weight'].replace(EleWeight, EleWeight+'*globalLeptonWeight')
+    if "noweights" in opt.tag.lower(): 
+        print "no weights being applied"
+    else:
+        AdditionalElectronScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag+'/AdditionalSF_'+yeartag+'Ele.root'
+        AdditionalMuonScaleFactorFile     = os.getenv('PWD')+'/Data/'+yeartag+'/AdditionalSF_'+yeartag+'Muon.root'
+        aliases['additionalLeptonWeight'] = {
+            'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/additionalLeptonWeightReader.cc+' ],
+            'class': 'AdditionalLeptonWeightReader',
+            'args': ( AdditionalMuonScaleFactorFile , AdditionalElectronScaleFactorFile, "hSFDataMC_central" ),
+            'samples': [ ]
+        }
+        for sample in samples:
+            if  not samples[sample]['isDATA']:
+                print "im doing weighting"
+
+                aliases['additionalLeptonWeight']['samples'].append(sample)
+                samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeight, LepWeight+'*additionalLeptonWeight')
     
 
 else:

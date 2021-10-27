@@ -15,15 +15,15 @@
 
 #include <iostream>
 
-class GlobalLeptonWeightReader : public multidraw::TTreeFunction {
+class AdditionalLeptonWeightReader : public multidraw::TTreeFunction {
 public:
-  GlobalLeptonWeightReader(char const* fileNameMuo, char const* fileNameEle, char const* histName);
+  AdditionalLeptonWeightReader(char const* fileNameMuo, char const* fileNameEle, char const* histName);
 
-  char const* getName() const override { return "GlobalLeptonWeightReader"; }
-  TTreeFunction* clone() const override { return new GlobalLeptonWeightReader(fileNameMuo_.Data(), fileNameEle_.Data(), histName_.Data()); }
+  char const* getName() const override { return "AdditionalLeptonWeightReader"; }
+  TTreeFunction* clone() const override { return new AdditionalLeptonWeightReader(fileNameMuo_.Data(), fileNameEle_.Data(), histName_.Data()); }
   
   void beginEvent(long long) override;
-  unsigned getNdata() override { return globalLeptonWeightReader.size(); }
+  unsigned getNdata() override { return additionalLeptonWeightReader.size(); }
   int getMultiplicity() override { return 1; }
   double evaluate(unsigned) override;
 
@@ -36,7 +36,7 @@ protected:
   IntArrayReader*   Lepton_electronIdx{};
   FloatArrayReader* Electron_deltaEtaSC{};
 
-  std::vector<double> globalLeptonWeightReader{};
+  std::vector<double> additionalLeptonWeightReader{};
   void setValues();
   double GetBinContent4Weight(TH2* hist, double valx, double valy, double sys);
 
@@ -46,16 +46,16 @@ protected:
 
   TFile* rootFileMuo{};
   TFile* rootFileEle{};
-  TH2F* histMuoGlobalLeptonWeightReader{};
-  TH2F* histEleGlobalLeptonWeightReader{};   
+  TH2F* histMuoAdditionalLeptonWeightReader{};
+  TH2F* histEleAdditionalLeptonWeightReader{};   
 
 };
 
-void GlobalLeptonWeightReader::beginEvent(long long _iEntry) {
+void AdditionalLeptonWeightReader::beginEvent(long long _iEntry) {
   setValues();
 }
 
-GlobalLeptonWeightReader::GlobalLeptonWeightReader(char const* fileNameMuo,  char const* fileNameEle, char const* histName) :
+AdditionalLeptonWeightReader::AdditionalLeptonWeightReader(char const* fileNameMuo,  char const* fileNameEle, char const* histName) :
   TTreeFunction(),
   fileNameMuo_{fileNameMuo},
   fileNameEle_{fileNameEle},
@@ -63,16 +63,16 @@ GlobalLeptonWeightReader::GlobalLeptonWeightReader(char const* fileNameMuo,  cha
 {
   rootFileMuo = new TFile(fileNameMuo_);
   rootFileEle = new TFile(fileNameEle_);
-  histMuoGlobalLeptonWeightReader = (TH2F*)rootFileMuo->Get(histName_);
-  histEleGlobalLeptonWeightReader = (TH2F*)rootFileEle->Get(histName_); 
+  histMuoAdditionalLeptonWeightReader = (TH2F*)rootFileMuo->Get(histName_);
+  histEleAdditionalLeptonWeightReader = (TH2F*)rootFileEle->Get(histName_); 
 }
 
 double
-GlobalLeptonWeightReader::evaluate(unsigned iJ) {
-  return globalLeptonWeightReader[iJ];
+AdditionalLeptonWeightReader::evaluate(unsigned iJ) {
+  return additionalLeptonWeightReader[iJ];
 }
 
-void GlobalLeptonWeightReader::bindTree_(multidraw::FunctionLibrary& _library) {
+void AdditionalLeptonWeightReader::bindTree_(multidraw::FunctionLibrary& _library) {
   _library.bindBranch(Lepton_pt, "Lepton_pt");
   _library.bindBranch(Lepton_eta, "Lepton_eta");
   _library.bindBranch(Lepton_pdgId, "Lepton_pdgId");
@@ -80,25 +80,25 @@ void GlobalLeptonWeightReader::bindTree_(multidraw::FunctionLibrary& _library) {
   _library.bindBranch(Electron_deltaEtaSC, "Electron_deltaEtaSC");
 }
 
-void GlobalLeptonWeightReader::setValues() {
-  globalLeptonWeightReader.clear();
-  float globalLeptonWeight = 1.;
+void AdditionalLeptonWeightReader::setValues() {
+  additionalLeptonWeightReader.clear();
+  float additionalLeptonWeight = 1.;
   for (int ilep = 0; ilep<2; ilep++) {  
     double lepEta{Lepton_eta->At(ilep)}; //TODO will use scEta for electron 
     double lepPt{Lepton_pt->At(ilep)};
     int lepId{Lepton_pdgId->At(ilep)};
     if (lepId==11 || lepId==-11) { // How was abs in C++?
-      globalLeptonWeight *= this->GetBinContent4Weight(histEleGlobalLeptonWeightReader, lepEta, lepPt, 0);
+      additionalLeptonWeight *= this->GetBinContent4Weight(histEleAdditionalLeptonWeightReader, lepEta, lepPt, 0);
     } else {
-      globalLeptonWeight *= this->GetBinContent4Weight(histMuoGlobalLeptonWeightReader, lepPt, lepEta, 0);
+      additionalLeptonWeight *= this->GetBinContent4Weight(histMuoAdditionalLeptonWeightReader, lepPt, lepEta, 0);
     }
-    std::cout<<"ID:"<<lepId<<", weight: "<<globalLeptonWeight<<", pt "<<lepPt<<", eta: "<< lepEta<< std::endl;
+    //std::cout<<"ilep:"<<ilep<<" ID:"<<lepId<<", weight: "<<additionalLeptonWeight<<", pt "<<lepPt<<", eta: "<< lepEta<< std::endl;
   }
-  globalLeptonWeightReader.push_back(globalLeptonWeight);
+  additionalLeptonWeightReader.push_back(additionalLeptonWeight);
 
 }
 
-double GlobalLeptonWeightReader::GetBinContent4Weight(TH2* hist, double valx, double valy, double sys){
+double AdditionalLeptonWeightReader::GetBinContent4Weight(TH2* hist, double valx, double valy, double sys){
   double xmin=hist->GetXaxis()->GetXmin();
   double xmax=hist->GetXaxis()->GetXmax();
   double ymin=hist->GetYaxis()->GetXmin();
