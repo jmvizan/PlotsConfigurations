@@ -66,19 +66,17 @@ if __name__ == '__main__':
         queue = args[lastarg]
         split = args[lastarg-1]
     else: split = args[lastarg]
-    print args
 
-    '''
     yearnm = '-'.join(yearset)
     hadd   = args[3]
     sigset = args[4]
     
-    multi  = ''
+    multi  = 'Multi'
     print tag.lower()
-    if '_multi'        in tag.lower() : 
-        multi='Multi'
-        sigset=tag.split('_multi')[0]
-        print "running on multi"
+    if '_notmulti' in tag.lower() : 
+        multi=''
+        sigset=tag.split('_notmulti')[0]
+        print "not running on multi"
     queue  = ''
     split  = ''
     rmlog  = None
@@ -92,12 +90,13 @@ if __name__ == '__main__':
                 split = args[6]
         else:
             split  = args[5]
-    '''
+    
+    if "amap" in split.lower(): split = "AsMuchAsPossible"
 
     keepsplit = False
     allsam  = None
     bkgs    = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY', 'Higgs']
-    bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY']
+    bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY', 'BackgroundsEOY']
     smsend  = bkgsend+ ['Data']
     for signal in sigset.split('__'):
         print "sample:",signal
@@ -132,7 +131,7 @@ if __name__ == '__main__':
         if hadd =='1' and 'Veto' in samsend: continue
         #if hadd =='0' and all_sam is True and  : continue
         if keepsplit is False:
-            if samsend in smsend and 'Veto' not in samsend:
+            if samsend in smsend and 'Veto' not in samsend and 'EOY' not in samsend:
                 split = 'AsMuchAsPossible'
             else:
                 split = ''
@@ -145,7 +144,6 @@ if __name__ == '__main__':
         
     if len(allcomms)>1: confirm()
     
-    #exit()
     for comm in allcomms:
         print comm
         os.system(comm+" 2>&1 | tee -a "+shapes_file)
