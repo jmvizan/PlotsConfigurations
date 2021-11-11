@@ -554,24 +554,35 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     if 'btagefficiencies' not in opt.tag and 'Test' not in opt.tag:
     
-        tWext = '' # TODO missing 2016
-        samples['STtW']    = {    'name'   : getSampleFiles(directoryBkg,'ST_tW_top_nohad'+tWext,False,treePrefix,skipTreesCheck) +
-                                             getSampleFiles(directoryBkg,'ST_tW_antitop_nohad'+tWext,    False,treePrefix,skipTreesCheck),
+        tWext = '' # TODO missing 2016 #Doesnt seem necessary
+        samples['STtW']    = {    'name'   : #getSampleFiles(directoryBkg,'ST_tW_top_nohad',    False,treePrefix,skipTreesCheck) +
+                                             getSampleFiles(directoryBkg,'ST_tW_antitop_nohad',False,treePrefix,skipTreesCheck),
                                   'weight' : XSWeight+'*'+SFweight ,
                              }
+        if "_HIPM" in yeartag:
+            samples['EOYSingleTopW'] = {    'name'   : getSampleFiles(directoryBkgEOY,'ST_tW_top_nohad',    False,treePrefix,skipTreesCheck) , #CHECK ACTUAL NAME   
+                                            'weight' : XSWeight+'*'+SFweight ,
+                             }
+        else:
+            samples['STtW']['name'] += getSampleFiles(directoryBkg,'ST_tW_top_nohad',    False,treePrefix,skipTreesCheck)
 
-        ttZToLLext = '' # TODO missing 2016
-        ttZToQQext = ''
-        samples['ttZ']   = {    'name'   : getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10'+ttZToLLext,False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'TTZToQQ'         +ttZToQQext,False,treePrefix,skipTreesCheck),
+
+        samples['ttZ']   = {    'name'   : getSampleFiles(directoryBkg,'TTZToLLNuNu_M-10',False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'TTZToQQ'         ,False,treePrefix,skipTreesCheck),
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
 
-        ttWToLLext = '' # TODO missing 2016
-        samples['ttW']   = {    'name'   : getSampleFiles(directoryBkg,'TTWJetsToLNu'+ttWToLLext,False,treePrefix,skipTreesCheck) +
-                                           getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix,skipTreesCheck), 
+        samples['ttW']   = {    'name'   : getSampleFiles(directoryBkg,'TTWJetsToLNu'+ttWToLLext,False,treePrefix,skipTreesCheck) ,# +
+                                           #getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix,skipTreesCheck), 
                                 'weight' : XSWeight+'*'+SFweight ,
                              }
+        
+        if "_HIPM" in yeartag:
+            samples['EOYDoubleTopW'] = {    'name'   : getSampleFiles(directoryBkgEOY,'TTWJetsToQQ',    False,treePrefix,skipTreesCheck) , #CHECK ACTUAL NAME   
+                                            'weight' : XSWeight+'*'+SFweight ,
+                             }
+        else:
+            samples['STtW']['name'] += getSampleFiles(directoryBkg,'TTWJetsToQQ',    False,treePrefix,skipTreesCheck)
        
         samples['WW']    = {    'name'   :   #getSampleFiles(directoryBkg,'WWTo2L2Nu',           False,treePrefix,skipTreesCheck) + ADD LATER
                                              #getSampleFiles(directoryBkg,'GluGluToWWToENEN',False,treePrefix,skipTreesCheck) + ADD LATER
@@ -585,6 +596,11 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              #getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix,skipTreesCheck),
                                 'weight' : XSWeight+'*'+SFweight ,
                             }
+        if '2016' in yeartag:
+            samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToENMN',False,treePrefix,skipTreesCheck)  
+            samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,treePrefix,skipTreesCheck)                                                  
+            samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix,skipTreesCheck)  
+
         if '2017' in yeartag:
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToENMN',False,treePrefix,skipTreesCheck)
             if 'EOY' in opt.tag: 
@@ -592,7 +608,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                                      getSampleFiles(directoryBkgEOY,'GluGluToWWToTNMN',False,treePrefix,skipTreesCheck) , 
                                           'weight' : XSWeight+'*'+SFweight ,
                                   }
-        if '2018' in opt.tag:
+        if '2018' in yeartag:
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,treePrefix,skipTreesCheck)                                                  
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix,skipTreesCheck)  
             if 'EOY' in opt.tag:
@@ -601,67 +617,94 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                          }
 
         WZext = ''#'_mllmin01' # placeholder TODO: change it when final datasets available
-        samples['WZ']    = {    'name'   : getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix,skipTreesCheck),
-                                'weight' : XSWeight+'*'+SFweight ,
-                                }
+        if '_HIPM' in opt.tag:
+            samples['EOYVV']  = { 'name'   : getSampleFiles(directoryBkgEOY,'WZTo3LNu'+WZext,False,treePrefix,skipTreesCheck),
+                                  'weight' : XSWeight+'*'+SFweight ,
+                                  }
+        else:
+            samples['WZ'] = { 'name'   : getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix,skipTreesCheck),
+                              'weight' : XSWeight+'*'+SFweight ,
+        }
         if '_mllmin01' in WZext:
             addSampleWeight(samples,'WZ','WZTo3LNu'+WZext, '4.42965/(58.59*0.601644)') # Wrong gridpack: mll>4 not mll>0.1
 
-        ZZext = ''
-        samples['ZZTo2L2Nu']  = {  'name'   : getSampleFiles(directoryBkg,'ZZTo2L2Nu'+ZZext,False,treePrefix,skipTreesCheck) +
-                                              getSampleFiles(directoryBkg,'ggZZ2e2n',       False,treePrefix,skipTreesCheck) +
-                                              getSampleFiles(directoryBkg,'ggZZ2m2n',       False,treePrefix,skipTreesCheck),  
+        samples['ZZTo2L2Nu']  = {  'name'   : getSampleFiles(directoryBkg,'ZZTo2L2Nu', False,treePrefix,skipTreesCheck) +
+                                              #getSampleFiles(directoryBkg,'ggZZ2e2n', False,treePrefix,skipTreesCheck) +
+                                              #getSampleFiles(directoryBkg,'ggZZ2m2n', False,treePrefix,skipTreesCheck),  
                                    'weight' : XSWeight+'*'+SFweight ,
                                  }
+        if '_HIPM' in opt.tag:
+            samples['EOYVV']['name'] +=  getSampleFiles(directoryBkgEOY,'ggZZ2e2n', False,treePrefix,skipTreesCheck)
+            samples['EOYVV']['name'] +=  getSampleFiles(directoryBkgEOY,'ggZZ2m2n', False,treePrefix,skipTreesCheck)
+        else:
+            samples['ZZTo2L2Nu']['name'] += getSampleFiles(directoryBkg,'ggZZ2e2n', False,treePrefix,skipTreesCheck)  
+            samples['ZZTo2L2Nu']['name'] += getSampleFiles(directoryBkg,'ggZZ2m2n', False,treePrefix,skipTreesCheck)  
+        
         addSampleWeight(samples,'ZZTo2L2Nu','ZZTo2L2Nu', '9.738e-01/6.008e-01') # From GenXSecAnalyzer: EOY mll>40 / UL mll>4
 
         # TODO missing HT binned samples
-        DYM10ext = ''
         DYMlow = 'M-4to50' 
-        DYMlowHT70ext, DYMlowHT100ext, DYMlowHT200ext, DYMlowHT400ext, DYMlowHT600ext = '', '', '', '', '' 
-        DYM50ext = ''
-        DYMhighHT70ext, DYMhighHT100ext, DYMhighHT200ext, DYMhighHT400ext, DYMhighHT600ext, DYMhighHT800ext, DYMhighHT1200ext, DYMhighHT2500ext = '', '', '', '', '', '', '', ''
-        samples['DY'] = { 'name' : getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'+DYM10ext,        False,treePrefix,skipTreesCheck) +
-                                   #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100'+DYMlowHT70ext, False,treePrefix,skipTreesCheck) +
-                                   #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-100to200'+DYMlowHT100ext,False,treePrefix,skipTreesCheck) +
-                                   #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-200to400'+DYMlowHT200ext,False,treePrefix,skipTreesCheck) +
-                                   #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-400to600'+DYMlowHT400ext,False,treePrefix,skipTreesCheck) +
-                                   #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toInf'+DYMlowHT600ext,False,treePrefix,skipTreesCheck) +
-                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'+DYM50ext,   False,treePrefix,skipTreesCheck) +
-                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-70to100'+DYMhighHT70ext,    False,treePrefix,skipTreesCheck) +
-                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-100to200'+DYMhighHT100ext,   False,treePrefix,skipTreesCheck) +
-                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-200to400'+DYMhighHT200ext,   False,treePrefix,skipTreesCheck) +
-                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-400to600'+DYMhighHT400ext,   False,treePrefix,skipTreesCheck) +
-                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-600to800'+DYMhighHT600ext,   False,treePrefix,skipTreesCheck) +
-                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-800to1200'+DYMhighHT800ext,  False,treePrefix,skipTreesCheck) +
-                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500'+DYMhighHT1200ext, False,treePrefix,skipTreesCheck) +
-                                   getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toInf'+DYMhighHT2500ext,  False,treePrefix,skipTreesCheck) ,
+        samples['DY'] = { 'name' :   getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO',        False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-70to100' +DYMlowHT70ext, False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-100to200'+DYMlowHT100ext,False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-200to400'+DYMlowHT200ext,False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-400to600'+DYMlowHT400ext,False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_'+DYMlow+'_HT-600toInf'+DYMlowHT600ext,False,treePrefix,skipTreesCheck) +
+                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'+DYM50ext,   False,treePrefix,skipTreesCheck) +
+                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-70to100'   +DYMhighHT70ext,  False,treePrefix,skipTreesCheck) +
+                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-100to200'  +DYMhighHT100ext, False,treePrefix,skipTreesCheck) +
+                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-200to400'  +DYMhighHT200ext, False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-400to600'  +DYMhighHT400ext, False,treePrefix,skipTreesCheck) +
+                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-600to800'  +DYMhighHT600ext, False,treePrefix,skipTreesCheck) +
+                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-800to1200' +DYMhighHT800ext, False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500'+DYMhighHT1200ext,False,treePrefix,skipTreesCheck) +
+                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-2500toInf'+DYMhighHT2500ext, False,treePrefix,skipTreesCheck) ,
                           'weight' : XSWeight+'*'+SFweight ,
                         }  
         addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO'+DYM50ext, 'LHE_HT<70.0')
         #addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO'+DYM10ext,  'LHE_HT<70.0') # TODO uncomment when DY samples available
-
+        if "2016" in yeartag and EOY in opt.tag: #ALMOST READY
+            samples['EOYDrellYan'] = { 'name'   : getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'+DYM10ext,        False,treePrefix,skipTreesCheck) +
+                                                  getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'+DYM50ext,   False,treePrefix,skipTreesCheck) +
+                                                  getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50_HT-400to600'  +DYMhighHT400ext, False,treePrefix,skipTreesCheck) +
+                                                  getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50_HT-1200to2500'+DYMhighHT1200ext,False,treePrefix,skipTreesCheck) ,
+                                       'weight' : XSWeight+'*'+SFweight ,
+                                   }
+        if '2017' in yeartag or '2018' in yeartag:
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'+DYM10ext,        False,treePrefix,skipTreesCheck)
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'+DYM50ext,   False,treePrefix,skipTreesCheck)
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-400to600'  +DYMhighHT400ext, False,treePrefix,skipTreesCheck)
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-1200to2500'+DYMhighHT1200ext,False,treePrefix,skipTreesCheck)
         # TODO missing
         ggHWWgen = ''
         ggHTText = ''
-        samples['Higgs']   = {  'name'   :   getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'+ggHTText,      False,treePrefix,skipTreesCheck) +
-                                             getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix,skipTreesCheck) + 
-                                             getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125',               False,treePrefix,skipTreesCheck) + 
-                                             getSampleFiles(directoryBkg,'VBFHToTauTau_M125',                  False,treePrefix,skipTreesCheck) + 
-        #                                     getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck) +  
-                                             getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125',             False,treePrefix,skipTreesCheck) + 
-        #                                     getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125',                False,treePrefix,skipTreesCheck) + 
-                                             getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125',            False,treePrefix,skipTreesCheck) ,
+        samples['Higgs']   = {  'name'   : getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'+ggHTText,      False,treePrefix,skipTreesCheck) +
+                                           getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125',               False,treePrefix,skipTreesCheck) + 
+                                           #getSampleFiles(directoryBkg,'VBFHToTauTau_M125',                  False,treePrefix,skipTreesCheck) + 
+                                           #getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck) +  
+                                           #getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125',             False,treePrefix,skipTreesCheck) + 
+                                           #getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125',                False,treePrefix,skipTreesCheck) + 
+                                           #getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125',            False,treePrefix,skipTreesCheck) ,
                                 'weight' : XSWeight+'*'+SFweight ,
                                }
 
-        if ('2017' in yeartag or '2018' in yeartag) and 'EOY' in opt.tag: #TODO 2016 MISSING
-            samples['EOYH']   = {  'name'   :   getSampleFiles(directoryBkgEOY,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck) +
-                                                getSampleFiles(directoryBkgEOY,'HWminus_HToWW_M125',                 False,treePrefix,skipTreesCheck) +
-                                                getSampleFiles(directoryBkgEOY,'VBFHToWWTo2L2Nu_M125',               False,treePrefix,skipTreesCheck) ,
+        if ('_HIPM' not in yeartag):
+                samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125',            False,treePrefix,skipTreesCheck)
+                samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck)
+                samples['Higgs']['name'] += getSampleFiles(directoryBkg,'VBFHToTauTau_M125' ,                 False,treePrefix,skipTreesCheck)
+            
+        if 'EOY' in opt.tag: #TODO 2016 MISSING
+            samples['EOYH']   = {  'name'   : getSampleFiles(directoryBkgEOY,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck) +
+                                              getSampleFiles(directoryBkgEOY,'HWminus_HToWW_M125',                 False,treePrefix,skipTreesCheck) +
+                                              getSampleFiles(directoryBkgEOY,'VBFHToWWTo2L2Nu_M125',               False,treePrefix,skipTreesCheck) ,
                                    'weight' : XSWeight+'*'+SFweight ,
-                                 }
-    
+                                   }
+            if '_HIPM' in yeartag:
+                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWminusJ_HToTauTau_M125',            False,treePrefix,skipTreesCheck)
+                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWplusJ_HToWW_M125',                 False,treePrefix,skipTreesCheck)
+                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'VBFHToTauTau_M125' ,                 False,treePrefix,skipTreesCheck)
+
         '''  
         if 'EOY' in opt.tag:
             ggHWWgen = 'AMCNLO'  if ('2016' in yeartag) else ''
@@ -673,6 +716,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             if '2018' in yeartag :
                 samples['Higgs']['name'] += getSampleFiles(directoryBkgEOY,'GluGluHToWWTo2L2Nu'+ggHWWgen+'_M125',False,treePrefix,skipTreesCheck)
         '''
+
+#IIIIIIIIIIIIIIIIIIII AAAAAMMMMMMMMMMMMMMMMMMMMMMMM HEEEEEEEEEEEEEEEEEEEEEEEEEREEEEEEEEEEEEEEEEEEEE
         # TODO missing UL VZ
         if 'EOY' in opt.tag:
             samples['EOYQQ']    = {    'name'   :   getSampleFiles(directoryBkgEOY,'WZTo2L2Q',False,treePrefix,skipTreesCheck) + 
@@ -682,20 +727,25 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         
         WZZext = '_ext1' if '2018' in yeartag else ''
         samples['VVV']   = {    'name'   :   getSampleFiles(directoryBkg,'WWW',False,treePrefix,skipTreesCheck) + 
-                                             getSampleFiles(directoryBkg,'WWZ',False,treePrefix,skipTreesCheck) + 
+                                             #getSampleFiles(directoryBkg,'WWZ',False,treePrefix,skipTreesCheck) + 
                                              getSampleFiles(directoryBkg,'WZZ'+WZZext,False,treePrefix,skipTreesCheck) + 
                                              getSampleFiles(directoryBkg,'ZZZ',False,treePrefix,skipTreesCheck) +
                                              getSampleFiles(directoryBkg,'WWG',False,treePrefix,skipTreesCheck), 
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
-
+        if "2016" in yeartag:
+            samples['EOYVVV'] = { 'name'   : getSampleFiles(directoryBkg,'WWZ',False,treePrefix,skipTreesCheck),
+                                  'weight' : XSWeight+'*'+SFweight ,
+            }
+        else:
+            samples['VVV']['name'] += getSampleFiles(directoryBkg,'WWZ',False,treePrefix,skipTreesCheck)
         if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot) or 'TheoryNormalizations' in opt.tag:
         
             ZZ4Lext = '' # TODO missing
             samples['ZZTo4L']   = {    'name'  :    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2m',            False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'+ZZ4Lext, False,treePrefix,skipTreesCheck) + 
+                                                    #getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'+ZZ4Lext, False,treePrefix,skipTreesCheck) + 
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4e',              False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4m',              False,treePrefix,skipTreesCheck) +
+                                                    #getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4m',              False,treePrefix,skipTreesCheck) +
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4t',              False,treePrefix,skipTreesCheck) +
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2t',            False,treePrefix,skipTreesCheck) +
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2m2t',            False,treePrefix,skipTreesCheck) +
@@ -705,15 +755,22 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        'JobsPerSample' : 6,
                                        'isControlSample' : 1,
                                    }
+            if ('2016' in yeartag or '2018' in yeartag) and 'EOY' in opt.tag:
+
+                if 'EOY' in opt.tag:
+                    samples['EOYZZ4L']   = { 'name'   : getSampleFiles(directoryBkg,'ZZTo4L'+ZZ4Lext,False,treePrefix,skipTreesCheck),
+                                             'weight' : XSWeight+'*'+SFweight ,
+                                             'isControlSample' : 1,
+                                         }
+                    if '_HIPM' in yeartag:
+                        samples['EOYZZ4L']['name'] += getSampleFiles(directoryBkgEOY.replace('reco', 'ctrl'),'ggZZ4m',              False,treePrefix,skipTreesCheck)
+                else: 
+                    samples['ZZ4L']['name']        += getSampleFiles(directoryBkg.replace('reco', 'ctrl'),   'ggZZ4m',              False,treePrefix,skipTreesCheck)
+                    
             if '2017' in yeartag:
                 samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'VBFHToZZTo4L_M125',   False,treePrefix,skipTreesCheck)
+                samples['ZZ4L']['name']   += getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4m',              False,treePrefix,skipTreesCheck)
 
-            if 'EOY' in opt.tag:
-                samples['EOYZZ4L']   = { 'weight' : XSWeight+'*'+SFweight ,
-                                         'isControlSample' : 1,
-                                        }
-                if '2018' in yeartag:
-                    samples['EOYZZ4L']['name'] = getSampleFiles(directoryBkgEOY.replace('reco', 'ctrl'),'VBFHToZZTo4L_M125',   False,treePrefix,skipTreesCheck)
 
             for kZZvariable in [ 'kZZmass', 'kZZdphi', 'kZZpt' ]:
                 if kZZvariable in opt.tag:  
