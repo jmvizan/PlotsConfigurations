@@ -26,7 +26,7 @@ recoFlag = '_UL'
 
 
 skipTreesCheck = True #False
-if 'EOY' in opt.sigset: skipTreesCheck = True  
+if '2017' in opt.tag: skipTreesCheck = False  
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
@@ -678,8 +678,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         # TODO missing
         samples['Higgs']   = {  'name'   : getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'   , False,treePrefix,skipTreesCheck) +
                                            getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu_M125', False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125'   , False,treePrefix,skipTreesCheck)  ,#+ 
-                                           #getSampleFiles(directoryBkg,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck) + 
+                                           #getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125'   , False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck) , #+ 
                                            #getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125'     , False,treePrefix,skipTreesCheck) +  
                                            #getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125' , False,treePrefix,skipTreesCheck) + 
                                            #getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125'    , False,treePrefix,skipTreesCheck) + 
@@ -689,12 +689,12 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
         if ('_HIPM' not in yeartag):
                 samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125', False,treePrefix,skipTreesCheck)
-                samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125'     , False,treePrefix,skipTreesCheck)
+                samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125' , False,treePrefix,skipTreesCheck)
                 samples['Higgs']['name'] += getSampleFiles(directoryBkg,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck)
             
         if 'EOY' in opt.sigset: 
             samples['EOYH']   = {  'name'   : getSampleFiles(directoryBkgEOY,'HWplusJ_HToWW_M125'  , False,treePrefix,skipTreesCheck) +
-                                              getSampleFiles(directoryBkgEOY,'HWminus_HToWW_M125'  , False,treePrefix,skipTreesCheck) +
+                                              getSampleFiles(directoryBkgEOY,'HWminusJ_HToWW_M125' , False,treePrefix,skipTreesCheck) +
                                               getSampleFiles(directoryBkgEOY,'VBFHToWWTo2L2Nu_M125', False,treePrefix,skipTreesCheck) ,
                                    'weight' : XSWeight+'*'+SFweight ,
                                    }

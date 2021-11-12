@@ -264,7 +264,7 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                     'fold'  : overflow                 #   fold overflow
                                 }
     
-    variables['njets']         = {  'name'  : 'njetscut',              #   variable name    
+    variables['njets']         = {  'name'  : njetscut,              #   variable name    
                                     'range' : (  6,    0.,     6.),    #   variable range
                                     'xaxis' : 'number of jets ('+pt+'>'+jetPtCut+gv+')',        #   x axis name
                                     'fold'  : overflow                 #   fold overflow
