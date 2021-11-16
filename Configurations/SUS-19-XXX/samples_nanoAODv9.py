@@ -365,8 +365,11 @@ nonpromptLepSF_Up   = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' 
 nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateDown']  + ')'
 
 # global SF weights 
+if 'EOY' in opt.tag:
+    SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight['Lep']['Reco'] + '*' + LepWeight['Lep']['IdIso'] +'*' + LepWeight['Lep']['Extra'] + '*' + nonpromptLepSF
+else:
+    SFweightCommon = 'puWeight*' + TriggerEff + '*' + '*' + LepWeight['Lep']['Tot'] + '*' + nonpromptLepSF
 
-SFweightCommon = 'puWeight*' + TriggerEff + '*' + RecoWeight + '*' + LepWeight + '*' + nonpromptLepSF
 if '2016' in yeartag or '2017' in yeartag: 
     SFweightCommon += '*PrefireWeight'
 if '2017' in yeartag and 'EENoise' in opt.tag:
@@ -374,7 +377,7 @@ if '2017' in yeartag and 'EENoise' in opt.tag:
 if '2018' in yeartag and 'HEM' in opt.tag: 
     SFweightCommon += '*' + VetoHEMmc
 SFweight       = SFweightCommon + '*' + METFilters_MC
-SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeightFS + '*isrW'
+SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeight['Lep']['FastSim'] + '*isrW'
     
 ### Special weights
 
