@@ -316,30 +316,6 @@ XSWeight       = 'baseW*genWeight'
 
 # lepton weights
 
-#AdditionalSF = 'Lepton_RecoSF[0]*Lepton_RecoSF[1]'
-'''
-EleWeightExt   = ElectronSF+'_ExtraSF[0]*'+ElectronSF+'_ExtraSF[1]'
-MuoWeightExt   = MuonSF+'_ExtraSF[0]*'+MuonSF+'_ExtraSF[1]'
-LepWeightExt   = EleWeightExt + '*' + MuoWeightExt
-EleWeightId    = ElectronSF+'_IdIsoSF[0]*'+ElectronSF+'_IdIsoSF[1]*'
-MuoWeightId    = MuonSF+'_IdIsoSF[0]*'+MuonSF+'_IdIsoSF[1]'
-LepWeightId    = EleWeightId + '*' + MuoWeightId
-EleWeight      = EleWeightId + '*' + EleWeightExtra
-MuoWeight      = MuoWeightId + '*' + MuoWeightExtra
-LepWeight      = EleWeight + '*' + MuoWeight
-EleWeightFS    = EleWeightId.replace('IdIsoSF', 'FastSimSF')
-MuoWeightFS    = MuoWeightId.replace('IdIsoSF', 'FastSimSF')
-LepWeightFS    = LepWeightOd.replace('IdIsoSF', 'FastSimSF')
-
-weightReco  = '('+RecoWeight.replace('RecoSF', 'RecoSF_Syst')+')/('+RecoWeight+')'
-weightEle   = '('+EleWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
-weightMuo   = '('+MuoWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
-weightLep   = '('+LepWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
-weightEleFS = weightEleId.replace('IdIsoSF', 'FastSimSF')
-weightMuoFS = weightMuoId.replace('IdIsoSF', 'FastSimSF')
-weightLepFS = weightLepId.replace('IdIsoSF', 'FastSimSF')
-'''
-
 allweights  = ['Extra', 'IdIso','Reco', 'Tot', 'FastSim']
 LepWeight = { 
     'Ele' : {'base' : [ElectronSF]},
@@ -358,25 +334,17 @@ for lep_i in LepWeight:
             LepWeight[lep_i][weight_i] = LepWeight[lep_i]['base'][0] + '_' + weight_i + 'SF[0]*'+LepWeight[lep_i]['base'][0] + '_' + weight_i + 'SF[1]'
             if lep_i == 'Lep': LepWeight[lep_i][weight_i] += '*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF[0]*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF[1]'
         
-leptonSF2 = {}
-for lep_i in ['Lep']:
-    for weight_i in allweights.remove('Tot'):
-        lepW_i = [LepWeight[lep_i][weight_i]]
-        leptonSF2[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : lepW_i.replace('SF[', 'SF_Up[')/lepW_i, lepW_i.replace('SF[', 'SF_Down[')/lepW_i]}
+leptonSF = {}
+allweights.remove('Tot')
 
-print LepWeight
-leptonSF = { 
-    #'trkreco'         : { 'type' : 'shape', 'weight' : [ '1.', '1.' ] }, ->  no scale factor required
-    'lepreco'         : { 'type' : 'shape', 'weight' : [ weightReco.replace('Syst', 'Up'), weightReco.replace('Syst', 'Down') ] },
-    #'electronIdIso'   : { 'type' : 'shape', 'weight' : [ weightEle.replace('Syst', 'Up'), weightEle.replace('Syst', 'Down') ] },
-    #'muonIdIso'       : { 'type' : 'shape', 'weight' : [ weightMuo.replace('Syst', 'Up'), weightMuo.replace('Syst', 'Down') ] },
-    'leptonIdIso'     : { 'type' : 'shape', 'weight' : [ weightLep.replace('Syst', 'Up'), weightLep.replace('Syst', 'Down') ] }, 
-    #'electronIdIsoFS' : { 'type' : 'shape', 'weight' : [ weightEleFS.replace('Syst', 'Up'), weightEleFS.replace('Syst', 'Down') ] },
-    #'muonIdIsoFS'     : { 'type' : 'shape', 'weight' : [ weightMuoFS.replace('Syst', 'Up'), weightMuoFS.replace('Syst', 'Down') ] },
-    #'leptonIdIsoFS'   : { 'type' : 'shape', 'weight' : [ weightLepFS.replace('Syst', 'Up'), weightLepFS.replace('Syst', 'Down') ] }, 
-    'leptonIdIsoFS'   : { 'type' : 'lnN', 'weight' : '1.04' },   
-}
-exit()
+for lep_i in ['Lep']:
+    for weight_i in allweights:
+        lepW_i = LepWeight[lep_i][weight_i]
+        print lepW_i
+        if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
+        else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/'+lepW_i, lepW_i.replace('SF[', 'SF_Down[')+'/'+lepW_i]}
+
+
 
 # nonprompt lepton rate TODO: update to UL values <- This is done, isnt it?
 
