@@ -322,12 +322,13 @@ if '2016' in opt.tag:
     RecoWeight = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
 else: 
     RecoWeight = 'Lepton_RecoSF[0]*Lepton_RecoSF[1]'
+'''
 EleWeightExt   = ElectronSF+'_ExtraSF[0]*'+ElectronSF+'_ExtraSF[1]'
 MuoWeightExt   = MuonSF+'_ExtraSF[0]*'+MuonSF+'_ExtraSF[1]'
-LepWeight      = EleWeightExt + '*' + MuoWeightExt
+LepWeightExt   = EleWeightExt + '*' + MuoWeightExt
 EleWeightId    = ElectronSF+'_IdIsoSF[0]*'+ElectronSF+'_IdIsoSF[1]*'
 MuoWeightId    = MuonSF+'_IdIsoSF[0]*'+MuonSF+'_IdIsoSF[1]'
-LepWeight      = EleWeightId + '*' + MuoWeightId
+LepWeightId    = EleWeightId + '*' + MuoWeightId
 EleWeight      = EleWeightId + '*' + EleWeightExtra
 MuoWeight      = MuoWeightId + '*' + MuoWeightExtra
 LepWeight      = EleWeight + '*' + MuoWeight
@@ -342,7 +343,21 @@ weightLep   = '('+LepWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+'
 weightEleFS = weightEleId.replace('IdIsoSF', 'FastSimSF')
 weightMuoFS = weightMuoId.replace('IdIsoSF', 'FastSimSF')
 weightLepFS = weightLepId.replace('IdIsoSF', 'FastSimSF')
+'''
 
+allweights = ["Extra", "IdIso","Reco", "Tot"]
+leptonWeight = { 
+    'Ele' : {'base' : [ElectronSF]},
+    'Muo' : {'base' : [MuonSF]},
+    'Lep' : {'base' : [ElectronSF, MuonSF]}}
+for key in leptonWeight:
+    for weight_i in allweights:
+        print key, weight_i
+        leptonWeight[key][weight_i] = leptonWeight[key]['base'][0] + '_' + weight_i + 'SF'
+        if len(leptonWeight[key]['base'])>1: leptonWeight[key][weight_i] += '*_' + leptonWeight[key]['base'][1] + weight_i + 'SF'
+
+print leptonWeight
+exit()
 leptonSF = { 
     #'trkreco'         : { 'type' : 'shape', 'weight' : [ '1.', '1.' ] }, ->  no scale factor required
     'lepreco'         : { 'type' : 'shape', 'weight' : [ weightReco.replace('Syst', 'Up'), weightReco.replace('Syst', 'Down') ] },
