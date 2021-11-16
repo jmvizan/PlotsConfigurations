@@ -361,7 +361,8 @@ for lep_i in LepWeight:
 leptonSF2 = {}
 for lep_i in ['Lep']:
     for weight_i in allweights.remove('Tot'):
-        leptonSF2[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [LepWeight[lep_i][weight_i].replace('SF', 'SF_Up'), LepWeight[lep_i][weight_i].replace('SF', 'SF_Down')]}
+        lepW_i = [LepWeight[lep_i][weight_i]]
+        leptonSF2[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : lepW_i.replace('SF[', 'SF_Up[')/lepW_i, lepW_i.replace('SF[', 'SF_Down[')/lepW_i]}
 
 print LepWeight
 leptonSF = { 
