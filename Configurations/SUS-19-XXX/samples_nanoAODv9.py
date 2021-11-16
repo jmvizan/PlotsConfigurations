@@ -340,7 +340,8 @@ weightMuoFS = weightMuoId.replace('IdIsoSF', 'FastSimSF')
 weightLepFS = weightLepId.replace('IdIsoSF', 'FastSimSF')
 '''
 
-allweights = ['Extra', 'IdIso','Reco', 'Tot', 'FastSim']
+allweights  = ['Extra', 'IdIso','Reco', 'Tot', 'FastSim']
+weight2calc = ['Extra', 'IdIso','Reco', 'FastSim']
 LepWeight = { 
     'Ele' : {'base' : [ElectronSF]},
     'Muo' : {'base' : [MuonSF]},
@@ -353,14 +354,17 @@ for lep_i in LepWeight:
                 LepRecoSF  = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
                 LepWeight[lep_i][weight_i] = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
             else: 
-                LepWeight[lep_i][weight_i] = 'LeptonSF_' + weight_i + 'SF'+[0]+'*LeptonSF_' + weight_i + 'SF'+[1]
+                LepWeight[lep_i][weight_i] = 'LeptonSF_' + weight_i + 'SF[0]*LeptonSF_' + weight_i + 'SF[1]'
         else:
-            LepWeight[lep_i][weight_i] = LepWeight[lep_i]['base'][0] + '_' + weight_i + 'SF'+[0]+'*'+LepWeight[lep_i]['base'][0] + '_' + weight_i + 'SF'+[1]
-            if lep_i == 'Lep': LepWeight[lep_i][weight_i] += '*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF'+[0]+'*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF'+[1]
+            LepWeight[lep_i][weight_i] = LepWeight[lep_i]['base'][0] + '_' + weight_i + 'SF[0]*'+LepWeight[lep_i]['base'][0] + '_' + weight_i + 'SF[1]'
+            if lep_i == 'Lep': LepWeight[lep_i][weight_i] += '*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF[0]*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF[1]'
         
+leptonSF2 = {}
+for lep_i in 'Lep':
+    for weight_i in weight2calc:
+        leptonSF2[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [LepWeight[lep_i][weight_i].replace('SF', 'SF_Up'), LepWeight[lep_i][weight_i].replace('SF', 'SF_Down')]}
 
 print LepWeight
-exit()
 leptonSF = { 
     #'trkreco'         : { 'type' : 'shape', 'weight' : [ '1.', '1.' ] }, ->  no scale factor required
     'lepreco'         : { 'type' : 'shape', 'weight' : [ weightReco.replace('Syst', 'Up'), weightReco.replace('Syst', 'Down') ] },
@@ -372,6 +376,7 @@ leptonSF = {
     #'leptonIdIsoFS'   : { 'type' : 'shape', 'weight' : [ weightLepFS.replace('Syst', 'Up'), weightLepFS.replace('Syst', 'Down') ] }, 
     'leptonIdIsoFS'   : { 'type' : 'lnN', 'weight' : '1.04' },   
 }
+exit()
 
 # nonprompt lepton rate TODO: update to UL values <- This is done, isnt it?
 
