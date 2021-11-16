@@ -345,15 +345,15 @@ LepWeight = {
     'Ele' : {'base' : [ElectronSF]},
     'Muo' : {'base' : [MuonSF]},
     'Lep' : {'base' : [ElectronSF, MuonSF]}}
-for key in LepWeight:
+for lep_i in LepWeight:
     for weight_i in allweights:
-        print key, weight_i
-        LepWeight[key][weight_i] = LepWeight[key]['base'][0] + '_' + weight_i + 'SF'
-        if len(LepWeight[key]['base'])>1: 
+        print lep_i, weight_i
+        LepWeight[lep_i][weight_i] = LepWeight[lep_i]['base'][0] + '_' + weight_i + 'SF'
+        if len(LepWeight[lep_i]['base'])>1: 
             if '2016' in opt.tag and weight_i == 'Reco': 
                 LepRecoSF  = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
-                LepWeight[key][weight_i] = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
-            else: LepWeight[key][weight_i] += '*' + LepWeight[key]['base'][1]+ '_'+ weight_i + 'SF'
+                LepWeight[lep_i][weight_i] = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
+            else: LepWeight[lep_i][weight_i] += '*' + LepWeight[lep_i]['base'][1]+ '_'+ weight_i + 'SF'
 
 
 print LepWeight
