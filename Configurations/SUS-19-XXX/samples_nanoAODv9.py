@@ -353,7 +353,7 @@ for key in LepWeight:
             if '2016' in opt.tag and weight_i == 'Reco': 
                 LepRecoSF  = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
                 LepWeight[key][weight_i] = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
-            LepWeight[key][weight_i] += '*_' + LepWeight[key]['base'][1] + weight_i + 'SF'
+            else: LepWeight[key][weight_i] += '*' + LepWeight[key]['base'][1]+ "_"+ weight_i + 'SF'
 
 
 print LepWeight
