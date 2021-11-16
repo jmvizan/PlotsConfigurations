@@ -67,18 +67,6 @@ regionName = '__susyMT2reco'+metnom+'/'
 ctrltag = ''
 
 
-#if 'SameSign' in opt.tag or 'Fake' in opt.tag or 'WZVal' in opt.tag or 'WZtoWW' in opt.tag or 'ttZ' in opt.tag or 'ZZVal' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag:
-#    regionName = regionName.replace('reco', 'ctrl')
-#    if 'SameSign' in opt.tag: ctrltag = '_SameSign'
-#    if 'Fake'     in opt.tag: ctrltag = '_Fake'
-#    if 'WZVal'    in opt.tag: ctrltag = '_WZ'
-#    if 'WZtoWW'   in opt.tag: ctrltag = '_WZtoWW'
-#    if 'ttZ'      in opt.tag: ctrltag = '_ttZ'
-#    if 'ZZVal'    in opt.tag: ctrltag = '_ZZ'
-#    if 'FitCRWZ'  in opt.tag: ctrltag = '_WZ'
-#    if 'FitCRZZ'  in opt.tag: ctrltag = '_ZZ'
-
-
 CRs = ["SameSign", "Fake", "WZVal", "WZtoWW", "ttZ", "ZZVal", "FitCRWZ", "FitCRZZ"]
 for CR_i in CRs:
     if CR_i in opt.tag: ctrltag = "_"+CR_i.replace("FitCR","").replace("Val","")
@@ -263,7 +251,7 @@ ISRCutMC   = '&& '+ISRCut
 ### MET Filters 
 
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#UL_data (checked on may20)
-METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter'#*Flag_BadPFMuonDzFilter' #TO BEREADDED WHEN AVAILABLE 
+METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter*Flag_BadPFMuonDzFilter' #TO BEREADDED WHEN AVAILABLE 
 
 if '2017' in opt.tag or '2018' in opt.tag :
     METFilters_Common += '*Flag_ecalBadCalibFilter'
@@ -328,25 +316,32 @@ XSWeight       = 'baseW*genWeight'
 
 # lepton weights
 
+#AdditionalSF = "Lepton_RecoSF[0]*Lepton_RecoSF[1]"
 if '2016' in opt.tag:
     LepRecoSF  = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
     RecoWeight = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
 else: 
     RecoWeight = 'Lepton_RecoSF[0]*Lepton_RecoSF[1]'
-EleWeight      = ElectronSF+'_IdIsoSF[0]*'+ElectronSF+'_IdIsoSF[1]'
-MuoWeight      = MuonSF+'_IdIsoSF[0]*'+MuonSF+'_IdIsoSF[1]'
+EleWeightExt   = ElectronSF+'_ExtraSF[0]*'+ElectronSF+'_ExtraSF[1]'
+MuoWeightExt   = MuonSF+'_ExtraSF[0]*'+MuonSF+'_ExtraSF[1]'
+LepWeight      = EleWeightExt + '*' + MuoWeightExt
+EleWeightId    = ElectronSF+'_IdIsoSF[0]*'+ElectronSF+'_IdIsoSF[1]*'
+MuoWeightId    = MuonSF+'_IdIsoSF[0]*'+MuonSF+'_IdIsoSF[1]'
+LepWeight      = EleWeightId + '*' + MuoWeightId
+EleWeight      = EleWeightId + '*' + EleWeightExtra
+MuoWeight      = MuoWeightId + '*' + MuoWeightExtra
 LepWeight      = EleWeight + '*' + MuoWeight
-EleWeightFS    = EleWeight.replace('IdIsoSF', 'FastSimSF')
-MuoWeightFS    = MuoWeight.replace('IdIsoSF', 'FastSimSF')
-LepWeightFS    = LepWeight.replace('IdIsoSF', 'FastSimSF')
+EleWeightFS    = EleWeightId.replace('IdIsoSF', 'FastSimSF')
+MuoWeightFS    = MuoWeightId.replace('IdIsoSF', 'FastSimSF')
+LepWeightFS    = LepWeightOd.replace('IdIsoSF', 'FastSimSF')
 
 weightReco  = '('+RecoWeight.replace('RecoSF', 'RecoSF_Syst')+')/('+RecoWeight+')'
 weightEle   = '('+EleWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+EleWeight+')'
 weightMuo   = '('+MuoWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+MuoWeight+')'
 weightLep   = '('+LepWeight.replace('IdIsoSF', 'IdIsoSF_Syst')+')/('+LepWeight+')'
-weightEleFS = weightEle.replace('IdIsoSF', 'FastSimSF')
-weightMuoFS = weightMuo.replace('IdIsoSF', 'FastSimSF')
-weightLepFS = weightLep.replace('IdIsoSF', 'FastSimSF')
+weightEleFS = weightEleId.replace('IdIsoSF', 'FastSimSF')
+weightMuoFS = weightMuoId.replace('IdIsoSF', 'FastSimSF')
+weightLepFS = weightLepId.replace('IdIsoSF', 'FastSimSF')
 
 leptonSF = { 
     #'trkreco'         : { 'type' : 'shape', 'weight' : [ '1.', '1.' ] }, ->  no scale factor required
