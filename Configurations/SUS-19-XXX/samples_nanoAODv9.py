@@ -45,7 +45,7 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    print "2016 samples not yet available"
+    print '2016 samples not yet available'
     exit()
     ProductionMC   = 'Summer20UL16_106X_nAODv9_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8__MCSusyNomin2016v8'
     ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
@@ -67,9 +67,9 @@ regionName = '__susyMT2reco'+metnom+'/'
 ctrltag = ''
 
 
-CRs = ["SameSign", "Fake", "WZVal", "WZtoWW", "ttZ", "ZZVal", "FitCRWZ", "FitCRZZ"]
+CRs = ['SameSign', 'Fake', 'WZVal', 'WZtoWW', 'ttZ', 'ZZVal', 'FitCRWZ', 'FitCRZZ']
 for CR_i in CRs:
-    if CR_i in opt.tag: ctrltag = "_"+CR_i.replace("FitCR","").replace("Val","")
+    if CR_i in opt.tag: ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','')
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
@@ -144,7 +144,7 @@ dPhill = 'acos(cos(Lepton_phi['+lep1idx+']-Lepton_phi['+lep0idx+']))'
 dEtall = 'Lepton_eta['+lep1idx+']-Lepton_eta['+lep0idx+']'
 dRll   = 'sqrt('+dPhill+'*'+dPhill+'+'+dEtall+'*'+dEtall+')'
 ptmiss_phi = 'ptmiss_phi'+ctrltag
-if "MET" in opt.tag:
+if 'MET' in opt.tag:
     ptmiss_phi = 'MET_phi' 
 mTllptmiss       = 'sqrt(2*'+pTll+'*ptmiss*(1.-cos('+phill+'-'+ptmiss_phi+')))'
 dPhillptmiss     = 'acos(cos('+phill+'-'+ptmiss_phi+'))'
@@ -316,7 +316,7 @@ XSWeight       = 'baseW*genWeight'
 
 # lepton weights
 
-#AdditionalSF = "Lepton_RecoSF[0]*Lepton_RecoSF[1]"
+#AdditionalSF = 'Lepton_RecoSF[0]*Lepton_RecoSF[1]'
 '''
 EleWeightExt   = ElectronSF+'_ExtraSF[0]*'+ElectronSF+'_ExtraSF[1]'
 MuoWeightExt   = MuonSF+'_ExtraSF[0]*'+MuonSF+'_ExtraSF[1]'
@@ -340,7 +340,7 @@ weightMuoFS = weightMuoId.replace('IdIsoSF', 'FastSimSF')
 weightLepFS = weightLepId.replace('IdIsoSF', 'FastSimSF')
 '''
 
-allweights = ["Extra", "IdIso","Reco", "Tot", "FastSim"]
+allweights = ['Extra', 'IdIso','Reco', 'Tot', 'FastSim']
 LepWeight = { 
     'Ele' : {'base' : [ElectronSF]},
     'Muo' : {'base' : [MuonSF]},
@@ -353,7 +353,7 @@ for key in LepWeight:
             if '2016' in opt.tag and weight_i == 'Reco': 
                 LepRecoSF  = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
                 LepWeight[key][weight_i] = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
-            else: LepWeight[key][weight_i] += '*' + LepWeight[key]['base'][1]+ "_"+ weight_i + 'SF'
+            else: LepWeight[key][weight_i] += '*' + LepWeight[key]['base'][1]+ '_'+ weight_i + 'SF'
 
 
 print LepWeight
@@ -568,7 +568,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'ST_tW_antitop_nohad',False,treePrefix,skipTreesCheck),
                                   'weight' : XSWeight+'*'+SFweight ,
                              }
-        if "_HIPM" in yeartag and 'EOY' in opt.sigset:
+        if '_HIPM' in yeartag and 'EOY' in opt.sigset:
             samples['EOYSingleTopW'] = {    'name'   : getSampleFiles(directoryBkgEOY,'ST_tW_top_nohad',    False,treePrefix,skipTreesCheck) , #CHECK ACTUAL NAME   
                                             'weight' : XSWeight+'*'+SFweight ,
                              }
@@ -586,7 +586,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                              }
         
-        if "_HIPM" in yeartag and 'EOY' in opt.sigset:
+        if '_HIPM' in yeartag and 'EOY' in opt.sigset:
             samples['EOYDoubleTopW'] = {    'name'   : getSampleFiles(directoryBkgEOY,'TTWJetsToQQ',    False,treePrefix,skipTreesCheck) , #CHECK ACTUAL NAME   
                                             'weight' : XSWeight+'*'+SFweight ,
                              }
@@ -613,7 +613,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         if '2017' in yeartag:
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToENMN',False,treePrefix,skipTreesCheck)
             if 'EOY' in opt.sigset: 
-                samples["EOYGluGlu"] = {  'name'   : getSampleFiles(directoryBkgEOY,'GluGluToWWToTNTN',False,treePrefix,skipTreesCheck) +
+                samples['EOYGluGlu'] = {  'name'   : getSampleFiles(directoryBkgEOY,'GluGluToWWToTNTN',False,treePrefix,skipTreesCheck) +
                                                      getSampleFiles(directoryBkgEOY,'GluGluToWWToTNMN',False,treePrefix,skipTreesCheck) , 
                                           'weight' : XSWeight+'*'+SFweight ,
                                   }
@@ -672,7 +672,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                         }  
         addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')
         #addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO'+DYM10ext,  'LHE_HT<70.0') # TODO uncomment when DY samples available
-        if "2016" in yeartag and 'EOY' in opt.sigset: #ALMOST READY
+        if '2016' in yeartag and 'EOY' in opt.sigset: #ALMOST READY
             samples['EOYDrellYan'] = { 'name'   : getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck) +
                                                   getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50-LO'           , False,treePrefix,skipTreesCheck) +
                                                   getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50_HT-400to600'  , False,treePrefix,skipTreesCheck) +
@@ -728,7 +728,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'WWG',False,treePrefix,skipTreesCheck), 
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
-        if "2016" in yeartag and 'EOY' in opt.sigset:
+        if '2016' in yeartag and 'EOY' in opt.sigset:
             samples['EOYVVV'] = { 'name'   : getSampleFiles(directoryBkg,'WWZ',False,treePrefix,skipTreesCheck),
                                   'weight' : XSWeight+'*'+SFweight ,
             }
@@ -815,13 +815,13 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'isDATA'    : 1, 
                            'isFastsim' : 0
                        }
-    v1v2samples = { "SingleMuon"     : ["Run2017E","Run2017F","Run2018A","Run2018B","Run2018C","Run2018D"],
-                    "SingleElectron" : ["Run2017E"],
-                    "DoubleMuon"     : ["Run2018B"],
-                    "EGamma"         : ["Run2018D"]
+    v1v2samples = { 'SingleMuon'     : ['Run2017E','Run2017F','Run2018A','Run2018B','Run2018C','Run2018D'],
+                    'SingleElectron' : ['Run2017E'],
+                    'DoubleMuon'     : ['Run2018B'],
+                    'EGamma'         : ['Run2018D']
               }
 
-    v1v3samples = { "SingleElectron" : ["Run2017F"] }
+    v1v3samples = { 'SingleElectron' : ['Run2017F'] }
     
     for Run in DataRun :
         for DataSet in DataSets :
