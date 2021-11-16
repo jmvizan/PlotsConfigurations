@@ -341,7 +341,6 @@ weightLepFS = weightLepId.replace('IdIsoSF', 'FastSimSF')
 '''
 
 allweights  = ['Extra', 'IdIso','Reco', 'Tot', 'FastSim']
-weight2calc = ['Extra', 'IdIso','Reco', 'FastSim']
 LepWeight = { 
     'Ele' : {'base' : [ElectronSF]},
     'Muo' : {'base' : [MuonSF]},
@@ -360,8 +359,8 @@ for lep_i in LepWeight:
             if lep_i == 'Lep': LepWeight[lep_i][weight_i] += '*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF[0]*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF[1]'
         
 leptonSF2 = {}
-for lep_i in 'Lep':
-    for weight_i in weight2calc:
+for lep_i in ['Lep']:
+    for weight_i in allweights.remove('Tot'):
         leptonSF2[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [LepWeight[lep_i][weight_i].replace('SF', 'SF_Up'), LepWeight[lep_i][weight_i].replace('SF', 'SF_Down')]}
 
 print LepWeight
