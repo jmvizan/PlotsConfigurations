@@ -251,7 +251,7 @@ ISRCutMC   = '&& '+ISRCut
 ### MET Filters 
 
 # https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#UL_data (checked on may20)
-METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter*Flag_BadPFMuonDzFilter' #TO BEREADDED WHEN AVAILABLE 
+METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter*Flag_BadPFMuonDzFilter'
 
 if '2017' in opt.tag or '2018' in opt.tag :
     METFilters_Common += '*Flag_ecalBadCalibFilter'
@@ -336,11 +336,10 @@ for lep_i in LepWeight:
         
 leptonSF = {}
 allweights.remove('Tot')
-
+if 'EOY' in opt.sigset: allweights.remove('Extra')
 for lep_i in ['Lep']:
     for weight_i in allweights:
         lepW_i = LepWeight[lep_i][weight_i]
-        print lepW_i
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
         else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/'+lepW_i, lepW_i.replace('SF[', 'SF_Down[')+'/'+lepW_i]}
 
@@ -365,8 +364,8 @@ nonpromptLepSF_Up   = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' 
 nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateDown']  + ')'
 
 # global SF weights 
-if 'EOY' in opt.tag:
-    SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight['Lep']['Reco'] + '*' + LepWeight['Lep']['IdIso'] +'*' + LepWeight['Lep']['Extra'] + '*' + nonpromptLepSF
+if 'EOY' in opt.sigset:
+    SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight['Lep']['Reco'] + '*' + LepWeight['Lep']['IdIso'] + '*' + nonpromptLepSF
 else:
     SFweightCommon = 'puWeight*' + TriggerEff + '*' + '*' + LepWeight['Lep']['Tot'] + '*' + nonpromptLepSF
 
@@ -484,11 +483,11 @@ if '2016' in yeartag or '2017' in yeartag :
         ]
     elif '2017' in yeartag :
         DataRun = [ 
-            ['B','Run2017B-UL2017_MiniAODv1_NanoAODv2-v1'],
-            ['C','Run2017C-UL2017_MiniAODv1_NanoAODv2-v1'],
-            ['D','Run2017D-UL2017_MiniAODv1_NanoAODv2-v1'],
-            ['E','Run2017E-UL2017_MiniAODv1_NanoAODv2-v1'],
-            ['F','Run2017F-UL2017_MiniAODv1_NanoAODv2-v1'],
+            ['B','Run2017B-UL2017_MiniAODv2_NanoAODv9-v1'],
+            ['C','Run2017C-UL2017_MiniAODv2_NanoAODv9-v1'],
+            ['D','Run2017D-UL2017_MiniAODv2_NanoAODv9-v1'],
+            ['E','Run2017E-UL2017_MiniAODv2_NanoAODv9-v1'],
+            ['F','Run2017F-UL2017_MiniAODv2_NanoAODv9-v1'],
         ]
 
     DataSets = ['MuonEG','DoubleMuon','SingleMuon','DoubleEG','SingleElectron']
@@ -504,19 +503,19 @@ if '2016' in yeartag or '2017' in yeartag :
 elif '2018' in yeartag :
 
     DataRun = [ 
-        ['A','Run2018A-UL2018_MiniAODv1_NanoAODv2-v1'] ,
-        ['B','Run2018B-UL2018_MiniAODv1_NanoAODv2-v1'] ,
-        ['C','Run2018C-UL2018_MiniAODv1_NanoAODv2-v1'] ,
-        ['D','Run2018D-UL2018_MiniAODv1_NanoAODv2-v1'] ,
+        ['A','Run2018A-UL2018_MiniAODv2_NanoAODv9-v1'] ,
+        ['B','Run2018B-UL2018_MiniAODv2_NanoAODv9-v1'] ,
+        ['C','Run2018C-UL2018_MiniAODv2_NanoAODv9-v1'] ,
+        ['D','Run2018D-UL2018_MiniAODv2_NanoAODv9-v1'] ,
     ]
 
     if '2018AB' in opt.tag :
-        DataRun.remove( ['C','Run2018C-UL2018_MiniAODv1_NanoAODv2-v1'] )
-        DataRun.remove( ['D','Run2018D-UL2018_MiniAODv1_NanoAODv2-v1'] )
+        DataRun.remove( ['C','Run2018C-UL2018_MiniAODv2_NanoAODv9-v1'] )
+        DataRun.remove( ['D','Run2018D-UL2018_MiniAODv2_NanoAODv9-v1'] )
 
     if '2018CD' in opt.tag :
-        DataRun.remove( ['A','Run2018A-UL2018_MiniAODv1_NanoAODv2-v1'] )
-        DataRun.remove( ['B','Run2018B-UL2018_MiniAODv1_NanoAODv2-v1'] )
+        DataRun.remove( ['A','Run2018A-UL2018_MiniAODv2_NanoAODv9-v1'] )
+        DataRun.remove( ['B','Run2018B-UL2018_MiniAODv2_NanoAODv9-v1'] )
 
     DataSets = ['MuonEG','DoubleMuon','SingleMuon','EGamma']
 
@@ -794,13 +793,13 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'isDATA'    : 1, 
                            'isFastsim' : 0
                        }
-    v1v2samples = { 'SingleMuon'     : ['Run2017E','Run2017F','Run2018A','Run2018B','Run2018C','Run2018D'],
-                    'SingleElectron' : ['Run2017E'],
-                    'DoubleMuon'     : ['Run2018B'],
-                    'EGamma'         : ['Run2018D']
+    v1v2samples = { 'SingleMuon'     : ['Run2017E','Run2017F','Run2018B','Run2018C'],
+                    'SingleElectron' : ['Run2017D'],
+                    'DoubleMuon'     : ['Run2018D'],
+                    'MET'            : ['Run2018A','Run2018B']
               }
 
-    v1v3samples = { 'SingleElectron' : ['Run2017F'] }
+    v1v3samples = { 'EGamma' : ['Run2018D'] }
     
     for Run in DataRun :
         for DataSet in DataSets :
@@ -845,9 +844,9 @@ if 'MET' in opt.sigset:
 
     for Run in DataRun :
         datasetName = 'MET_'+Run[1]
-        if 'Run2017E' in Run[1]: datasetName = datasetName.replace('-v1', '-v3')
-        if 'Run2018A' in Run[1]: datasetName = datasetName.replace('-v1', '-v5')
-        if 'Run2018B' in Run[1]: datasetName = datasetName.replace('-v1', '-v5')
+        #if 'Run2017E' in Run[1]: datasetName = datasetName.replace('-v1', '-v3')
+        #if 'Run2018A' in Run[1]: datasetName = datasetName.replace('-v1', '-v5')
+        #if 'Run2018B' in Run[1]: datasetName = datasetName.replace('-v1', '-v5')
         FileTarget = getSampleFiles(directoryMET,datasetName,True,treePrefix,skipTreesCheck)
         for iFile in FileTarget:
             samples['DATA']['name'].append(iFile)
