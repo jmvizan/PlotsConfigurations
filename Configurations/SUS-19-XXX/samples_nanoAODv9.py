@@ -317,11 +317,6 @@ XSWeight       = 'baseW*genWeight'
 # lepton weights
 
 #AdditionalSF = "Lepton_RecoSF[0]*Lepton_RecoSF[1]"
-if '2016' in opt.tag:
-    LepRecoSF  = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
-    RecoWeight = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
-else: 
-    RecoWeight = 'Lepton_RecoSF[0]*Lepton_RecoSF[1]'
 '''
 EleWeightExt   = ElectronSF+'_ExtraSF[0]*'+ElectronSF+'_ExtraSF[1]'
 MuoWeightExt   = MuonSF+'_ExtraSF[0]*'+MuonSF+'_ExtraSF[1]'
@@ -345,18 +340,23 @@ weightMuoFS = weightMuoId.replace('IdIsoSF', 'FastSimSF')
 weightLepFS = weightLepId.replace('IdIsoSF', 'FastSimSF')
 '''
 
-allweights = ["Extra", "IdIso","Reco", "Tot"]
-leptonWeight = { 
+allweights = ["Extra", "IdIso","Reco", "Tot", "FastSim"]
+LepWeight = { 
     'Ele' : {'base' : [ElectronSF]},
     'Muo' : {'base' : [MuonSF]},
     'Lep' : {'base' : [ElectronSF, MuonSF]}}
-for key in leptonWeight:
+for key in LepWeight:
     for weight_i in allweights:
         print key, weight_i
-        leptonWeight[key][weight_i] = leptonWeight[key]['base'][0] + '_' + weight_i + 'SF'
-        if len(leptonWeight[key]['base'])>1: leptonWeight[key][weight_i] += '*_' + leptonWeight[key]['base'][1] + weight_i + 'SF'
+        LepWeight[key][weight_i] = LepWeight[key]['base'][0] + '_' + weight_i + 'SF'
+        if len(LepWeight[key]['base'])>1: 
+            if '2016' in opt.tag and weight_i == 'Reco': 
+                LepRecoSF  = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
+                LepWeight[key][weight_i] = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
+            LepWeight[key][weight_i] += '*_' + LepWeight[key]['base'][1] + weight_i + 'SF'
 
-print leptonWeight
+
+print LepWeight
 exit()
 leptonSF = { 
     #'trkreco'         : { 'type' : 'shape', 'weight' : [ '1.', '1.' ] }, ->  no scale factor required
