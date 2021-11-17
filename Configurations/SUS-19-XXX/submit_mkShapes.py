@@ -111,6 +111,7 @@ if __name__ == '__main__':
         if sigset.replace('Backgrounds','') in bkgs or sigset == 'Data': 
             print "please choose a valid signal"
             exit()
+        elif "mc" in split.lower(): allsend = bkgsend
         elif hadd == '0' and sigset in ["SM", "Backgrounds"]:
             allsend = smsend
         else: allsend = smsend+[sigset]

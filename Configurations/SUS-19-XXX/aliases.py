@@ -18,6 +18,8 @@ for sample in samples:
         samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeightFS, 'fastsimLeptonWeight')
 
 if 'UL' in recoFlag:
+    print 'no longer needed'
+    '''
         
     if "noweights" in opt.tag.lower(): 
         print "no additional lepton weights being applied"
@@ -36,7 +38,7 @@ if 'UL' in recoFlag:
                 aliases['additionalLeptonWeight']['samples'].append(sample)
                 samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeight, LepWeight+'*additionalLeptonWeight')
     
-
+    '''
 else:
 
     if '2016' in opt.tag:
