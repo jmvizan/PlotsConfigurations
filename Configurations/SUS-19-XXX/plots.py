@@ -39,21 +39,21 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'samples'  : ['EOYGluGlu']
     }
 
-    groupPlot['EOYSingleTopWtW']  = {
+    groupPlot['tW']  = {
+        'nameHR' : 'tW',
+        'nameLatex' : '\\tW',
+        'isSignal' : 0,
+        'color': 403,   # kYellow+3
+        'samples'  : ['STtW', 'tW'] 
+    }
+
+    groupPlot['EOYSingleTopW']  = {
         'nameHR' : 'EOY tW',
         'nameLatex' : 'EOY \\tW',
         'isSignal' : 0,
         'color': 403,   # kYellow+3
         'fill' : 3005,
-        'samples'  : ['STtW', 'tW'] 
-    }
-
-    groupPlot['']  = {
-        'nameHR' : 'tW',
-        'nameLatex' : '\\tW',
-        'isSignal' : 0,
-        'color': 403,   # kYellow+3
-        'samples'  : ['STtW', 'tW']
+        'samples'  : ['EOYSingleTopW']
     }
 
     groupPlot['DY']  = {
@@ -70,7 +70,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'isSignal' : 0,
         'color': 418,    # kGreen+2
         'fill' : 3005,
-        'samples'  : ['DY']
+        'samples'  : ['EOYDrellYan']
     }
 
     groupPlot['ZZ']  = {
