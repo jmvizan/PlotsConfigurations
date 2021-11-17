@@ -286,7 +286,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         plot['EOYGluGlu']     = plot['WW']
         plot['EOYSingleTopW'] = plot['STtW']
         plot['EOYDoubleTopW'] = plot['ttW']
-        plot['EOYVW']         = plot['WZ']
+        plot['EOYVZ']         = plot['WZ']
         plot['EOYDrellYan']   = plot['DY']
         plot['EOY3V']         = plot['VVV']
 

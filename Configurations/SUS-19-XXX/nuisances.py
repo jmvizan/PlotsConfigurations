@@ -95,7 +95,7 @@ for scalefactor in bTagNuisances:
                 if 'FS' not in scalefactor or samples[sample]['isFastsim']:
                     if 'EOY' not in sample or scalefactor!='btagcor': 
                         nuisances[scalefactor+bsel]['samples'][sample] = [ bselweight.replace('syst', scafactvar.replace('VAR', 'up'  )),
-                                                                           bselweight.replace('syst', scafactvar.replace('VAR', 'down')) ],
+                                                                           bselweight.replace('syst', scafactvar.replace('VAR', 'down')) ]
         for cut in cuts.keys():
             for bselcut in bSelections[bsel]['cuts']:
                 if bselcut in cut:
