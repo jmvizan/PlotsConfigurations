@@ -390,7 +390,7 @@ for lep_i in ['Lep']:
     for weight_i in allweights:
         lepW_i = LepWeight[lep_i][weight_i]
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
-        else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/'+lepW_i, lepW_i.replace('SF[', 'SF_Down[')+'/'+lepW_i]}
+        else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
 
 # nonprompt lepton rate TODO: update to UL values <- This is done, isnt it? I don't think so, not nAODv9 for sure
 
