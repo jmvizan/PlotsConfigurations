@@ -6,17 +6,37 @@ from LatinoAnalysis.Tools.commonTools import *
 
 ### Generals
 
+# lumi from https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#TabLum
+
 opt.lumi = 0.
 if '2016' in opt.tag : 
-    opt.lumi += 35.9 # 35.92
+    opt.lumi += 35.9 # 35.92 --> 36.33
     yeartag = '2016'
+    lumi_uncertainty     = '1.012'
+    lumi_uncertainty_unc = '1.010'
+    lumi_uncertainty_cor = '1.006'
+    lumi_uncertainty_dos = '1.000'
+    trigger_uncertainty  = '1.020'
 if '2017' in opt.tag : 
-    opt.lumi += 41.5 # 41.53
+    opt.lumi += 41.5 # 41.53 --> 41.48
     yeartag = '2017'
+    lumi_uncertainty     = '1.023'
+    lumi_uncertainty_unc = '1.020'
+    lumi_uncertainty_cor = '1.009'
+    lumi_uncertainty_dos = '1.006'
+    trigger_uncertainty  = '1.020'
 if '2018' in opt.tag : 
-    opt.lumi += 59.7 # 59.74
+    opt.lumi += 59.7 # 59.74 --> 59.83
     yeartag = '2018'
+    lumi_uncertainty     = '1.025'
+    lumi_uncertainty_unc = '1.015'
+    lumi_uncertainty_cor = '1.020'
+    lumi_uncertainty_dos = '1.002'
+    trigger_uncertainty  = '1.020'
 print 'Value of lumi set to', opt.lumi
+
+nuis_jer_whole  = True
+nuis_lumi_split = False
 
 treePrefix= 'nanoLatino_'
 
@@ -82,6 +102,8 @@ directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', '
 
 directoryBkgEOY = directoryBkg.replace('Summer20UL17_106X_nAODv8', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv8', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')   
 
+# nuisance parameters
+
 removeZeros = 1 if 'StatZero' in opt.tag else 0
 #removeZeros = 0 if 'NoStat0' in opt.tag else 1
 
@@ -91,10 +113,12 @@ if metnom=='Nomin':
     #treeNuisances['jesTotal']  = { 'name' : 'JES',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
     #treeNuisances['unclustEn'] = { 'name' : 'MET',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 elif metnom=='Smear':
-    #treeNuisances['jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
-    treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
-    treeNuisances['jesTotal']  = { 'name' : 'SJS',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
-    treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
+    if not nuis_jer_whole:
+        treeNuisances['jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
+    else:
+        treeNuisances['jer']      = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
+    treeNuisances['jesTotal']     = { 'name' : 'SJS',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
+    treeNuisances['unclustEn']    = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 
 treeNuisanceDirs = { }
 #treeNuisanceSuffix = '' if  'ctrl' in regionName else '__hadd'
@@ -118,6 +142,26 @@ for treeNuisance in treeNuisances:
     if 'EOY' in opt.sigset:
         treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL17_106X_nAODv8', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv8', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
         treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL17_106X_nAODv8', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv8', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+
+globalNuisances = { }
+globalNuisances['trigger'] = { 'name' : 'trigger_'+yeartag, 'value' : trigger_uncertainty }
+if nuis_lumi_split:
+    globalNuisances['lumi_unc'] = { 'name' : 'lumi_'+yeartag, 'value' : lumi_uncertainty_unc }
+    globalNuisances['lumi_cor'] = { 'name' : 'lumi'         , 'value' : lumi_uncertainty_cor }
+    if '2016' not in yeartag:
+        globalNuisances['lumi_dos'] = { 'name' : 'lumi_1718', 'value' : lumi_uncertainty_dos }
+else:
+    globalNuisances['lumi']     = { 'name' : 'lumi_'+yeartag, 'value' : lumi_uncertainty }
+
+bTagNuisances = {
+    'btag'     : { 'name' : 'btag_'+yeartag,     'var' : 'b_VAR' },
+    #'btagunc'  : { 'name' : 'btag_'+yeartag,     'var' : 'b_VAR_uncorrelated' },
+    #'btagcor'  : { 'name' : 'btag',              'var' : 'b_VAR_correlated' },
+    'mistag'   : { 'name' : 'mistag_'+yeartag,   'var' : 'l_VAR' },
+    'btagFS'   : { 'name' : 'btagFS_'+yeartag,   'var' : 'b_VAR_fastsim' },
+    'ctagFS'   : { 'name' : 'ctagFS_'+yeartag,   'var' : 'c_VAR_fastsim' },
+    'mistagFS' : { 'name' : 'mistagFS_'+yeartag, 'var' : 'l_VAR_fastsim' },
+}
 
 # Complex cut variables
 
@@ -251,7 +295,7 @@ if 'pt30' in opt.tag: btagWeight1tag += '_Pt30'
 btagWeight0tag = '(1.-'+btagWeight1tag+')'
 btagWeight2tag = btagWeight1tag.replace('_1tag_', '_2tag_')
 
-ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
+ISRCut = '(CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5)'
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
 
@@ -286,10 +330,7 @@ if '2017' in yeartag and 'EENoise' in opt.tag:
     elif 'EENoiseHT' in opt.tag:
         VetoEENoise = '('+HTForwardSoft+'<60.)'
     elif 'EENoiseDPhiHard' in opt.tag:
-        if 'UL' in recoFlag:
-            VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>2.560)==0)'
-        else:
-            VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0)'
+        VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>2.560)==0)'
     elif 'EENoiseDPhiSoftPt50' in opt.tag:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_pt50+'>0. && '+dPhieenoiseptmiss_pt50+'<0.96)==0)'
     elif 'EENoiseDPhiSoft' in opt.tag:
@@ -568,8 +609,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'TTWJetsToQQ',False,treePrefix,skipTreesCheck), 
                                 'weight' : XSWeight+'*'+SFweight ,
                              }
-
-       
+ 
         samples['WW']    = {    'name'   :   getSampleFiles(directoryBkg,'WWTo2L2Nu',           False,treePrefix,skipTreesCheck) +
                                              getSampleFiles(directoryBkg,'GluGluToWWToENEN',False,treePrefix,skipTreesCheck) +
                                              getSampleFiles(directoryBkg,'GluGluToWWToENMN',False,treePrefix,skipTreesCheck) +
@@ -584,6 +624,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                             }
         if '2017' in yeartag : 
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToTNEN',False,treePrefix,skipTreesCheck)
+
         if '2018' in opt.tag and 'EOY' in opt.tag:
             samples['EOYGluGlu']    = {  'name'   : getSampleFiles(directoryBkgEOY,'GluGluToWWToTNEN',False,treePrefix,skipTreesCheck),
                                          'weight' : XSWeight+'*'+SFweight ,
@@ -663,7 +704,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                                     getSampleFiles(directoryBkgEOY,'ZZTo2L2Q',False,treePrefix,skipTreesCheck) ,
                                        'weight' : XSWeight+'*'+SFweight
                                    }
-        
+
         WZZext = '_ext1' if '2018' in yeartag else ''
         samples['VVV']   = {    'name'   :   getSampleFiles(directoryBkg,'WWW',False,treePrefix,skipTreesCheck) + 
                                              getSampleFiles(directoryBkg,'WWZ',False,treePrefix,skipTreesCheck) + 

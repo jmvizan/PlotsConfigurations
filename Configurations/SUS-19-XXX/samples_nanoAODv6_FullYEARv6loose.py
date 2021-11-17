@@ -8,15 +8,30 @@ from LatinoAnalysis.Tools.commonTools import *
 
 opt.lumi = 0.
 if '2016' in opt.tag : 
-    opt.lumi += 35.9 # 35.92
+    opt.lumi += 35.9 # 35.92 --> 36.33
     yeartag = '2016'
+    lumi_uncertainty     = '1.025'
+    lumi_uncertainty_unc = '1.022'
+    lumi_uncertainty_cor = '1.012'
+    trigger_uncertainty  = '1.020'
 if '2017' in opt.tag : 
-    opt.lumi += 41.5 # 41.53
+    opt.lumi += 41.5 # 41.53 --> 41.53
     yeartag = '2017'
+    lumi_uncertainty     = '1.023'
+    lumi_uncertainty_unc = '1.020'
+    lumi_uncertainty_cor = '1.011'
+    trigger_uncertainty  = '1.020'
 if '2018' in opt.tag : 
-    opt.lumi += 59.7 # 59.74
+    opt.lumi += 59.7 # 59.74 --> 59.74
     yeartag = '2018'
+    lumi_uncertainty     = '1.025'
+    lumi_uncertainty_unc = '1.015'
+    lumi_uncertainty_cor = '1.020'
+    trigger_uncertainty  = '1.020'
 print 'Value of lumi set to', opt.lumi
+
+nuis_jer_whole  = True
+nuis_lumi_split = False
 
 treePrefix= 'nanoLatino_'
 
@@ -77,6 +92,8 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
 
+# nuisance parameters
+
 #removeZeros = 1 #if 'StatZero' in opt.tag else 0
 removeZeros = 0 if 'NoStat0' in opt.tag else 1
 
@@ -86,8 +103,10 @@ if metnom=='Nomin':
     treeNuisances['jesTotal']  = { 'name' : 'JES',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
     treeNuisances['unclustEn'] = { 'name' : 'MET',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 elif metnom=='Smear':
-    #treeNuisances['jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
-    treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
+    if not nuis_jer_whole:
+        treeNuisances['jer']   = { 'name' : 'JER',  'jetname' : 'JER', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
+    else:
+        treeNuisances['jer']   = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
     treeNuisances['jesTotal']  = { 'name' : 'SJS',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
     treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 
@@ -98,7 +117,7 @@ for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
     if treeNuisance=='jer' and treeNuisances[treeNuisance]['name']!='JER':
         treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
-        treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg
+        treeNuisa/nceDirs['jer']['MC']['Down'] = directoryBkg
         treeNuisanceDirs['jer']['FS']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
         treeNuisanceDirs['jer']['FS']['Down'] = directorySig
     else:
@@ -110,6 +129,22 @@ for treeNuisance in treeNuisances:
         for variation in [ 'Down', 'Up' ]:
             treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
             treeNuisanceDirs[treeNuisance]['FS'][variation]  = directorySigTemp.replace('variation', variation[:2])
+
+globalNuisances = { }
+globalNuisances['trigger'] = { 'name' : 'trigger_'+yeartag, 'value' : trigger_uncertainty }
+if nuis_lumi_split:
+    globalNuisances['lumi_unc'] = { 'name' : 'lumi_'+yeartag, 'value' : lumi_uncertainty_unc }
+    globalNuisances['lumi_cor'] = { 'name' : 'lumi',          'value' : lumi_uncertainty_cor }
+else:
+    globalNuisances['lumi']     = { 'name' : 'lumi_'+yeartag, 'value' : lumi_uncertainty }
+
+bTagNuisances = { 
+    'btag'     : { 'name' : 'btag_'+yeartag,     'var' : 'b_VAR' },
+    'mistag'   : { 'name' : 'mistag_'+yeartag,   'var' : 'l_VAR' },  
+    'btagFS'   : { 'name' : 'btagFS_'+yeartag,   'var' : 'b_VAR_fastsim' }, 
+    'ctagFS'   : { 'name' : 'ctagFS_'+yeartag,   'var' : 'c_VAR_fastsim' }, 
+    'mistagFS' : { 'name' : 'mistagFS_'+yeartag, 'var' : 'l_VAR_fastsim' },
+}
 
 # Complex cut variables
 
