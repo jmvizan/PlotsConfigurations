@@ -378,7 +378,7 @@ for lep_i in LepWeight:
                 LepRecoSF  = '((abs(Lepton_pdgId[LEPIDX])==13)+(Lepton_RecoSF[LEPIDX]*(abs(Lepton_pdgId[LEPIDX])==11)))'
                 LepWeight[lep_i][weight_i] = LepRecoSF.replace('LEPIDX', '0') + '*' + LepRecoSF.replace('LEPIDX', '1')
             else: 
-                LepWeight[lep_i][weight_i] = 'LeptonSF_' + weight_i + 'SF[0]*LeptonSF_' + weight_i + 'SF[1]'
+                LepWeight[lep_i][weight_i] = 'Lepton_' + weight_i + 'SF[0]*Lepton_' + weight_i + 'SF[1]'
         else:
             LepWeight[lep_i][weight_i] = LepWeight[lep_i]['base'][0] + '_' + weight_i + 'SF[0]*'+LepWeight[lep_i]['base'][0] + '_' + weight_i + 'SF[1]'
             if lep_i == 'Lep': LepWeight[lep_i][weight_i] += '*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF[0]*'+LepWeight[lep_i]['base'][1] + '_' + weight_i + 'SF[1]'
