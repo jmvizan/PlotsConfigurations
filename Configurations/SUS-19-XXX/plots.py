@@ -39,12 +39,21 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'samples'  : ['EOYGluGlu']
     }
 
-    groupPlot['tW']  = {
+    groupPlot['EOYSingleTopWtW']  = {
+        'nameHR' : 'EOY tW',
+        'nameLatex' : 'EOY \\tW',
+        'isSignal' : 0,
+        'color': 403,   # kYellow+3
+        'fill' : 3005,
+        'samples'  : ['STtW', 'tW'] 
+    }
+
+    groupPlot['']  = {
         'nameHR' : 'tW',
         'nameLatex' : '\\tW',
         'isSignal' : 0,
         'color': 403,   # kYellow+3
-        'samples'  : ['STtW', 'tW'] 
+        'samples'  : ['STtW', 'tW']
     }
 
     groupPlot['DY']  = {
@@ -53,6 +62,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'isSignal' : 0,
         'color': 418,    # kGreen+2
         'samples'  : ['DY'] 
+    }
+
+    groupPlot['EOYDrellYan']  = {
+        'nameHR' : 'EOY Drell-Yan',
+        'nameLatex' : 'EOY \\DY',
+        'isSignal' : 0,
+        'color': 418,    # kGreen+2
+        'fill' : 3005,
+        'samples'  : ['DY']
     }
 
     groupPlot['ZZ']  = {
@@ -79,6 +97,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'samples'  : ['WZ'] 
     }
      
+    groupPlot['EOYVZ']  = {
+        'nameHR' : 'EOY WZ+ggZZ',
+        'nameLatex' : 'EOY WZ+ggZZ',
+        'isSignal' : 0,
+        'color': 798,    # kOrange-2
+        'fill' : 3005,
+        'samples'  : ['EOYVZ']
+    }
+
     groupPlot['Others']  = {  
         'nameHR' : 'Minor bkg.',
         'isSignal' : 0,
@@ -91,7 +118,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'isSignal' : 0,
         'color': 394, #  kYellow-6
         'fill' : 3005,
-        'samples'  : ['EOYQQ', 'EOYH']
+        'samples'  : ['EOYQQ', 'EOYH', 'EOY3V', 'EOYDoubleTopW']
     }
   
     groupPlot['ZZTo4L'] = {
@@ -253,10 +280,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     }
 
     if 'EOY' in opt.tag:
-        plot['EOYZZ4L']   = plot['ZZTo4L']
-        plot['EOYH']      = plot['Higgs']
-        plot['EOYQQ']     = plot['VZ']
-        plot['EOYGluGlu'] = plot['WW']
+        plot['EOYZZ4L']       = plot['ZZTo4L']
+        plot['EOYH']          = plot['Higgs']
+        plot['EOYQQ']         = plot['VZ']
+        plot['EOYGluGlu']     = plot['WW']
+        plot['EOYSingleTopW'] = plot['STtW']
+        plot['EOYDoubleTopW'] = plot['ttW']
+        plot['EOYVW']         = plot['WZ']
+        plot['EOYDrellYan']   = plot['DY']
+        plot['EOY3V']         = plot['VVV']
 
     # Backward compatibility for background names
     plot['tW']  = plot['STtW']

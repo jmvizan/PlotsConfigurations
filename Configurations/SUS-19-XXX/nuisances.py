@@ -17,16 +17,16 @@ nuisances['stat']  = {
 
 ### global lnN (luminosity and trigger)
 
-for globalUncertainty in globalUncertainties:
+for globalNuisance in globalNuisances:
 
-    nuisances[globalUncertainty]  = {
-                   'name'  : globalUncertainties[globalUncertainty]['name']
+    nuisances[globalNuisance]  = {
+                   'name'  : globalNuisances[globalNuisance]['name'],
                    'samples'  : { },
                    'type'  : 'lnN',
     }
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
-            nuisances[globalUncertainty]['samples'][sample] = globalUncertainties[globalUncertainty]['value']
+            nuisances[globalNuisance]['samples'][sample] = globalNuisances[globalNuisance]['value']
 
 # background cross section and scale factor uncertainties
 
@@ -48,9 +48,9 @@ for background in normBackgroundNuisances:
             scalefactorFromData = normBackgroundNuisances[background][region]['scalefactorFromData']  
 
         if scalefactorFromData: # Remove gloabl lnN uncertainties for backgrounds normalized on data
-            for globalUncertainty in globalUncertainties: 
-                if background in nuisances[globalUncertainty]['samples']:
-                    del nuisances[globalUncertainty]['samples'][background]
+            for globalNuisance in globalNuisances: 
+                if background in nuisances[globalNuisance]['samples']:
+                    del nuisances[globalNuisance]['samples'][background]
 
 ### shapes
 
@@ -68,7 +68,8 @@ for scalefactor in leptonSF:
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]['weight']
+                if 'EOY' not in sample or 'Extra' not in scalefactor:
+                    nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]['weight']
 
 # b-tagging scale factors
 
@@ -87,11 +88,14 @@ for scalefactor in bTagNuisances:
             'type'  : 'shape',
             'cuts'  : [ ]           
         }
+        bselweight = bSelections[bsel]['weight']
+        scafactvar = bTagNuisances[scalefactor]['var']
         for sample in samples.keys():
             if not samples[sample]['isDATA']:
                 if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                    nuisances[scalefactor+bsel]['samples'][sample] = [ bSelections[bsel]['weight'].replace('syst', bTagNuisances[scalefactor]['var'].replace('VAR', 'up'  )),
-                                                                       bSelections[bsel]['weight'].replace('syst', bTagNuisances[scalefactor]['var'].replace('VAR', 'down')) ],
+                    if 'EOY' not in sample or scalefactor!='btagcor': 
+                        nuisances[scalefactor+bsel]['samples'][sample] = [ bselweight.replace('syst', scafactvar.replace('VAR', 'up'  )),
+                                                                           bselweight.replace('syst', scafactvar.replace('VAR', 'down')) ],
         for cut in cuts.keys():
             for bselcut in bSelections[bsel]['cuts']:
                 if bselcut in cut:

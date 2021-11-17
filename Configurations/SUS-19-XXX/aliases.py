@@ -15,11 +15,9 @@ aliases['fastsimLeptonWeight'] = {
 for sample in samples:
     if 'isFastsim' in samples[sample] and samples[sample]['isFastsim']:
         aliases['fastsimLeptonWeight']['samples'].append(sample)
-        samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeightFS, 'fastsimLeptonWeight')
+        samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeight['Lep']['FastSim'], 'fastsimLeptonWeight')
 
-if 'UL' in recoFlag:
-    print 'no longer needed'
-    '''
+if 'nanoAODv8' in opt.samplesFile:
         
     if "noweights" in opt.tag.lower(): 
         print "no additional lepton weights being applied"
@@ -38,8 +36,7 @@ if 'UL' in recoFlag:
                 aliases['additionalLeptonWeight']['samples'].append(sample)
                 samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeight, LepWeight+'*additionalLeptonWeight')
     
-    '''
-else:
+elif 'nanoAODv6' in opt.samplesFile:
 
     if '2016' in opt.tag:
         zerohitElectronRootFile = 'Full2016v2/ElectronScaleFactors_Run2016_SUSY.root'
