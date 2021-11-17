@@ -793,7 +793,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'isDATA'    : 1, 
                            'isFastsim' : 0
                        }
-    v1v2samples = { 'SingleMuon'     : ['Run2017E','Run2017F','Run2018B','Run2018C'],
+    v1v2samples = { 'SingleMuon'     : ['Run2018B','Run2018C'],
                     'SingleElectron' : ['Run2017D'],
                     'DoubleMuon'     : ['Run2018D'],
                     'MET'            : ['Run2018A','Run2018B']
