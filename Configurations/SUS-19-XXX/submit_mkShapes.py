@@ -11,7 +11,7 @@ def confirm():
 
 
 def logtitle(filename,sigset):
-    if(os.path.exists(filename) is False):  print "CREATING LOG FILE\n:"+filename
+    if(os.path.exists(filename) is False):  print "CREATING LOG FILE :"+filename
     f = open(filename,"a")
     # Textual month, day and year                                                                      
     now = datetime.now()
@@ -42,15 +42,15 @@ if __name__ == '__main__':
         yearset = args[1].split('-')
 
     if   args[2] == '0':
-        tag = 'Preselection'
+        tags = 'Preselection'
     elif args[2] == '1':
-        tag = 'ValidationRegions'
+        tags = 'ValidationRegions'
     elif args[2] == '2':
-        tag = 'StopSignalRegions'
+        tags = 'StopSignalRegions'
     else:
-        tag = args[2]
+        tags = args[2]
     
-    #    tag=sys.argv[2]                                                                         
+    #    tags=sys.argv[2]                                                                         
     lastarg = len(args)-1
     yearnm  = '-'.join(yearset)
     hadd    = args[3]
@@ -72,11 +72,12 @@ if __name__ == '__main__':
     sigset = args[4]
     
     multi  = 'Multi'
-    print tag.lower()
-    if '_notmulti' in tag.lower() : 
-        multi=''
-        sigset=tag.split('_notmulti')[0]
+    
+    if '_notmulti' in tags.lower() : 
+        multi = ''
+        tags   = tags.split('_notmulti')[0]
         print "not running on multi"
+
     queue  = ''
     split  = ''
     rmlog  = None
@@ -92,18 +93,22 @@ if __name__ == '__main__':
             split  = args[5]
     
     if "amap" in split.lower(): split = "AsMuchAsPossible"
-
+    script    = './run_mkShapes'+multi+'.sh'
     keepsplit = False
-    allsam  = None
-    bkgs    = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY', 'Higgs']
-    bkgsend = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY', 'BackgroundsEOY']
-    smsend  = bkgsend+ ['Data']
+    allsam    = None
+    bkgs      = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY', 'Higgs']
+    bkgsend   = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY', 'BackgroundsEOY']
+    smsend    = bkgsend+ ['Data']
     for signal in sigset.split('__'):
         print "sample:",signal
     if        len(sigset.split('__'))>1 : allsend = sigset.split('__')
     elif           '.' in sigset        : allsend = readsamples(sigset)
     elif 'backgrounds' in split.lower() : allsend = bkgsend
     elif          'SM' in split         : allsend = smsend
+    elif        'plot' in args[-1].lower() : 
+        allsend = ["SM"]
+        script  = './run_mkPlot.sh'
+        hadd    = '' 
     elif         'all' in split.lower() :
         all_sam = True
         #print bool(hadd=='0'), bool(sigset in 
@@ -120,25 +125,27 @@ if __name__ == '__main__':
         keepsplit = True
 
     shapes_fol  = "./Shapes/log/"+yearnm+'/'
-    shapes_file = shapes_fol+tag+'_'+sigset+'.log'
-    os.system('mkdir -p '+shapes_fol)
-    allcomms= []
+    allcomms    = []
+    for tag in tags.split('_'):
 
-    if rmlog:
-        os.system('rm '+shapes_file)
-        print "REMOVING FILE:\n", shapes_file
-    logtitle(shapes_file,tag+" "+sigset+" "+split)
-    for samsend in allsend:
-        if hadd =='1' and 'Veto' in samsend: continue
-        #if hadd =='0' and all_sam is True and  : continue
-        if keepsplit is False:
-            if samsend in smsend and 'Veto' not in samsend and 'EOY' not in samsend:
-                split = 'AsMuchAsPossible'
-            else:
-                split = ''
-        for year in yearset:
-            command = "./run_mkShapes"+multi+".sh "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
-            allcomms.append(command)
+        shapes_file = shapes_fol+tag+'_'+sigset+'.log'
+        os.system('mkdir -p '+shapes_fol)
+        
+        if rmlog:
+            os.system('rm '+shapes_file)
+            print "REMOVING FILE:\n", shapes_file
+        logtitle(shapes_file,tag+" "+sigset+" "+split)
+        for samsend in allsend:
+            if hadd =='1' and 'Veto' in samsend: continue
+            #if hadd =='0' and all_sam is True and  : continue
+            if keepsplit is False:
+                if samsend in smsend and 'Veto' not in samsend and 'EOY' not in samsend:
+                    split = 'AsMuchAsPossible'
+                else:
+                    split = ''
+            for year in yearset:
+                command = script+" "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
+                allcomms.append(command)
     print "Commands to be ran:"
     for comm in allcomms:
         print comm
