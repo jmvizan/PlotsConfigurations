@@ -755,7 +755,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             samples['EOY3V'] = { 'name'   : getSampleFiles(directoryBkgEOY,'WWZ',False,treePrefix,skipTreesCheck),
                                  'weight' : XSWeight+'*'+SFweight ,
                                 }
-        elif '2016' not in yeartag:
+        elif '2017' in yeartag:
             samples['VVV']['name'] += getSampleFiles(directoryBkg,'WWZ',False,treePrefix,skipTreesCheck)
 
         if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot) or 'TheoryNormalizations' in opt.tag:
