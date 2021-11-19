@@ -751,7 +751,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                              getSampleFiles(directoryBkg,'WWG',False,treePrefix,skipTreesCheck), 
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
-        if '2016' in yeartag and 'EOY' in opt.tag:
+        if ('2016' in yeartag or '2018' in yeartag) and 'EOY' in opt.tag:
             samples['EOY3V'] = { 'name'   : getSampleFiles(directoryBkgEOY,'WWZ',False,treePrefix,skipTreesCheck),
                                  'weight' : XSWeight+'*'+SFweight ,
                                 }
