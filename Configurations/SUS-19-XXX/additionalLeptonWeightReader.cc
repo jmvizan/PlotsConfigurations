@@ -90,7 +90,7 @@ void AdditionalLeptonWeightReader::setValues() {
     if (lepId==11 || lepId==-11) { // How was abs in C++?
       additionalLeptonWeight *= this->GetBinContent4Weight(histEleAdditionalLeptonWeightReader, lepEta, lepPt, 0);
     } else {
-      additionalLeptonWeight *= this->GetBinContent4Weight(histMuoAdditionalLeptonWeightReader, lepPt, lepEta, 0);
+      additionalLeptonWeight *= this->GetBinContent4Weight(histMuoAdditionalLeptonWeightReader, lepEta, lepPt, 0);
     }
     //std::cout<<"ilep:"<<ilep<<" ID:"<<lepId<<", weight: "<<additionalLeptonWeight<<", pt "<<lepPt<<", eta: "<< lepEta<< std::endl;
   }

@@ -11,9 +11,16 @@ from LatinoAnalysis.Tools.commonTools import *
 # https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#LumiComb (minimal correlations 2016-2018)
 
 opt.lumi = 0.
-if '2016' in opt.tag : 
-    opt.lumi += 36.33
-    yeartag = '2016'
+if '2016' in opt.tag:
+    if 'noHIPM' in opt.tag:
+        opt.lumi += 16.81 
+        yeartag = '2016noHIPM'
+    elif 'HIPM' in opt.tag:
+        opt.lumi += 19.52
+        yeartag = '2016HIPM'
+    else: 
+        opt.lumi += 36.33
+        yeartag = '2016'
     lumi_uncertainty     = '1.012'
     lumi_uncertainty_unc = '1.010'
     lumi_uncertainty_cor = '1.006'
@@ -69,9 +76,12 @@ elif 'ifca' in SITE or 'cloud' in SITE:
 if '2016' in yeartag :
     print '2016 samples not yet available'
     exit()
-    ProductionMC   = 'Summer20UL16_106X_nAODv9_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8__MCSusyNomin2016v8'
+    if 'HIPM' not in yeartag :
+        if not hasattr(opt, 'doHadd'): 
+            skipTreesCheck = True
+    ProductionMC   = 'Summer20UL16_106X_nAODv9_'+yeartag.replace('2016', '')+'_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8__MCSusyNomin2016v8'
     ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
-    ProductionData = 'Run2016_106X_nAODv9_Full2016v8/DATASusy2016v8__hadd'
+    ProductionData = 'Run2016_106X_nAODv9_'+yeartag.replace('2016', '')+'Full2016v8/DATASusy2016v8__hadd'
 elif '2017' in yeartag :
     ProductionMC   = 'Summer20UL17_106X_nAODv9_Full2017v8/MCSusy2017v8__MCSusyCorr2017v8__MCSusyNomin2017v8'
     ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6loose/hadd__susyGen__susyW__FSSusy2017v6loose__FSSusyCorr2017v6loose__FSSusyNomin2017v6loose'
@@ -88,10 +98,12 @@ if 'Smear' in opt.tag:
 regionName = '__susyMT2reco'+metnom+'/'
 ctrltag = ''
 
-
 CRs = ['SameSign', 'Fake', 'WZVal', 'WZtoWW', 'ttZ', 'ZZVal', 'FitCRWZ', 'FitCRZZ']
 for CR_i in CRs:
-    if CR_i in opt.tag: ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','')
+    if CR_i in opt.tag:
+        regionName = regionName.replace('reco', 'ctrl') 
+        ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','')
+
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
@@ -408,10 +420,10 @@ nonpromptLepSF_Up   = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' 
 nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateDown']  + ')'
 
 # global SF weights 
-if 'EOY' in opt.sigset:
+if 'EOY' in opt.sigset or 'TestExtra' in opt.tag:
     SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight['Lep']['Reco'] + '*' + LepWeight['Lep']['IdIso'] + '*' + nonpromptLepSF
 else:
-    SFweightCommon = 'puWeight*' + TriggerEff + '*' + '*' + LepWeight['Lep']['Tot'] + '*' + nonpromptLepSF
+    SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight['Lep']['Tot'] + '*' + nonpromptLepSF
 
 if '2016' in yeartag or '2017' in yeartag: 
     SFweightCommon += '*PrefireWeight'
@@ -584,7 +596,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                             'weight' : XSWeight+'*'+SFweightFS ,
                             }
 
-    if 'btagefficiencies' not in opt.tag and 'Test' not in opt.tag:
+    if 'btagefficiencies' not in opt.tag and 'TEST' not in opt.tag:
     
         samples['STtW']    = {    'name'   : #getSampleFiles(directoryBkg,'ST_tW_top_nohad',    False,treePrefix,skipTreesCheck) +
                                              getSampleFiles(directoryBkg,'ST_tW_antitop_nohad',False,treePrefix,skipTreesCheck),
@@ -693,10 +705,10 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                         }  
 
         if '2016' in yeartag and 'EOY' in opt.tag: #ALMOST READY
-            samples['EOYDrellYan'] = { 'name'   : getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck) +
+            samples['EOYDrellYan'] = { 'name'   : getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck) + # Missing for noHIPM
                                                   getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50-LO'           , False,treePrefix,skipTreesCheck) +
                                                   getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50_HT-400to600'  , False,treePrefix,skipTreesCheck) +
-                                                  getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50_HT-1200to2500', False,treePrefix,skipTreesCheck) ,
+                                                  getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50_HT-1200to2500', False,treePrefix,skipTreesCheck) , # Missing for HIPM
                                        'weight' : XSWeight+'*'+SFweight ,
                                    }
         if '2017' in yeartag or '2018' in yeartag:

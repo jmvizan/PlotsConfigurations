@@ -5,19 +5,23 @@ fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag+'/fastsimLepton
 fastsimMuonScaleFactorHisto = 'Muo_tight_fullsim'
 fastsimElectronScaleFactorHisto = 'Ele_tight_fullsim'
 
+if 'nanoAODv9' in opt.samplesFile: 
+    LepWeightFS = LepWeight['Lep']['FastSim']
+    if 'TestExtraV8' in opt.tag: LepWeight = LepWeight['Lep']['IdIso']
+    if 'TestExtraV6' in opt.tag: EleWeight = LepWeight['Lep']['IdIso']
+
 aliases['fastsimLeptonWeight'] = {
         'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/fastsimLeptonWeightReader.cc+' ],
         'class': 'FastsimLeptonWeightReader',
         'args': ( fastsimLeptonScaleFactorFile, fastsimMuonScaleFactorHisto, fastsimElectronScaleFactorHisto ),
         'samples': [ ]
 } 
-
 for sample in samples:
     if 'isFastsim' in samples[sample] and samples[sample]['isFastsim']:
         aliases['fastsimLeptonWeight']['samples'].append(sample)
-        samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeight['Lep']['FastSim'], 'fastsimLeptonWeight')
+        samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeightFS, 'fastsimLeptonWeight')
 
-if 'nanoAODv8' in opt.samplesFile:
+if 'nanoAODv8' in opt.samplesFile or 'TestExtraV8' in opt.tag:
         
     if "noweights" in opt.tag.lower(): 
         print "no additional lepton weights being applied"
@@ -36,7 +40,7 @@ if 'nanoAODv8' in opt.samplesFile:
                 aliases['additionalLeptonWeight']['samples'].append(sample)
                 samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeight, LepWeight+'*additionalLeptonWeight')
     
-elif 'nanoAODv6' in opt.samplesFile:
+elif 'nanoAODv6' in opt.samplesFile or 'TestExtraV6' in opt.tag:
 
     if '2016' in opt.tag:
         zerohitElectronRootFile = 'Full2016v2/ElectronScaleFactors_Run2016_SUSY.root'

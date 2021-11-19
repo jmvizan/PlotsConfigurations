@@ -33,7 +33,7 @@ else: ## mkShapeMulti
     overflow  = 2
     underflow = 1
 
-if 'Test' in opt.tag: 
+if 'TEST' in opt.tag: 
     
     variables['nbjets']        = {  'name'  : nbjets,                    #   variable name    
                                     'range' : (  3,    0.,     3.),      #   variable range
