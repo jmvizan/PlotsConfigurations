@@ -414,9 +414,11 @@ if hasattr(opt, 'outputDirDatacard'):
 
                 isControlSample = True if ('isControlSample' in samples[sample] and samples[sample]['isControlSample']==1) else False
 
+                initialValue = '1.00' if 'initval' not in rateparameters[rateparam].keys() else rateparameters[rateparam]['initval']
+
                 nuisances[sample+rateparamname]  = {
                     'name'  : rateparamname+year,
-                    'samples'  : { sample : '1.00' },
+                    'samples'  : { sample : initialValue },
                     'type'  : 'rateParam',
                     'cuts'  : [ ] 
                 }
