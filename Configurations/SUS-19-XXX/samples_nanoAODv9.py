@@ -63,7 +63,7 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/home-p/pmatorra/Samples/Nano/UL/'
     treeBaseDirMC   = '/eos/home-p/pmatorra/Samples/Nano/UL/'
     treeBaseDirData = '/eos/home-p/pmatorra/Samples/Nano/UL/'
-    print 'most nanoAODv8 trees not available yet on cern'
+    print 'nanoAODv9 trees not available yet on cern'
     if not hasattr(opt, 'doHadd') or opt.doHadd:
         skipTreesCheck = True
     else:
