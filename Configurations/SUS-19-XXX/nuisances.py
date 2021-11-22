@@ -68,7 +68,7 @@ for scalefactor in leptonSF:
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                if 'EOY' not in sample or 'Extra' not in scalefactor:
+                if ('EOY' not in sample and not samples[sample]['isFastsim']) or 'Extra' not in scalefactor:
                     nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]['weight']
 
 # b-tagging scale factors
@@ -93,7 +93,7 @@ for scalefactor in bTagNuisances:
         for sample in samples.keys():
             if not samples[sample]['isDATA']:
                 if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                    if 'EOY' not in sample or scalefactor!='btagcor': 
+                    if ('EOY' not in sample and not samples[sample]['isFastsim']) or scalefactor!='btagcor': 
                         nuisances[scalefactor+bsel]['samples'][sample] = [ bselweight.replace('syst', scafactvar.replace('VAR', 'up'  )),
                                                                            bselweight.replace('syst', scafactvar.replace('VAR', 'down')) ]
         for cut in cuts.keys():
@@ -186,7 +186,8 @@ if not hasattr(opt, 'outputDirDatacard') or mt2llNuisances:
         mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
     elif 'High' in opt.tag and 'Extra' in opt.tag:
         mt2llBins = ['Bin6', 'Bin7', 'Bin8', 'Bin9' ]
-        mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']    
+        mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']
+        mt2llSystematics = [0.20, 0.30, 0.30, 0.30] # placeholders    
     elif 'High' in opt.tag:
         mt2llBins = ['Bin6', 'Bin7', 'Bin8' ]     
         mt2llEdges = ['100.', '160.', '370.', '999999999.']
