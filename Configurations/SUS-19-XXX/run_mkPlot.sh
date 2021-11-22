@@ -59,9 +59,13 @@ else
 fi
 
 PLOTDIR=./Plots/$YEAR/$TAG
+if [[ $SIGSET != 'SM' ]]; then
+    PLOTDIR=./Plots/$YEAR/${TAG}/$SIGSET
+fi
 mkdir -p $PLOTDIR
 
 cp ./Plots/index.php ./Plots/$YEAR/
+cp ./Plots/index.php ./Plots/$YEAR/${TAG}/
 cp ./Plots/index.php $PLOTDIR/
 
 NUISANCES=nuisances.py

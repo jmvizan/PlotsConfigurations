@@ -1,24 +1,7 @@
 ### nuisances
 
 ### general parameters
-if '2016' in opt.tag : 
-    year = '_2016'
-    lumi_uncertainty     = '1.025'
-    lumi_uncertainty_unc = '1.022'
-    lumi_uncertainty_cor = '1.012' 
-    trigger_uncertainty = '1.020'
-elif '2017' in opt.tag : 
-    year = '_2017'
-    lumi_uncertainty     = '1.023'
-    lumi_uncertainty_unc = '1.020'
-    lumi_uncertainty_cor = '1.011'
-    trigger_uncertainty = '1.020'
-elif '2018' in opt.tag : 
-    year = '_2018'
-    lumi_uncertainty     = '1.025'
-    lumi_uncertainty_unc = '1.015'                                                                                                       
-    lumi_uncertainty_cor = '1.020'
-    trigger_uncertainty = '1.020'
+year = '_' + yeartag
 
 ### nuisances = {}
  
@@ -32,53 +15,18 @@ nuisances['stat']  = {
               'samples' : {}
              }
 
-### lnN
+### global lnN (luminosity and trigger)
 
-# luminosity -> https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#TabLum
+for globalNuisance in globalNuisances:
 
-split_lumi = False
-
-if not split_lumi:
-
-    nuisances['lumi']  = {
-                   'name'  : 'lumi_13TeV'+year,
+    nuisances[globalNuisance]  = {
+                   'name'  : globalNuisances[globalNuisance]['name'],
                    'samples'  : { },
                    'type'  : 'lnN',
-                   'lumisyst' : lumi_uncertainty
     }
-
-else:
-
-    nuisances['lumi_unc']  = {
-                   'name'  : 'lumi_13TeV'+year,
-                   'samples'  : { },
-                   'type'  : 'lnN',
-                   'lumisyst' : lumi_uncertainty_unc
-    }
-
-    nuisances['lumi_cor']  = {
-                   'name'  : 'lumi_13TeV',
-                   'samples'  : { },
-                   'type'  : 'lnN',
-                   'lumisyst' : lumi_uncertainty_cor
-    }
-
-for lumitype in [ 'lumi', 'lumi_unc', 'lumi_cor' ]:
-    if lumitype in nuisances:
-        for sample in samples.keys():
-            if not samples[sample]['isDATA']:
-                nuisances[lumitype]['samples'][sample] = nuisances[lumitype]['lumisyst']
-
-# trigger
-
-nuisances['trigger']  = {
-               'name'  : 'trigger'+year,
-               'samples'  : { },
-               'type'  : 'lnN',
-}
-for sample in samples.keys():
-    if not samples[sample]['isDATA']:
-        nuisances['trigger']  ['samples'][sample] = trigger_uncertainty
+    for sample in samples.keys():
+        if not samples[sample]['isDATA']:
+            nuisances[globalNuisance]['samples'][sample] = globalNuisances[globalNuisance]['value']
 
 # background cross section and scale factor uncertainties
 
@@ -99,15 +47,10 @@ for background in normBackgroundNuisances:
                 nuisances[nuisancename]['kind'] = normBackgroundNuisances[background][region]['kind']
             scalefactorFromData = normBackgroundNuisances[background][region]['scalefactorFromData']  
 
-        if scalefactorFromData:
-            
-            for lumitype in [ 'lumi', 'lumi_cor', 'lumi_unc' ]:
-                if lumitype in nuisances:
-                    if background in nuisances[lumitype]['samples']:
-                        del nuisances[lumitype]['samples'][background]
- 
-            if background in nuisances['trigger']['samples']:
-                del nuisances['trigger']['samples'][background]
+        if scalefactorFromData: # Remove gloabl lnN uncertainties for backgrounds normalized on data
+            for globalNuisance in globalNuisances: 
+                if background in nuisances[globalNuisance]['samples']:
+                    del nuisances[globalNuisance]['samples'][background]
 
 ### shapes
 
@@ -125,41 +68,39 @@ for scalefactor in leptonSF:
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]['weight']
+                if 'EOY' not in sample or 'Extra' not in scalefactor:
+                    nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]['weight']
 
 # b-tagging scale factors
 
-weight1b = btagWeight1tag+'_syst/'+btagWeight1tag
-weight0b = '(1.-'+btagWeight1tag+'_syst)/(1.-'+btagWeight1tag+')'
+bSelections = { '1b' : { 'weight' : btagWeight1tag+'_syst/'+btagWeight1tag,
+                         'cuts'   : [ '_Tag', 'SS_', 'Fake', 'ttZ', '1tag', '2tag' ] },
+                '0b' : { 'weight' : '(1.-'+btagWeight1tag+'_syst)/(1.-'+btagWeight1tag+')',
+                         'cuts'   : [ '_Veto', '_NoTag', 'WZ_', 'WZtoWW_', 'ZZ', 'Zpeak' ] },
+               }
 
-btagSF = {
-    'btag1b'     : [ weight1b.replace('syst', 'b_up'),         weight1b.replace('syst', 'b_down') ],
-    'btag0b'     : [ weight0b.replace('syst', 'b_up'),         weight0b.replace('syst', 'b_down') ],
-    'mistag1b'   : [ weight1b.replace('syst', 'l_up'),         weight1b.replace('syst', 'l_down') ],
-    'mistag0b'   : [ weight0b.replace('syst', 'l_up'),         weight0b.replace('syst', 'l_down') ],
-    'btag1bFS'   : [ weight1b.replace('syst', 'b_up_fastsim'), weight1b.replace('syst', 'b_down_fastsim') ],
-    'btag0bFS'   : [ weight0b.replace('syst', 'b_up_fastsim'), weight0b.replace('syst', 'b_down_fastsim') ],
-    'ctag1bFS'   : [ weight1b.replace('syst', 'c_up_fastsim'), weight1b.replace('syst', 'c_down_fastsim') ],
-    'ctag0bFS'   : [ weight0b.replace('syst', 'c_up_fastsim'), weight0b.replace('syst', 'c_down_fastsim') ],
-    'mistag1bFS' : [ weight1b.replace('syst', 'l_up_fastsim'), weight1b.replace('syst', 'l_down_fastsim') ],
-    'mistag0bFS' : [ weight0b.replace('syst', 'l_up_fastsim'), weight0b.replace('syst', 'l_down_fastsim') ],
-}
-
-for scalefactor in btagSF:
-    nuisances[scalefactor]  = {
-        'name'  : scalefactor.replace('0', '').replace('1', '') +year,
-        'samples'  : { },
-        'kind'  : 'weight',
-        'type'  : 'shape',
-        'cuts'  : [ ]           
-    }
-    for sample in samples.keys():
-        if not samples[sample]['isDATA']:
-            if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                nuisances[scalefactor]['samples'][sample] = btagSF[scalefactor]
-    for cut in cuts.keys():
-        if ('1b' in scalefactor and ('_Tag' in cut or 'SS_' in cut or 'Fake' in cut or 'ttZValidation' in cut or '1tag' in cut or '2tag' in cut)) or ('0b' in scalefactor and ('_Veto' in cut or '_NoTag' in cut or 'WZ_' in cut or 'WZtoWW_' in cut or 'ZZ' in cut or 'Zpeak' in cut)):
-            nuisances[scalefactor]['cuts'].append(cut)
+for scalefactor in bTagNuisances:
+    for bsel in bSelections:
+        nuisances[scalefactor+bsel]  = {
+            'name'  : bTagNuisances[scalefactor]['name'],
+            'samples'  : { },
+            'kind'  : 'weight',
+            'type'  : 'shape',
+            'cuts'  : [ ]           
+        }
+        bselweight = bSelections[bsel]['weight']
+        scafactvar = bTagNuisances[scalefactor]['var']
+        for sample in samples.keys():
+            if not samples[sample]['isDATA']:
+                if 'FS' not in scalefactor or samples[sample]['isFastsim']:
+                    if 'EOY' not in sample or scalefactor!='btagcor': 
+                        nuisances[scalefactor+bsel]['samples'][sample] = [ bselweight.replace('syst', scafactvar.replace('VAR', 'up'  )),
+                                                                           bselweight.replace('syst', scafactvar.replace('VAR', 'down')) ]
+        for cut in cuts.keys():
+            for bselcut in bSelections[bsel]['cuts']:
+                if bselcut in cut:
+                    nuisances[scalefactor+bsel]['cuts'].append(cut)
+                    break
 
 # pileup
 
@@ -246,7 +187,6 @@ if not hasattr(opt, 'outputDirDatacard') or mt2llNuisances:
     elif 'High' in opt.tag and 'Extra' in opt.tag:
         mt2llBins = ['Bin6', 'Bin7', 'Bin8', 'Bin9' ]
         mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']    
-        mt2llSystematics = [0.20, 0.30, 0.30, 0.30] # placeholders
     elif 'High' in opt.tag:
         mt2llBins = ['Bin6', 'Bin7', 'Bin8' ]     
         mt2llEdges = ['100.', '160.', '370.', '999999999.']
@@ -504,6 +444,7 @@ if hasattr(opt, 'outputDirDatacard'):
                             histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
                             cutB = rateparameters[rateparam]['subcuts'][0]
                             cutA = rateparameters[rateparameters[rateparam]['bondrate']]['subcuts'][0]
+                            cutA = rateparameters[rateparameters[rateparam]['bondrate']]['subcuts'][0]
                             histoA = fileIn.Get(cut.replace(cutB, cutA)+'/'+variable+'/histo_'+sample)
                             yieldB = '%-.4f' % histoB.Integral()
                             yieldA = '%-.4f' % histoA.Integral()
@@ -545,7 +486,7 @@ if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalizati
 else:
 
     for nuisance in nuisances:
-        if nuisance!='stat' and nuisance!='lumi': # example ...
+        if nuisance!='stat' and 'lumi' not in nuisance: # example ...
             nuisanceToRemove.append(nuisance)
 
 for nuisance in nuisanceToRemove:

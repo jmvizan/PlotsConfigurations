@@ -53,7 +53,12 @@ else:
 compweb = web+"CompareToEOY/"
 os.system("mkdir -p " + compweb)
 
-doTest  = opt.test
+doTest = False
+if len(sys.argv)>4:
+    print "do Test"
+    doTest  = True
+sameFolder = False
+if "pmatorra" in  os.getenv('USER'): sameFolder = True
 
 for year in yearlist:
   for tag in taglist:
@@ -66,7 +71,7 @@ for year in yearlist:
       variables = {}
       samples   = {}
       cuts      = {} 
-      exec(open('samples_nanoAODv6_FullYEARv6loose.py').read())
+      exec(open('samples_nanoAODv8.py').read())
       exec(open('variables.py').read())
       exec(open('cuts.py').read())
 
@@ -75,6 +80,7 @@ for year in yearlist:
       except NameError:
         import os
 
+      
       #if "Control" not in tag: continue
       #tweaks         = all_info[tag]["tweaks"]
       #for tweak in tweaks:
@@ -85,17 +91,32 @@ for year in yearlist:
       #    ControlRegions += extraCRs
       #    variables       = VetoNoiseEEvars
       #for year in all_info[tag]["years"]:
-      #hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
-      hfileV8nm  = "Shapes/"+year+"/"+tag+"/plots_"+tag+"_SM.root"
-      hfileV6nm  = EOYArea + hfileV8nm.replace('VetoNoiseEE', 'VetoNoiseEEMET').replace('DYControlRegionSmearEENoiseHTHEMEOY', 'DYControlRegionSmearHEM').replace('TopControlRegionSmearEENoiseHTHEMEOY', 'TopControlRegionSmearEENoiseDPhiHEM')
-      if year=='2017': hfileV6nm = hfileV6nm.replace("EOY", "")
-      #missV8     = fileismissing(hfileV8nm)
-      #missV6     = fileismissing(hfileV6nm)
-      #if missV8 or missV6: continue
+      #hfileV8nm  = "Data/plots_"+year+tag+tweak+"V8_ALL_DATA.root"
+      #hfileV6nm  = "Data/plots_"+year+tag+tweak+"V6_ALL_DATA.root"
+      if "_" in process:
+          Samfol  = '/'
+          All     = '_'
+          yearnm  = ''
+          procnm  = process.split("_")[0]
+          process = process.split("_")[1]
+      else:
+          Samfol = '/Samples/'
+          All    = '_ALL_'
+          yearnm = year
+          procnm = process
+      if sameFolder is True :
+          hfileV8nm  = "Shapes/"+year+"/"+tag+"_V8"+Samfol+"plots_"+yearnm+tag+"_V8"+All+procnm+".root"
+          hfileV6nm  = "Shapes/"+year+"/"+tag+"_V6"+Samfol+"plots_"+yearnm+tag+"_V6"+All+procnm+".root"
+      else:
+          hfileV8nm  = "Shapes/"+year+"/"+tag+"/Samples/plots_"+year+tag+"_ALL_"+process+".root"
+          hfileV6nm  = EOYArea + hfileV8nm
+
+      missV8     = fileismissing(hfileV8nm)
+      missV6     = fileismissing(hfileV6nm)
+      if missV8 or missV6: exit()
       hfileV8 = TFile(hfileV8nm)
       hfileV6 = TFile(hfileV6nm)
       for region in ControlRegions:
-        #folloc  = year+"/"+tag+"/"+tweak+"/"+region+"/"
         folloc  = year+"/"+tag+"/"+region+"/"+process+"/"
         #thisfol = "Figures/"+folloc
         webloc  = compweb+folloc
