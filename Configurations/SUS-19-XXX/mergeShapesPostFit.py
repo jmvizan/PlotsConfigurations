@@ -5,6 +5,7 @@ import json
 import ROOT
 import LatinoAnalysis.Gardener.hwwtools as hwwtools
 import os.path
+import math
 
 def warnMissingShape(shapeName):
     print 'Warning: missing', shapeName, 'shape'
@@ -145,17 +146,8 @@ if __name__ == '__main__':
                     shapes['overall'][shapeName+fitkind] = inputShape 
                 elif opt.verbose:
                     warnMissingShape(fitdir+'/'+shapeName)
-
-    outputDir = opt.outputDir + '/' + years + '/' + tag + '/'
-    os.system('mkdir -p ' + outputDir)
-    outputFile = ROOT.TFile.Open(outputDir + 'plots_' + opt.postFit + tag + '_SM-' + opt.masspoint + '.root', 'recreate')
-
-    for shapeName in [ 'total_overall', 'total_signal', 'total_background', 'total_data', 'overall_total_covar' ]:
-        for fitkind in fitkindToOpt:
-            if shapeName+fitkind in shapes['overall']:
-                shapes['overall'][shapeName+fitkind].Write()
-    
-    if '-' in years:
+   
+    if '-' in years and 'PostFit' in opt.postFit: # Use mergeShapes to merge prefit shapes across the years
    
         cutList = [ ]
         for cut in shapes['cuts'].keys():
@@ -169,9 +161,36 @@ if __name__ == '__main__':
 
             shapes['cuts'][cut] = { } 
             for shape in shapeList:
+
                 for year in years.split('-'):
                     if shape not in shapes['cuts'][cut]: shapes['cuts'][cut][shape] = shapes['cuts'][cut+'_'+year][shape]
-                    else: shapes['cuts'][cut][shape].Add(shapes['cuts'][cut+'_'+year][shape]) #### FIX uncertainties!!!
+                    else: shapes['cuts'][cut][shape].Add(shapes['cuts'][cut+'_'+year][shape])
+
+                if shape=='histo_total' or (shape=='histo_total_background' and opt.postFit=='PostFit'):
+                    for ibin in range(1, shapes['cuts'][cut][shape].GetNbinsX()+1):
+                        binSquaredError = 0.
+                        for yearx in years.split('-'):
+                            errorX = shapes['cuts'][cut+'_'+yearx][shape].GetBinError(ibin)
+                            binCovX = shapes['overall']['overall_total_covar'].GetXaxis().FindBin(cut+'_'+yearx+'_'+str(ibin-1))
+                            for yeary in years.split('-'):
+                                errorY = shapes['cuts'][cut+'_'+yeary][shape].GetBinError(ibin) 
+                                binCovY = shapes['overall']['overall_total_covar'].GetYaxis().FindBin(cut+'_'+yeary+'_'+str(ibin-1))
+                                covariance = shapes['overall']['overall_total_covar'].GetBinContent(binCovX, binCovY)
+                                binSquaredError += errorX*errorY*covariance
+                        shapes['cuts'][cut][shape].SetBinError(math.sqrt(binSquaredError)) 
+ 
+                elif shape=='histo_DATA':
+                    pass # check if something is needed here
+
+
+    outputDir = opt.outputDir + '/' + years + '/' + tag + '/'
+    os.system('mkdir -p ' + outputDir)
+    outputFile = ROOT.TFile.Open(outputDir + 'plots_' + opt.postFit + tag + '_SM-' + opt.masspoint + '.root', 'recreate')
+
+    for shapeName in [ 'total_overall', 'total_signal', 'total_background', 'total_data', 'overall_total_covar' ]:
+        for fitkind in fitkindToOpt:
+            if shapeName+fitkind in shapes['overall']:
+                shapes['overall'][shapeName+fitkind].Write()
 
     for cut in shapes['cuts']:
 
