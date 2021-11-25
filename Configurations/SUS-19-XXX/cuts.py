@@ -200,15 +200,15 @@ if 'DYControlRegion' in opt.tag:
     
     cuts['DY_ee']     = { 'expr' : '(' + DY+' && '+EE+')', 'weight' : btagWeight0tag }
     cuts['DY_mm']     = { 'expr' : '(' + DY+' && '+MM+')', 'weight' : btagWeight0tag }
-    cuts['DY_ee_jet'] = { 'expr' : '(' + DY+' && '+EE+' && '+NoJets+')', 'weight' : btagWeight0tag }
-    cuts['DY_mm_jet'] = { 'expr' : '(' + DY+' && '+MM+' && '+NoJets+')', 'weight' : btagWeight0tag }
+    cuts['DY_NoJet_ee'] = { 'expr' : '(' + DY+' && '+EE+' && '+NoJets+')', 'weight' : btagWeight0tag }
+    cuts['DY_NoJet_mm'] = { 'expr' : '(' + DY+' && '+MM+' && '+NoJets+')', 'weight' : btagWeight0tag }
 
 if 'DYtauControlRegion' in opt.tag:
 
     DYtau = OC+' && '+DF+' && '+Zcut.replace('ZCUT',  '15.')
 
     cuts['DY_em']     = { 'expr' : '(' + DYtau+')', 'weight' : btagWeight0tag }
-    cuts['DY_em_jet'] = { 'expr' : '(' + DYtau+' && '+NoJets+')', 'weight' : btagWeight0tag }
+    cuts['DY_NoJet_em'] = { 'expr' : '(' + DYtau+' && '+NoJets+')', 'weight' : btagWeight0tag }
 
 if 'DYDarkMatterControlRegion' in opt.tag:
 
