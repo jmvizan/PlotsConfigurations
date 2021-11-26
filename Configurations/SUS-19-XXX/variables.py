@@ -233,16 +233,22 @@ elif 'btagefficiencies' in opt.tag:
 
 elif 'Trigger' in opt.tag:
 
-    variables['Leptonpt1pt2']  = {  'name'  : 'Lepton_pt[1]:Lepton_pt[0]',                                         #   variable name  
-                                    'range' : ([20, 25, 30, 40, 50, 70, 100, 150],[20, 25, 30, 40, 50, 70, 100, 150]), #   variable range
-                                    'xaxis' : '2D pt',                                                             #   x axis name
-                                    'fold'  : overflow                                                             #   fold overflow
+    variables['Leptonpt1pt2']  = {  'name'  : 'Lepton_pt[1]:Lepton_pt[0]',                                                       #   variable name  
+                                    'range' : ([20, 25, 30, 40, 50, 70, 100, 150, 200],[20, 25, 30, 40, 50, 70, 100, 150, 200]), #   variable range
+                                    'xaxis' : '2D pt',                                                                           #   x axis name
+                                    'fold'  : overflow                                                                           #   fold overflow
                                    } 
 
-    variables['Lepton1pteta']  = {  'name'  : 'Lepton_eta[0]:Lepton_pt[0]',                                        #   variable name
-                                    'range' : ([20, 25, 30, 40, 50, 70, 100, 150, 300],[-2.4, -0.8, 0, 0.8, 2.4]), #   variable range
-                                    'xaxis' : '2D eta:#pt'                                                         #   x axis name
-                                  }
+    variables['Leptonpt1pt2bis']  = {  'name'  : 'Lepton_pt[1]:Lepton_pt[0]',                                         #   variable name
+                                       'range' : ([20, 30, 40, 60, 100, 160, 200],[20, 30, 40, 60, 100, 160, 200]),   #   variable range
+                                       'xaxis' : '2D pt',                                                             #   x axis name
+                                       'fold'  : overflow                                                             #   fold overflow
+                                     }
+
+    #variables['Lepton1pteta']  = {  'name'  : 'Lepton_eta[0]:Lepton_pt[0]',                                        #   variable name
+    #                                'range' : ([20, 25, 30, 40, 50, 70, 100, 150, 300],[-2.4, -0.8, 0, 0.8, 2.4]), #   variable range
+    #                                'xaxis' : '2D eta:#pt'                                                         #   x axis name
+    #                              }
 
     #variables['Lepton1pt']     = {  'name'  : 'Lepton_pt[0]',                                                      #   variable name 
     #                                'range' : ([20, 25, 30, 40, 50, 70, 100, 150, 300],[1]),                       #   variable range    

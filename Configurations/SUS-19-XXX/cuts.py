@@ -28,27 +28,33 @@ if opt.tag=='btagefficiencies':
 
 if 'Trigger' in opt.tag:
 
-    OCT = OC.replace('mll>=20. && ', '') 
+    triggerOC = OC.replace('mll>=20. && ', '') 
+    #triggerCuts = { 'none' : '', 'mll' : ' && mll>=20.',  'met' : ' && MET_pt>100.', 'all' : ' && mll>=20. && MET_pt>100.' }
+    triggerCuts = { 'none' : '', 'met' : ' && MET_pt>100.' }
 
-    cuts['ee_denominator'] = OCT+' && '+EE
-    cuts['mm_denominator'] = OCT+' && '+MM  
-    cuts['em_denominator'] = OCT+' && '+DF
+    etaBins = { '_full' : '', '_cent' : ' && abs(Lepton_eta[0])<=1.2', '_forw' : ' && abs(Lepton_eta[0])>1.2 && abs(Lepton_eta[0])<=2.4' }
 
-    if 'MET' in opt.sigset:
+    fullTrigger = '(Trigger_dblEl || Trigger_dblMu || Trigger_ElMu  || Trigger_sngEl || Trigger_sngMu)'
+    triggerBits = { 'ee' : { 'cut' : EE, 'double' : 'Trigger_dblEl', 'both' : '(Trigger_dblEl || Trigger_sngEl)'                 , 'full' : fullTrigger },
+                    'mm' : { 'cut' : MM, 'double' : 'Trigger_dblEl', 'both' : '(Trigger_dblMu || Trigger_sngMu)'                 , 'full' : fullTrigger },
+                    'em' : { 'cut' : DF, 'double' : 'Trigger_ElMu' , 'both' : '(Trigger_ElMu  || Trigger_sngEl || Trigger_sngMu)', 'full' : fullTrigger }
+                   }
 
-        cuts['ee_numerator_double'] = OCT+' && '+EE+' && Trigger_dblEl' 
-        cuts['mm_numerator_double'] = OCT+' && '+MM+' && Trigger_dblMu'
-        cuts['em_numerator_double'] = OCT+' && '+DF+' && Trigger_ElMu'
+    for ch in triggerBits:
+        for etab in etaBins:
+            for cutt in triggerCuts:
 
-        cuts['ee_numerator'] = OCT+' && '+EE+' && (Trigger_dblEl || Trigger_sngEl)'
-        cuts['mm_numerator'] = OCT+' && '+MM+' && (Trigger_dblMu || Trigger_sngMu)'
-        cuts['em_numerator'] = OCT+' && '+DF+' && (Trigger_ElMu  || Trigger_sngEl || Trigger_sngMu)'  
+                denominatorName = ch+etab+'_'+cutt
+                denominatorCut  = triggerOC + ' && ' + triggerBits[ch]['cut'] + etaBins[etab] + triggerCuts[cutt]
+                cuts[denominatorName] = denominatorCut
+   
+                if 'MET' in opt.sigset:
+                    for trgbit in triggerBits[ch]:
+                        if trgbit!='cut':
+                            cuts[denominatorName+'_'+trgbit] = denominatorCut + ' && ' + triggerBits[ch][trgbit]
 
-    else:
-
-        cuts['ee_numerator'] = { 'expr' : OCT+' && '+EE, 'weight' : 'TriggerEffWeight_2l' }
-        cuts['mm_numerator'] = { 'expr' : OCT+' && '+MM, 'weight' : 'TriggerEffWeight_2l' }
-        cuts['em_numerator'] = { 'expr' : OCT+' && '+DF, 'weight' : 'TriggerEffWeight_2l' }
+                else:
+                    cuts[denominatorName+'_eff'] = { 'expr' : denominatorCut, 'weight' : 'TriggerEffWeight_2l' }
 
 if 'TwoLeptons' in opt.tag:
 
