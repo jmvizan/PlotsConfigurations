@@ -453,13 +453,6 @@ if 'SignalRegions' in opt.tag or 'BackSF' in opt.tag:
     normBackgrounds['DY']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
     normBackgrounds['ttSemilep'] = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
 
-    if 'NJSF2' in opt.tag:
-        for bkg in [ 'ttbar', 'STtW', 'WW' ]:
-            normBackgrounds[bkg] = { 'nojet' : { 'scalefactor' : { '1.30' : '0.00' }, 'cuts' : [ '_NoJet' ], 'selection' : '(nCleanJet==0)' }, }
-    elif 'NJSF' in opt.tag:
-        for bkg in [ 'ttbar', 'STtW', 'WW' ]:
-            normBackgrounds[bkg] = { 'nojet' : { 'scalefactor' : { '1.15' : '0.00' }, 'cuts' : [ '_NoJet' ], 'selection' : '(nCleanJet==0)' }, }
-
     if 'FitCR' not in opt.tag: # To be updated to UL if one wants to use them
 
         if '2016' in yeartag:
