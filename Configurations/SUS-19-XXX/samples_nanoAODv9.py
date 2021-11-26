@@ -784,11 +784,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
      
             missingZZ4L = { '2016HIPM'   : [ 'ZZTo4L', 'ggZZ4m', 'VBFHToZZTo4L_M125', 'GluGluHToZZTo4L_M125' ],
                             '2016noHIPM' : [ 'ZZTo4L',           'VBFHToZZTo4L_M125'                         ],
-<<<<<<< HEAD
-                           '2017'       : [                                                                 ],
-=======
                             '2017'       : [                                                                 ],
->>>>>>> upstream/worker
                             '2018'       : [           'ggZZ4m', 'VBFHToZZTo4L_M125'                         ] }
 
                                        

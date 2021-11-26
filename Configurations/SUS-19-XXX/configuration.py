@@ -13,8 +13,8 @@ cutsFile = 'cuts.py'
 
 # file with list of samples
 #samplesFile = 'samples_nanoAODv8.py'
-#samplesFile = 'samples_nanoAODv9.py'
-samplesFile = 'samples_nanoAODv6_FullYEARv6loose.py' 
+samplesFile = 'samples_nanoAODv9.py'
+#samplesFile = 'samples_nanoAODv6_FullYEARv6loose.py' 
 
 # file with the definition of the mass points for the signals
 #signalMassPointsFile = 'signalMassPoints.py'
