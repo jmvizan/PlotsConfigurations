@@ -117,7 +117,7 @@ for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
     if treeNuisance=='jer' and treeNuisances[treeNuisance]['name']!='JER':
         treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
-        treeNuisa/nceDirs['jer']['MC']['Down'] = directoryBkg
+        treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg
         treeNuisanceDirs['jer']['FS']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
         treeNuisanceDirs['jer']['FS']['Down'] = directorySig
     else:
@@ -170,25 +170,25 @@ lep2idx = '2'
 nLooseLepton = 'nLepton'
 nTightLepton = 'Sum$(('+ElectronWP+'+'+MuonWP+')==1)'
 
-pxll = '(Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+']))'
-pyll = '(Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+']))'
-pTll = 'sqrt('+pxll+'*'+pxll+'+'+pyll+'*'+pyll+')'
-phill = 'atan('+pyll+'/'+pxll+')'
-dPhill = 'acos(cos(Lepton_phi['+lep1idx+']-Lepton_phi['+lep0idx+']))'
-dEtall = 'Lepton_eta['+lep1idx+']-Lepton_eta['+lep0idx+']'
-dRll = 'sqrt('+dPhill+'*'+dPhill+'+'+dEtall+'*'+dEtall+')'
+pxll       = '(Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+']))'
+pyll       = '(Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+']))'
+pTll       = 'sqrt('+pxll+'*'+pxll+'+'+pyll+'*'+pyll+')'
+phill      = 'atan('+pyll+'/'+pxll+')'
+dPhill     = 'acos(cos(Lepton_phi['+lep1idx+']-Lepton_phi['+lep0idx+']))'
+dEtall     = 'Lepton_eta['+lep1idx+']-Lepton_eta['+lep0idx+']'
+dRll       = 'sqrt('+dPhill+'*'+dPhill+'+'+dEtall+'*'+dEtall+')'
 ptmiss_phi = 'ptmiss_phi'+ctrltag
 if "MET" in opt.tag:
     ptmiss_phi = 'MET_phi' 
-mTllptmiss = 'sqrt(2*'+pTll+'*ptmiss*(1.-cos('+phill+'-'+ptmiss_phi+')))'
-dPhillptmiss = 'acos(cos('+phill+'-'+ptmiss_phi+'))'
-dPhilep0ptmiss = 'acos(cos(Lepton_phi['+lep0idx+']-'+ptmiss_phi+'))'
-dPhilep1ptmiss = 'acos(cos(Lepton_phi['+lep1idx+']-'+ptmiss_phi+'))'
+mTllptmiss       = 'sqrt(2*'+pTll+'*ptmiss*(1.-cos('+phill+'-'+ptmiss_phi+')))'
+dPhillptmiss     = 'acos(cos('+phill+'-'+ptmiss_phi+'))'
+dPhilep0ptmiss   = 'acos(cos(Lepton_phi['+lep0idx+']-'+ptmiss_phi+'))'
+dPhilep1ptmiss   = 'acos(cos(Lepton_phi['+lep1idx+']-'+ptmiss_phi+'))'
 dPhiMinlepptmiss = 'TMath::Min('+dPhilep0ptmiss+','+dPhilep1ptmiss+')'
-dPhijet0ptmiss = 'acos(cos(CleanJet_phi[0]-'+ptmiss_phi+'))'
-dPhijet1ptmiss = 'acos(cos(CleanJet_phi[1]-'+ptmiss_phi+'))'
-jetrawpteenoise = '(Jet_pt*(1.-Jet_rawFactor)*(2*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)-1))'
-jetpteenoise = '(Jet_pt*(2*(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)-1))'
+dPhijet0ptmiss   = 'acos(cos(CleanJet_phi[0]-'+ptmiss_phi+'))'
+dPhijet1ptmiss   = 'acos(cos(CleanJet_phi[1]-'+ptmiss_phi+'))'
+jetrawpteenoise  = '(Jet_pt*(1.-Jet_rawFactor)*(2*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)-1))'
+jetpteenoise     = '(Jet_pt*(2*(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)-1))'
 dPhieenoiseptmiss_pt30 = 'acos(cos(Jet_phi-'+ptmiss_phi+'))*(2.*((Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
 dPhieenoiseptmiss_pt50 = 'acos(cos(Jet_phi-'+ptmiss_phi+'))*(2.*((Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
 dPhieenoiseptmiss_pt15 = 'acos(cos(Jet_phi-'+ptmiss_phi+'))*(2.*((Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>15. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==1)-1.)'
@@ -198,7 +198,9 @@ dPhieenoiseptmiss_pt15_norawcut = 'acos(cos(Jet_phi-'+ptmiss_phi+'))*(2.*((Jet_p
 HTForward     = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139))'
 HTForwardSoft = 'Sum$(Jet_pt*(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && Jet_pt*(1.-Jet_rawFactor)<50.))'
 jetpteenoisedphi = '(Jet_pt*(2*(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139 && acos(cos(Jet_phi-'+ptmiss_phi+'))<0.96)-1))'
-
+jetPtCut = '20.'
+if 'pt25' in opt.tag: jetPtCut = '25.'
+if 'pt30' in opt.tag: jetPtCut = '30.'
 ptmissNano = 'METFixEE2017_pt' if '2017' in yeartag else 'MET_pt'
 if 'Data' not in opt.sigset: # 2016 and 2018 data do not have pt_nom, but it's equal to pt as the JEC in central production were the final ones
     if metnom=='Nomin': ptmissNano += '_nom'

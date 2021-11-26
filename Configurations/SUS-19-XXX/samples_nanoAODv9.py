@@ -786,15 +786,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                             '2016noHIPM' : [ 'ZZTo4L',           'VBFHToZZTo4L_M125'                         ],
                             '2017'       : [                                                                 ],
                             '2018'       : [           'ggZZ4m', 'VBFHToZZTo4L_M125'                         ] }
-
+                                       
             for yyeeaarr in missingZZ4L:
                 if yyeeaarr in yeartag:
                     for addingZZ4L in [ 'ZZTo4L', 'ggZZ4m', 'VBFHToZZTo4L_M125', 'GluGluHToZZTo4L_M125' ]:
                         if addingZZ4L not in missingZZ4L[yyeeaarr]:
                             samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg.replace('reco', 'ctrl'), addingZZ4L, False,treePrefix,skipTreesCheck)
-                           
-            del missingZZ4L['2017'] # because 2017 is complete
-
+            
+            del missingZZ4L['2017']
+            
             if 'EOY' in opt.tag:
                 for yyeeaarr in missingZZ4L:
                     if yyeeaarr in yeartag:
@@ -804,7 +804,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                                  'weight' : XSWeight+'*'+SFweight ,
                                                   'isControlSample' : 1,
                                                 }
-
  
                         for addingZZ4L in missingZZ4L[yyeeaarr]:
                             if addingZZ4L!=firstMissingZZ4L:
