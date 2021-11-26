@@ -47,15 +47,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'samples'  : ['STtW', 'tW'] 
     }
 
-    groupPlot['EOYSingleTopW']  = {
-        'nameHR' : 'EOY tW',
-        'nameLatex' : 'EOY \\tW',
-        'isSignal' : 0,
-        'color': 403,   # kYellow+3
-        'fill' : 3005,
-        'samples'  : ['EOYSingleTopW']
-    }
-
     groupPlot['DY']  = {
         'nameHR' : 'Drell-Yan',
         'nameLatex' : '\\DY',
@@ -284,7 +275,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         plot['EOYH']          = plot['Higgs']
         plot['EOYQQ']         = plot['VZ']
         plot['EOYGluGlu']     = plot['WW']
-        plot['EOYSingleTopW'] = plot['STtW']
         plot['EOYDoubleTopW'] = plot['ttW']
         plot['EOYVZ']         = plot['WZ']
         plot['EOYDrellYan']   = plot['DY']

@@ -250,8 +250,8 @@ if '__susyMT2reco' not in directorySig:
             nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
 ### QCD scale and PDFs
-
-exec(open('./theoryNormalizations/theoryNormalizations'+recoFlag+year+'.py').read())
+if opt.sigset!='MET': # TODO add files for UL2016
+    exec(open('./theoryNormalizations/theoryNormalizations'+recoFlag+year+'.py').read())
 
 # LHE scale variation weights (w_var / w_nominal)
 # [0] is muR=0.50000E+00 muF=0.50000E+00
