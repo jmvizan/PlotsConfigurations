@@ -190,9 +190,13 @@ if 'HMControlRegion' in opt.tag:
     cuts['Top_hm'] = { 'expr' : '(' + OC+' && (('+DF+') || ('+SF+'))  && MET_significance>12  && CleanJet_pt[1]>=30. && '+dPhijet0ptmiss+'>0.64 && '+dPhijet1ptmiss+'>0.25)', 'weight' : btagWeight1tag }
     
 if 'WWControlRegion' in opt.tag:
-
-    cuts['WW_metcut']   = '(' + OC+' && '+DF+' && '+NoJets+' && ptmiss>=70)'
-    cuts['WW_nometcut'] = '(' + OC+' && '+DF+' && '+NoJets+')'
+    if 'Latino' in opt.tag:
+        print "im doing latinos"
+        cuts['WW_Latino_em']   = '(' + OC+' && '+DF+' && '+pTll+'>30 && '+NoJets+' &&  ptmiss>=20 && mll>20) '
+        cuts['WW_Latino_sf']   = '(' + OC+' && '+SF+' && '+pTll+'>30 && '+NoJets+' && ' +vetoZ+' && ptmiss>=20 && mll>40) '
+    else:
+        cuts['WW_metcut']   = '(' + OC+' && '+DF+' && '+NoJets+' && ptmiss>=70)'
+        cuts['WW_nometcut'] = '(' + OC+' && '+DF+' && '+NoJets+')'
 
 if 'DYControlRegion' in opt.tag:
 

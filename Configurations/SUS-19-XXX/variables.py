@@ -366,7 +366,7 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                     'fold'  : overflow                 #   fold overflow
                                  }
 
-    if 'Latino' in opt.tag:
+    if 'LatinoV6' in opt.tag:
     
         variables['mT2']         = {   'name'  : 'mT2',                 #   variable name    
                                        'range' : (  20,    0.,  200.),  #   variable range
