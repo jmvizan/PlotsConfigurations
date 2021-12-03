@@ -9,6 +9,7 @@ NoJets = 'Alt$(CleanJet_pt[0],0)<' +jetPtCut
 HasJet = 'Alt$(CleanJet_pt[0],0)>='+jetPtCut
  
 if 'Data' in opt.sigset:
+    btagWeightNoCut = '1.'
     btagWeight1tag = bTagPass
     btagWeight0tag = bTagVeto
     btagWeight2tag = b2TagPass
@@ -28,10 +29,13 @@ if opt.tag=='btagefficiencies':
 
 if 'Trigger' in opt.tag:
 
-    triggerOC = OC.replace('mll>=20. && ', '') 
+    triggerOC = OC.replace('mll'+ctrltag+'>=20. && ', '') 
     #triggerCuts = { 'none' : '', 'mll' : ' && mll>=20.',  'met' : ' && MET_pt>100.', 'all' : ' && mll>=20. && MET_pt>100.' }
-    triggerCuts = { 'none' : '', 'met' : ' && MET_pt>100.' }
-
+    triggerCuts = { 'none' : '', 'met' : ' && MET_pt>100.', 'btag' : ' && MET_pt>100. && '+bTagPass, 'veto' : ' && MET_pt>100. && '+bTagVeto }
+    if '3Lep' in opt.tag:
+        triggerOC = triggerOC.replace('==2', '==3')
+        for cutt in triggerCuts:
+            triggerCuts[cutt] = triggerCuts[cutt].replace('mll', 'mll'+ctrltag)
     etaBins = { '_full' : '', '_cent' : ' && abs(Lepton_eta[0])<=1.2', '_forw' : ' && abs(Lepton_eta[0])>1.2 && abs(Lepton_eta[0])<=2.4' }
 
     fullTrigger = '(Trigger_dblEl || Trigger_dblMu || Trigger_ElMu  || Trigger_sngEl || Trigger_sngMu)'
@@ -230,6 +234,9 @@ if 'DYDarkMatterControlRegion' in opt.tag:
     cuts['DY_mm_pfmet'] = '(' + DY+' && '+MM+') && Alt$(CleanJet_pt[1],0)>=30. && ptmiss>=50.'
 
 if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.tag:
+
+    cuts['VR1_em']   = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeightNoCut }
+    cuts['VR1_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeightNoCut }
 
     cuts['VR1_Tag_em']   = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight1tag }
     cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight0tag }

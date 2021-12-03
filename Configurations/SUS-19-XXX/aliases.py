@@ -1,7 +1,48 @@
 
 ### aliases = { }
 
-fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag+'/fastsimLeptonWeights.root'
+## Trigger efficiencies
+
+if recoFlag=='_UL' and 'Trig' in opt.tag and 'Trigger' not in opt.tag and 'TriggerEffWeight_2l' in TriggerEff: # Too low stat for 3Lep
+
+    leptonFlag = '_3Lep' if 'TriggerEffWeight_3l' in TriggerEff else ''
+    triggerEfficiencyFile = os.getenv('PWD')+'/Data/'+yeartag+'/TriggerEfficiencies_UL'+yeartag+leptonFlag+'.root'
+    triggerPtBins = 'Leptonpt1pt2' # [20, 25, 30, 40, 50, 70, 100, 150, 200]
+    #triggerPtBins = 'Leptonpt1pt2bis' # [20, 30, 40, 60, 100, 160, 200]
+    triggerEtaBins = 'split' if ('TrigEta' in opt.tag or 'TrigBTagEta' in opt.tag) else 'merged'
+   
+    trW = 'triggerWeight' 
+    aliases['triggerWeight'] = {
+            'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/triggerWeightReader.cc+' ],
+            'class': 'TriggerWeightReader',
+            'args': ( triggerEfficiencyFile, triggerPtBins, triggerEtaBins, 'met' ),
+            'samples': [ ]
+    }
+    if 'TrigBTag' in opt.tag:
+        aliases['triggerWeightBTag'] = {
+                'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/triggerWeightReader.cc+' ],
+                'class': 'TriggerWeightReader',
+                'args': ( triggerEfficiencyFile, triggerPtBins, triggerEtaBins, 'btag' ),
+                'samples': [ ]
+        }
+        aliases['triggerWeightVeto'] = {
+                'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/triggerWeightReader.cc+' ],
+                'class': 'TriggerWeightReader',
+                'args': ( triggerEfficiencyFile, triggerPtBins, triggerEtaBins, 'veto' ),
+                'samples': [ ]
+        }
+        trW = '1.'
+    for sample in samples:
+        if not samples[sample]['isDATA']:
+            aliases['triggerWeight']['samples'].append(sample)
+            if 'TrigBTag' in opt.tag:
+                aliases['triggerWeightBTag']['samples'].append(sample)
+                aliases['triggerWeightVeto']['samples'].append(sample)
+            samples[sample]['weight'] = samples[sample]['weight'].replace(TriggerEff, trW)
+     
+## FastSim lepton scale factors
+
+fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag+'/fastsimLeptonWeights.root' # TODO switch to UL scale factors when FastSim available
 fastsimMuonScaleFactorHisto = 'Muo_tight_fullsim'
 fastsimElectronScaleFactorHisto = 'Ele_tight_fullsim'
 
@@ -21,6 +62,8 @@ for sample in samples:
         aliases['fastsimLeptonWeight']['samples'].append(sample)
         samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeightFS, 'fastsimLeptonWeight')
 
+## d_xy/d_z/noLostHits scale factors
+
 if 'nanoAODv8' in opt.samplesFile or 'TestExtraV8' in opt.tag:
         
     if "noweights" in opt.tag.lower(): 
@@ -36,7 +79,6 @@ if 'nanoAODv8' in opt.samplesFile or 'TestExtraV8' in opt.tag:
         }
         for sample in samples:
             if  not samples[sample]['isDATA']:
-                #print "im doing additional lepton weighting for sample", sample
                 aliases['additionalLeptonWeight']['samples'].append(sample)
                 samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeight, LepWeight+'*additionalLeptonWeight')
     

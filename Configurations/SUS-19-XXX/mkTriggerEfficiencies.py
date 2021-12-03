@@ -9,56 +9,64 @@ from array import *
 
 if __name__ == '__main__':
 
+    selectionFlag = 'MLLtag' #'3Lep'
     years = [ '2016HIPM', '2016noHIPM', '2017', '2018']
     #leptons = { '' : [ 'DATA', 'ttbar' ], 'Latino' : [ 'DATA' ], 'LatinoCut' : [ 'DATA' ] }
+    #leptonWPs = { '' : [ 'MET', 'ttbar' ] }
     leptonWPs = { '' : [ 'MET' ] }
-    triggerCuts = { 'none' : '', 'met' : ' && MET_pt>100.' }
+    if selectionFlag=='MLLtag':
+        triggerCuts = { 'none', 'met', 'btag', 'veto' }
+    else:
+        triggerCuts = { 'none', 'met' }
     etaBins = { '_full' : '', '_cent' : ' && abs(Lepton_eta[0])<=1.2', '_forw' : ' && abs(Lepton_eta[0])>1.2 && abs(Lepton_eta[0])<=2.4' }
     fullTrigger = '(Trigger_dblEl || Trigger_dblMu || Trigger_ElMu  || Trigger_sngEl || Trigger_sngMu)'
-    channels = { 'ee' : { 'double' : 'Trigger_dblEl', 'both' : '(Trigger_dblEl || Trigger_sngEl)'                 , 'full' : fullTrigger },
-                 'mm' : { 'double' : 'Trigger_dblEl', 'both' : '(Trigger_dblMu || Trigger_sngMu)'                 , 'full' : fullTrigger },
-                 'em' : { 'double' : 'Trigger_ElMu' , 'both' : '(Trigger_ElMu  || Trigger_sngEl || Trigger_sngMu)', 'full' : fullTrigger }
-                }
+    channels = [ 'ee', 'em', 'mm' ]
+    triggerLevel = { 'MET' : [ 'double', 'both', 'full' ], 'ttbar' : [ 'eff' ] } 
     variables = { 'Leptonpt1pt2' : [20, 25, 30, 40, 50, 70, 100, 150, 200], 'Leptonpt1pt2bis' : [20, 30, 40, 60, 100, 160, 200] }
+
+    if len(sys.argv)>1:
+       years = sys.argv[1].split('-')
+       if len(sys.argv)>2:
+           channels = sys.argv[2].split('-')
 
     for year in years:
 
-        outputDir = './Plots/'+year+'/Trigger/'
+        outputDir = './Plots/'+year+'/Trigger'+selectionFlag+'/'
         os.system('mkdir -p '+outputDir)
         os.system('cp ./Plots/index.php '+outputDir)
 
-        EFFhistos = { }
+        outputRootDir = './Data/'+year+'/'
+        os.system('mkdir -p '+outputRootDir)
+        outputRootFile = ROOT.TFile(outputRootDir+'TriggerEfficiencies_UL'+year+'_'+selectionFlag+'.root', 'recreate')
+
+        for variable in variables:
+            outputRootFile.mkdir(variable)
+            for ch in channels:
+                outputRootFile.mkdir(variable+'/'+ch)
 
         for leptonWP in leptonWPs: 
 
             for sample in leptonWPs[leptonWP]:
 
-                inputFile = ROOT.TFile('./Shapes/'+year+'/Trigger'+leptonWP+'/Samples/plots_'+year+'Trigger'+leptonWP+'_ALL_'+sample+'.root', 'READ')
+	        inputFileName = './Shapes/'+year+'/Trigger'+selectionFlag+leptonWP+'/Samples/plots_'+year+'Trigger'+selectionFlag+leptonWP+'_ALL_'+sample+'.root'
+                if not os.path.isfile(inputFileName): continue
+                inputFile = ROOT.TFile(inputFileName, 'READ')
 
                 for ch in channels:
-
-                    outputDirChannel = outputDir+ch+'/'
-                    os.system('mkdir -p '+outputDirChannel)
-                    os.system('cp ./Plots/index.php '+outputDirChannel)
-
                     for etab in etaBins:
                         for cutt in triggerCuts:
 
                             denominatorName = ch+etab+'_'+cutt 
 
-                            for trgbit in channels[ch]:
+                            for trgbit in triggerLevel[sample]:
 
                                 numeratorName = denominatorName + '_' + trgbit
 
                                 for variable in variables:
 
-                                    if variable not in EFFhistos:
-                                        EFFhistos[variable] = { }
-                                    if ch not in EFFhistos[variable]:
-                                        EFFhistos[variable][ch] = [ ] 
-
-                                    outputDirVar = outputDirChannel+variable+'/'
+                                    outputDirVar = outputDir+variable+'/'+ch+'/'
                                     os.system('mkdir -p '+outputDirVar)
+                                    os.system('cp ./Plots/index.php '+outputDir+variable+'/')
                                     os.system('cp ./Plots/index.php '+outputDirVar)
 
                                     binsx = variables[variable]
@@ -70,10 +78,11 @@ if __name__ == '__main__':
                                     if len(binsx)==0:
                                         pass
 
-                                    title = 'efficiency_' + year + '_' + leptonWP + '_' + sample + '_' + ch + etab + '_' + cutt + '_' + trgbit
-                                    title = title.replace('__', '_')
+                                    histoName = 'efficiency_' + leptonWP + '_' + year + '_' + sample + '_' + ch + etab + '_' + cutt + '_' + trgbit
+                                    histoName = histoName.replace('__', '_')
+                                    plotTitle = histoName.replace('_'+year, '').replace('_'+ch, '')
 
-                                    EFF = ROOT.TH2F(title, '', len(binsx)-1, array('d',binsx), len(binsy)-1, array('d',binsy))     
+                                    EFF = ROOT.TH2F(histoName, '', len(binsx)-1, array('d',binsx), len(binsy)-1, array('d',binsy))     
                                     EFF.SetXTitle('Leading lepton p_{T}')
                                     EFF.SetYTitle('Trailing lepton p_{T}')
 
@@ -130,43 +139,13 @@ if __name__ == '__main__':
 
                                     EFF.Draw(drawPlotOption)
 
-                                    plotCanvas.Print(outputDirVar+title+'.png')
-                                    plotCanvas.Print(outputDirVar+title+'.pdf')
+                                    if leptonWP=='' and sample=='MET':
+                                        outputRootFile.cd(variable+'/'+ch)
+                                        EFF.Write(plotTitle)
+
+                                    plotCanvas.Print(outputDirVar+plotTitle+'.png')
+                                    plotCanvas.Print(outputDirVar+plotTitle+'.pdf')
 
                                     plotCanvas.Close()
- 
-                                    EFFhistos[variable][ch].append(EFF)
 
-                                    #if sample=='MET' and (leptonWP=='' or leptonWP=='Latino'): 
-                                    #lpt = 'susy' if leptonWP=='' else leptonWP
-                                    #if lpt not in EFFhistos: EFFhistos[lpt] = { }
-                                    #EFFhistos[lpt][channel] = copy.deepcopy(EFF)
-
-        # Save histogram file
-        outputRootDir = './Data/'+year+'/'
-        os.system('mkdir -p '+outputRootDir)
-        outputRootFile = ROOT.TFile(outputRootDir+'TriggerEfficiencies_UL'+year+'.root', 'recreate')
-
-        for variable in variables:
-            outputRootFile.mkdir(variable)
-            for ch in channels:
-                outputRootFile.mkdir(variable+'/'+ch)
-                outputRootFile.cd(variable+'/'+ch)
-                for histo in EFFhistos[variable][ch]:
-                    histo.Write()
-
-"""
-        for channel in channels:
-
-            EFFhistos['susy'][channel].Divide(EFFhistos['Latino'][channel])
-
-            ROOT.gStyle.SetPaintTextFormat("1.3f")
-            sfCanvas = ROOT.TCanvas( 'sfCanvas', '', 1200, 900)
-
-            EFFhistos['susy'][channel].Draw('textcolz')
-
-            title = 'scalefactors_' + year + '_' + channel
-            sfCanvas.Print(outputDir+title+'.png')
-            sfCanvas.Print(outputDir+title+'.pdf')
-"""
 
