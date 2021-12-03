@@ -3,7 +3,7 @@
 
 ## Trigger efficiencies
 
-if recoFlag=='_UL' and 'Trig' in opt.tag and 'Trigger' not in opt.tag and 'TriggerEffWeight_2l' in TriggerEff: # Too low stat for 3Lep
+if recoFlag=='_UL' and 'TrigLatino' not in opt.tag and 'Trigger' not in opt.tag and 'TriggerEffWeight_2l' in TriggerEff: # Too low stat for 3Lep
 
     leptonFlag = '_3Lep' if 'TriggerEffWeight_3l' in TriggerEff else ''
     triggerEfficiencyFile = os.getenv('PWD')+'/Data/'+yeartag+'/TriggerEfficiencies_UL'+yeartag+leptonFlag+'.root'

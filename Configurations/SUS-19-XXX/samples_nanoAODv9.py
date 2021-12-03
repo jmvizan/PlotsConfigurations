@@ -92,9 +92,9 @@ elif '2018' in yeartag :
     ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6loose/hadd__susyGen__susyW__FSSusy2018v6loose__FSSusyCorr2018v6loose__FSSusyNomin2018v6loose'
     ProductionData = 'Run2018_106X_nAODv9_Full2018v8/DATASusy2018v8__hadd'
 
-metnom, metsmr = 'Nomin', 'Smear'
-if 'Smear' in opt.tag:
-    metnom, metsmr = 'Smear', 'Nomin'
+metnom, metsmr = 'Smear', 'Nomin'
+if 'Nomin' in opt.tag:
+    metnom, metsmr = 'Nomin', 'Smear'
 
 regionName = '__susyMT2reco'+metnom+'/'
 ctrltag = ''
@@ -344,31 +344,44 @@ if 'EOY' in opt.sigset:
 
 ### EE Noise in 2017 and HEM Issue in 2018
 
+DataQualityCuts = ''
+if 'VetoesUL' in opt.tag: DataQualityCuts = 'EENoiseHTHEM'
+elif 'VetoesEOY' in opt.tag: DataQualityCuts = 'EENoiseDPhiHEM'
+else:
+    if 'EENoise30' in opt.tag: DataQualityCuts += 'EENoise30'
+    elif 'EENoiseHT' in opt.tag: DataQualityCuts += 'EENoiseHT'
+    elif 'EENoiseDPhiHard' in opt.tag: DataQualityCuts += 'EENoiseDPhiHard'
+    elif 'EENoiseDPhiSoftPt50' in opt.tag: DataQualityCuts += 'EENoiseDPhiSoftPt50'
+    elif 'EENoiseDPhiSoft' in opt.tag: DataQualityCuts += 'EENoiseDPhiSoft'
+    elif 'EENoiseDPhi' in opt.tag: DataQualityCuts += 'EENoiseDPhi'
+    if 'HEM20' in opt.tag: DataQualityCuts += 'HEM20'
+    elif 'HEM' in opt.tag: DataQualityCuts += 'HEM'
+
 VetoEENoise, VetoHEMdata, VetoHEMmc  = '1.', '1.', '1.'
-if '2017' in yeartag and 'EENoise' in opt.tag:
+if '2017' in yeartag and 'EENoise' in DataQualityCuts:
     VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
-    if 'EENoise30' in opt.tag:
+    if 'EENoise30' in DataQualityCuts:
         VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<30. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)==0)'
         #VetoEENoise = '('+njeteenoise30+'==0)'
-    elif 'EENoiseHT' in opt.tag:
+    elif 'EENoiseHT' in DataQualityCuts:
         VetoEENoise = '('+HTForwardSoft+'<60.)'
-    elif 'EENoiseDPhiHard' in opt.tag:
+    elif 'EENoiseDPhiHard' in DataQualityCuts:
         if 'UL' in recoFlag:
             VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>2.560)==0)'
         else:
             VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0)'
-    elif 'EENoiseDPhiSoftPt50' in opt.tag:
+    elif 'EENoiseDPhiSoftPt50' in DataQualityCuts:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_pt50+'>0. && '+dPhieenoiseptmiss_pt50+'<0.96)==0)'
-    elif 'EENoiseDPhiSoft' in opt.tag:
+    elif 'EENoiseDPhiSoft' in DataQualityCuts:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_pt30+'>0. && '+dPhieenoiseptmiss_pt30+'<0.96)==0)'
-    elif 'EENoiseDPhi' in opt.tag:
+    elif 'EENoiseDPhi' in DataQualityCuts:
         VetoEENoise = '(Sum$('+dPhieenoiseptmiss_hard+'>1.257)==0 && Sum$('+dPhieenoiseptmiss_pt50+'>0. && '+dPhieenoiseptmiss_pt50+'<0.96)==0)'
-    #if 'Veto' in opt.tag:
+    #if 'Veto' in DataQualityCuts:
     #    #VetoEENoise = '(1. - '+VetoEENoise+')'
     #    VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
 
-elif '2018' in yeartag and 'HEM' in opt.tag:
-    hemPtCut    = '20.' if 'HEM20' in opt.tag else '30.' 
+elif '2018' in yeartag and 'HEM' in DataQualityCuts:
+    hemPtCut    = '20.' if 'HEM20' in DataQualityCuts else '30.' 
     VetoHEMele  = '(Sum$(Electron_pt>'+hemPtCut+' && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)==0)'
     VetoHEMjet  = '(Sum$(Jet_pt>'+hemPtCut+' && Jet_eta>-3.2 && Jet_eta<-1.2 && Jet_phi>-1.77 && Jet_phi<-0.67)==0)'
     VetoHEM     = '('+VetoHEMele+' && '+VetoHEMjet+')'
@@ -380,7 +393,7 @@ elif '2018' in yeartag and 'HEM' in opt.tag:
 TriggerEff = 'TriggerEffWeight_2l' if 'Trigger' not in opt.tag else '1.'
 
 if 'WZtoWW' in opt.tag or 'WZVal' in opt.tag or 'ZZVal' in opt.tag or 'ttZ' in opt.tag or 'FitCRZZ' in opt.tag or 'FitCRWZ' in opt.tag:
-    TriggerEff = 'TriggerEffWeight_3l' if 'Trig' not in opt.tag else '1.'
+    TriggerEff = 'TriggerEffWeight_3l' if 'TrigLatino' in opt.tag else '1.'
 
 ### MC weights
 
@@ -465,7 +478,7 @@ if 'SignalRegions' in opt.tag or 'BackSF' in opt.tag:
     normBackgrounds['DY']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
     normBackgrounds['ttSemilep'] = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
 
-    if 'FitCR' not in opt.tag: # To be updated to UL if one wants to use them
+    if 'BackSF' in opt.tag: # To be updated to UL if one wants to use them
 
         if '2016' in yeartag:
             normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.08' }, 'selection' : '1.' } }

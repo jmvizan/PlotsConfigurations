@@ -462,10 +462,11 @@ if 'SignalRegion' in opt.tag:
     splitjets=False  
     if 'CharginoSignalRegions' in opt.tag or 'TChipmWWSignalRegions' in opt.tag or 'VisHT' in opt.tag: splitjets=True
 
-    ptmiss_cuts={"SR1": ' && ptmiss>=140 && ptmiss<200 ',
-                 "SR2": ' && ptmiss>=200 && ptmiss<300 ',
-                 "SR3": ' && ptmiss>=300 '}
-    if 'Optim' in opt.tag and 'Ptm' in opt.tag:
+    if 'Paper2016' in opt.tag or 'METBins2016' in opt.tag:
+        ptmiss_cuts={"SR1": ' && ptmiss>=140 && ptmiss<200 ',
+                     "SR2": ' && ptmiss>=200 && ptmiss<300 ',
+                     "SR3": ' && ptmiss>=300 '}
+    else:
         ptmiss_cuts={"SR1": ' && ptmiss>=160 && ptmiss<220 ',
                      "SR2": ' && ptmiss>=220 && ptmiss<280 ',
                      "SR3": ' && ptmiss>=280 && ptmiss<380 ',
@@ -473,16 +474,21 @@ if 'SignalRegion' in opt.tag:
         if 'TChipmWWSignalRegions' in opt.tag:
             ptmiss_cuts['SR1'] = ptmiss_cuts['SR1'].replace('ptmiss>=160', 'ptmiss>=140')
 
+ 
+    isrRegions = [ ]
+    if 'StopSignalRegions' in opt.tag: 
+        if 'NoISR' not in opt.tag: 
+            if 'ISR4' not in opt.tag: isrRegions.append('SR3')
+            isrRegions.append('SR4')
+    elif 'CharginoSignalRegions' in opt.tag or 'TChipmWWSignalRegions' in opt.tag:
+        if 'ISR' in opt.tag:
+            if 'ISR4' not in opt.tag: isrRegions.append('SR3')
+            isrRegions.append('SR4') 
+
     for SR in ptmiss_cuts:
 
         isrcut = ''
-        doISR  = False
-        if "ISR" in opt. tag:
-            if "ISR4" in opt.tag:
-                if SR in ["SR4"]: doISR = True
-            else:
-                if SR in ["SR3","SR4"]:
-                    doISR = True
+        if SR in isrRegions: isrcut=' && '+ISRCut
 
         if doISR: isrcut=' && '+ISRCut
 

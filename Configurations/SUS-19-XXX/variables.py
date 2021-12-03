@@ -431,6 +431,7 @@ elif 'ttZNormalization' in opt.tag:
 
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
+    ### Set the mt2ll variable
     mt2ll = 'mt2ll' + ctrltag
 
     if 'FitCRttZ' in opt.tag: # this is not really right, but it's just for normalization
@@ -438,7 +439,9 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     if 'FakeValidationRegion' in opt.tag:
         mt2ll = T0+'*mt2llfake0+'+T1+'*mt2llfake1+'+T2+'*mt2llfake2'
-
+  
+    ### Here is the stuff for mt2ll binning 
+    # Some studies I don't remember ...
     if 'StudyHighMT2' in opt.tag:
  
         variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
@@ -447,45 +450,38 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          'fold'  : overflow                #   fold overflow
                                      }
 
-    elif 'Optim' in opt.tag and 'MT2' in opt.tag:
-        if 'High' in opt.tag:
-            
-            if 'Extrabin' in opt.tag:
-                variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                                 'range' : ([0, 20, 40, 60, 80, 100, 160, 240,370,500],[1]), # variable range
-                                                 'xaxis' : mt2 + pll + gv,         #   x axis name
-                                                 'fold'  : overflow,               #   fold overflow
-                                                 'CRbins' : [1, 4] 
-                                             }
+    # ... and then the real validation and signal regions
+    else:
 
-            else:
-                variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                                 'range' : ([0, 20, 40, 60, 80, 100, 160, 370, 500],[1]), # variable range
-                                                 'xaxis' : mt2 + pll + gv,         #   x axis name
-                                                 'fold'  : overflow,               #   fold overflow
-                                                 'CRbins' : [1, 4] 
-                                             }
+        mt2llOptimBin          = [0, 20, 40, 60, 80, 100, 160,           220]
+        mt2llOptimHighBin      = [0, 20, 40, 60, 80, 100, 160,      370, 500]
+        mt2llOptimHighExtraBin = [0, 20, 40, 60, 80, 100, 160, 240, 370, 500]
+
+        # main mt2ll binning
+        if 'Paper2016' in opt.tag or 'MT2Bins2016' in opt.tag or 'ValidationRegion' in opt.tag:
+
+            variables['mt2ll'] = {   'name'  : mt2ll,                  #   variable name
+                                     'range' : (   7,    0.,  140.),   #   variable range
+                                     'xaxis' : mt2 + pll + gv,         #   x axis name
+                                     'fold'  : overflow,               #   fold overflow
+                                     'CRbins' : [1, 4]
+                                  }
 
         else:
-            variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                             'range' : ([0, 20, 40, 60, 80, 100, 160, 220],[1]), # variable range
-                                             'xaxis' : mt2 + pll + gv,         #   x axis name
-                                             'fold'  : overflow,               #   fold overflow
-                                             'CRbins' : [1, 4] 
-                                         }
+            
+            if 'StopSignalRegions' in opt.tag or 'MT2BinsStop' in opt.tag: mt2llMainBins = mt2llOptimBin
+            elif 'MT2BinsMore' in opt.tag: mt2llMainBins = mt2llOptimHighBin
+            else: mt2llMainBins = mt2llOptimHighExtraBin
+        
+            variables['mt2ll'] = {   'name'  : mt2ll,               #   variable name    
+                                     'range' : (mt2llMainBins,[1]), # variable range
+                                     'xaxis' : mt2 + pll + gv,      #   x axis name
+                                     'fold'  : overflow,            #   fold overflow
+                                     'CRbins' : [1, 4] 
+                                  }
 
-    else:
-    
-        variables['mt2ll']         = {   'name'  : mt2ll,                  #   variable name    
-                                         'range' : (   7,    0.,  140.),   #   variable range
-                                         'xaxis' : mt2 + pll + gv,         #   x axis name
-                                         'fold'  : overflow,               #   fold overflow
-                                         'CRbins' : [1, 4] 
-                                     }
-
+        # Some other mt2ll binning for validation regions
         if 'ValidationRegion' in opt.tag:
-
-            mt2llOptimBin = [0, 20, 40, 60, 80, 100, 160, 220]
 
             variables['mt2llOptim'] = {   'name'  : mt2ll,                  #   variable name    
                                           'range' : (mt2llOptimBin,[1]),    #   variable range
@@ -496,14 +492,12 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
 	    if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'FakeValidationRegion' in opt.tag:
 
-                mt2llOptimHighBin = [0, 20, 40, 60, 80, 100, 160, 370, 500]                                                                                               
 
                 variables['mt2llOptimHigh'] = {   'name'  : mt2ll,                   #   variable name
                                                   'range' : (mt2llOptimHighBin,[1]), #   variable range
                                                   'xaxis' : mt2 + pll + gv,          #   x axis name
                                                   'fold'  : overflow,                #   fold overflow
                                                   'CRbins' : [1, 4]                                                                                                                                                      }
-                mt2llOptimHighExtraBin = [0, 20, 40, 60, 80, 100, 160, 240, 370, 500]
 
                 variables['mt2llOptimHighExtra'] = {   'name'  : mt2ll,                        #   variable name
                                                        'range' : (mt2llOptimHighExtraBin,[1]), # variable range
@@ -512,6 +506,8 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                                        'CRbins' : [1, 4]
                                                     }
 
+    ### Extra variables 
+    # Optimization ...
     if 'StudyVisHT' in opt.tag:
  
         visht = sumLeptonPt+'+Sum$(CleanJet_pt)'
@@ -540,6 +536,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                         'fold'  : overflow                 #   fold overflow
                                     }
 
+    # ... and validation regions
     if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
 
         variables['ptmiss']        = {  'name'  : 'ptmiss'+ctrltag,        #   variable name    

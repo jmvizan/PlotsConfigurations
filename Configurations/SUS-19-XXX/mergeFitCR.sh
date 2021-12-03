@@ -35,6 +35,14 @@ for year in "${yearlist[@]}"; do
 
         filename=./Shapes/$year/$intag/plots_${intag}
 
+        infile=${filename}_SM.root
+        if test -f "$infile"; then
+            echo "$infile exists, will use it."
+        else
+            smtag="${intag/FitCR/}"
+            infile=./Shapes/$year/$smtag/plots_${smtag}_SM.root
+        fi
+   
         # Check if tag was already merged
         outfile=${filename}_SM-$sample.root
         if test -f "$outfile"; then
@@ -43,12 +51,9 @@ for year in "${yearlist[@]}"; do
 
             sigtag=$intag
             if [ $addCR == '1' ]; then
-                sigset=''
-                sigtag="${intag/FitCR/$sigset}"
+                sigtag="${intag/FitCR/}"
             fi
             sigfile=./Shapes/$year/$sigtag/plots_${sigtag}_$sample.root
-
-            infile=${filename}_SM.root
         
             wztag="${intag/FitCR/FitCRWZ}"
             wzfile=./Shapes/$year/$wztag/plots_${wztag}_SM.root
@@ -71,7 +76,6 @@ for year in "${yearlist[@]}"; do
     fi
 
 done
-
 
 
 
