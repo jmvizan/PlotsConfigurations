@@ -109,7 +109,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'isSignal' : 0,
         'color': 394, #  kYellow-6
         'fill' : 3005,
-        'samples'  : ['EOYQQ', 'EOYH', 'EOY3V', 'EOYDoubleTopW']
+        'samples'  : ['EOYQQ', 'EOYH', 'EOY3V' ]
     }
   
     groupPlot['ZZTo4L'] = {
@@ -275,7 +275,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         plot['EOYH']          = plot['Higgs']
         plot['EOYQQ']         = plot['VZ']
         plot['EOYGluGlu']     = plot['WW']
-        plot['EOYDoubleTopW'] = plot['ttW']
         plot['EOYVZ']         = plot['WZ']
         plot['EOYDrellYan']   = plot['DY']
         plot['EOY3V']         = plot['VVV']
