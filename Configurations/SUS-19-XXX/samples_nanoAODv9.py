@@ -112,7 +112,9 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
 
-directoryBkgEOY = directoryBkg.replace('Summer20UL16_106X_HIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_noHIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose') 
+directoryBkgEOY = directoryBkg.replace('Summer20UL16_106X_nAODv9_HIPM', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_nAODv9_noHIPM', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose').replace('noHIPM','').replace('HIPM','') 
+if 'cern' in SITE:
+    directoryBkgEOY = directoryBkgEOY.replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
 
 # nuisance parameters
 
