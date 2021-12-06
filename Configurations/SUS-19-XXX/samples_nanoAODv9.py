@@ -733,7 +733,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        'weight' : XSWeight+'*'+SFweight ,
                                    }
             if '2016noHIPM' in yeartag: 
-                samples['EOYDrellYan']['name'] += getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50-LO'           , False,treePrefix,skipTreesCheck)
+                samples['EOYDrellYan']['name'] += getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50-LO_ext2'           , False,treePrefix,skipTreesCheck)
                 addSampleWeight(samples,'EOYDrellYan','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')
 
         if '2016HIPM' in yeartag or '2017' in yeartag or '2018' in yeartag:
