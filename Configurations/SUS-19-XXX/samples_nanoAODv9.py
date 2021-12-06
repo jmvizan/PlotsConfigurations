@@ -50,6 +50,8 @@ nuis_btag_split = True
 
 treePrefix= 'nanoLatino_'
 
+isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit')
+
 ### Directories
 
 recoFlag = '_UL'
@@ -60,11 +62,11 @@ SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
 if  'cern' in SITE :
-    treeBaseDirSig  = '/eos/home-p/pmatorra/Samples/Nano/UL/'
-    treeBaseDirMC   = '/eos/home-p/pmatorra/Samples/Nano/UL/'
-    treeBaseDirData = '/eos/home-p/pmatorra/Samples/Nano/UL/'
+    treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
+    treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
+    treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     print 'nanoAODv9 trees not available yet on cern'
-    if not hasattr(opt, 'doHadd') or opt.doHadd:
+    if '2016' not in yeartag and (not hasattr(opt, 'doHadd') or opt.doHadd):
         skipTreesCheck = True
     else:
         exit()
@@ -74,8 +76,8 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    if 'SM' in opt.sigset or 'Background' in opt.sigset:
-        print '2016 MC samples not yet available'
+    if 'ifca' in SITE and ('SM' in opt.sigset or 'Background' in opt.sigset):
+        print '2016 MC samples not yet available in gridui'
         exit()
     if 'HIPM' not in yeartag :
         if not hasattr(opt, 'doHadd'): 
@@ -109,7 +111,7 @@ directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
 
-directoryBkgEOY = directoryBkg.replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose') 
+directoryBkgEOY = directoryBkg.replace('Summer20UL16_106X_HIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_noHIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose') 
 
 # nuisance parameters
 
@@ -118,14 +120,14 @@ removeZeros = 1 if 'StatZero' in opt.tag else 0
 
 treeNuisances = { }
 if metnom=='Nomin':
-    treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
+    treeNuisances['smear']        = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
     #treeNuisances['jesTotal']  = { 'name' : 'JES',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
     #treeNuisances['unclustEn'] = { 'name' : 'MET',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 elif metnom=='Smear':
-    if not nuis_jer_whole:
+    if not isDatacardOrPlot or not nuis_jer_whole:
         treeNuisances['jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
-    else:
-        treeNuisances['jer']       = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
+    if not isDatacardOrPlot or nuis_jer_whole:
+        treeNuisances['nosmear']  = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
     treeNuisances['jesTotal']  = { 'name' : 'SJS',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
     treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 
@@ -134,11 +136,11 @@ treeNuisanceDirs = { }
 treeNuisanceSuffix = '__hadd' if  'cern' in SITE else ''
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
-    if treeNuisance=='jer' and treeNuisances[treeNuisance]['name']!='JER':
-        treeNuisanceDirs['jer']['MC']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
-        treeNuisanceDirs['jer']['MC']['Down'] = directoryBkg
-        treeNuisanceDirs['jer']['FS']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
-        treeNuisanceDirs['jer']['FS']['Down'] = directorySig
+    if treeNuisance=='nosmear' or treeNuisance=='smaer':
+        treeNuisanceDirs[treeNuisance]['MC']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
+        treeNuisanceDirs[treeNuisance]['MC']['Down'] = directoryBkg
+        treeNuisanceDirs[treeNuisance]['FS']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
+        treeNuisanceDirs[treeNuisance]['FS']['Down'] = directorySig
     else:
         directoryBkgTemp = directoryBkg.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
         directorySigTemp = directorySig.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
@@ -149,8 +151,8 @@ for treeNuisance in treeNuisances:
             treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
             treeNuisanceDirs[treeNuisance]['FS'][variation]  = directorySigTemp.replace('variation', variation[:2])
     if 'EOY' in opt.sigset:
-        treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
-        treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL16_106X_HIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_noHIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL16_106X_HIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_noHIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
 
 globalNuisances = { }
 globalNuisances['trigger'] = { 'name' : 'trigger_'+yeartag, 'value' : trigger_uncertainty }
@@ -453,9 +455,9 @@ else:
 
 if '2016' in yeartag or '2017' in yeartag: 
     SFweightCommon += '*PrefireWeight'
-if '2017' in yeartag and 'EENoise' in opt.tag:
+if '2017' in yeartag and 'EENoise' in DataQualityCuts:
     SFweightCommon += '*' + VetoEENoise
-if '2018' in yeartag and 'HEM' in opt.tag: 
+if '2018' in yeartag and 'HEM' in DataQualityCuts: 
     SFweightCommon += '*' + VetoHEMmc
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeight['Lep']['FastSim'] + '*isrW'
@@ -463,8 +465,6 @@ SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeight['Lep']['
 ### Special weights
 
 # background cross section uncertainties and normalization scale factors
-
-isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit')
 
 normBackgrounds = {}
 
@@ -881,8 +881,8 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                        }
     v1v2samples = { 'SingleMuon'     : ['Run2018B','Run2018C'],
                     #'SingleElectron' : ['Run2017D'], # Done v1 after v2 was invalidated
-                    'DoubleMuon'     : ['Run2018D'],
-                    'MET'            : ['Run2018A','Run2018B']
+                    'DoubleMuon'     : ['Run2016G_UL2016', 'Run2018D'],
+                    'DoubleEG'       : ['Run2016B-ver2_HIPM']
               }
 
     v1v3samples = { 'EGamma' : ['Run2018D'] }
