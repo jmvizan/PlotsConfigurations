@@ -40,7 +40,7 @@ if __name__ == '__main__':
     exec(open(opt.samplesFile).read())
 
     theoryNormalizations = { }
-             
+
     for sam_k, sam_v in samples.iteritems():
 
         if not sam_v['isSignal']: # Background samples
@@ -56,8 +56,9 @@ if __name__ == '__main__':
             for treeName in sam_v['name']:
                 if 'rootd' not in treeName:
                     treeName = treeName.replace('###', '')
+                treeName = treeName.replace('root://eoscms.cern.ch/', '')
                 chain.Add(treeName)
-       
+   
             genWeight = 0.
             qcdWeights, pdfWeights = [ ], [ ] 
 
@@ -140,6 +141,8 @@ if __name__ == '__main__':
                         for ipdf in range(expectedPdfWeights):
                             if ipdf<getattr(chain, 'nLHEPdfSumw'+underscore):
                                 eventWeight = chain.LHEPdfSumw_[ipdf] if underscore=='_' else chain.LHEPdfSumw[ipdf]
+                                if eventWeight<0:
+                                    pdfStatus = 2
                                 pdfWeights[ipdf] += eventWeight/LHECentralSumw*getattr(chain, 'genEventSumw'+underscore)
                             else:
                                 pdfWeights[ipdf] += getattr(chain, 'genEventSumw'+underscore)

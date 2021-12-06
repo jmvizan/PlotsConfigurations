@@ -65,11 +65,12 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
-    print 'nanoAODv9 trees not available yet on cern'
-    if '2016' not in yeartag and (not hasattr(opt, 'doHadd') or opt.doHadd):
-        skipTreesCheck = True
-    else:
-        exit()
+    if '2016' not in yeartag:
+        print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
+        if not hasattr(opt, 'doHadd') or opt.doHadd:
+            skipTreesCheck = True
+        else:
+            exit()
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -82,7 +83,7 @@ if '2016' in yeartag :
     if 'HIPM' not in yeartag :
         if not hasattr(opt, 'doHadd'): 
             skipTreesCheck = True
-    ProductionMC   = 'Summer20UL16_106X_nAODv9_'+yeartag.replace('2016', '')+'_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8__MCSusyNomin2016v8'
+    ProductionMC   = 'Summer20UL16_106X_nAODv9_'+yeartag.replace('2016', '')+'_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8'+yeartag.replace('2016', '')+'__MCSusyNomin2016v8'
     ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
     ProductionData = 'Run2016_106X_nAODv9_'+yeartag.replace('2016', '')+'_Full2016v8/DATASusy2016v8__hadd'
 elif '2017' in yeartag :
