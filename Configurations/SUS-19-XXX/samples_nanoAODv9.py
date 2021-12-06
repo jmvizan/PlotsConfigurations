@@ -727,14 +727,16 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                         }  
 
         if '2016' in yeartag and 'EOY' in opt.tag: #ALMOST READY
-            samples['EOYDrellYan'] = { 'name'   : getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck) + # Done for HIPM
-                                                  getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50-LO'           , False,treePrefix,skipTreesCheck),
+            samples['EOYDrellYan'] = { 'name'   : getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck),
                                        'weight' : XSWeight+'*'+SFweight ,
                                    }
-            addSampleWeight(samples,'EOYDrellYan','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')
+            if '2016noHIPM' in yeartag: 
+                samples['EOYDrellYan']['name'] += getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50-LO'           , False,treePrefix,skipTreesCheck)
+                addSampleWeight(samples,'EOYDrellYan','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')
 
-        if '2017' in yeartag or '2018' in yeartag:
-            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck)
+        if '2016HIPM' in yeartag or '2017' in yeartag or '2018' in yeartag:
+            if '2017' in yeartag or '2018' in yeartag:
+                samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck)
             samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'           , False,treePrefix,skipTreesCheck)
             addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')
 
