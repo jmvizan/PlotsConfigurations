@@ -8,7 +8,7 @@ import LatinoAnalysis.Gardener.hwwtools as hwwtools
 PWD     = os.getenv('PWD')
 CMSSW_v = 'CMSSW_'+PWD.split('CMSSW_')[1].split('/')[0]
 COMBINE = PWD.split('CMSSW_')[0]+CMSSW_v
-if os.path.isdir(COMBINE) is False: COMBINE=PWD.split('CMSSW_')[0]+'CMSSW_8_1_0/src/'
+if os.path.isdir(COMBINE) is False: COMBINE=PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
 
 if __name__ == '__main__':
 
@@ -61,7 +61,7 @@ if __name__ == '__main__':
     exec(open(opt.variablesFile).read())
     exec(open(opt.cutsFile).read())
 
-    maxFitCommand = 'cd '+COMBINE+' ;  eval `scramv1 runtime -sh` ; cd - ; combineCards.py '
+    maxFitCommand = 'cd '+opt.combineLocation+' ;  eval `scramv1 runtime -sh` ; cd - ; combineCards.py '
 
     for year in yearset.split('-'):
         for cut in cuts:

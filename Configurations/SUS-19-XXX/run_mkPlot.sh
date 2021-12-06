@@ -100,7 +100,7 @@ if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
             if [[ $NORM == *'PostFitS'* ]]; then
                 mkPlot.py --pycfg=configuration.py --tag=$FITYEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_$NORM${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --postFit=p --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=None
             else
-               mkPlot.py --pycfg=configuration.py --tag=$FITYEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_$NORM${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --postFit=p --showDataVsBkgOnly --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=None
+                mkPlot.py --pycfg=configuration.py --tag=$FITYEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_$NORM${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --postFit=p --showDataVsBkgOnly --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=None
             fi
         done
         PLOTDIR=$CLEANDIR
