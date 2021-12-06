@@ -443,10 +443,15 @@ if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the
     elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.48', 'rateDown' : '0.52' } 
     elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.30', 'rateDown' : '0.70' } 
 
-promptLeptons = 'Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]'
-nonpromptLepSF      = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rate']      + ')'
-nonpromptLepSF_Up   = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateUp']    + ')'
-nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateDown']  + ')'
+if 'SameSignValidationRegion' in opt.tag:
+    nonpromptLepSF      = '1.'
+    nonpromptLepSF_Up   = '1.'
+    nonpromptLepSF_Down = '1.'
+else:
+    promptLeptons = 'Lepton_promptgenmatched[0]*Lepton_promptgenmatched[1]'
+    nonpromptLepSF      = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rate']      + ')'
+    nonpromptLepSF_Up   = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateUp']    + ')'
+    nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateDown']  + ')'
 
 # global SF weights 
 if 'EOY' in opt.sigset or 'TestExtra' in opt.tag:
