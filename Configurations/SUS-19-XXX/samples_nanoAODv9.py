@@ -438,13 +438,13 @@ for lep_i in ['Lep']:
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
         else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
 
-# nonprompt lepton rate TODO: update UL16 values
+# nonprompt lepton rate TODO:
 
 if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.02', 'rateUp' : '1.11', 'rateDown' : '0.93' } 
 elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.21', 'rateDown' : '0.81' } 
 elif '2017'       in yeartag: nonpromptLep = { 'rate' : '1.38', 'rateUp' : '1.46', 'rateDown' : '1.29' } 
 elif '2018'       in yeartag: nonpromptLep = { 'rate' : '1.28', 'rateUp' : '1.37', 'rateDown' : '1.21' } 
-if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the limits
+if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the limits (EOY values)
     if   '2016' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.23', 'rateDown' : '0.77' } 
     elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.48', 'rateDown' : '0.52' } 
     elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.30', 'rateDown' : '0.70' } 
