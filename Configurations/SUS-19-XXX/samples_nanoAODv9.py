@@ -278,7 +278,7 @@ MET_significance = 'MET_significance'
 btagAlgo   = 'deepcsv'
 btagDisc   = 'btagDeepB'
 bTagWP     = '_M'
-if 'EOY' in opt.sigset:
+if 'EOY' in opt.sigset and 'EOYWJets' not in opt.sigset:
     btagAlgo   = 'btagDeepB'
     bTagWP     = 'M'
 bTagPtCut  = '20.'
@@ -884,8 +884,13 @@ if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrou
                 sampleToRemove.append(sample)
             if 'EOY' in sample: 
                 sampleToRemove.append(sample)
+        elif 'EOYWJets' in opt.sigset:
+            if sample!='EOYWJets':
+                sampleToRemove.append(sample)
         elif 'EOY' in opt.sigset:
             if 'EOY' not in sample:
+                sampleToRemove.append(sample)
+            if sample=='EOYWJets':
                 sampleToRemove.append(sample)
         elif 'Backgrounds'+sample!= opt.sigset:
             sampleToRemove.append(sample)
