@@ -77,7 +77,7 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    if 'ifca' in SITE and ('SM' in opt.sigset or 'Background' in opt.sigset) and 'EOY' not in opt.sigset:
+    if 'ifca' in SITE and ('SM' in opt.sigset or 'Background' in opt.sigset) and 'EOY' not in opt.sigset and '16noHIPM' in yeartag:
         print '2016 MC samples not yet available in gridui'
         exit()
     if 'HIPM' not in yeartag :
@@ -107,6 +107,10 @@ for CR_i in CRs:
     if CR_i in opt.tag:
         regionName = regionName.replace('reco', 'ctrl') 
         ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','').replace('Trigger3Lep','WZ')
+
+if ctrltag!='' and '2016HIPM' in yeartag: 
+    print 'still copying trees'
+    exit()
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
