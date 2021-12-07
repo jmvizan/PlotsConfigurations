@@ -854,15 +854,16 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                     WJetsHT400ext, WJetsHT600ext, WJetsHT800ext, WJetsHT1200ext, WJetsHT2500ext = '_ext1', '_ext1', '_ext1', '_ext1', '_ext1'
                 elif '2017' in yeartag:
                     WJetsext = '_ext1'
-                samples['EOYWJets'] = { 'name'   : getSampleFiles(directoryBkgEOY,'WJetsToLNu-LO'         +WJetsext,      False,treePrefix) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT70_100'   +WJetsHT70ext,  False,treePrefix) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT100_200'  +WJetsHT100ext, False,treePrefix) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT200_400'  +WJetsHT200ext, False,treePrefix) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT400_600'  +WJetsHT400ext, False,treePrefix) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT600_800'  +WJetsHT600ext, False,treePrefix) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT800_1200' +WJetsHT800ext, False,treePrefix) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT1200_2500'+WJetsHT1200ext,False,treePrefix) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT2500_inf' +WJetsHT2500ext,False,treePrefix),
+                skipWJetsTreesCheck = True if 'cern' in SITE else skipTreesCheck
+                samples['EOYWJets'] = { 'name'   : getSampleFiles(directoryBkgEOY,'WJetsToLNu-LO'         +WJetsext,      False,treePrefix,skipWJetsTreesCheck) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT70_100'   +WJetsHT70ext,  False,treePrefix,skipWJetsTreesCheck) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT100_200'  +WJetsHT100ext, False,treePrefix,skipWJetsTreesCheck) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT200_400'  +WJetsHT200ext, False,treePrefix,skipWJetsTreesCheck) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT400_600'  +WJetsHT400ext, False,treePrefix,skipWJetsTreesCheck) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT600_800'  +WJetsHT600ext, False,treePrefix,skipWJetsTreesCheck) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT800_1200' +WJetsHT800ext, False,treePrefix,skipWJetsTreesCheck) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT1200_2500'+WJetsHT1200ext,False,treePrefix,skipWJetsTreesCheck) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT2500_inf' +WJetsHT2500ext,False,treePrefix,skipWJetsTreesCheck),
                                         'weight' : XSWeight+'*'+SFweight ,
                                         'isControlSample' : 1,
                                        }
