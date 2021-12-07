@@ -44,7 +44,7 @@ if '2018' in opt.tag :
     trigger_uncertainty  = '1.020'
 print 'Value of lumi set to', opt.lumi
 
-nuis_jer_whole  = True
+nuis_jer_whole  = True if 'JER' not in opt.tag else False
 nuis_lumi_split = True
 nuis_btag_split = True
 
@@ -139,8 +139,7 @@ elif metnom=='Smear':
     treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 
 treeNuisanceDirs = { }
-#treeNuisanceSuffix = '' if  'ctrl' in regionName else '__hadd'
-treeNuisanceSuffix = '__hadd' if  'cern' in SITE else ''
+treeNuisanceSuffix = '__hadd' if ('cern' in SITE and 'EOY' in opt.sigset) else ''
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
     if treeNuisance=='nosmear' or treeNuisance=='smaer':
