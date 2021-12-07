@@ -439,12 +439,12 @@ for lep_i in ['Lep']:
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
         else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
 
-# nonprompt lepton rate TODO: update to UL values <- This is done, isnt it? I don't think so, not nAODv9 for sure
+# nonprompt lepton rate TODO: update UL16 values
 
 if   '2016' in yeartag: nonpromptLep = { 'rate' : '1.23', 'rateUp' : '1.31', 'rateDown' : '1.15' } 
 elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.38', 'rateUp' : '1.46', 'rateDown' : '1.29' } 
 elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.28', 'rateUp' : '1.37', 'rateDown' : '1.21' } 
-if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the limits
+if 'nonpromptSF' in opt.tag: # EOY To check that mismodelling doesnt change much the limits
     if   '2016' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.23', 'rateDown' : '0.77' } 
     elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.48', 'rateDown' : '0.52' } 
     elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.30', 'rateDown' : '0.70' } 
