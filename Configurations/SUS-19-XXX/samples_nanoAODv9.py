@@ -44,7 +44,7 @@ if '2018' in opt.tag :
     trigger_uncertainty  = '1.020'
 print 'Value of lumi set to', opt.lumi
 
-nuis_jer_whole  = True
+nuis_jer_whole  = True if 'JER' not in opt.tag else False
 nuis_lumi_split = True
 nuis_btag_split = True
 
@@ -77,7 +77,7 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    if 'ifca' in SITE and ('SM' in opt.sigset or 'Background' in opt.sigset) and 'EOY' not in opt.sigset:
+    if 'ifca' in SITE and ('SM' in opt.sigset or 'Background' in opt.sigset) and 'EOY' not in opt.sigset and '16noHIPM' in yeartag:
         print '2016 MC samples not yet available in gridui'
         exit()
     if 'HIPM' not in yeartag :
@@ -108,6 +108,10 @@ for CR_i in CRs:
         regionName = regionName.replace('reco', 'ctrl') 
         ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','').replace('Trigger3Lep','WZ')
 
+if ctrltag!='' and '2016HIPM' in yeartag: 
+    print 'still copying trees'
+    exit()
+
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
@@ -135,8 +139,7 @@ elif metnom=='Smear':
     treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
 
 treeNuisanceDirs = { }
-#treeNuisanceSuffix = '' if  'ctrl' in regionName else '__hadd'
-treeNuisanceSuffix = '__hadd' if  'cern' in SITE else ''
+treeNuisanceSuffix = '__hadd' if ('cern' in SITE and 'EOY' in opt.sigset) else ''
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
     if treeNuisance=='nosmear' or treeNuisance=='smaer':
@@ -435,7 +438,7 @@ for lep_i in ['Lep']:
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
         else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
 
-# nonprompt lepton rate TODO: update to UL values <- This is done, isnt it? I don't think so, not nAODv9 for sure
+# nonprompt lepton rate TODO: update UL16 values
 
 if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.02', 'rateUp' : '1.11', 'rateDown' : '0.93' } 
 elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.21', 'rateDown' : '0.81' } 
