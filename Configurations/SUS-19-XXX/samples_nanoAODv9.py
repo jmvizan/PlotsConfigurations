@@ -77,7 +77,7 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    if 'ifca' in SITE and ('SM' in opt.sigset or 'Background' in opt.sigset) and 'EOY' not in opt.sigset:
+    if 'ifca' in SITE and ('SM' in opt.sigset or 'Background' in opt.sigset) and 'EOY' not in opt.sigset and '16noHIPM' in yeartag:
         print '2016 MC samples not yet available in gridui'
         exit()
     if 'HIPM' not in yeartag :
@@ -107,6 +107,10 @@ for CR_i in CRs:
     if CR_i in opt.tag:
         regionName = regionName.replace('reco', 'ctrl') 
         ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','').replace('Trigger3Lep','WZ')
+
+if ctrltag!='' and '2016HIPM' in yeartag: 
+    print 'still copying trees'
+    exit()
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
@@ -437,8 +441,8 @@ for lep_i in ['Lep']:
 # nonprompt lepton rate TODO: update to UL values <- This is done, isnt it? I don't think so, not nAODv9 for sure
 
 if   '2016' in yeartag: nonpromptLep = { 'rate' : '1.23', 'rateUp' : '1.31', 'rateDown' : '1.15' } 
-elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.48', 'rateUp' : '1.62', 'rateDown' : '1.37' } 
-elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.30', 'rateUp' : '1.36', 'rateDown' : '1.21' } 
+elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.38', 'rateUp' : '1.46', 'rateDown' : '1.29' } 
+elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.28', 'rateUp' : '1.37', 'rateDown' : '1.21' } 
 if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the limits
     if   '2016' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.23', 'rateDown' : '0.77' } 
     elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.48', 'rateDown' : '0.52' } 
