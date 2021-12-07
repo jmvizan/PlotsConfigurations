@@ -159,6 +159,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameLatex' : 'EOY \\PW+jets ($\\to\\ell\\nu$)',
         'isSignal' : 0,
         'color': 38,
+        'fill' : 3005,
         'samples'  : ['EOYWJets']
     }
 
