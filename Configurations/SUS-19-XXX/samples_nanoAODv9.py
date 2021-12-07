@@ -844,6 +844,29 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 if kZZvariable in opt.tag:  
                     addSampleWeight(samples,'ZZTo4L','ZZTo4L'+ZZ4Lext, kZZvariable.replace('kZZ', 'kZZ_'))
 
+        if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJetsToLNu' in opt.sigset:
+
+            if 'EOY' in opt.tag:
+
+                WJetsext, WJetsHT70ext, WJetsHT100ext, WJetsHT200ext, WJetsHT400ext, WJetsHT600ext, WJetsHT800ext, WJetsHT1200ext, WJetsHT2500ext = '', '', '', '', '', '', '', '', ''
+                if '2016' in yeartag:
+                    WJetsext, WJetsHT100ext, WJetsHT200ext = '_ext2', '_ext2', '_ext2'
+                    WJetsHT400ext, WJetsHT600ext, WJetsHT800ext, WJetsHT1200ext, WJetsHT2500ext = '_ext1', '_ext1', '_ext1', '_ext1', '_ext1'
+                elif '2017' in yeartag:
+                    WJetsext = '_ext1'
+                samples['EOYWJets'] = { 'name'   : getSampleFiles(directoryBkgEOY,'WJetsToLNu-LO'         +WJetsext,      False,treePrefix) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT70_100'   +WJetsHT70ext,  False,treePrefix) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT100_200'  +WJetsHT100ext, False,treePrefix) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT200_400'  +WJetsHT200ext, False,treePrefix) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT400_600'  +WJetsHT400ext, False,treePrefix) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT600_800'  +WJetsHT600ext, False,treePrefix) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT800_1200' +WJetsHT800ext, False,treePrefix) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT1200_2500'+WJetsHT1200ext,False,treePrefix) +
+                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT2500_inf' +WJetsHT2500ext,False,treePrefix),
+                                        'weight' : XSWeight+'*'+SFweight ,
+                                        'isControlSample' : 1,
+                                       }
+
         #if 'SameSignValidationRegion' in opt.tag:
     
         samples['ttSemilep'] = { 'name'   : getSampleFiles(directoryBkg,'TTToSemiLeptonic', False,treePrefix,skipTreesCheck),

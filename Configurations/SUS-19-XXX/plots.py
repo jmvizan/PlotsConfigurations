@@ -135,7 +135,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             'nameHR' : 't#bar{t} Semilep.',
             'nameLatex' : '\\ttbar Semilep.',
             'isSignal' : 0,
-            'color': 4,# used to be 401,   # kYellow+1
+            'color': 401,   # kYellow+1
             'samples'  : ['ttSemilep'] 
         }
 
@@ -145,6 +145,22 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     else:
 
         groupPlot['ttbar']['samples'].extend(['ttSemilep'])
+
+    groupPlot['WJetsToLNu']  = {
+        'nameHR' : 'W+jets (#rightarrow ' + sl + '#nu)',
+        'nameLatex' : '\\PW+jets ($\\to\\ell\\nu$)',
+        'isSignal' : 0,
+        'color': 38,
+        'samples'  : ['WJetsToLNu']
+    }
+
+    groupPlot['EOYWJets']  = {
+        'nameHR' : 'EOY W+jets (#rightarrow ' + sl + '#nu)',
+        'nameLatex' : 'EOY \\PW+jets ($\\to\\ell\\nu$)',
+        'isSignal' : 0,
+        'color': 38,
+        'samples'  : ['EOYWJets']
+    }
 
 #plot = {}
 
@@ -270,6 +286,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'scale'    : 1.0
     }
 
+    plot['WJetsToLNu'] = {
+        'nameHR' : 'W+jets (#rightarrow ' + sl + '#nu)',
+        'nameLatex' : '\\PW+jets ($\\to\\ell\\nu$)',
+        'color': 38,
+        'isSignal' : 0,
+        'isData'   : 0 ,
+        'scale'    : 1.0
+    }
+
     if 'EOY' in opt.tag:
         plot['EOYZZ4L']       = plot['ZZTo4L']
         plot['EOYH']          = plot['Higgs']
@@ -278,6 +303,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         plot['EOYVZ']         = plot['WZ']
         plot['EOYDrellYan']   = plot['DY']
         plot['EOY3V']         = plot['VVV']
+        plot['EOYWJets']      = plot['WJetsToLNu']
 
     # Backward compatibility for background names
     plot['tW']  = plot['STtW']
