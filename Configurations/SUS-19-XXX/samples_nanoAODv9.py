@@ -820,7 +820,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        
             for yyeeaarr in missingZZ4L:
                 if yyeeaarr in yeartag:
-                    for addingZZ4L in [ 'ZZTo4L_ext1', 'ggZZ4m', 'VBFHToZZTo4L_M125', 'GluGluHToZZTo4L_M125' ]:
+                    for addingZZ4L in [ 'ZZTo4L', 'ggZZ4m', 'VBFHToZZTo4L_M125', 'GluGluHToZZTo4L_M125' ]:
                         if addingZZ4L not in missingZZ4L[yyeeaarr]:
                             if '2016' in yeartag and 'ZZTo4L' in addingZZ4L: addingZZ4L+='_ext1'
                             samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg.replace('reco', 'ctrl'), addingZZ4L, False,treePrefix,skipTreesCheck)
