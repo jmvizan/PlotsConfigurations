@@ -372,16 +372,13 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
 if 'ttZNormalization' in opt.tag or 'FitCRttZ' in opt.tag:
 
-    ttZcommon = 'deltaMassZ_ctrltag<10. && deltaMassZ_ctrltag>=0. && ptmiss_ctrltag>=0.'
-    if 'Z15' in opt.tag:
-        ttZcommon = ttZcommon.replace('deltaMassZ_ctrltag<10.', 'deltaMassZ_ctrltag<15.')
+    ttZcommon = 'deltaMassZ_ctrltag<15. && deltaMassZ_ctrltag>=0. && ptmiss_ctrltag>=0.'
+    if 'Z10' in opt.tag:
+        ttZcommon = ttZcommon.replace('deltaMassZ_ctrltag<15.', 'deltaMassZ_ctrltag<10.')
     ttZ3Lep = nLooseLepton+'==3 && '+ttZcommon.replace('_ctrltag', '_WZtoWW' )
     ttZ4Lep = nLooseLepton+'==4 && '+ttZcommon.replace('_ctrltag', '_ttZ')
-    ptmissTTZ3Lep = ptmissNano
-    ptmissTTZ4Lep = ptmissNano
-    if 'AddZ' in opt.tag:
-        ptmissTTZ3Lep = ptmiss_ttZ3Lep 
-        ptmissTTZ4Lep = 'ptmiss_ttZ'
+    ptmissTTZ3Lep = ptmissNano if 'NoZ' in opt.tag else ptmiss_ttZ3Lep
+    ptmissTTZ4Lep = ptmissNano if 'NoZ' in opt.tag else 'ptmiss_ttZ'
     if 'FitCRttZ' not in opt.tag:
         ttZ3Lep += ' && '+ptmissTTZ3Lep+'>=METCUT'
         ttZ4Lep += ' && '+ptmissTTZ4Lep+'>=METCUT'
