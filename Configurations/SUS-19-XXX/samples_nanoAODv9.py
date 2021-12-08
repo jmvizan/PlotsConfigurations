@@ -833,8 +833,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             if 'EOY' in opt.tag:
                 for yyeeaarr in missingZZ4L:
                     if yyeeaarr in yeartag:
-
                         firstMissingZZ4L = missingZZ4L[yyeeaarr][0]
+                        if '2016' in yeartag and 'ZZTo4L' in firstMissingZZ4L: firstMissingZZ4L+='_ext1'
                         samples['EOYZZ4L']   = { 'name'   : getSampleFiles(directoryBkgEOY,firstMissingZZ4L,False,treePrefix,skipTreesCheck),
                                                  'weight' : XSWeight+'*'+SFweight ,
                                                   'isControlSample' : 1,
