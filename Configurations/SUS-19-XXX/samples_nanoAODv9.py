@@ -153,8 +153,8 @@ for treeNuisance in treeNuisances:
             treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
             treeNuisanceDirs[treeNuisance]['FS'][variation]  = directorySigTemp.replace('variation', variation[:2])
     if 'EOY' in opt.sigset:
-        treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL16_106X_HIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_noHIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
-        treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL16_106X_HIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_noHIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL16_106X_nAODv9_HIPM', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_nAODv9_noHIPM', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL16_106X_nAODv9_HIPM', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_nAODv9_noHIPM', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
 
 globalNuisances = { }
 globalNuisances['trigger'] = { 'name' : 'trigger_'+yeartag, 'value' : trigger_uncertainty }
