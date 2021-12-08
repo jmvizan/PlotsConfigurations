@@ -440,7 +440,7 @@ for lep_i in ['Lep']:
 
 # nonprompt lepton rate TODO:
 
-if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.02', 'rateUp' : '1.11', 'rateDown' : '0.93' } 
+if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.07', 'rateUp' : '1.16', 'rateDown' : '0.97' } 
 elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.21', 'rateDown' : '0.81' } 
 elif '2017'       in yeartag: nonpromptLep = { 'rate' : '1.38', 'rateUp' : '1.46', 'rateDown' : '1.29' } 
 elif '2018'       in yeartag: nonpromptLep = { 'rate' : '1.28', 'rateUp' : '1.37', 'rateDown' : '1.21' } 
