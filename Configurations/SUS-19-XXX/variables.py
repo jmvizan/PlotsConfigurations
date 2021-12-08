@@ -434,6 +434,9 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
     ### Set the mt2ll variable
     mt2ll = 'mt2ll' + ctrltag
 
+    if 'WZValidationRegionZLeps' in opt.tag:
+        mt2ll = '(mt2llfake0+mt2llfake1+mt2llfake2-mt2ll_WZ)'
+
     if 'FitCRttZ' in opt.tag: # this is not really right, but it's just for normalization
         mt2ll = 'mt2ll_WZtoWW*('+nLooseLepton+'==3) + mt2ll_ttZ*('+nLooseLepton+'==4)'
 

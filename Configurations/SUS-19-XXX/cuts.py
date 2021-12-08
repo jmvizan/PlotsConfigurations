@@ -331,6 +331,9 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
     if 'WZValidationRegion' in opt.tag:
 
+        if 'WZValidationRegionZLeps' in opt.tag:
+            WZselection += ' && (mt2llfake0+mt2llfake1+mt2llfake2-mt2ll_WZ)>0.'
+
         cuts['WZ_3Lep']             = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3LepZ']            = { 'expr' : '(' + WZselection.replace('ZCUT',  '15.').replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3Lep_ptmiss-140']  = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT', '140') + ')', 'weight' : btagWeight0tag }
