@@ -44,7 +44,7 @@ if '2018' in opt.tag :
     trigger_uncertainty  = '1.020'
 print 'Value of lumi set to', opt.lumi
 
-nuis_jer_whole  = True if 'JER' not in opt.tag else False
+nuis_jer_whole  = False if 'JRW' not in opt.tag else True
 nuis_lumi_split = True
 nuis_btag_split = True
 
