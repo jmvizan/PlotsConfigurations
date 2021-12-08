@@ -105,13 +105,11 @@ if __name__ == '__main__':
     elif           '.' in sigset        : allsend = readsamples(sigset)
     elif 'backgrounds' in split.lower() : allsend = bkgsend
     elif          'SM' in split         : allsend = smsend
-    elif        'plot' in args[-1].lower() : 
+    if        'plot' in args[-1].lower() : 
         allsend = ["SM"]
         script  = './run_mkPlot.sh'
         hadd    = '' 
-    elif         'all' in split.lower() :
-        all_sam = True
-        #print bool(hadd=='0'), bool(sigset in 
+    if         'all' in split.lower() :
         if hadd == '1' and "SM-" not in sigset and sigset not in smsend+["SM","Backgrounds"]: sigset="SM-"+sigset
         if sigset.replace('Backgrounds','') in bkgs or sigset == 'Data': 
             print "please choose a valid signal"
