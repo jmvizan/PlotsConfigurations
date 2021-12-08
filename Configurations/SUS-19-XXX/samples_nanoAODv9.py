@@ -239,6 +239,10 @@ ptmissNano = 'MET_pt'
 if 'Data' not in opt.sigset: # data do not have pt_nom, but it's equal to pt as the JEC in central production were the final ones
     if   metnom =='Nomin': ptmissNano = 'MET_T1_pt'
     elif metnom =='Smear': ptmissNano = 'MET_T1Smear_pt'
+if 'EOY' in opt.sigset:
+    ptmissNano = 'METFixEE2017_pt' if '2017' in yeartag else 'MET_pt'
+    if metnom=='Nomin': ptmissNano += '_nom'
+    elif metnom=='Smear': ptmissNano += '_jer'
 ptmissPhiNano = ptmissNano.replace('_pt', '_phi')
 
 ptxLep = 'Lepton_pt[abs(lepidx_WZtoWW)]*cos(Lepton_phi[abs(lepidx_WZtoWW)])'
