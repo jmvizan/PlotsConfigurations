@@ -153,9 +153,8 @@ for treeNuisance in treeNuisances:
             treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
             treeNuisanceDirs[treeNuisance]['FS'][variation]  = directorySigTemp.replace('variation', variation[:2])
     if 'EOY' in opt.sigset:
-        treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL16_106X_HIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_noHIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
-        treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL16_106X_HIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_noHIPM_nAODv9', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
-
+        treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
 globalNuisances = { }
 globalNuisances['trigger'] = { 'name' : 'trigger_'+yeartag, 'value' : trigger_uncertainty }
 if nuis_lumi_split:
@@ -834,8 +833,10 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 for yyeeaarr in missingZZ4L:
                     if yyeeaarr in yeartag:
                         firstMissingZZ4L = missingZZ4L[yyeeaarr][0]
-                        if '2016' in yeartag and 'ZZTo4L' in firstMissingZZ4L: firstMissingZZ4L+='_ext1'
-                        samples['EOYZZ4L']   = { 'name'   : getSampleFiles(directoryBkgEOY,firstMissingZZ4L,False,treePrefix,skipTreesCheck),
+                        ZZ4Lstr = '' 
+                        if '2016' in yeartag and 'ZZTo4L' in firstMissingZZ4L: ZZ4Lstr+='_ext1'
+
+                        samples['EOYZZ4L']   = { 'name'   : getSampleFiles(directoryBkgEOY,firstMissingZZ4L+ZZ4Lstr,False,treePrefix,skipTreesCheck),
                                                  'weight' : XSWeight+'*'+SFweight ,
                                                   'isControlSample' : 1,
                                                 }
