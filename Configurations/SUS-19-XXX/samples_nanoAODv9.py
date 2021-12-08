@@ -108,10 +108,6 @@ for CR_i in CRs:
         regionName = regionName.replace('reco', 'ctrl') 
         ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','').replace('Trigger3Lep','WZ')
 
-if ctrltag!='' and '2016HIPM' in yeartag: 
-    print 'still copying trees'
-    exit()
-
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
