@@ -813,15 +813,16 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                        'isControlSample' : 1,
                                    }
      
-            missingZZ4L = { '2016HIPM'   : [ 'ZZTo4L_ext1', 'ggZZ4m', 'VBFHToZZTo4L_M125', 'GluGluHToZZTo4L_M125' ],
-                            '2016noHIPM' : [ 'ZZTo4L_ext1',           'VBFHToZZTo4L_M125'                         ], 
-                            '2017'       : [                                                                      ],
-                            '2018'       : [                'ggZZ4m', 'VBFHToZZTo4L_M125'                         ] } # PP: ggZZ4m, VBFHToZZ
+            missingZZ4L = { '2016HIPM'   : [ 'ZZTo4L', 'ggZZ4m', 'VBFHToZZTo4L_M125', 'GluGluHToZZTo4L_M125' ],
+                            '2016noHIPM' : [ 'ZZTo4L',           'VBFHToZZTo4L_M125'                         ], 
+                            '2017'       : [                                                                 ],
+                            '2018'       : [           'ggZZ4m', 'VBFHToZZTo4L_M125'                         ] } # PP: ggZZ4m, VBFHToZZ
                                        
             for yyeeaarr in missingZZ4L:
                 if yyeeaarr in yeartag:
                     for addingZZ4L in [ 'ZZTo4L_ext1', 'ggZZ4m', 'VBFHToZZTo4L_M125', 'GluGluHToZZTo4L_M125' ]:
                         if addingZZ4L not in missingZZ4L[yyeeaarr]:
+                            if '2016' in yeartag and 'ZZTo4L' in addingZZ4L: addingZZ4L+='_ext1'
                             samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg.replace('reco', 'ctrl'), addingZZ4L, False,treePrefix,skipTreesCheck)
             
             del missingZZ4L['2017']
