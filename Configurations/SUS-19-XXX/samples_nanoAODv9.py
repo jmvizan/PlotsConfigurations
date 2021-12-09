@@ -20,7 +20,7 @@ if '2016' in opt.tag:
         yeartag = '2016HIPM'
     else: 
         opt.lumi += 36.33
-        yeartag = '2016'
+        yeartag = '2016HIPM2016noHIPM' # This is because of EOY samples
     lumi_uncertainty     = '1.012'
     lumi_uncertainty_unc = '1.010'
     lumi_uncertainty_cor = '1.006'
@@ -77,7 +77,7 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    if 'HIPM' not in yeartag :
+    if yeartag.count('HIPM')!=1:
         skipTreesCheck = True
     ProductionMC   = 'Summer20UL16_106X_nAODv9_'+yeartag.replace('2016', '')+'_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8'+yeartag.replace('2016', '')+'__MCSusyNomin2016v8'
     ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
@@ -297,7 +297,7 @@ bTagEtaMax = '2.4' if ('2016' in opt.tag) else '2.5'
 if '2016HIPM' in yeartag: 
     bTagCut = '0.6001' 
     btagWP  = '2016'
-if '2016noHIPM' in yeartag:
+elif '2016noHIPM' in yeartag:
     bTagCut = '0.5847' 
     btagWP  = '2016'
 elif '2017' in yeartag: 
