@@ -114,7 +114,11 @@ directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', '
 
 directoryBkgEOY = directoryBkg.replace('Summer20UL16_106X_nAODv9_HIPM', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_nAODv9_noHIPM', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose').replace('noHIPM','').replace('HIPM','') 
 if 'cern' in SITE:
-    directoryBkgEOY = directoryBkgEOY.replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
+    if '2016' in yeartag:
+        directoryBkgEOY = directoryBkgEOY.replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
+    elif 'EOY' in opt.sigset: 
+        print 'Set directoryBkgEOY for', yeartag, 'year'
+        exit()
 
 # nuisance parameters
 
@@ -155,7 +159,10 @@ for treeNuisance in treeNuisances:
     if 'EOY' in opt.sigset:
         treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
         treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
-globalNuisances = { }
+        if 'cern' in SITE:
+            treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
+            treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
+
 globalNuisances['trigger'] = { 'name' : 'trigger_'+yeartag, 'value' : trigger_uncertainty }
 if nuis_lumi_split:
     globalNuisances['lumi_unc'] = { 'name' : 'lumi_'+yeartag, 'value' : lumi_uncertainty_unc }
