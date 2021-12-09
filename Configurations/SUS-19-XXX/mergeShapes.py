@@ -78,7 +78,7 @@ if __name__ == '__main__':
            for nuisance in nuisances:
                if nuisance!='stat':
                    if nuisances[nuisance]['name'] not in allnuisances:
-                       allnuisances[nuisances[nuisance]['name']] = nuisances[nuisance]
+                       allnuisances[nuisances[nuisance]['name']] = nuisances[nuisance] # TODO: check for b-tagging nuisances
                    if 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='lnN':
                        allnuisances[nuisances[nuisance]['name']]['samples_'+localyear] = nuisances[nuisance]['samples']
                elif 'stat' not in allnuisances:
