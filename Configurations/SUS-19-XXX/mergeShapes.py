@@ -14,15 +14,17 @@ if __name__ == '__main__':
     parser.add_option('--tag'            , dest='tag'            , help='Tag used for the shape file name'           , default=None)
     parser.add_option('--years'          , dest='years'          , help='Years'                                      , default='all')
     parser.add_option('--sigset'         , dest='sigset'         , help='Signal samples [SM]'                        , default='SM')
-    parser.add_option('--outputDir'      , dest='outputDir'      , help='output directory'                           , default='./Shapes')
-    parser.add_option('--saveNuisances'  , dest='saveNuisances'  , help='save file with merged nuisances'            , default=False, action='store_true')
-    parser.add_option('--nuisancesFile'  , dest='nuisancesFile'  , help='file with nuisances configurations'         , default=None)
-    parser.add_option('--verbose'        , dest='verbose'        , help='activate print for debugging'               , default=False, action='store_true')
+    parser.add_option('--outputDir'      , dest='outputDir'      , help='Output directory'                           , default=None)
+    parser.add_option('--skipLNN'        , dest='skipLNN'        , help='Skip lnN nuisances'                         , default=False, action='store_true')
+    parser.add_option('--saveNuisances'  , dest='saveNuisances'  , help='Save file with merged nuisances'            , default=False, action='store_true')
+    parser.add_option('--localNuisFile'  , dest='localNuisFile'  , help='File with local nuisances'                  , default=None)
+    parser.add_option('--nuisancesFile'  , dest='nuisancesFile'  , help='File with nuisances configurations'         , default=None)
+    parser.add_option('--verbose'        , dest='verbose'        , help='Activate print for debugging'               , default=False, action='store_true')
     # read default parsing options as well
     hwwtools.addOptions(parser)
     hwwtools.loadOptDefaults(parser)
     (opt, args) = parser.parse_args()
-   
+
     if opt.years=='-1' or opt.years.lower()=='all':
         years = [ '2016', '2017', '2018' ]
     elif opt.years=='0':
@@ -38,7 +40,7 @@ if __name__ == '__main__':
         print 'Nothing to do with one year (for the moment?)'
         exit()
 
-    localnuisancesFile = opt.nuisancesFile.replace('.py', '_'+'-'.join(years)+'_'+opt.tag+'_'+opt.sigset+'.py')
+    localnuisancesFile = opt.localNuisFile if opt.localNuisFile!=None else opt.nuisancesFile.replace('.py', '_'+'-'.join(years)+'_'+opt.tag+'_'+opt.sigset+'.py')
 
     localtag = opt.tag
     opt.tag = '-'.join(years) + localtag
@@ -69,22 +71,27 @@ if __name__ == '__main__':
         handle.close()
         allnuisances = nuisances
     else:
-        for localyear in years:
+        for yeartag in years:
            nuisances = {}
-           opt.tag = localyear + localtag
            handle = open(opt.nuisancesFile,'r')
            exec(handle)
            handle.close()
            for nuisance in nuisances:
+               if opt.skipLNN and 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='lnN': continue
                if nuisance!='stat':
                    if nuisances[nuisance]['name'] not in allnuisances:
-                       allnuisances[nuisances[nuisance]['name']] = nuisances[nuisance] # TODO: check for b-tagging nuisances
-                   if 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='lnN':
-                       allnuisances[nuisances[nuisance]['name']]['samples_'+localyear] = nuisances[nuisance]['samples']
+                       allnuisances[nuisance+'__'+nuisances[nuisance]['name']] = nuisances[nuisance] # TODO: check for b-tagging nuisances
+                   if 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='lnN': # TODO: what was it?
+                       allnuisances[nuisance+'__'+nuisances[nuisance]['name']]['samples_'+yeartag] = nuisances[nuisance]['samples']
                elif 'stat' not in allnuisances:
                    allnuisances['stat'] = nuisances[nuisance]
 
-    outDirName = opt.outputDir + '/' + '-'.join(years) + '/' + localtag
+    for nn in allnuisances:
+        if 'tag' in nn: print allnuisances[nn]
+
+    exit()
+
+    outDirName = './Shapes/' + '-'.join('-') + '/' + localtag if opt.outputDir!=None else opt.outputDir
     os.system ('mkdir -p ' + outDirName)
 
     outFileName = outDirName + '/plots_' + localtag + '_' + opt.sigset + '.root'
@@ -118,11 +125,10 @@ if __name__ == '__main__':
                     for nuisance in allnuisances:
                         if (sample in allnuisances[nuisance]['samples'] or nuisance=='stat') and ('cuts' not in allnuisances[nuisance] or cutName in allnuisances[nuisance]['cuts']):   
 
-                            if nuisance!='stat' and 'type' not in allnuisances[nuisance]:
-                                print 'Warning: nuisance without type -> ', nuisance
-                                continue
-
-                            elif nuisance!='stat':
+                            if nuisance!='stat': 
+                                if 'type' not in allnuisances[nuisance]:
+                                    print 'Warning: nuisance without type -> ', nuisance
+                                    continue
                                 if allnuisances[nuisance]['type']!='shape' and allnuisances[nuisance]['type']!='lnN':
                                     if allnuisances[nuisance]['type']!='rateParam':
                                         print 'Warning: unknown nuisance type -> ', allnuisances[nuisance]['type']
@@ -135,8 +141,7 @@ if __name__ == '__main__':
                                 if nuisance=='stat' and var=='Down': continue 
                                  
                                 shapeVar = shapeName if nuisance=='stat' else shapeName + '_' + allnuisances[nuisance]['name'] + var
-                                 
- 
+                                  
                                 for idir, indir in enumerate(inDirs):
 
                                     if indir[0].GetListOfKeys().Contains(shapeVar):

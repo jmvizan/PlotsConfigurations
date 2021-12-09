@@ -71,9 +71,11 @@ cp ./Plots/index.php $PLOTDIR/
 NUISANCES=nuisances.py
 if [[ $NORM == *'PreFit'* ]] || [[ $NORM == *'PostFit'* ]]; then
     ./mergeShapesPostFit.py --years=$YEAR --tag=$TAG --masspoint=$SIGSET --postFit=$NORM
+elif [[ $NORM == *'-'* ]]; then
+    ./mergeShapes.py --years=$NORM --tag=$TAG --sigset=$SIGSET --outputDir=./Shapes/$YEAR/$TAG/ --skipLNN
 elif [[ $YEAR == *'-'* ]]; then
-    ./mergeShapes.py --years=$YEAR --tag=$TAG --sigset=$SIGSET --saveNuisances
     NUISANCES=nuisances_${YEAR}_${TAG}_${SIGSET}.py
+    ./mergeShapes.py --years=$YEAR --tag=$TAG --sigset=$SIGSET --localNuisFile=$NUISANCES --saveNuisances
 fi
 
 if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
@@ -115,8 +117,7 @@ if [[ $YEAR == *'-'* ]] && [[ $NORM != *'Fit'* ]]; then # To keep clean
     rm nuisances_${YEAR}_${TAG}_${SIGSET}.py
 fi
 
-if [ $# -lt 6 ]; then
-    
+if [ $# -lt 6 ]; then 
     if [[ $SIGSET == 'SM'* ]]; then  
 	rm $PLOTDIR/c_*
 	rm $PLOTDIR/log_c_*

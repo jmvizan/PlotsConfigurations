@@ -20,7 +20,7 @@ nuisances['stat']  = {
 for globalNuisance in globalNuisances:
 
     nuisances[globalNuisance]  = {
-                   'name'  : globalNuisances[globalNuisance]['name'],
+                   'name'  : globalNuisances[globalNuisance]['name'].replace('_yeartag', year),
                    'samples'  : { },
                    'type'  : 'lnN',
     }
@@ -83,7 +83,7 @@ bSelections = { '1b' : { 'weight' : btagWeight1tagSyst+'_syst/'+btagWeight1tagSy
 for scalefactor in bTagNuisances:
     for bsel in bSelections:
         nuisances[scalefactor+bsel]  = {
-            'name'  : bTagNuisances[scalefactor]['name'],
+            'name'  : bTagNuisances[scalefactor]['name'].replace('_yeartag', year),
             'samples'  : { },
             'kind'  : 'weight',
             'type'  : 'shape',
@@ -312,7 +312,7 @@ for treeNuisance in treeNuisances:
         else:
 
             mcTypeName = '_'+mcTpye if (mcType=='FS' and not treeNuisances[treeNuisance]['MCtoFS']) else ''
-            yearCorr = '' if treeNuisances[treeNuisance]['year'] else year # correlated through the years?
+            yearCorr = '' if treeNuisances[treeNuisance]['year'] else year # not correlated through the years?
 
             nuisances[treeNuisance+mcType] = {
                 'name': treeNuisance+mcTypeName+yearCorr, 
@@ -466,6 +466,9 @@ nuisanceToRemove = [ ]
 for nuisance in nuisances:
     if 'cuts' in nuisances[nuisance]:
         if len(nuisances[nuisance]['cuts'])==0:
+            nuisanceToRemove.append(nuisance)
+    if nuisance!='stat' and nuisance not in nuisanceToRemove and 'samples' in nuisances[nuisance]:
+        if len(nuisances[nuisance]['samples'])==0:
             nuisanceToRemove.append(nuisance)
 
 for nuisance in nuisanceToRemove:

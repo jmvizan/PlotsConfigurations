@@ -11,16 +11,17 @@ from LatinoAnalysis.Tools.commonTools import *
 # https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#LumiComb (minimal correlations 2016-2018)
 
 opt.lumi = 0.
+yearstag = [ ]
 if '2016' in opt.tag:
-    if 'noHIPM' in opt.tag:
-        opt.lumi += 16.81 
-        yeartag = '2016noHIPM'
-    elif 'HIPM' in opt.tag:
-        opt.lumi += 19.52
-        yeartag = '2016HIPM'
-    else: 
+    if 'HIPM' not in opt.tag:
         opt.lumi += 36.33
-        yeartag = '2016HIPM2016noHIPM' # This is because of EOY samples
+        yearstag.append('2016')
+    if '2016noHIPM' in opt.tag:
+        opt.lumi += 16.81 
+        yearstag.append('2016noHIPM')
+    if '2016HIPM' in opt.tag:
+        opt.lumi += 19.52
+        yearstag.append('2016HIPM')
     lumi_uncertainty     = '1.012'
     lumi_uncertainty_unc = '1.010'
     lumi_uncertainty_cor = '1.006'
@@ -28,7 +29,7 @@ if '2016' in opt.tag:
     trigger_uncertainty  = '1.020'
 if '2017' in opt.tag : 
     opt.lumi += 41.48
-    yeartag = '2017'
+    yearstag.append('2017')
     lumi_uncertainty     = '1.023'
     lumi_uncertainty_unc = '1.020'
     lumi_uncertainty_cor = '1.009'
@@ -36,13 +37,17 @@ if '2017' in opt.tag :
     trigger_uncertainty  = '1.020'
 if '2018' in opt.tag : 
     opt.lumi += 59.83
-    yeartag = '2018'
+    yearstag.append('2018')
     lumi_uncertainty     = '1.025'
     lumi_uncertainty_unc = '1.015'
     lumi_uncertainty_cor = '1.020'
     lumi_uncertainty_dos = '1.002'
     trigger_uncertainty  = '1.020'
 print 'Value of lumi set to', opt.lumi
+
+recoFlag = '_UL'
+
+yeartag = '-'.join(yearstag)
 
 nuis_jer_whole  = False if 'JRW' not in opt.tag else True
 nuis_lumi_split = True
@@ -54,9 +59,7 @@ isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit')
 
 ### Directories
 
-recoFlag = '_UL'
-
-skipTreesCheck = False
+skipTreesCheck = False if len(yearstag)==1 else True
  
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
@@ -160,26 +163,26 @@ for treeNuisance in treeNuisances:
             treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
 
 globalNuisances = { }
-globalNuisances['trigger'] = { 'name' : 'trigger_'+yeartag, 'value' : trigger_uncertainty }
+globalNuisances['trigger'] = { 'name' : 'trigger_yeartag', 'value' : trigger_uncertainty }
 if nuis_lumi_split:
-    globalNuisances['lumi_unc'] = { 'name' : 'lumi_'+yeartag, 'value' : lumi_uncertainty_unc }
+    globalNuisances['lumi_unc'] = { 'name' : 'lumi_yeartag', 'value' : lumi_uncertainty_unc }
     globalNuisances['lumi_cor'] = { 'name' : 'lumi'         , 'value' : lumi_uncertainty_cor }
     if '2016' not in yeartag:
         globalNuisances['lumi_dos'] = { 'name' : 'lumi_1718', 'value' : lumi_uncertainty_dos }
 else:
-    globalNuisances['lumi']     = { 'name' : 'lumi_'+yeartag, 'value' : lumi_uncertainty }
+    globalNuisances['lumi']     = { 'name' : 'lumi_yeartag', 'value' : lumi_uncertainty }
 
 bTagNuisances = {
-    'mistag'   : { 'name' : 'mistag_'+yeartag,   'var' : 'l_VAR' },
-    'btagFS'   : { 'name' : 'btagFS_'+yeartag,   'var' : 'b_VAR_fastsim' },
-    'ctagFS'   : { 'name' : 'ctagFS_'+yeartag,   'var' : 'c_VAR_fastsim' },
-    'mistagFS' : { 'name' : 'mistagFS_'+yeartag, 'var' : 'l_VAR_fastsim' },
+    'mistag'   : { 'name' : 'mistag_yeartag',   'var' : 'l_VAR' },
+    'btagFS'   : { 'name' : 'btagFS_yeartag',   'var' : 'b_VAR_fastsim' },
+    'ctagFS'   : { 'name' : 'ctagFS_yeartag',   'var' : 'c_VAR_fastsim' },
+    'mistagFS' : { 'name' : 'mistagFS_yeartag', 'var' : 'l_VAR_fastsim' },
 }
 if nuis_btag_split and 'EOY' not in opt.sigset:
-    bTagNuisances['btagunc'] = { 'name' : 'btag_'+yeartag,     'var' : 'b_VAR_uncorrelated' }
+    bTagNuisances['btagunc'] = { 'name' : 'btag_yeartag',     'var' : 'b_VAR_uncorrelated' }
     bTagNuisances['btagcor'] = { 'name' : 'btag',              'var' : 'b_VAR_correlated' }
 else:
-    bTagNuisances['btag']    = { 'name' : 'btag_'+yeartag,     'var' : 'b_VAR' }
+    bTagNuisances['btag']    = { 'name' : 'btag_yeartag',     'var' : 'b_VAR' }
 
 # Complex cut variables
 
