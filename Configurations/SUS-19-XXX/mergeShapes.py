@@ -122,7 +122,6 @@ if __name__ == '__main__':
 
                 globalScale = None
                 if 'BkgSF' in opt.tag:
-                    print 'im filling this up'
                     globalScale = {
                         'ZZTo4L'  : { '2016HIPM' : [1.291, 0.257] , '2016noHIPM' : [0.820, 0.224], '2017' : [0.973,0.151], '2018' : [0.887, 0.121]},
                         'WZ'  : { '2016HIPM' : [0.850, 0.113] , '2016noHIPM' : [0.840, 0.113], '2017' : [1.105,0.088], '2018' : [0.827, 0.063]},
