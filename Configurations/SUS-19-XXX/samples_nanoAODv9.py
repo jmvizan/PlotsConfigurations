@@ -11,17 +11,17 @@ from LatinoAnalysis.Tools.commonTools import *
 # https://twiki.cern.ch/twiki/bin/view/CMS/TWikiLUM#LumiComb (minimal correlations 2016-2018)
 
 opt.lumi = 0.
-yearstag = [ ]
+yearstag = { }
 if '2016' in opt.tag:
     if 'HIPM' not in opt.tag:
         opt.lumi += 36.33
-        yearstag.append('2016')
+        yearstag['2016'] = '2016HIPM-2016noHIPM'
     if '2016noHIPM' in opt.tag:
         opt.lumi += 16.81 
-        yearstag.append('2016noHIPM')
+        yearstag['2016noHIPM'] = '2016noHIPM'
     if '2016HIPM' in opt.tag:
         opt.lumi += 19.52
-        yearstag.append('2016HIPM')
+        yearstag['2016HIPM'] = '2016HIPM'
     lumi_uncertainty     = '1.012'
     lumi_uncertainty_unc = '1.010'
     lumi_uncertainty_cor = '1.006'
@@ -29,7 +29,7 @@ if '2016' in opt.tag:
     trigger_uncertainty  = '1.020'
 if '2017' in opt.tag : 
     opt.lumi += 41.48
-    yearstag.append('2017')
+    yearstag['2017'] = '2017'
     lumi_uncertainty     = '1.023'
     lumi_uncertainty_unc = '1.020'
     lumi_uncertainty_cor = '1.009'
@@ -37,7 +37,7 @@ if '2017' in opt.tag :
     trigger_uncertainty  = '1.020'
 if '2018' in opt.tag : 
     opt.lumi += 59.83
-    yearstag.append('2018')
+    yearstag['2018'] = '2018'
     lumi_uncertainty     = '1.025'
     lumi_uncertainty_unc = '1.015'
     lumi_uncertainty_cor = '1.020'
@@ -47,7 +47,7 @@ print 'Value of lumi set to', opt.lumi
 
 recoFlag = '_UL'
 
-yeartag = '-'.join(yearstag)
+yeartag = '-'.join(yearstag.values())
 
 nuis_jer_whole  = False if 'JRW' not in opt.tag else True
 nuis_lumi_split = True
@@ -59,7 +59,7 @@ isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit')
 
 ### Directories
 
-skipTreesCheck = False if len(yearstag)==1 else True
+skipTreesCheck = False if len(yeartag.split('-'))==1 else True
  
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
@@ -80,8 +80,6 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    if yeartag.count('HIPM')!=1:
-        skipTreesCheck = True
     ProductionMC   = 'Summer20UL16_106X_nAODv9_'+yeartag.replace('2016', '')+'_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8'+yeartag.replace('2016', '')+'__MCSusyNomin2016v8'
     ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
     ProductionData = 'Run2016_106X_nAODv9_'+yeartag.replace('2016', '')+'_Full2016v8/DATASusy2016v8__hadd'

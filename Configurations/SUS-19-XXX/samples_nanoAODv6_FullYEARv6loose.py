@@ -7,6 +7,7 @@ from LatinoAnalysis.Tools.commonTools import *
 ### Generals
 
 opt.lumi = 0.
+yearstag = { }
 if '2016' in opt.tag : 
     opt.lumi += 35.9 # 35.92 --> 36.33
     yeartag = '2016'
@@ -29,6 +30,8 @@ if '2018' in opt.tag :
     lumi_uncertainty_cor = '1.020'
     trigger_uncertainty  = '1.020'
 print 'Value of lumi set to', opt.lumi
+
+yearstag[yeartag] = yeartag # UL needs this to deal with 2016 split
 
 nuis_jer_whole  = True
 nuis_lumi_split = False

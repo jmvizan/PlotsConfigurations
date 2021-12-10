@@ -1,7 +1,13 @@
 ### nuisances
 
 ### general parameters
-year = '_' + yeartag
+
+if len(yearstag.keys())!=1:
+    print 'WARNING: nuisances.py cannot be used on multiple years'
+    exit()
+
+for key in yearstag:
+    year = '_' + key
 
 ### nuisances = {}
  
@@ -251,26 +257,13 @@ if '__susyMT2reco' not in directorySig:
             nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
 ### QCD scale and PDFs
-if opt.sigset!='MET': # TODO add files for UL2016
-    exec(open('./theoryNormalizations/theoryNormalizations'+recoFlag+year+'.py').read())
-
-# LHE scale variation weights (w_var / w_nominal)
-# [0] is muR=0.50000E+00 muF=0.50000E+00
-# [1] is muR=0.50000E+00 muF=0.10000E+01
-# [2] is muR=0.50000E+00 muF=0.20000E+01
-# [3] is muR=0.10000E+01 muF=0.50000E+00
-# [4] is muR=0.10000E+01 muF=0.10000E+01
-# [5] is muR=0.10000E+01 muF=0.20000E+01
-# [6] is muR=0.20000E+01 muF=0.50000E+00
-# [7] is muR=0.20000E+01 muF=0.10000E+01
-# [8] is muR=0.20000E+01 muF=0.20000E+01
 
 nuisances['qcdScale'] = {
     'name': 'qcdScale', # Scales correlated through the years?
     'kind': 'weight_envelope',
     'type': 'shape',
     'samples': { },
-    'cuts' : [ ], 
+    'cuts' : [ ],
 }
 
 nuisances['pdf'] = {
@@ -281,23 +274,38 @@ nuisances['pdf'] = {
     'cuts' : [ ],
 }
 
-for sample in samples.keys():
-    if not samples[sample]['isDATA']:
-        if sample not in theoryNormalizations:
-             print 'Nuisance warning:', sample, 'not in theoryNormalizations'
-             continue
-        if theoryNormalizations[sample]['qcdScaleStatus']==3:
-            qcdScaleVariations = [ ]
-            for i in [0, 1, 3, 5, 7, 8]:
-                qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
-            nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
-        if not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
-            pdfVariations = [ ] 
-            for i in range(len(theoryNormalizations[sample]['pdf'])):                              
-                pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
-            nuisances['pdf']['samples'][sample] = pdfVariations
+for yeartomerge in yearstag[year.replace('_', '')].split('-'):
 
-for cut in cuts:
+    exec(open('./theoryNormalizations/theoryNormalizations'+recoFlag+'_'+yeartomerge+'.py').read())
+
+    # LHE scale variation weights (w_var / w_nominal)
+    # [0] is muR=0.50000E+00 muF=0.50000E+00
+    # [1] is muR=0.50000E+00 muF=0.10000E+01
+    # [2] is muR=0.50000E+00 muF=0.20000E+01
+    # [3] is muR=0.10000E+01 muF=0.50000E+00
+    # [4] is muR=0.10000E+01 muF=0.10000E+01
+    # [5] is muR=0.10000E+01 muF=0.20000E+01
+    # [6] is muR=0.20000E+01 muF=0.50000E+00
+    # [7] is muR=0.20000E+01 muF=0.10000E+01
+    # [8] is muR=0.20000E+01 muF=0.20000E+01
+
+    for sample in samples.keys():
+        if not samples[sample]['isDATA']:
+            if sample not in theoryNormalizations:
+                print 'Nuisance warning:', sample, 'not in theoryNormalizations'
+                continue
+            if theoryNormalizations[sample]['qcdScaleStatus']==3:
+                qcdScaleVariations = [ ]
+                for i in [0, 1, 3, 5, 7, 8]:
+                    qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
+                nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
+            if not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
+                pdfVariations = [ ] 
+                for i in range(len(theoryNormalizations[sample]['pdf'])):                              
+                    pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
+                nuisances['pdf']['samples'][sample] = qcdScaleVariations
+
+for cut in cuts: # TODO: Why only in the signal regions? 
     if 'SR' in cut.split('_')[0]:
         nuisances['qcdScale']['cuts'].append(cut)
         nuisances['pdf']['cuts'].append(cut)
@@ -499,3 +507,6 @@ else:
 for nuisance in nuisanceToRemove:
     del nuisances[nuisance]
 
+print samples.keys()
+print nuisances.keys()
+exit()
