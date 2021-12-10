@@ -119,13 +119,23 @@ if __name__ == '__main__':
                 inDirs = [ ] 
                 for infile in inFiles:
                     inDirs.append([ infile[0].Get(folderName), infile[1] ])
- 
+
+                globalScale = None
+                if 'BkgSF' in opt.tag:
+                    print 'im filling this up'
+                    globalScale = {
+                        'ZZTo4L'  : { '2016HIPM' : [1.291, 0.257] , '2016noHIPM' : [0.820, 0.224], '2017' : [0.973,0.151], '2018' : [0.887, 0.121]},
+                        'WZ'  : { '2016HIPM' : [0.850, 0.113] , '2016noHIPM' : [0.840, 0.113], '2017' : [1.105,0.088], '2018' : [0.827, 0.063]},
+                        'ttZ' : { '2016HIPM' : [1.179, 0.313] , '2016noHIPM' : [1.118, 0.322], '2017' : [1.553,0.223], '2018' : [1.553, 0.192]}}
                 for sample in samples:
-
-                    globalScale = { }
-                    for year in years:
-                        globalScale[year] = 1.
-
+                    
+                    if globalScale and (sample in globalScale.keys() or sample+'EOY' in globalScale.keys()): globalScale_i = globalScale[sample] 
+                    else:
+                        globalScale_i = { }
+                        for year in years:
+                            globalScale_i[year] = [1., 0.]
+                            
+                    #print 'These are the global sF', globalScale_i,'for sample', sample
                     for nuisance in allnuisances:
                         if (sample in allnuisances[nuisance]['samples'] or nuisance=='stat') and ('cuts' not in allnuisances[nuisance] or cutName in allnuisances[nuisance]['cuts']):   
 
@@ -151,7 +161,7 @@ if __name__ == '__main__':
                                     if indir[0].GetListOfKeys().Contains(shapeVar):
                                         tmpHisto = indir[0].Get(shapeVar)
                                         tmpHisto.SetDirectory(0)   
-                                        if globalScale[indir[1]]!=1.: tmpHisto.Scale(globalScale[indir[1]])
+                                        if globalScale_i[indir[1]][0]!=1.: tmpHisto.Scale(globalScale_i[indir[1]][0]) #We could reformulate this line, too
 
                                     else:
 
@@ -164,7 +174,7 @@ if __name__ == '__main__':
                                         else:
                                             tmpHisto = indir[0].Get(shapeName)
                                             tmpHisto.SetDirectory(0)
-                                            if globalScale[indir[1]]!=1.: tmpHisto.Scale(globalScale[indir[1]])
+                                            if globalScale_i[indir[1]][0]!=1.: tmpHisto.Scale(globalScale_i[indir[1]][0])
 
                                         if opt.verbose: print sample, nuisance,  var, tmpHisto.Integral()
                                         if allnuisances[nuisance]['type']=='lnN' or 'waslnN' in allnuisances[nuisance]:
