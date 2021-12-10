@@ -67,7 +67,7 @@ mkdir -p $PLOTDIR
 cp ./Plots/index.php ./Plots/$YEAR/
 cp ./Plots/index.php ./Plots/$YEAR/${TAG}/
 cp ./Plots/index.php $PLOTDIR/
-echo $SIGSET $NORM $FILESET
+
 NUISANCES=nuisances.py
 if [[ $NORM == *'PreFit'* ]] || [[ $NORM == *'PostFit'* ]]; then
     ./mergeShapesPostFit.py --years=$YEAR --tag=$TAG --masspoint=$SIGSET --postFit=$NORM
