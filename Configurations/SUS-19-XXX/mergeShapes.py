@@ -104,6 +104,8 @@ if __name__ == '__main__':
     for year in years:
         inFiles.append([ ROOT.TFile('./Shapes/'+year+'/'+localtag+outFileName, 'READ') , year ])
 
+    missingSampleList = [ ]
+
     for cutName in cuts:
 
         outFile.mkdir(cutName)
@@ -155,7 +157,10 @@ if __name__ == '__main__':
 
                                     else:
 
-                                        if 'EOY' in shapeName and not indir[0].GetListOfKeys().Contains(shapeName):
+                                        if not indir[0].GetListOfKeys().Contains(shapeName):
+                                            if 'EOY' not in sample and indir[1]+'_'+sample not in missingSampleList: 
+                                                print 'Warning:', sample, 'not in input shape file for', indir[1], 'year!'
+                                                missingSampleList.append(indir[1]+'_'+sample)
                                             for idir2, indir2 in enumerate(inDirs):
                                                 if indir2[0].GetListOfKeys().Contains(shapeName):
                                                     tmpHisto = indir2[0].Get(shapeName)
@@ -174,8 +179,8 @@ if __name__ == '__main__':
                                                     if var=='Down': systNorm = 2. - systNorm
                                                     tmpHisto.Scale(systNorm)
                                                     if opt.verbose: print 'samples_'+indir[1], tmpHisto.Integral()
-                                            else:
-                                                print 'Warning: samples_'+indir[1]+' not in allnuisances['+nuisance+']'
+                                            elif indir[1] in nuisance:
+                                                print 'Error: samples_'+indir[1]+' not in allnuisances['+nuisance+']'
 
                                     if idir==0:
                                         sumHisto = tmpHisto.Clone()
