@@ -39,7 +39,7 @@ if __name__ == '__main__':
     elif args[1] == '2':
         yearset = ['2018']
     else:
-        yearset = args[1].split('-')
+        yearset = args[1].split('_')
 
     if   args[2] == '0':
         tags = 'Preselection'
@@ -126,13 +126,13 @@ if __name__ == '__main__':
     allcomms    = []
     for tag in tags.split('_'):
 
-        shapes_file = shapes_fol+tag+'_'+sigset+'.log'
-        os.system('mkdir -p '+shapes_fol)
+        #shapes_file = shapes_fol+tag+'_'+sigset+'.log'
+        #os.system('mkdir -p '+shapes_fol)
         
         if rmlog:
             os.system('rm '+shapes_file)
             print "REMOVING FILE:\n", shapes_file
-        logtitle(shapes_file,tag+" "+sigset+" "+split)
+        #logtitle(shapes_file,tag+" "+sigset+" "+split)
         for samsend in allsend:
             if hadd =='1' and 'Veto' in samsend: continue
             #if hadd =='0' and all_sam is True and  : continue
