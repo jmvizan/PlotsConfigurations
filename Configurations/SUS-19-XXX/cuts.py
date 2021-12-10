@@ -490,8 +490,6 @@ if 'SignalRegion' in opt.tag:
         isrcut = ''
         if SR in isrRegions: isrcut=' && '+ISRCut
 
-        if doISR: isrcut=' && '+ISRCut
-
         if splitjets is True:
             if   SR == "SR1":
                 jetscut  = ' && '+jetscutSR1

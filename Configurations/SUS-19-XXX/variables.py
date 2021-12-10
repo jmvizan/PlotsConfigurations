@@ -401,9 +401,9 @@ elif 'ttZNormalization' in opt.tag:
                            'xaxis' : 'm' + pll + gv,       #   x axis name
                        }
   
-    ptmissTTZ = ptmissNano
-    if 'AddZ' in opt.tag:
-        ptmissTTZ = ptmiss_ttZLoose
+    ptmissTTZ = ptmiss_ttZLoose
+    if 'NoZ' in opt.tag:
+        ptmissTTZ = ptmissNano
 
     variables['ptmiss'] = {  'name'  : ptmissTTZ,               #   variable name
                              'range' : (  20,    0.,  400.),    #   variable range
@@ -437,7 +437,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
     if 'WZValidationRegionZLeps' in opt.tag:
         mt2ll = '(mt2llfake0+mt2llfake1+mt2llfake2-mt2ll_WZ)'
 
-    if 'FitCRttZ' in opt.tag: # this is not really right, but it's just for normalization
+    if 'FitCRttZ' in opt.tag or ('ttZNormalization' in opt.tag and 'NoZ' not in opt.tag): # this is not really right, but it's just for normalization
         mt2ll = 'mt2ll_WZtoWW*('+nLooseLepton+'==3) + mt2ll_ttZ*('+nLooseLepton+'==4)'
 
     if 'FakeValidationRegion' in opt.tag:
