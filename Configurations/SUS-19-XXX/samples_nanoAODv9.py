@@ -63,7 +63,7 @@ skipTreesCheck = False if len(yeartag.split('-'))==1 else True
 
 if not isDatacardOrPlot and skipTreesCheck:
     print 'Error: it is not allowed to fill shapes and skipping trees check!'
-    exit()/
+    exit()
  
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
@@ -700,7 +700,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             samples['EOYVZ']  = { 'name'   : getSampleFiles(directoryBkgEOY,'WZTo3LNu'+WZext,False,treePrefix,skipTreesCheck),
                                   'weight' : XSWeight+'*'+SFweight ,
                                   }
-        elif '2016HIPM' not in yeartag or (isDatacardOrPlot and skipTreesCheck and len(yeartag.split('-'))>1):
+        if '2016HIPM' not in yeartag or (isDatacardOrPlot and skipTreesCheck and len(yeartag.split('-'))>1):
             samples['WZ'] = { 'name'   : getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix,skipTreesCheck),
                               'weight' : XSWeight+'*'+SFweight ,
                              }
