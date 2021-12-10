@@ -569,7 +569,7 @@ systematicTopPt = '1.'
 
 if '2016' in yeartag or '2017' in yeartag :
 
-    if '2016HIPM' in opt.tag :
+    if '2016HIPM' in yeartag :
         DataRun = [ 
             ['B','Run2016B-ver2_HIPM_UL2016-v1'],
             ['C','Run2016C_HIPM_UL2016-v1'],
@@ -577,7 +577,7 @@ if '2016' in yeartag or '2017' in yeartag :
             ['E','Run2016E_HIPM_UL2016-v1'],
             ['F','Run2016F_HIPM_UL2016-v1']
         ]
-    elif '2016noHIPM' in opt.tag :
+    elif '2016noHIPM' in yeartag :
         DataRun = [
             ['F','Run2016F_UL2016-v1'],
             ['G','Run2016G_UL2016-v1'],

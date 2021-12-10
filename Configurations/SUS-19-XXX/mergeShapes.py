@@ -71,38 +71,38 @@ if __name__ == '__main__':
         handle.close()
         allnuisances = nuisances
     else:
-        for yeartag in years:
+        yerstagOriginal = yearstag.copy()
+        for year2merge in years:
+           yearstag.clear()
+           yearstag[year2merge] = yerstagOriginal[year2merge]
            nuisances = {}
            handle = open(opt.nuisancesFile,'r')
            exec(handle)
            handle.close()
            for nuisance in nuisances:
                if opt.skipLNN and 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='lnN': continue
-               if nuisance!='stat':
-                   if nuisances[nuisance]['name'] not in allnuisances:
-                       allnuisances[nuisance+'__'+nuisances[nuisance]['name']] = nuisances[nuisance] # TODO: check for b-tagging nuisances
-                   if 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='lnN': # TODO: what was it?
-                       allnuisances[nuisance+'__'+nuisances[nuisance]['name']]['samples_'+yeartag] = nuisances[nuisance]['samples']
+               if nuisance!='stat': 
+                   nuisanceKey = nuisance+'__'+nuisances[nuisance]['name']
+                   if nuisanceKey not in allnuisances:
+                       allnuisances[nuisanceKey] = nuisances[nuisance].copy()
+                   else:
+                       for sample in nuisances[nuisance]['samples']:
+                           if sample not in allnuisances[nuisanceKey]['samples']:
+                               allnuisances[nuisanceKey]['samples'][sample] = nuisances[nuisance]['samples'][sample]
+                   if 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='lnN':
+                       allnuisances[nuisanceKey]['samples_'+year2merge] = nuisances[nuisance]['samples']
                elif 'stat' not in allnuisances:
                    allnuisances['stat'] = nuisances[nuisance]
 
-    for nn in allnuisances:
-        if 'tag' in nn: print allnuisances[nn]
-
-    exit()
-
-    outDirName = './Shapes/' + '-'.join('-') + '/' + localtag if opt.outputDir!=None else opt.outputDir
+    outDirName = opt.outputDir if len(opt.outputDir)>9 else './Shapes/'+'-'.join(years)+'/'+localtag
     os.system ('mkdir -p ' + outDirName)
 
-    outFileName = outDirName + '/plots_' + localtag + '_' + opt.sigset + '.root'
-    outFile = ROOT.TFile.Open(outFileName, 'recreate') 
+    outFileName = '/plots_' + localtag + '_' + opt.sigset + '.root'
+    outFile = ROOT.TFile.Open(outDirName+outFileName, 'recreate') 
 
     inFiles = [ ]
     for year in years:
-        inFileName = outFileName
-        #if year!='2017': inFileName = inFileName.replace('EENoiseDPhi', '')
-        #if year!='2018': inFileName = inFileName.replace('HEM', '')
-        inFiles.append([ ROOT.TFile(inFileName.replace('-'.join(years), year), 'READ') , year ])
+        inFiles.append([ ROOT.TFile('./Shapes/'+year+'/'+localtag+outFileName, 'READ') , year ])
 
     for cutName in cuts:
 
@@ -121,7 +121,11 @@ if __name__ == '__main__':
                     inDirs.append([ infile[0].Get(folderName), infile[1] ])
  
                 for sample in samples:
-                    globalScale = { '2016' : 1., '2017' : 1., '2018' : 1. }
+
+                    globalScale = { }
+                    for year in years:
+                        globalScale[year] = 1.
+
                     for nuisance in allnuisances:
                         if (sample in allnuisances[nuisance]['samples'] or nuisance=='stat') and ('cuts' not in allnuisances[nuisance] or cutName in allnuisances[nuisance]['cuts']):   
 
@@ -165,11 +169,13 @@ if __name__ == '__main__':
                                         if opt.verbose: print sample, nuisance,  var, tmpHisto.Integral()
                                         if allnuisances[nuisance]['type']=='lnN' or 'waslnN' in allnuisances[nuisance]:
                                             if 'samples_'+indir[1] in allnuisances[nuisance]:
-                                                systNorm = float(allnuisances[nuisance]['samples_'+indir[1]][sample])
-                                                if var=='Down':
-                                                    systNorm = 2. - systNorm
-                                                tmpHisto.Scale(systNorm)
-                                                if opt.verbose: print 'samples_'+indir[1], tmpHisto.Integral()
+                                                if sample in allnuisances[nuisance]['samples_'+indir[1]]:
+                                                    systNorm = float(allnuisances[nuisance]['samples_'+indir[1]][sample])
+                                                    if var=='Down': systNorm = 2. - systNorm
+                                                    tmpHisto.Scale(systNorm)
+                                                    if opt.verbose: print 'samples_'+indir[1], tmpHisto.Integral()
+                                            else:
+                                                print 'Warning: samples_'+indir[1]+' not in allnuisances['+nuisance+']'
 
                                     if idir==0:
                                         sumHisto = tmpHisto.Clone()

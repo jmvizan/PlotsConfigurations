@@ -8,6 +8,7 @@ if len(yearstag.keys())!=1:
 
 for key in yearstag:
     year = '_' + key
+    yearstaglist = yearstag[key].split('-')
 
 ### nuisances = {}
  
@@ -274,7 +275,7 @@ nuisances['pdf'] = {
     'cuts' : [ ],
 }
 
-for yeartomerge in yearstag[year.replace('_', '')].split('-'):
+for yeartomerge in yearstaglist:
 
     exec(open('./theoryNormalizations/theoryNormalizations'+recoFlag+'_'+yeartomerge+'.py').read())
 
@@ -506,4 +507,30 @@ else:
 
 for nuisance in nuisanceToRemove:
     del nuisances[nuisance]
+
+if len(yearstaglist)>1:
+  
+   nuisanceToRemove = [ ]
+
+   for nuisance in nuisances:
+       if 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='shape':
+           if year in nuisances[nuisance]['name']:
+               nuisanceToRemove.append(nuisance)
+
+   for nuisance in nuisanceToRemove:
+
+       for ytag in yearstaglist:
+           nuisances[nuisance+'_'+ytag] = nuisances[nuisance].copy()
+           nuisances[nuisance+'_'+ytag]['name'] = nuisances[nuisance+'_'+ytag]['name'].replace(year, '_'+ytag)
+
+       del nuisances[nuisance]
+
+
+   #for nuisance in sorted (nuisances.keys()):
+   #    print nuisance
+   #    if nuisance!='stat':
+   #       print '             ', nuisances[nuisance]['name']
+
+   #exit()
+
 

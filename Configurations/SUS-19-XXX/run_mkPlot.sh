@@ -40,7 +40,7 @@ else
 	FILESET=$SIGSET
         NORM='None'
     elif [ $# -eq 4 ]; then
-        if [ $4 == 'Norm' ] || [ $4 == 'CRnorm' ] || [ $4 == 'PreFit' ] || [ $4 == 'PostFit' ] || [ $4 == 'PostFitS' ]; then 
+        if [[ $4 == 'Norm' ]] || [[ $4 == 'CRnorm' ]] || [[ $4 == *'Fit'* ]] || [[ $4 == *'-'* ]] ; then 
 	    NORM=$4
 	    FILESET=$SIGSET
 	else
@@ -48,7 +48,7 @@ else
 	    FILESET=$4
 	fi
     else
-        if [ $4 == 'Norm' ] || [ $4 == 'CRnorm' ] || [ $4 == 'PreFit' ] || [ $4 == 'PostFit' ] || [ $4 == 'PostFitS' ]; then 
+        if [[ $4 == 'Norm' ]] || [[ $4 == 'CRnorm' ]] || [[ $4 == *'Fit'* ]] || [[ $4 == *'-'* ]] ; then 
 	    NORM=$4
 	    FILESET=$5
 	else
@@ -67,7 +67,7 @@ mkdir -p $PLOTDIR
 cp ./Plots/index.php ./Plots/$YEAR/
 cp ./Plots/index.php ./Plots/$YEAR/${TAG}/
 cp ./Plots/index.php $PLOTDIR/
-
+echo $SIGSET $NORM $FILESET
 NUISANCES=nuisances.py
 if [[ $NORM == *'PreFit'* ]] || [[ $NORM == *'PostFit'* ]]; then
     ./mergeShapesPostFit.py --years=$YEAR --tag=$TAG --masspoint=$SIGSET --postFit=$NORM
