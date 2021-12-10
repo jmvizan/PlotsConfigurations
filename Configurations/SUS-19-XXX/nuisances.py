@@ -26,7 +26,7 @@ nuisances['stat']  = {
 for globalNuisance in globalNuisances:
 
     nuisances[globalNuisance]  = {
-                   'name'  : globalNuisances[globalNuisance]['name'].replace('_yeartag', year),
+                   'name'  : globalNuisances[globalNuisance]['name'].replace('_yeartag', year.replace('noHIPM','').replace('HIPM','')), # Bleah!
                    'samples'  : { },
                    'type'  : 'lnN',
     }
@@ -507,6 +507,3 @@ else:
 for nuisance in nuisanceToRemove:
     del nuisances[nuisance]
 
-print samples.keys()
-print nuisances.keys()
-exit()
