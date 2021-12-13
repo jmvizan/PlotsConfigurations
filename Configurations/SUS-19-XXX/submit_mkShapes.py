@@ -159,4 +159,4 @@ if __name__ == '__main__':
         print comm
         os.system(comm)#+" 2>&1 | tee -a "+shapes_file)
 
-    print "Shapes logfile in: \n"+shapes_file
+    #print "Shapes logfile in: \n"+shapes_file
