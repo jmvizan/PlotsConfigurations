@@ -102,7 +102,7 @@ if __name__ == '__main__':
 
     inFiles = [ ]
     for year in years:
-        inFiles.append([ ROOT.TFile('./Shapes/'+year+'/'+localtag+outFileName, 'READ') , year ])
+        inFiles.append([ ROOT.TFile('./Shapes/'+year+'/'+localtag.replace('BkgSF', '')+outFileName.replace('BkgSF', ''), 'READ') , year ])
 
     missingSampleList = [ ]
 
