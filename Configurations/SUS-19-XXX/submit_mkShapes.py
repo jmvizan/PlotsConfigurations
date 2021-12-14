@@ -31,7 +31,7 @@ if __name__ == '__main__':
         sys.exit()
 
     if   args[1] == '-1':
-        yearset = ['2016','2017','2018']
+        yearset = ['2016HIPM', '2016noHIPM','2017','2018']
     elif args[1] == '0':
         yearset = ['2016']
     elif args[1] == '1':

@@ -217,6 +217,19 @@ if 'DYControlRegion' in opt.tag:
     cuts['DY_NoJet_ee'] = { 'expr' : '(' + DY+' && '+EE+' && '+NoJets+')', 'weight' : btagWeight0tag }
     cuts['DY_NoJet_mm'] = { 'expr' : '(' + DY+' && '+MM+' && '+NoJets+')', 'weight' : btagWeight0tag }
 
+if 'DYMeasurements' in opt.tag:
+
+    DY = OC+' && '+LL+' && mll>=60. && mll<=140.'
+
+    cuts['DY_ee']       = { 'expr' : '(' + DY+' && '+EE+')', 'weight' : btagWeight0tag }
+    cuts['DY_mm']       = { 'expr' : '(' + DY+' && '+MM+')', 'weight' : btagWeight0tag }
+    cuts['DY_ee_nojet'] = { 'expr' : '(' + DY+' && '+EE+' && Alt$(CleanJet_pt[0],0)<30.)', 'weight' : btagWeight0tag }
+    cuts['DY_mm_nojet'] = { 'expr' : '(' + DY+' && '+MM+' && Alt$(CleanJet_pt[0],0)<30.)', 'weight' : btagWeight0tag }
+    cuts['DY_ee_nomet'] = { 'expr' : '(' + DY+' && '+EE+' && ptmiss<30.)', 'weight' : btagWeight0tag }
+    cuts['DY_ee_nomet'] = { 'expr' : '(' + DY+' && '+EE+' && ptmiss<30.)', 'weight' : btagWeight0tag }
+    cuts['DY_ee_cuts']  = { 'expr' : '(' + DY+' && '+EE+' && ptmiss<30. && Alt$(CleanJet_pt[0],0)<30.)', 'weight' : btagWeight0tag }
+    cuts['DY_ee_cuts']  = { 'expr' : '(' + DY+' && '+EE+' && ptmiss<30. && Alt$(CleanJet_pt[0],0)<30.)', 'weight' : btagWeight0tag }
+
 if 'DYtauControlRegion' in opt.tag:
 
     DYtau = OC+' && '+DF+' && '+Zcut.replace('ZCUT',  '15.')

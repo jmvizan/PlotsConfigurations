@@ -261,7 +261,26 @@ elif 'Trigger' in opt.tag:
     #                                'xaxis' : '1D eta',                                                            #   x axis name
     #                                'fold'  : 0                                                                    #   fold overflow
     #                              }
-                            
+      
+elif 'DYMeasurements' in opt.tag:
+
+    variables['mll']           = {   'name'  : 'mll',                #   variable name
+                                     'range' : ( 40,    60.,  140.), #   variable range
+                                     'xaxis' : 'm' + pll + gv,       #   x axis name
+                                     'fold'  : overflow              #   fold overflow
+                                 }
+
+    variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name
+                                    'range' : (  6,    0.,     6.),    #   variable range
+                                    'xaxis' : 'number of jets',        #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
 elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag or 'More' in opt.tag:
 
     variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
