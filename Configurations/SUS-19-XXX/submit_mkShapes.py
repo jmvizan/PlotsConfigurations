@@ -31,7 +31,7 @@ if __name__ == '__main__':
         sys.exit()
 
     if   args[1] == '-1':
-        yearset = ['2016','2017','2018']
+        yearset = ['2016HIPM', '2016noHIPM','2017','2018']
     elif args[1] == '0':
         yearset = ['2016']
     elif args[1] == '1':
@@ -93,11 +93,12 @@ if __name__ == '__main__':
             split  = args[5]
     
     if "amap" in split.lower(): split = "AsMuchAsPossible"
+    
     script    = './run_mkShapes'+multi+'.sh'
     keepsplit = False
     allsam    = None
     bkgs      = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY', 'Higgs']
-    bkgsend   = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY', 'BackgroundsEOY']
+    bkgsend   = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY','BackgroundsZZTo4L', 'BackgroundsEOY']
     smsend    = bkgsend+ ['Data']
     for signal in sigset.split('__'):
         print "sample:",signal
@@ -125,7 +126,8 @@ if __name__ == '__main__':
     shapes_fol  = "./Shapes/log/"+yearnm+'/'
     allcomms    = []
     for tag in tags.split('_'):
-
+        skipZZ4L = True
+        if 'ZZValidationRegion' in tags or 'ttZ' in tags or 'WZValidationRegion' in tags or 'WZtoWWValidationRegion' in tags or 'FitCRWZ' in tags or 'FitCRZZ' in tags or ('FitCR' in tags and isDatacardOrPlot) or 'TheoryNormalizations' in tags: skipZZ4L = False
         #shapes_file = shapes_fol+tag+'_'+sigset+'.log'
         #os.system('mkdir -p '+shapes_fol)
         
@@ -134,6 +136,9 @@ if __name__ == '__main__':
             print "REMOVING FILE:\n", shapes_file
         #logtitle(shapes_file,tag+" "+sigset+" "+split)
         for samsend in allsend:
+            if skipZZ4L and "ZZ" in samsend: 
+                print "this should skip", samsend
+                continue
             if hadd =='1' and 'Veto' in samsend: continue
             #if hadd =='0' and all_sam is True and  : continue
             if keepsplit is False:
@@ -152,6 +157,6 @@ if __name__ == '__main__':
     
     for comm in allcomms:
         print comm
-        os.system(comm+" 2>&1 | tee -a "+shapes_file)
+        os.system(comm)#+" 2>&1 | tee -a "+shapes_file)
 
-    print "Shapes logfile in: \n"+shapes_file
+    #print "Shapes logfile in: \n"+shapes_file

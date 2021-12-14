@@ -105,6 +105,15 @@ if __name__ == '__main__':
         inFiles.append([ ROOT.TFile('./Shapes/'+year+'/'+localtag.replace('BkgSF', '')+outFileName.replace('BkgSF', ''), 'READ') , year ])
 
     missingSampleList = [ ]
+    if 'BkgSF' in opt.tag:
+        globalScale = {
+            'ZZTo4L' : { '2016HIPM' : [1.291, 0.257] , '2016noHIPM' : [0.820, 0.224], '2017' : [0.973,0.151], '2018' : [0.887, 0.121]},
+            'WZ'     : { '2016HIPM' : [0.850, 0.113] , '2016noHIPM' : [0.840, 0.113], '2017' : [1.105,0.088], '2018' : [0.827, 0.063]},
+            'EOYZZ4L': { '2016HIPM' : [1.291, 0.257] , '2016noHIPM' : [0.820, 0.224], '2017' : [0.973,0.151], '2018' : [0.887, 0.121]},
+            'EOYVZ'  : { '2016HIPM' : [0.850, 0.113] , '2016noHIPM' : [0.840, 0.113], '2017' : [1.105,0.088], '2018' : [0.827, 0.063]},
+            'ttZ'    : { '2016HIPM' : [1.179, 0.313] , '2016noHIPM' : [1.118, 0.322], '2017' : [1.553,0.223], '2018' : [1.553, 0.192]}
+        }
+        
 
     for cutName in cuts:
 
@@ -123,11 +132,6 @@ if __name__ == '__main__':
                     inDirs.append([ infile[0].Get(folderName), infile[1] ])
 
                 globalScale = None
-                if 'BkgSF' in opt.tag:
-                    globalScale = {
-                        'ZZTo4L'  : { '2016HIPM' : [1.291, 0.257] , '2016noHIPM' : [0.820, 0.224], '2017' : [0.973,0.151], '2018' : [0.887, 0.121]},
-                        'WZ'  : { '2016HIPM' : [0.850, 0.113] , '2016noHIPM' : [0.840, 0.113], '2017' : [1.105,0.088], '2018' : [0.827, 0.063]},
-                        'ttZ' : { '2016HIPM' : [1.179, 0.313] , '2016noHIPM' : [1.118, 0.322], '2017' : [1.553,0.223], '2018' : [1.553, 0.192]}}
                 for sample in samples:
                     
                     if globalScale and (sample in globalScale.keys() or sample+'EOY' in globalScale.keys()): globalScale_i = globalScale[sample] 
