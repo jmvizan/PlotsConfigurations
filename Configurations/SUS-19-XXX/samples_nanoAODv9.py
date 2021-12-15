@@ -784,7 +784,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
             if '2016HIPM' in yeartag:
                 samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'GluGluHToTauTau_M125'   , False,treePrefix,skipTreesCheck)
                 samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWminusJ_HToTauTau_M125', False,treePrefix,skipTreesCheck)
-                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWplusJ_HToWW_M125'     , False,treePrefix,skipTreesCheck)
+                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWplusJ_HToTauTau_M125'     , False,treePrefix,skipTreesCheck)
                 samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck)
 
 
