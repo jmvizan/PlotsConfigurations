@@ -37,7 +37,7 @@ if __name__ == '__main__':
         years = opt.years.split('-')
    
     if len(years)==1 and 'BkgSF' not in opt.tag:
-        print 'Nothing to do with one year without BkgSF'
+        print 'mergeShapes: nothing to do with one year without BkgSF'
         exit()
 
     localnuisancesFile = opt.localNuisFile if opt.localNuisFile!=None else opt.nuisancesFile.replace('.py', '_'+'-'.join(years)+'_'+opt.tag+'_'+opt.sigset+'.py')
@@ -50,6 +50,12 @@ if __name__ == '__main__':
       handle = open(opt.samplesFile,'r')
       exec(handle)
       handle.close()
+
+    if 'BkgSF' in opt.tag:
+        for year2merge in years:
+            if len(yearstag[year2merge].split('-'))>1:
+                print 'mergeShapes: cannot apply background scale factors to merged year', year2merge
+                exit()    
 
     variables = {}
     if os.path.exists(opt.variablesFile) :

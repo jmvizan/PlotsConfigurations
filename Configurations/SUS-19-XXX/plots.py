@@ -1,5 +1,5 @@
 # plot configuration
-if opt.lumi>100: lumi_i=int(opt.lumi)
+if opt.lumi>100: lumi_i=int(round(opt.lumi, 0))
 else           : lumi_i=round(opt.lumi, 1)
 legend['lumi'] = 'L = '+str(lumi_i)+'/fb'
 legend['sqrt'] = '#sqrt{s} = 13 TeV'
