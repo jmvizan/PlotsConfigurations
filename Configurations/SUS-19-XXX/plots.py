@@ -1,6 +1,7 @@
 # plot configuration
-
-legend['lumi'] = 'L = '+str(round(opt.lumi, 3-len(str(int(opt.lumi)))))+'/fb'
+if opt.lumi>100: lumi_i=int(opt.lumi)
+else           : lumi_i=round(opt.lumi, 1)
+legend['lumi'] = 'L = '+str(lumi_i)+'/fb'
 legend['sqrt'] = '#sqrt{s} = 13 TeV'
 
 sl  = '#font[12]{l}'
