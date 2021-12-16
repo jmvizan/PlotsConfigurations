@@ -36,8 +36,8 @@ if __name__ == '__main__':
     else:
         years = opt.years.split('-')
    
-    if len(years)==1:
-        print 'Nothing to do with one year (for the moment?)'
+    if len(years)==1 and 'BkgSF' not in opt.tag:
+        print 'Nothing to do with one year without BkgSF'
         exit()
 
     localnuisancesFile = opt.localNuisFile if opt.localNuisFile!=None else opt.nuisancesFile.replace('.py', '_'+'-'.join(years)+'_'+opt.tag+'_'+opt.sigset+'.py')
@@ -105,13 +105,15 @@ if __name__ == '__main__':
         inFiles.append([ ROOT.TFile('./Shapes/'+year+'/'+localtag.replace('BkgSF', '')+outFileName.replace('BkgSF', ''), 'READ') , year ])
 
     missingSampleList = [ ]
+    globalScale = { }
     if 'BkgSF' in opt.tag:
         globalScale = {
             'ZZTo4L' : { '2016HIPM' : [1.291, 0.257] , '2016noHIPM' : [0.820, 0.224], '2017' : [0.973,0.151], '2018' : [0.887, 0.121]},
-            'WZ'     : { '2016HIPM' : [0.850, 0.113] , '2016noHIPM' : [0.840, 0.113], '2017' : [1.105,0.088], '2018' : [0.827, 0.063]},
+            'WZ'     : { '2016HIPM' : [0.918, 0.111] , '2016noHIPM' : [0.878, 0.123], '2017' : [1.191,0.085], '2018' : [0.894, 0.063]},
             'EOYZZ4L': { '2016HIPM' : [1.291, 0.257] , '2016noHIPM' : [0.820, 0.224], '2017' : [0.973,0.151], '2018' : [0.887, 0.121]},
             'EOYVZ'  : { '2016HIPM' : [0.850, 0.113] , '2016noHIPM' : [0.840, 0.113], '2017' : [1.105,0.088], '2018' : [0.827, 0.063]},
-            'ttZ'    : { '2016HIPM' : [1.179, 0.313] , '2016noHIPM' : [1.118, 0.322], '2017' : [1.553,0.223], '2018' : [1.553, 0.192]}
+            'ttZ'    : { '2016HIPM' : [0.700, 0.575] , '2016noHIPM' : [0.884, 0.665], '2017' : [1.877,0.223], '2018' : [0.822, 0.192]}
+            #'ttZ'    : { '2016HIPM' : [1.179, 0.313] , '2016noHIPM' : [1.118, 0.322], '2017' : [1.553,0.223], '2018' : [1.553, 0.192]}
         }
         
 
@@ -131,16 +133,16 @@ if __name__ == '__main__':
                 for infile in inFiles:
                     inDirs.append([ infile[0].Get(folderName), infile[1] ])
 
-                globalScale = None
                 for sample in samples:
                     
-                    if globalScale and (sample in globalScale.keys() or sample+'EOY' in globalScale.keys()): globalScale_i = globalScale[sample] 
+                    if sample in globalScale.keys(): 
+                       globalScale_i = globalScale[sample] 
+                       if opt.verbose: print 'These are the global sF', globalScale_i,'for sample', sample
                     else:
                         globalScale_i = { }
                         for year in years:
                             globalScale_i[year] = [1., 0.]
-                            
-                    #print 'These are the global sF', globalScale_i,'for sample', sample
+                                   
                     for nuisance in allnuisances:
                         if (sample in allnuisances[nuisance]['samples'] or nuisance=='stat') and ('cuts' not in allnuisances[nuisance] or cutName in allnuisances[nuisance]['cuts']):   
 

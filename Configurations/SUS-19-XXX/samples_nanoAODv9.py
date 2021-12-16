@@ -677,8 +677,8 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                             }
         if '2016' in yeartag:
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToENMN',False,treePrefix,skipTreesCheck)  
-            samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,treePrefix,skipTreesCheck)                                                  
-            samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix,skipTreesCheck)  
+            samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToTNMN',False,treePrefix,skipTreesCheck)
+            samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToTNTN',False,treePrefix,skipTreesCheck) 
 
         if '2017' in yeartag:
             samples['WW']['name'] += getSampleFiles(directoryBkg,'GluGluToWWToENMN',False,treePrefix,skipTreesCheck)
