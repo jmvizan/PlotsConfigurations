@@ -739,7 +739,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         #addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')i     # TODO uncomment when DY M-50-LO samples available for all years
 
         # TODO missing
-        samples['Higgs']   = {  'name'   : #getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'   , False,treePrefix,skipTreesCheck) + 
+        samples['Higgs']   = {  'name'   : getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'   , False,treePrefix,skipTreesCheck) + 
                                            getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu_M125', False,treePrefix,skipTreesCheck) + 
                                            getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125'   , False,treePrefix,skipTreesCheck), #+
                                            #getSampleFiles(directoryBkg,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck) + 
@@ -751,7 +751,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                }
 
         if '2016HIPM' not in yeartag:
-            samples['Higgs']['name'] += getSampleFiles(directoryBkg,'GluGluHToTauTau_M125',    False,treePrefix,skipTreesCheck) 
             samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125', False,treePrefix,skipTreesCheck)
             samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125' , False,treePrefix,skipTreesCheck)
             samples['Higgs']['name'] += getSampleFiles(directoryBkg,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck)
@@ -762,7 +761,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                    'weight' : XSWeight+'*'+SFweight ,
                                    }
             if '2016HIPM' in yeartag:
-                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'GluGluHToTauTau_M125'   , False,treePrefix,skipTreesCheck)
                 samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWminusJ_HToTauTau_M125', False,treePrefix,skipTreesCheck)
                 samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWplusJ_HToTauTau_M125'     , False,treePrefix,skipTreesCheck)
                 samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck)
