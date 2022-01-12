@@ -6,6 +6,7 @@ import os
 import math
 import LatinoAnalysis.Gardener.hwwtools as hwwtools
 
+
 def _getSampleYields(sample, shape, SMyields):
 
     sampleYields = ''
@@ -105,6 +106,17 @@ if __name__ == '__main__':
     refmasspoint = opt.masspoints.split(',')[0]
 
     SMyields = [ ] 
+
+
+
+    print "I SHOULD BE HERE"
+    text= "/eos/home-p/pmatorra/Work/AN-19-256/tables/07/T22016/prefit_SR3_Tag_sf_2016.tex"
+    with open(text) as f:
+        lines = f.readlines()
+    for line in lines:
+        if "SM" in line and "Processes" in line: print line
+
+    exit()
 
     for fittype in opt.fit.split('-'):
         for year in yearset.split('-'):

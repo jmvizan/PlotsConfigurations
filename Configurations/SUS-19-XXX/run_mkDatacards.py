@@ -45,8 +45,15 @@ inputtag = tag.replace('NoStat0', '')
 
 for year in years:
     os.system('mkdir -p ./Datacards/'+year+'/'+tag)
-    for model in signalMassPoints:
-        if model in sigset:
-            for massPoint in signalMassPoints[model]:
-                if massPointInSignalSet(massPoint, sigset):
-                    os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+tag+'/'+massPoint+' --inputFile=./Shapes/'+year+'/'+inputtag+'/plots_'+inputtag+'_'+fileset+'.root') 
+    #print "this is signset", sigset,signalMassPoints
+    if "wjets" in sigset.lower(): 
+        massPoint = 'EOYWJets'
+        os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+tag+'/\
+        '+massPoint+' --inputFile=./Shapes/'+year+'/'+inputtag+'/plots_'+inputtag+'_'+fileset+'.root')
+    else:
+        for model in signalMassPoints:
+            print "model", model, sigset
+            if model in sigset:
+                for massPoint in signalMassPoints[model]:
+                    if massPointInSignalSet(massPoint, sigset):
+                        os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+tag+'/'+massPoint+' --inputFile=./Shapes/'+year+'/'+inputtag+'/plots_'+inputtag+'_'+fileset+'.root') 

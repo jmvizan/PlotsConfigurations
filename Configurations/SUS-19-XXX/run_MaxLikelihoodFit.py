@@ -41,13 +41,15 @@ if __name__ == '__main__':
         yearset='2018'
     else:
         yearset=opt.years
-
+    print "so these are the years", yearset
     opt.sigset = opt.masspoint
 
     if 'SM-' not in opt.fileset:
         opt.fileset = 'SM-' + opt.fileset
-
+    
+    print "enter"
     if not opt.nododatacards:
+        print "why dont you enter"
         os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset)
 
     tag = opt.tag
@@ -56,11 +58,11 @@ if __name__ == '__main__':
     samples = { }
     variables = { }
     cuts = { }
-
+    opt.sigset = "SM-WJetsToLNu"
     exec(open(opt.samplesFile).read())
     exec(open(opt.variablesFile).read())
     exec(open(opt.cutsFile).read())
-
+    opt.sigset = opt.masspoint
     maxFitCommand = 'cd '+opt.combineLocation+' ;  eval `scramv1 runtime -sh` ; cd - ; combineCards.py '
 
     for year in yearset.split('-'):

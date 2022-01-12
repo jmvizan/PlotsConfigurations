@@ -347,7 +347,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
 # Signal  
 
-signalColor = 1 if opt.postFit=='n' else 880 # kViolet
+signalColor = 1 if (hasattr(opt, 'postFit') and opt.postFit=='n') else 880 # kViolet
 
 LSP = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}'
 CHR = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}'

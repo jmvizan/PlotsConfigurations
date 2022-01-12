@@ -72,12 +72,15 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
+    '''
     if '2016' not in yeartag:
-        print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
+        print 'nanoAODv9 trees for', yeartag, 'not available yet on cern, IGNORE ME FOR NOW, GOSH SAKE'
         if not hasattr(opt, 'doHadd') or opt.doHadd:
             skipTreesCheck = True
         else:
-            exit()
+            1==1
+            #exit()
+    '''
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -119,7 +122,7 @@ if 'cern' in SITE:
         directoryBkgEOY = directoryBkgEOY.replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
     elif 'EOY' in opt.sigset: 
         print 'Set directoryBkgEOY for', yeartag, 'year'
-        exit()
+        #exit()
 
 # nuisance parameters
 
@@ -858,7 +861,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 if kZZvariable in opt.tag:  
                     addSampleWeight(samples,'ZZTo4L','ZZTo4L'+ZZ4Lext, kZZvariable.replace('kZZ', 'kZZ_'))
 
-        if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJetsToLNu' in opt.sigset:
+        if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJets' in opt.sigset:
 
             if 'EOY' in opt.tag:
 
@@ -919,6 +922,8 @@ for sample in samples:
     samples[sample]['suppressNegative'] = ['all']
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
+print samples.keys(), opt.sigset
+samples['EOYWJets']['isSignal']  = 1
 
 ### Data
 
