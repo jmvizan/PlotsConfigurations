@@ -72,12 +72,15 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
+    '''
     if '2016' not in yeartag:
-        print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
+        print 'nanoAODv9 trees for', yeartag, 'not available yet on cern, IGNORE ME FOR NOW, GOSH SAKE'
         if not hasattr(opt, 'doHadd') or opt.doHadd:
             skipTreesCheck = True
         else:
-            exit()
+            1==1
+            #exit()
+    '''
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -119,7 +122,7 @@ if 'cern' in SITE:
         directoryBkgEOY = directoryBkgEOY.replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
     elif 'EOY' in opt.sigset: 
         print 'Set directoryBkgEOY for', yeartag, 'year'
-        exit()
+        #exit()
 
 # nuisance parameters
 
@@ -446,7 +449,7 @@ for lep_i in ['Lep']:
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
         else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
 
-# nonprompt lepton rate TODO:
+# nonprompt lepton rate TODO?:
 
 if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.07', 'rateUp' : '1.16', 'rateDown' : '0.97' } 
 elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.09', 'rateUp' : '1.30', 'rateDown' : '0.91' } 
@@ -487,6 +490,16 @@ SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeight['Lep']['
 # background cross section uncertainties and normalization scale factors
 
 normBackgrounds = {}
+
+if 'WWSF' in opt.tag:
+    if '2016HIPM' in opt.tag:
+        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.142' : '0.191' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+    elif '2016noHIPM' in opt.tag:
+        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.416' : '0.189' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+    elif '2017' in opt.tag:
+        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.333' : '0.140' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+    elif '2018' in opt.tag:
+        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.395' : '0.167' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
 
 if 'SignalRegions' in opt.tag or 'BackSF' in opt.tag:
 
@@ -833,7 +846,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 if kZZvariable in opt.tag:  
                     addSampleWeight(samples,'ZZTo4L','ZZTo4L'+ZZ4Lext, kZZvariable.replace('kZZ', 'kZZ_'))
 
-        if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJetsToLNu' in opt.sigset:
+        if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJets' in opt.sigset:
 
             if 'EOY' not in opt.tag: # TODO too small to care about it before all available
                 samples['WJetsToLNu'] = { 'name' : getSampleFiles(directoryBkgEOY,'WJetsToLNu-LO'          , False,treePrefix,skipWJetsTreesCheck) +
@@ -909,7 +922,13 @@ for sample in samples:
     samples[sample]['suppressNegative'] = ['all']
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
+<<<<<<< HEAD
 #samples['EOYWJets']['isSignal']  = 1
+=======
+print samples.keys(), opt.sigset
+samples['EOYWJets']['isSignal']  = 1
+
+>>>>>>> 7e270f5438de8946050ce3ae5947631b43348aed
 ### Data
 
 if 'SM' in opt.sigset or 'Data' in opt.sigset:
