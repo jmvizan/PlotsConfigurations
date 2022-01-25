@@ -192,6 +192,7 @@ if __name__ == '__main__':
                         if siter<opt.maxsignallines:
                             table.write(signalPoint[siter]+signalYields[signalPoint[siter]]+' \\\\\n')
 
+                    # TODO uncomment and remove when the comparison with EOY is over
                     #table.write('\\hline\n')
 
                     #table.write('\\end{tabular}\n')
