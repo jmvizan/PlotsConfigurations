@@ -164,6 +164,7 @@ if __name__ == '__main__':
                                 shapeVar = shapeName if nuisance=='stat' else shapeName + '_' + allnuisances[nuisance]['name'] + var
                                   
                                 for idir, indir in enumerate(inDirs):
+
                                     if indir[0].GetListOfKeys().Contains(shapeVar):
                                         tmpHisto = indir[0].Get(shapeVar)
                                         tmpHisto.SetDirectory(0)   
