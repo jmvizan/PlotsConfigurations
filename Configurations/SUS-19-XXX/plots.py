@@ -31,15 +31,6 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'samples'  : ['WW'] 
     }
 
-    groupPlot['EOYWW']  = {
-        'nameHR' : 'EOY WW',
-        'nameLatex' : 'EOY \\WW',
-        'isSignal' : 0,
-        'color': 851,    # kAzure-9
-        'fill' : 3005,
-        'samples'  : ['EOYGluGlu']
-    }
-
     groupPlot['tW']  = {
         'nameHR' : 'tW',
         'nameLatex' : '\\tW',
