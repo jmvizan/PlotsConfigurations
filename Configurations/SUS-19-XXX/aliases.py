@@ -42,7 +42,7 @@ if recoFlag=='_UL' and 'TrigLatino' not in opt.tag and 'Trigger' not in opt.tag 
      
 ## FastSim lepton scale factors
 
-fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag+'/fastsimLeptonWeights.root' # TODO switch to UL scale factors when FastSim available
+fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag.replace('noHIPM','').replace('HIPM','')+'/fastsimLeptonWeights.root' # TODO switch to UL scale factors when FastSim available
 fastsimMuonScaleFactorHisto = 'Muo_tight_fullsim'
 fastsimElectronScaleFactorHisto = 'Ele_tight_fullsim'
 
