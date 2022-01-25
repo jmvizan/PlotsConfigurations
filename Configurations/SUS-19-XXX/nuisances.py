@@ -291,7 +291,7 @@ for yeartomerge in yearstaglist:
     # [8] is muR=0.20000E+01 muF=0.20000E+01
 
     for sample in samples.keys():
-        if not samples[sample]['isDATA']:
+        if not samples[sample]['isDATA'] and 'TChipmSlepSnu' not in sample:
             if sample not in theoryNormalizations:
                 print 'Nuisance warning:', sample, 'not in theoryNormalizations'
                 continue

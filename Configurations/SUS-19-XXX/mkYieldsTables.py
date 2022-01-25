@@ -110,7 +110,9 @@ if __name__ == '__main__':
         for year in yearset.split('-'):
             for cut in cuts:
                 if 'SR' in cut:
-       
+      
+                    if '_Tag_' in cut and 'Stop' not in tag: continue 
+                
                     tableName = outputDir+fittype+'_'+cut+'_'+year+'.tex'
                     table = open(tableName , 'w')
 
@@ -190,8 +192,22 @@ if __name__ == '__main__':
                         if siter<opt.maxsignallines:
                             table.write(signalPoint[siter]+signalYields[signalPoint[siter]]+' \\\\\n')
 
-                    table.write('\\hline\n')
+                    #table.write('\\hline\n')
 
-                    table.write('\\end{tabular}\n')
-                    #table.write('\\end{center}\n') 
- 
+                    #table.write('\\end{tabular}\n')
+                    ##table.write('\\end{center}\n') 
+
+                    eoyTableName = '/afs/cern.ch/user/s/scodella/Documents/notes/AN-19-256/EOY/tables/07/PROC'+year+'/'+fittype+'_'+cut+'_'+year+'.tex'
+                    if 'Chargino' in tag: eoyTableName = eoyTableName.replace('PROC','TChipm')
+                    if 'Stop' in tag: eoyTableName = eoyTableName.replace('PROC','T2')
+                    with open(eoyTableName) as f:
+      	                 lines = f.readlines()
+                         doPrint = False
+                         for line in lines:
+    	                     if "SM" in line and "Processes" in line:
+                                 line = line.replace("Processes", "Processes (EOY)")
+                                 doPrint = True
+                             if doPrint: table.write(line)
+                 
+                             
+

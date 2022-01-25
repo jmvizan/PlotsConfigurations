@@ -7,7 +7,8 @@ import LatinoAnalysis.Gardener.hwwtools as hwwtools
 
 PWD     = os.getenv('PWD')
 CMSSW_v = 'CMSSW_'+PWD.split('CMSSW_')[1].split('/')[0]
-COMBINE = PWD.split('CMSSW_')[0]+CMSSW_v
+#COMBINE = PWD.split('CMSSW_')[0]+CMSSW_v
+COMBINE = PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
 if os.path.isdir(COMBINE) is False: COMBINE=PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
 
 if __name__ == '__main__':
@@ -42,14 +43,16 @@ if __name__ == '__main__':
     else:
         yearset=opt.years
 
-    opt.sigset = opt.masspoint
+    opt.sigset = 'SM'#opt.masspoint
 
     if 'SM-' not in opt.fileset:
         opt.fileset = 'SM-' + opt.fileset
 
     if not opt.nododatacards:
-        os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset)
-
+        #os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset)
+        os.system('mkdir -p ./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint)
+        os.system('mkDatacards.py --pycfg=configuration.py --tag='+yearset+opt.tag+' --sigset=SM --outputDirDatacard=./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint+' --inputFile=./Shapes/'+yearset+'/'+opt.tag+'/plots_'+opt.tag+'_SM.root')
+ 
     tag = opt.tag
     opt.tag = yearset.split('-')[0] + opt.tag
 
