@@ -595,7 +595,35 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                         'fold'  : overflow                 #   fold overflow
                                      }
 
-        variables['ptmissSR']     = {  'name'  : 'ptmiss'+ctrltag,        #   variable name    
+        variables['ptmissSR']     = {  'name'  : 'ptmiss'+ctrltag,        #   variable name  
+                                        'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]), #   variable range
+                                        'xaxis' : met + gv,                #   x axis name
+                                        'fold'  : overflow                 #   fold overflow
+                                     }
+
+        if 'DYValidationRegion' in opt.tag:   
+
+            variables['deltaPhiLep']   = {  'name'  : dPhill,                  #   variable name    
+                                            'range' : (  10,    0.,  3.2),     #   variable range
+                                            'xaxis' : dphill,                  #   x axis name
+                                            'fold'  : overflow                 #   fold overflow
+                                         }
+
+            variables['ptll']          = {  'name'  : pTll,                    #   variable name    
+                                            'range' : ([0, 20, 30, 40, 50, 60, 70, 80, 100, 120, 150, 200, 250, 300, 400, 500, 1000],[1]), #   variable range
+                                            'xaxis' : ptll + gv,               #   x axis name
+                                            'fold'  : overflow                 #   fold overflow
+                                         } 
+
+        if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag: 
+
+            variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name    
+                                            'range' : (  6,    0.,     6.),    #   variable range
+                                            'xaxis' : 'number of jets',        #   x axis name
+                                            'fold'  : overflow                 #   fold overflow
+                                         } 
+
+            variables['jets']          = {  'name'  : 'nCleanJet>0',           #   variable name        
                                             'range' : (  2,    0.,     2.),    #   variable range
                                             'xaxis' : 'number of jets',        #   x axis name
                                             'fold'  : overflow                 #   fold overflow
