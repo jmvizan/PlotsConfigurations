@@ -812,6 +812,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                             samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg.replace('reco', 'ctrl'), addingZZ4L, False,treePrefix,skipTreesCheck)
             
             del missingZZ4L['2017']
+            del missingZZ4L['2018']
             
             if 'EOY' in opt.tag:
                 for yyeeaarr in missingZZ4L:
