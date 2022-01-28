@@ -509,8 +509,8 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                 cutTypes = { } 
 
                 for cut in cuts: 
-                    cutType = cut.split('_')[0]
-                    if 'SR' in cutType and cutType not in cutTypes:
+                    cutType = cut.split('_')[0].replace('CR','SR')
+                    if cutType not in cutTypes:
                         cutTypes[cutType] = { }
                         cutTypes[cutType]['cuts'] = [ ]
                         for cut2 in cuts:
@@ -628,4 +628,5 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                             'xaxis' : 'number of jets',        #   x axis name
                                             'fold'  : overflow                 #   fold overflow
                                          }
-     
+
+
