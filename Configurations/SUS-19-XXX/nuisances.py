@@ -453,6 +453,7 @@ if hasattr(opt, 'outputDirDatacard'):
                         nuisances[sample+rateparamname]['bond'][cut] = {}
 
                         for variable in variables.keys():
+                            if 'cuts' in variables[variable] and cut not in variables[variable]['cuts']: continue
 
                             histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
                             cutB = rateparameters[rateparam]['subcuts'][0]
