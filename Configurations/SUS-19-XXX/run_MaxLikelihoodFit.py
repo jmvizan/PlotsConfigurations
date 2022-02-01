@@ -57,24 +57,25 @@ if __name__ == '__main__':
     opt.tag = yearset.split('-')[0] + opt.tag
 
     samples = { }
-    variables = { }
     cuts = { }
+    variables = { }
 
     exec(open(opt.samplesFile).read())
-    exec(open(opt.variablesFile).read())
     exec(open(opt.cutsFile).read())
+    exec(open(opt.variablesFile).read())
 
     maxFitCommand = 'cd '+opt.combineLocation+' ;  eval `scramv1 runtime -sh` ; cd - ; combineCards.py '
 
     for year in yearset.split('-'):
         for cut in cuts:
             for variable in variables:
-                datacardName = PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+tag+'/'+opt.masspoint+'/'+cut+'/'+variable+'/datacard.txt'
-                if os.path.isfile(datacardName):
-                    maxFitCommand += cut+'_'+year+'='+datacardName + ' ' 
-                else:
-                   print 'Missing datacard:', datacardName 
-                   exit()
+                if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+                    datacardName = PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+tag+'/'+opt.masspoint+'/'+cut+'/'+variable+'/datacard.txt'
+                    if os.path.isfile(datacardName):
+                        maxFitCommand += cut+'_'+year+'='+datacardName + ' ' # Here we are assuming one variable for cut!
+                    else:
+                       print 'Missing datacard:', datacardName 
+                       exit()
 
     outputDir = PWD+'/'+opt.outputDirMaxFit+'/'+yearset+'/'+tag+'/'+opt.masspoint+'/'    
     os.system('mkdir -p '+outputDir)

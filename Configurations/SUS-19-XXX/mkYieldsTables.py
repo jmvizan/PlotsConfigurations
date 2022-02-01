@@ -80,15 +80,15 @@ if __name__ == '__main__':
     opt.sigset = 'SM-' + opt.masspoints
 
     samples = { }
-    variables = { }
     cuts = { }
+    variables = { }
     plot = { } 
     groupPlot = { }
     legend = { }
 
     exec(open(opt.samplesFile).read())
-    exec(open(opt.variablesFile).read())
     exec(open(opt.cutsFile).read())
+    exec(open(opt.variablesFile).read())
     exec(open(opt.plotFile).read())
 
     samples['total_background'] = { 'isData' : 0, 'isSignal' : 0 }
@@ -116,8 +116,16 @@ if __name__ == '__main__':
                     tableName = outputDir+fittype+'_'+cut+'_'+year+'.tex'
                     table = open(tableName , 'w')
 
+                    # Here we are assuming one variable for cut!
                     for variable in variables:
-                        nbins = len(variables[variable]['range'][0])-1
+                        if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+                            fitvariable = variables[variable]
+
+                    if fitvariable==None:
+                        print 'mkYieldsTables: fit variable not found for cut', cut
+                        exit()
+
+                    nbins = len(fitvariable['range'][0])-1
 
                     #table.write('\\begin{center}\n')
                     table.write('\\begin{tabular}{l')
@@ -128,10 +136,9 @@ if __name__ == '__main__':
                 
                     table.write('\\mtll bin')
 
-                    for variable in variables:
-                        for ibin in range(nbins-1):
-                            table.write(' & '+str(variables[variable]['range'][0][ibin])+'-'+str(variables[variable]['range'][0][ibin+1]))
-                        table.write(' & $\\ge '+str(variables[variable]['range'][0][nbins-1])+'$')
+                    for ibin in range(nbins-1):
+                        table.write(' & '+str(fitvariable['range'][0][ibin])+'-'+str(fitvariable['range'][0][ibin+1]))
+                    table.write(' & $\\ge '+str(fitvariable['range'][0][nbins-1])+'$')
 
                     table.write(' \\\\\n')
                    

@@ -86,13 +86,12 @@ if __name__ == '__main__':
     opt.sigset = 'SM-' + opt.masspoint
 
     samples = { }
+    cuts = { }
     variables = { }
 
     exec(open(opt.samplesFile).read())
+    exec(open(opt.cutsFile).read())
     exec(open(opt.variablesFile).read())
-
-    for variable in variables:
-        fitvariable = variables[variable]
 
     shapes = { }
     shapes['cuts'] = { }
@@ -115,6 +114,15 @@ if __name__ == '__main__':
                     if cut not in shapes['cuts']:
                         shapes['cuts'][cut] = { }
 
+                    # Here we are assuming one variable for cut!
+                    for variable in variables:
+                        if 'cuts' not in variables[variable] or cut.replace('_'+cut.split('_')[-1], '') in variables[variable]['cuts']:
+                            fitvariable = variables[variable]  
+                 
+                    if fitvariable==None:
+                        print 'mergeShapesPostFit: fit variable not found for cut', cut
+                        exit()
+ 
                     for sample in samples:
 
                         if 'SR' in cut and 'isControlSample' in samples[sample] and samples[sample]['isControlSample']==1: continue
