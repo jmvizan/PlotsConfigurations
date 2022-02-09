@@ -893,7 +893,7 @@ if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrou
         elif 'EOYWJets' in opt.sigset:
             if sample!='EOYWJets':
                 sampleToRemove.append(sample)
-        elif 'EOY' in opt.sigset:
+        elif 'BackgroundsEOY'==opt.sigset:
             if 'EOY' not in sample:
                 sampleToRemove.append(sample)
             if sample=='EOYWJets':
