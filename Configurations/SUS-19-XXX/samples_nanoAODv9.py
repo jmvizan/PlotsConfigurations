@@ -922,13 +922,9 @@ for sample in samples:
     samples[sample]['suppressNegative'] = ['all']
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
-<<<<<<< HEAD
-#samples['EOYWJets']['isSignal']  = 1
-=======
-print samples.keys(), opt.sigset
-samples['EOYWJets']['isSignal']  = 1
 
->>>>>>> 7e270f5438de8946050ce3ae5947631b43348aed
+
+#samples['EOYWJets']['isSignal']  = 1
 ### Data
 
 if 'SM' in opt.sigset or 'Data' in opt.sigset:

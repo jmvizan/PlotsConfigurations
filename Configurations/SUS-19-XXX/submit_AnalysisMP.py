@@ -192,10 +192,11 @@ missDC       = []
 
             
 for model in signalMassPoints:
-    print "Model:", model,"\tSignal set", sigset
+    print "Model:", model,"\tSignal set", sigset, bool(model in sigset)
     if model not in sigset:  continue
+    #print signalMassPoints[model]
     for massPoint in signalMassPoints[model]:
-        if(massPointInSignalSet(massPoint,sigset)):
+        if(massPointInSignalSet(massPoint,sigset.replace('EOY',''))):
 
             submitThis = True
 	    rootname   = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_Blind.AsymptoticLimits.mH120.root'
