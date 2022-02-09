@@ -31,6 +31,9 @@ if __name__ == '__main__':
     tags   = args[2]
     #sigset = args[3]
 
+    print "years", yearset
+    print "tags ", tags
+    if len(tags.split('-'))>1 or len(yearset)>1: confirm()
     #c1 = ROOT.TCanvas( 'c1', 'Dynamic Filling Example', 200,10, 1600, 900 )
     for year in yearset:
         for tag in tags.split('-'):
@@ -66,9 +69,9 @@ if __name__ == '__main__':
                         h2 = h1.Clone("histo_DATA")
                         h2.Write()
                         #outfile.cd()
-                        print "done"
+                        #print "done"
                     else:
-                        print "yey", keynm
+                        #print "yey", keynm
                         outfile.cd(fol_i)
                         h4 = outfile.Get(keynm).Get(var).Get('histo_DATA')
                         h4.Add(h1)
@@ -82,7 +85,7 @@ if __name__ == '__main__':
             print tag, year
             folder  = os.getcwd()+'/Shapes/'+year+'/'+tag+'/Samples/'
             #outfile  = ROOT.TFile(folder+'plots_'+year+tag+'_ALL_DATA.root', "UPDATE")
-            print outfile.ls()
+            #print outfile.ls()
             keys   = outfile.GetListOfKeys()
             var    = 'mt2ll'
             print keys
