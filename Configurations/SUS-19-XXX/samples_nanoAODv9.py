@@ -72,7 +72,7 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
-    if '2016' not in yeartag:
+    if not skipTreesCheck:
         print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
         if not hasattr(opt, 'doHadd') or opt.doHadd:
             skipTreesCheck = True
