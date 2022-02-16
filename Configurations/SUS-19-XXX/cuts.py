@@ -606,7 +606,7 @@ if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):
 # For postfit plots
 
 if hasattr(opt, 'postFit'):
-    if opt.postFit!='n':
+    if opt.postFit!='n' and 'Fit' not in opt.postFit:
         if opt.tag!=opt.inputFile.split('/')[2]+opt.inputFile.split('/')[3]:
             
             cutList = [ ]
