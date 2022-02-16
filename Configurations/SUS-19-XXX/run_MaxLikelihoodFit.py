@@ -49,9 +49,9 @@ if __name__ == '__main__':
         opt.fileset = 'SM-' + opt.fileset
 
     if not opt.nododatacards:
-        #os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset) # TODO: put back when EOY is over
-        os.system('mkdir -p ./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint)
-        os.system('mkDatacards.py --pycfg=configuration.py --tag='+yearset+opt.tag+' --sigset=SM --outputDirDatacard=./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint+' --inputFile=./Shapes/'+yearset+'/'+opt.tag+'/plots_'+opt.tag+'_SM.root')
+        os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset) # TODO: put back when EOY is over
+        #os.system('mkdir -p ./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint)
+        #os.system('mkDatacards.py --pycfg=configuration.py --tag='+yearset+opt.tag+' --sigset=SM --outputDirDatacard=./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint+' --inputFile=./Shapes/'+yearset+'/'+opt.tag+'/plots_'+opt.tag+'_SM.root')
  
     tag = opt.tag
     opt.tag = yearset.split('-')[0] + opt.tag
