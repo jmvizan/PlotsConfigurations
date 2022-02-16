@@ -29,7 +29,7 @@ if __name__ == '__main__':
 
     yearnm = '-'.join(yearset)
     tags   = args[2]
-    #sigset = args[3]
+    rmtag  = args[3]
 
     print "years", yearset
     print "tags ", tags
@@ -41,67 +41,53 @@ if __name__ == '__main__':
             print tag, year
             folder    = os.getcwd()+'/Shapes/'+year+'/'+tag+'/Samples/'
             infiles   = []
-            infiles   = [f for f in  os.listdir(folder) if tag in f and year in f and "DATA" not in f and "_TChi" not in f and "_T2tt" not in f]
+            infiles   = [f for f in  os.listdir(folder) if tag in f and year in f and "DATA" not in f and "_TChi" not in f and "_T2tt" not in f and "_EOY" not in f]
             outfilenm = 'plots_'+year+tag+'_ALL_DATA.root'
             outfile   = ROOT.TFile(folder+outfilenm,"RECREATE","Final merged one");
             print "Files over which we are looping\n",infiles
-            #exit()
-            #infiles  = [infiles[0]]
             for infilenm in infiles:
                 print "File:", infilenm
                 sig_i  = infilenm.split('ALL')[1].split('.root')[0]
                 infile = ROOT.TFile(folder+infilenm, "READ", infilenm)
                 keys   = infile.GetListOfKeys()
                 for key in keys:
-                    #key    = keys[0]
-                    keynm  = key.GetTitle()
-                    #keynm  = "SR2_Veto_sf"
-                    print "Folder:", key.GetTitle()
-                    var = 'mt2ll'
-                    h1  =  infile.Get(keynm).Get(var).Get('histo'+sig_i)
+                    keynm = key.GetTitle()
+                    var   = 'mt2ll'
+                    h1    =  infile.Get(keynm).Get(var).Get('histo'+sig_i)
                     fol_i = keynm+'/'+var
                     
                     if bool(outfile.FindObject(keynm)) is False:
-                        print "FIRST ITERATION:", keynm
                         dict_i = outfile.mkdir(fol_i)
                         outfile.cd(fol_i)
-                        #print "ee", outfile.ls()
-                        h2 = h1.Clone("histo_DATA")
+                        h2     = h1.Clone("histo_DATA")
                         h2.Write()
-                        #outfile.cd()
-                        #print "done"
+                        
+                        
                     else:
-                        #print "yey", keynm
                         outfile.cd(fol_i)
                         h4 = outfile.Get(keynm).Get(var).Get('histo_DATA')
                         h4.Add(h1)
-                        #print h4
-                        #h4.Draw()
-                        #c1.SaveAs(keynm+sig_i+'.png')
                         h4.Write()
                     outfile.cd()
                     
-            print "DONE WITH THE FIRST PART"
+            print "\nCalculating the uncertainty for the new data events..."
             print tag, year
-            folder  = os.getcwd()+'/Shapes/'+year+'/'+tag+'/Samples/'
-            #outfile  = ROOT.TFile(folder+'plots_'+year+tag+'_ALL_DATA.root', "UPDATE")
-            #print outfile.ls()
+            folder = os.getcwd()+'/Shapes/'+year+'/'+tag+'/Samples/'
             keys   = outfile.GetListOfKeys()
             var    = 'mt2ll'
             print keys
             for key in keys:
 
                 keynm  = key.GetTitle()
-                print "FOL_I", keynm
                 outfile.cd(keynm)
-                #print outfile.ls()                                                     
                 h1  =  outfile.Get(keynm).Get('histo_DATA')
-                #h1_err = h1.Clone('histo_DATA_err')
-
+                
                 for  i_bin in range(0, h1.GetNbinsX()+1):
-                    #print np.sqrt(h1.GetBinContent(i_bin))                            
-                    h1.SetBinError(i_bin, np.sqrt(h1.GetBinContent(i_bin)))
+                    i_content = h1.GetBinContent(i_bin)
+                    h1.SetBinContent(i_bin, int(i_content))
+                    h1.SetBinError(i_bin, np.sqrt(i_content))
                 h1.Write()
-                #print h1.GetEntries()                                                 
                 outfile.cd()
-            print "Final Root file in", folder+outfilenm
+            print "\nFinal Root file in", folder+outfilenm
+            newplace = folder.replace(rmtag,'') + outfilenm.replace(rmtag,'')
+            print "Moving stuff to "+ newplace

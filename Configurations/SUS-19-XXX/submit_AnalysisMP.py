@@ -91,14 +91,15 @@ flavopts  = {"0" : "espresso", "1" : "microcentury", "2" : "longlunch",
  
 doDC      = ' '
 argfloc   = 0
+limrun    = ' '
 print "before the loop"
 for arg in args[4:]:
-    print arg, sigset.split('_')[0]
+    print "args", arg, sigset.split('_')[0]
     if arg.lower() in doDCopts : doDC    = arg
     if arg.lower() in allMPopts: allMP   = True
     if signm       in arg      : fileset = arg
     if "nmp=" in arg.lower():
-        nMPi= arg.split("=")[1]
+        nMPi= arg.split("nmp=")[1].split(' ')[0]
         if nMPi.isdigit():
             nMPs = nMPi
             print "JOBS SPLIT EACH "+nMPi+" MASSPOINTS"
@@ -106,7 +107,7 @@ for arg in args[4:]:
             print "MASSPOINT NUMBER NOT VALID"
             exit()
     if "fl=" in arg.lower():
-        flvi=arg.split("=")[1]
+        flvi=arg.split("fl=")[1].split(' ')[0]
         print "FLVI", flvi
         if   flvi in flavopts:
             flavour = "\"" + flavopts[flvi] + "\""
@@ -115,7 +116,9 @@ for arg in args[4:]:
         else:
             print "flavour not recognised"
             exit()
-
+    if "limrun=" in arg.lower():
+        limrun = 'limrun='+arg.split("limrun=")[1].split(' ')[0]
+        print "this is limrun", limrun
 
 
 '''
@@ -145,7 +148,7 @@ if "nmp=" in args[len(args)-1].lower():
     if nMPi.isdigit():
         nMPs = nMPi
         print "JOBS SPLIT EACH "+nMPi+" MASSPOINTS"
-    else: 
+    else : 
         print "MASSPOINT NUMBER NOT VALID"
         exit()
 flloc=len(args)-1
@@ -255,7 +258,7 @@ if len(missDCfolder) > 0 or len(missDC) > 0 or len(emptyDC) > 0:
     exit()
 
 
-#Make a more human-readable logfile if necessary
+#Make a more human-readable logfile in case its useful later
 sigsets     = sigset.split(',')
 firstsigset = sigsets[0].split('_')
 writesigset = firstsigset    
@@ -314,7 +317,7 @@ for ijob,job in enumerate(jobs):
     #    submit="condor_submit "+subfilename+" >>"+logfile
     
     if gridui is True:
-        arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)
+        arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)+' '+limrun
         gridnm    = gridfol+argsigset
         gridcomm  = 'sbatch -o '+gridnm+'.out -e '+gridnm+'.err --qos=cms_high --partition=cloudcms '+gridnm+'.sh>'+gridnm+'.jid'
         f2 = open(gridnm+".sh","w+")
