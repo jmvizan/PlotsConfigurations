@@ -494,13 +494,41 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
             if 'StopSignalRegions' in opt.tag or 'MT2BinsStop' in opt.tag: mt2llMainBins = mt2llOptimBin
             elif 'MT2BinsMore' in opt.tag: mt2llMainBins = mt2llOptimHighBin
             else: mt2llMainBins = mt2llOptimHighExtraBin
+
+            if 'Merge' not in opt.tag:
         
-            variables['mt2ll'] = {   'name'  : mt2ll,               #   variable name    
-                                     'range' : (mt2llMainBins,[1]), # variable range
-                                     'xaxis' : mt2 + pll + gv,      #   x axis name
-                                     'fold'  : overflow,            #   fold overflow
-                                     'CRbins' : [1, 4] 
-                                  }
+                variables['mt2ll'] = {   'name'  : mt2ll,               #   variable name    
+                                         'range' : (mt2llMainBins,[1]), # variable range
+                                         'xaxis' : mt2 + pll + gv,      #   x axis name
+                                         'fold'  : overflow,            #   fold overflow
+                                         'CRbins' : [1, 4] 
+                                      }
+
+            else: 
+
+                cutTypes = { } 
+
+                for cut in cuts: 
+                    cutType = cut.split('_')[0].replace('CR','SR')
+                    if cutType not in cutTypes:
+                        cutTypes[cutType] = { }
+                        cutTypes[cutType]['cuts'] = [ ]
+                        for cut2 in cuts:
+                            if cutType in cut2 or cutType.replace('SR','CR') in cut2:
+                                cutTypes[cutType]['cuts'].append(cut2)
+                        if 'SR1' in cutType: cutTypes[cutType]['mt2llbins'] = mt2llOptimBin
+                        elif 'SR4' in cutType: cutTypes[cutType]['mt2llbins'] = mt2llMainBins
+                        else: cutTypes[cutType]['mt2llbins'] = [0, 20, 40, 60, 80, 100, 160, 240, 500]
+
+                for cutType in cutTypes:
+
+                    variables['mt2ll'+cutType] = {   'name'  : mt2ll,               #   variable name
+                                                     'range' : (cutTypes[cutType]['mt2llbins'],[1]), # variable range
+                                                     'xaxis' : mt2 + pll + gv,      #   x axis name
+                                                     'fold'  : overflow,            #   fold overflow
+                                                     'cuts'  : cutTypes[cutType]['cuts'],
+                                                     'CRbins' : [1, 4]
+                                                  }
 
         # Some other mt2ll binning for validation regions
         if 'ValidationRegion' in opt.tag:
@@ -567,7 +595,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                         'fold'  : overflow                 #   fold overflow
                                      }
 
-        variables['ptmissSR']     = {  'name'  : 'ptmiss'+ctrltag,        #   variable name    
+        variables['ptmissSR']     = {  'name'  : 'ptmiss'+ctrltag,        #   variable name  
                                         'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]), #   variable range
                                         'xaxis' : met + gv,                #   x axis name
                                         'fold'  : overflow                 #   fold overflow
@@ -588,16 +616,17 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          } 
 
         if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag: 
-    
+
             variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name    
                                             'range' : (  6,    0.,     6.),    #   variable range
                                             'xaxis' : 'number of jets',        #   x axis name
                                             'fold'  : overflow                 #   fold overflow
                                          } 
-    
-            variables['jets']          = {  'name'  : 'nCleanJet>0',           #   variable name    
+
+            variables['jets']          = {  'name'  : 'nCleanJet>0',           #   variable name        
                                             'range' : (  2,    0.,     2.),    #   variable range
                                             'xaxis' : 'number of jets',        #   x axis name
                                             'fold'  : overflow                 #   fold overflow
                                          }
-     
+
+

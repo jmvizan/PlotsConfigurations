@@ -72,9 +72,14 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
+<<<<<<< HEAD
     '''
     if '2016' not in yeartag:
         print 'nanoAODv9 trees for', yeartag, 'not available yet on cern, IGNORE ME FOR NOW, GOSH SAKE'
+=======
+    if not skipTreesCheck:
+        print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
+>>>>>>> upstream/worker
         if not hasattr(opt, 'doHadd') or opt.doHadd:
             skipTreesCheck = True
         else:
@@ -99,6 +104,11 @@ elif '2018' in yeartag :
     ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6loose/hadd__susyGen__susyW__FSSusy2018v6loose__FSSusyCorr2018v6loose__FSSusyNomin2018v6loose'
     ProductionData = 'Run2018_106X_nAODv9_Full2018v8/DATASusy2018v8__hadd'
 
+fastsimSignal = False if ('S2tt' in opt.sigset or 'SChipm' in opt.sigset) else True
+signalReco = 'fast' if fastsimSignal else 'reco'
+if not fastsimSignal:
+    ProductionSig = ProductionMC.replace('/MCSusy', '/susyGen__susyW__MCSusy')
+
 metnom, metsmr = 'Smear', 'Nomin'
 if 'Nomin' in opt.tag:
     metnom, metsmr = 'Nomin', 'Smear'
@@ -113,7 +123,7 @@ for CR_i in CRs:
         ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','').replace('Trigger3Lep','WZ')
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
-directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  'fast')
+directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  signalReco)
 directoryData = treeBaseDirData + ProductionData + regionName.replace('Smear', 'Nomin')
 
 directoryBkgEOY = directoryBkg.replace('Summer20UL16_106X_nAODv9_HIPM', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_nAODv9_noHIPM', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose').replace('noHIPM','').replace('HIPM','') 
@@ -131,26 +141,30 @@ removeZeros = 1 if 'StatZero' in opt.tag else 0
 
 treeNuisances = { }
 if metnom=='Nomin':
-    treeNuisances['smear']        = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
-    #treeNuisances['jesTotal']  = { 'name' : 'JES',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
-    #treeNuisances['unclustEn'] = { 'name' : 'MET',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
+    treeNuisances['smear']        = { 'name' : metsmr,                 'onesided' : True  }
+    #treeNuisances['jesTotal']  = { 'name' : 'JES',  'jetname' : 'JES', 'onesided' : False }
+    #treeNuisances['unclustEn'] = { 'name' : 'MET',                     'onesided' : False }
 elif metnom=='Smear':
     if not isDatacardOrPlot or not nuis_jer_whole:
-        treeNuisances['jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
+        treeNuisances['jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'onesided' : False }
     if not isDatacardOrPlot or nuis_jer_whole:
-        treeNuisances['nosmear']  = { 'name' : metsmr,                    'year' : False, 'MCtoFS' : True, 'onesided' : True  }
-    treeNuisances['jesTotal']  = { 'name' : 'SJS',  'jetname' : 'JES', 'year' : False, 'MCtoFS' : True, 'onesided' : False }
-    treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'year' : False, 'MCtoFS' : True, 'onesided' : False }
+        treeNuisances['nosmear']  = { 'name' : metsmr,                    'onesided' : True  }
+    treeNuisances['jesTotal']  = { 'name' : 'SJS',  'jetname' : 'JES', 'onesided' : False }
+    treeNuisances['unclustEn'] = { 'name' : 'SMT',                     'onesided' : False }
+
+for treeNuisance in treeNuisances:
+    treeNuisances[treeNuisance]['year']     = False # ???
+    treeNuisances[treeNuisance]['BkgToSig'] = True if not fastsimSignal else True # ???
 
 treeNuisanceDirs = { }
 treeNuisanceSuffix = '__hadd' if ('cern' in SITE and 'EOY' in opt.sigset) else ''
 for treeNuisance in treeNuisances:
-    treeNuisanceDirs[treeNuisance] = { 'MC' : { }, 'FS' : { }, }
+    treeNuisanceDirs[treeNuisance] = { 'Bkg' : { }, 'Sig' : { }, }
     if treeNuisance=='nosmear' or treeNuisance=='smaer':
-        treeNuisanceDirs[treeNuisance]['MC']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
-        treeNuisanceDirs[treeNuisance]['MC']['Down'] = directoryBkg
-        treeNuisanceDirs[treeNuisance]['FS']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
-        treeNuisanceDirs[treeNuisance]['FS']['Down'] = directorySig
+        treeNuisanceDirs[treeNuisance]['Bkg']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
+        treeNuisanceDirs[treeNuisance]['Bkg']['Down'] = directoryBkg
+        treeNuisanceDirs[treeNuisance]['Sig']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
+        treeNuisanceDirs[treeNuisance]['Sig']['Down'] = directorySig
     else:
         directoryBkgTemp = directoryBkg.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
         directorySigTemp = directorySig.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
@@ -158,14 +172,14 @@ for treeNuisance in treeNuisances:
             directoryBkgTemp = directoryBkgTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation')
             directorySigTemp = directorySigTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation') 
         for variation in [ 'Down', 'Up' ]:
-            treeNuisanceDirs[treeNuisance]['MC'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
-            treeNuisanceDirs[treeNuisance]['FS'][variation]  = directorySigTemp.replace('variation', variation[:2])
+            treeNuisanceDirs[treeNuisance]['Bkg'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
+            treeNuisanceDirs[treeNuisance]['Sig'][variation]  = directorySigTemp.replace('variation', variation[:2])
     if 'EOY' in opt.sigset:
-        treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
-        treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        treeNuisanceDirs[treeNuisance]['Bkg']['Up']   = treeNuisanceDirs[treeNuisance]['Bkg']['Up'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        treeNuisanceDirs[treeNuisance]['Bkg']['Down'] = treeNuisanceDirs[treeNuisance]['Bkg']['Down'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
         if 'cern' in SITE:
-            treeNuisanceDirs[treeNuisance]['MC']['Up']   = treeNuisanceDirs[treeNuisance]['MC']['Up'].replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
-            treeNuisanceDirs[treeNuisance]['MC']['Down'] = treeNuisanceDirs[treeNuisance]['MC']['Down'].replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
+            treeNuisanceDirs[treeNuisance]['Bkg']['Up']   = treeNuisanceDirs[treeNuisance]['Bkg']['Up'].replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
+            treeNuisanceDirs[treeNuisance]['Bkg']['Down'] = treeNuisanceDirs[treeNuisance]['Bkg']['Down'].replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
 
 globalNuisances = { }
 globalNuisances['trigger'] = { 'name' : 'trigger_yeartag', 'value' : trigger_uncertainty }
@@ -825,6 +839,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                             samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg.replace('reco', 'ctrl'), addingZZ4L, False,treePrefix,skipTreesCheck)
             
             del missingZZ4L['2017']
+            del missingZZ4L['2018']
             
             if 'EOY' in opt.tag:
                 for yyeeaarr in missingZZ4L:
@@ -905,7 +920,7 @@ if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrou
         elif 'EOYWJets' in opt.sigset:
             if sample!='EOYWJets':
                 sampleToRemove.append(sample)
-        elif 'EOY' in opt.sigset:
+        elif 'BackgroundsEOY'==opt.sigset:
             if 'EOY' not in sample:
                 sampleToRemove.append(sample)
             if sample=='EOYWJets':
@@ -967,12 +982,12 @@ if 'MET' in opt.sigset:
         print 'MET datasets not available on lxplus, please use gridui' 
 
     metTriggers = ''
-    if '2016' in yeartag: 
+    if '2016' in yeartag:
         metTriggers = '(HLT_PFMET300 > 0 || HLT_MET200 > 0 || HLT_PFHT300_PFMET110 > 0 || HLT_PFMET170_HBHECleaned > 0 || HLT_PFMETNoMu120_PFMHTNoMu120_IDTight > 0 || HLT_PFMET120_PFMHT120_IDTight > 0)'
     elif '2017' in yeartag:
         metTriggers = '( HLT_PFMETNoMu120_PFMHTNoMu120_IDTight > 0 || HLT_PFMET120_PFMHT120_IDTight > 0 || HLT_PFHT500_PFMET100_PFMHT100_IDTight > 0 || HLT_PFHT700_PFMET85_PFMHT85_IDTight > 0 || HLT_PFHT800_PFMET75_PFMHT75_IDTight > 0)'
     elif '2018' in yeartag:
-        metTriggers = '(HLT_PFMET200_HBHECleaned > 0 || HLT_PFMET200_HBHE_BeamHaloCleaned > 0 || HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned > 0 || HLT_PFMETNoMu120_PFMHTNoMu120_IDTight > 0 || HLT_PFMET120_PFMHT120_IDTight > 0 || HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60 > 0 || HLT_PFMET120_PFMHT120_IDTight_PFHT60 > 0 || HLT_PFHT500_PFMET100_PFMHT100_IDTight > 0 || HLT_PFHT700_PFMET85_PFMHT85_IDTight > 0 || HLT_PFHT800_PFMET75_PFMHT75_IDTight > 0)' 
+        metTriggers = '(HLT_PFMET200_HBHECleaned > 0 || HLT_PFMET200_HBHE_BeamHaloCleaned > 0 || HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned > 0 || HLT_PFMETNoMu120_PFMHTNoMu120_IDTight > 0 || HLT_PFMET120_PFMHT120_IDTight > 0 || HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60 > 0 || HLT_PFMET120_PFMHT120_IDTight_PFHT60 > 0 || HLT_PFHT500_PFMET100_PFMHT100_IDTight > 0 || HLT_PFHT700_PFMET85_PFMHT85_IDTight > 0 || HLT_PFHT800_PFMET75_PFMHT75_IDTight > 0)'
 
     samples['MET']  = {   'name': [ ] ,
                            'weight' : METFilters_Data+'*'+VetoHEMdata+'*'+VetoEENoise,
@@ -1014,22 +1029,27 @@ exec(open('./signalMassPoints.py').read())
 for model in signalMassPoints:
     if model in opt.sigset.replace('EOY', ''):
 
-        isrObservable = 'ptISR' if ('T2' not in model and '2016' in opt.tag) else 'njetISR'
+        isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
 
         for massPoint in signalMassPoints[model]:
             if massPointInSignalSet(massPoint, opt.sigset.replace('EOY', '')):
 
-                #if  os.path.isfile('./Shapes/'+opt.tag.replace(yeartag, yeartag+'/')+'/Samples/plots_'+opt.tag+'_ALL_'+massPoint+'.root'): continue
-
                 samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
-                                       'weight' : XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut'] ,
                                        'FilesPerJob' : 2 ,
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
                                        'suppressZeroTreeNuisances' : ['all'],
                                        'isrObservable' : isrObservable,
                                        'isSignal'  : 1,
-                                       'isDATA'    : 0, 
-                                       'isFastsim' : 1
-                                   }
-                
+                                       'isDATA'    : 0,
+                                     }
+                  
+                if fastsimSignal:
+                    samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPoint]['isFastsim'] = 1
+                else:
+                    samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPoint]['isFastsim'] = 0
+
+            
+

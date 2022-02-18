@@ -300,7 +300,7 @@ for yeartomerge in yearstaglist:
                 for i in [0, 1, 3, 5, 7, 8]:
                     qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
                 nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
-            if not samples[sample]['isFastsim'] and theoryNormalizations[sample]['pdfStatus']==3:
+            if not samples[sample]['isSignal'] and theoryNormalizations[sample]['pdfStatus']==3:
                 pdfVariations = [ ] 
                 for i in range(len(theoryNormalizations[sample]['pdf'])):                              
                     pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
@@ -320,7 +320,7 @@ for treeNuisance in treeNuisances:
             print 'nuisance warning: missing trees for', treeNuisance, mcType, 'variations'
         else:
 
-            mcTypeName = '_'+mcTpye if (mcType=='FS' and not treeNuisances[treeNuisance]['MCtoFS']) else ''
+            mcTypeName = '_FS' if (mcType=='Sig' and not treeNuisances[treeNuisance]['BkgToSig']) else ''
             yearCorr = '' if treeNuisances[treeNuisance]['year'] else year # not correlated through the years?
 
             nuisances[treeNuisance+mcType] = {
@@ -335,16 +335,16 @@ for treeNuisance in treeNuisances:
             }
             for sample in samples.keys():
                 if not samples[sample]['isDATA'] and not ('NoDY' in opt.tag and treeNuisance=='jer' and '2017' in year and sample=='DY'):
-                    if (mcType=='MC' and not samples[sample]['isFastsim']) or (mcType=='FS' and samples[sample]['isFastsim']):
+                    if (mcType=='Bkg' and not samples[sample]['isSignal']) or (mcType=='Sig' and samples[sample]['isSignal']):
                         nuisances[treeNuisance+mcType]['samples'][sample] = ['1.', '1.']
 
             if len(nuisances[treeNuisance+mcType]['samples'].keys())==0:
                 del nuisances[treeNuisance+mcType]
 
-    if hasattr(opt, 'cardList') and treeNuisances[treeNuisance]['MCtoFS']:
-        if treeNuisance+'MC' in nuisances and treeNuisance+'FS' in nuisances:
-            nuisances[treeNuisance+'MC']['samples'].update(nuisances[treeNuisance+'FS']['samples']) 
-            del nuisances[treeNuisance+'FS']
+    if hasattr(opt, 'cardList') and treeNuisances[treeNuisance]['BkgToSig']:
+        if treeNuisance+'Bkg' in nuisances and treeNuisance+'Sig' in nuisances:
+            nuisances[treeNuisance+'Bkg']['samples'].update(nuisances[treeNuisance+'Sig']['samples']) 
+            del nuisances[treeNuisance+'Sig']
 
 ### rate parameters
 if 'WWSF' in opt.tag:
@@ -464,6 +464,7 @@ if hasattr(opt, 'outputDirDatacard'):
                         nuisances[sample+rateparamname]['bond'][cut] = {}
 
                         for variable in variables.keys():
+                            if 'cuts' in variables[variable] and cut not in variables[variable]['cuts']: continue
 
                             histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
                             cutB = rateparameters[rateparam]['subcuts'][0]

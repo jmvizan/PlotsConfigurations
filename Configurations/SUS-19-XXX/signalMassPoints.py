@@ -83,6 +83,20 @@ def massPointInSignalSet(massPoint, sigSet):
 
     return False
 
+signalMassPoints['S2tt'] = {
+    'S2tt_mS-525_mX-350' : { 'massPointDataset' : 'T2tt_mStop-525_mLSP-350', 
+                             'massPointCut'     : '(susyMstop>=521 && susyMstop<=529 && susyMLSP>=348 && susyMLSP<=352)' },
+    'S2tt_mS-525_mX-438' : { 'massPointDataset' : 'T2tt_mStop-525_mLSP-438',
+                             'massPointCut'     : '(susyMstop>=521 && susyMstop<=529 && susyMLSP>=436 && susyMLSP<=440)' },
+}
+
+signalMassPoints['SChipmSlepSnu'] = {
+    'SChipmSlepSnu_mC-1150_mX-1'   : { 'massPointDataset' : 'TChipmSlepSnu_mC-1150_mX-1',
+                                       'massPointCut'     : '(susyMChargino>=1146 && susyMChargino<=1154 && susyMLSP>=0 && susyMLSP<=3)' },
+    'SChipmSlepSnu_mC-900_mX-475'  : { 'massPointDataset' : 'TChipmSlepSnu_mC-900_mX-475',
+                                       'massPointCut'     : '(susyMChargino>=896 && susyMChargino<=904 && susyMLSP>=473 && susyMLSP<=477)' },
+} 
+
 signalMassPoints['T2tt'] = {}
 
 for mStop in range( 150,  2001, 25):

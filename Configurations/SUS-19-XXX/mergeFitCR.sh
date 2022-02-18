@@ -31,8 +31,9 @@ fi
 IFS=- read -ra yearlist <<< $years
 for year in "${yearlist[@]}"; do
 
-    if [ $year == '2016' ] || [ $year == '2017' ] || [ $year == '2018' ]; then
+    if [[ $year == '2016'* ]] || [ $year == '2017' ] || [ $year == '2018' ]; then
 
+        mkdir -p ./Shapes/$year/$intag
         filename=./Shapes/$year/$intag/plots_${intag}
 
         infile=${filename}_SM.root

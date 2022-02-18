@@ -1,5 +1,5 @@
 # plot configuration
-if opt.lumi>100: lumi_i=int(opt.lumi)
+if opt.lumi>100: lumi_i=int(round(opt.lumi, 0))
 else           : lumi_i=round(opt.lumi, 1)
 legend['lumi'] = 'L = '+str(lumi_i)+'/fb'
 legend['sqrt'] = '#sqrt{s} = 13 TeV'
@@ -125,7 +125,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
         groupPlot['ttSemilep']  = {
             'nameHR' : 't#bar{t} Semilep.',
-            'nameLatex' : '\\ttbar Semilep.',
+            'nameLatex' : '\\ttbar$ Semilep.',
             'isSignal' : 0,
             'color': 401,   # kYellow+1
             'samples'  : ['ttSemilep'] 
@@ -289,13 +289,14 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     }
 
     if 'EOY' in opt.tag:
-        plot['EOYZZ4L']       = plot['ZZTo4L']
-        plot['EOYH']          = plot['Higgs']
-        plot['EOYQQ']         = plot['VZ']
-        plot['EOYVZ']         = plot['WZ']
-        plot['EOYDrellYan']   = plot['DY']
-        plot['EOY3V']         = plot['VVV']
-        plot['EOYWJets']      = plot['WJetsToLNu']
+        plot['EOYZZ4L']       = plot['ZZTo4L'].copy()
+        plot['EOYH']          = plot['Higgs'].copy()
+        plot['EOYQQ']         = plot['VZ'].copy()
+        plot['EOYGluGlu']     = plot['WW'].copy()
+        plot['EOYVZ']         = plot['WZ'].copy()
+        plot['EOYDrellYan']   = plot['DY'].copy()
+        plot['EOY3V']         = plot['VVV'].copy()
+        plot['EOYWJets']      = plot['WJetsToLNu'].copy()
 
     # Backward compatibility for background names
     plot['tW']  = plot['STtW']
@@ -310,6 +311,14 @@ for sample in plot:
 
 for sample in sampleToRemoveFromPlot:
     del plot[sample]
+
+eosNameToFix = [ ]
+for sample in plot:
+    if 'EOY' in sample:
+        eosNameToFix.append(sample)
+for sample in eosNameToFix:
+    plot[sample]['nameHR'] = 'EOY '+plot[sample]['nameHR']
+    plot[sample]['nameLatex'] = 'EOY '+plot[sample]['nameLatex']
 
 groupToRemoveFromPlot = [ ] 
 
@@ -337,7 +346,11 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
 # Signal  
 
+<<<<<<< HEAD
 signalColor = 1 if (hasattr(opt, 'postFit') and opt.postFit=='n') else 880 # kViolet
+=======
+signalColor = 1 if hasattr(opt, 'postFit') and opt.postFit=='n' else 880 # kViolet
+>>>>>>> upstream/worker
 
 LSP = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}'
 CHR = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}'

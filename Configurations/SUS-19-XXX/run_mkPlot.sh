@@ -40,7 +40,7 @@ else
 	FILESET=$SIGSET
         NORM='None'
     elif [ $# -eq 4 ]; then
-        if [[ $4 == 'Norm' ]] || [[ $4 == 'CRnorm' ]] || [[ $4 == *'Fit'* ]] || [[ $4 == *'-'* ]] ; then 
+        if [[ $4 == 'Norm' ]] || [[ $4 == 'CRnorm' ]] || [[ $4 == *'Fit'* ]] || [[ $4 == '2'*'-'* ]] ; then 
 	    NORM=$4
 	    FILESET=$SIGSET
 	else
@@ -48,7 +48,7 @@ else
 	    FILESET=$4
 	fi
     else
-        if [[ $4 == 'Norm' ]] || [[ $4 == 'CRnorm' ]] || [[ $4 == *'Fit'* ]] || [[ $4 == *'-'* ]] ; then 
+        if [[ $4 == 'Norm' ]] || [[ $4 == 'CRnorm' ]] || [[ $4 == *'Fit'* ]] || [[ $4 == '2'*'-'* ]] ; then 
 	    NORM=$4
 	    FILESET=$5
 	else
