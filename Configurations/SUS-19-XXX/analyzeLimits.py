@@ -687,9 +687,9 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
             for massPoint in sorted(signalMassPoints[model]):
 
                 if massPointInSignalSet(massPoint, sigset):
-                    print "limit option", limitOption
+                    #print "limit option", limitOption
 
-                    inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
+                    inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption.replace('Observed','both') + '.AsymptoticLimits.mH120.root'
                     inputFile = ROOT.TFile(inputFileName, 'READ')
                 
                     inputTree = inputFile.Get('limit')
@@ -712,6 +712,8 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 
                             if inputTree.quantileExpected==-1. and limitOption=='Observed':
                                 massPointLimits['histo_r_observed'] = roundBin(inputTree.limit)
+                                print "im inside this still"
+                                
                             elif inputTree.quantileExpected==0.5:
                                 massPointLimits['histo_r_'+limitType] = roundBin(inputTree.limit)
                             elif round(inputTree.quantileExpected, 2)==0.84:
@@ -748,7 +750,8 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                                                              histoBin['Y'], histoMin['Y'], histoMax['Y'])
                 massScanHistos[limit].SetXTitle(histogramSettings['X']['label'])
                 massScanHistos[limit].SetYTitle(histogramSettings['Y']['label'])
-
+                print "im inside this", limit
+                                
             massPointBin = massScanHistos[limit].FindBin(massPoints[massPoint]['massX'], massPoints[massPoint]['massY'])
             massScanHistos[limit].SetBinContent(massPointBin, massPoints[massPoint]['limits'][limit])
 
@@ -775,12 +778,13 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                         crossSectionHistos[xSection].SetBinContent(xb, yb, massPointCrossSection)
     
     # Save histogram file 
+    print "and this should be the filename", outputFileName
     outputFile = ROOT.TFile(outputFileName, 'recreate')
     for histo in massScanHistos:
 
         if fillemptybins:
             fillEmptyBins(sigset, massScanHistos[histo]) 
-
+        print "will this be the right name?", massScanHistos[histo].GetName()
         massScanHistos[histo].Write()
         
     for histo in crossSectionHistos:
@@ -869,6 +873,7 @@ def getMassScanContours(outputFileName):
 
     for key in inputFile.GetListOfKeys():
         histo = key.ReadObj()
+        print "histo names", histo.GetName()
         if histo.ClassName()=='TH2F':
             histo.SetDirectory(0)
             if '_r_' in histo.GetName():
@@ -883,8 +888,9 @@ def getMassScanContours(outputFileName):
         outputContours.extend(getMassScanContour(outputFileName, histo))
 
     outputFile = ROOT.TFile(outputFileName, 'recreate')
-
+    print outputFileName
     for contour in outputContours:
+        print "contour", contour.GetName()
         contour.Write()
         if 'Observed' not in outputFileName:
             x, y = array( 'd' ), array( 'd' )
@@ -920,7 +926,7 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         if tag=='':
             continue
             
-        tagFileName = getFileName('./Limits/' + year + '/' + tag + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + emptyBinsOption)
+        tagFileName = getFileName('./Limits/' + year + '/' + tag + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1].replace('Observed','both') + emptyBinsOption)
 
         if not fileExist(tagFileName):
             print 'Error: input file', tagFileName, 'not found'
@@ -929,7 +935,6 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         tagFile = ROOT.TFile(tagFileName, 'READ')
         print "e", tagFile, tagFile.GetListOfKeys()
         for key in tagFile.GetListOfKeys():
-            print "key", key
             obj = key.ReadObj()
             print "obj", obj.GetName(), "opts", limitOptions, bool(limitOptions[-1].lower() in obj.GetName())
             if limitOptions[0].lower() in obj.GetName():
