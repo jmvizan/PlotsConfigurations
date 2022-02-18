@@ -78,7 +78,7 @@ elif args[2] =='2':
     tag ='StopSignalRegions'                                                        
 else:                                                                              
     tag = args[2]
- 
+nMPs = 1 
 sigset    = args[3]
 signm     = sigset.split('_')[0]
 fileset   = sigset

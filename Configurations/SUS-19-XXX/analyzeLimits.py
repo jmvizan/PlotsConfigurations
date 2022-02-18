@@ -686,10 +686,8 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
             
             for massPoint in sorted(signalMassPoints[model]):
 
-                if massPointInSignalSet(massPoint, sigset):
-                    #print "limit option", limitOption
-
-                    inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption.replace('Observed','both') + '.AsymptoticLimits.mH120.root'
+                if massPointInSignalSet(massPoint, sigset): 
+                    inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
                     inputFile = ROOT.TFile(inputFileName, 'READ')
                 
                     inputTree = inputFile.Get('limit')
@@ -712,8 +710,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 
                             if inputTree.quantileExpected==-1. and limitOption=='Observed':
                                 massPointLimits['histo_r_observed'] = roundBin(inputTree.limit)
-                                print "im inside this still"
-                                
                             elif inputTree.quantileExpected==0.5:
                                 massPointLimits['histo_r_'+limitType] = roundBin(inputTree.limit)
                             elif round(inputTree.quantileExpected, 2)==0.84:
@@ -750,8 +746,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                                                              histoBin['Y'], histoMin['Y'], histoMax['Y'])
                 massScanHistos[limit].SetXTitle(histogramSettings['X']['label'])
                 massScanHistos[limit].SetYTitle(histogramSettings['Y']['label'])
-                print "im inside this", limit
-                                
+
             massPointBin = massScanHistos[limit].FindBin(massPoints[massPoint]['massX'], massPoints[massPoint]['massY'])
             massScanHistos[limit].SetBinContent(massPointBin, massPoints[massPoint]['limits'][limit])
 
@@ -778,17 +773,16 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                         crossSectionHistos[xSection].SetBinContent(xb, yb, massPointCrossSection)
     
     # Save histogram file 
-    print "and this should be the filename", outputFileName
     outputFile = ROOT.TFile(outputFileName, 'recreate')
     for histo in massScanHistos:
 
         if fillemptybins:
             fillEmptyBins(sigset, massScanHistos[histo]) 
-        print "will this be the right name?", massScanHistos[histo].GetName()
+
         massScanHistos[histo].Write()
         
     for histo in crossSectionHistos:
-        if limitOption == 'Observed': continue
+
         crossSectionHistos[histo].Multiply(massScanHistos[histo.replace('_X_', '_r_').replace('_up', '').replace('_down', '')])
         crossSectionHistos[histo].Write()
 
@@ -873,7 +867,6 @@ def getMassScanContours(outputFileName):
 
     for key in inputFile.GetListOfKeys():
         histo = key.ReadObj()
-        print "histo names", histo.GetName()
         if histo.ClassName()=='TH2F':
             histo.SetDirectory(0)
             if '_r_' in histo.GetName():
@@ -888,9 +881,8 @@ def getMassScanContours(outputFileName):
         outputContours.extend(getMassScanContour(outputFileName, histo))
 
     outputFile = ROOT.TFile(outputFileName, 'recreate')
-    print outputFileName
+
     for contour in outputContours:
-        print "contour", contour.GetName()
         contour.Write()
         if 'Observed' not in outputFileName:
             x, y = array( 'd' ), array( 'd' )
@@ -909,7 +901,7 @@ def makeMassScanContours(year, tag, sigset, limitOption, reMakeContours):
             getMassScanContours(outputFileName)
 
 def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
-    print "before the tags part", tags
+                 
     if plotOption!='Histograms' and plotOption!='Contours':
         print 'plotLimits error: unkown option', plotOption, 'for limit comparison'
         exit()
@@ -926,17 +918,16 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
         if tag=='':
             continue
             
-        tagFileName = getFileName('./Limits/' + year + '/' + tag + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1].replace('Observed','both') + emptyBinsOption)
+        tagFileName = getFileName('./Limits/' + year + '/' + tag + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + emptyBinsOption)
 
         if not fileExist(tagFileName):
             print 'Error: input file', tagFileName, 'not found'
             exit()
             
         tagFile = ROOT.TFile(tagFileName, 'READ')
-        print "e", tagFile, tagFile.GetListOfKeys()
+
         for key in tagFile.GetListOfKeys():
             obj = key.ReadObj()
-            print "obj", obj.GetName(), "opts", limitOptions, bool(limitOptions[-1].lower() in obj.GetName())
             if limitOptions[0].lower() in obj.GetName():
                 if obj.ClassName()=='TH2F':
                     obj.SetDirectory(0)
@@ -947,23 +938,18 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
                         obj.SetLineStyle(2)
                 if limitOptions[0].lower() in obj.GetName():
                     tagObj.append(obj)
-            if len(limitOptions)>1 and limitOptions[1].lower() in obj.GetName():
-                print "come ooon"
-                tagObj.append(obj)
+
     # Draw comparison
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
-    print "Tag obj", tagObj
+
     plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 1200, 900)
     tagnm=tags[0]
     if len(tags[1])>0:
         tagnm+='_vs_'+tags[1]  
-    limOptnm = limitOptions[0]
-    #if len(limitOptions)>0: limOptnm+='_'+limitOptions[1]
-    print "limOptnm", limOptnm
-    plotName = tagnm + '_' + sigset + '_' + limOptnm + '_' + plotOption+ '_'+ year + emptyBinsOption
-    plotTitle = sigset + '_' + limOptnm + '_' + plotOption+ '_'+ year + emptyBinsOption
-    print "THESE ARE THE TAGS", tags, bool(tags[1] == '')
+
+    plotName = tagnm + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
+    plotTitle = sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
     if tags[1]!='':
         plotName.replace(tags[0], tags[0] + '_to_' + tags[1]) 
     tagObj[0].SetTitle(plotTitle)   
@@ -1092,18 +1078,18 @@ if __name__ == '__main__':
     usage = 'usage: %prog [options]'
     parser = optparse.OptionParser(usage)
     
-    parser.add_option('--years'         , dest='years'         , help='Year(s) to be processed'                               , default='all')
-    parser.add_option('--tag'           , dest='tag'           , help='Tag used for the tag file name'                        , default='Test')
-    parser.add_option('--sigset'        , dest='sigset'        , help='Model and mass point range'                            , default='')
-    parser.add_option('--limitoption'   , dest='limitOption'   , help='Observed (0), Expected (1), Both (2), Blind (3) limit' , default='Blind')
-    parser.add_option('--sigmp'         , dest='signalMPcfg'   , help='Signal mass point cfg file'                            , default='./signalMassPoints.py') 
-    parser.add_option('--nomakehistos'  , dest='noMakeHistos'  , help='Do not make the mass scan histograms'                  , default=False, action='store_true')
-    parser.add_option('--remakehistos'  , dest='reMakeHistos'  , help='Redo the mass scan histograms'                         , default=False, action='store_true')
-    parser.add_option('--nofillempties' , dest='noFillEmpties' , help='Do not fill empty bins'                                , default=False, action='store_true')
-    parser.add_option('--makecontours'  , dest='makeContours'  , help='Make limit contours'                                   , default=False, action='store_true')
-    parser.add_option('--remakecontours', dest='reMakeContours', help='Remake limit contours'                                 , default=False, action='store_true')
-    parser.add_option('--compareto'     , dest='compareTo'     , help='Reference tag used for comparison'                     , default='')
-    parser.add_option('--plotoption'    , dest='plotOption'    , help='-1 None, 0 Histograms, 1 Contours, 2 Final'            , default='-1')
+    parser.add_option('--years'         , dest='years'         , help='Year(s) to be processed'                     , default='all')
+    parser.add_option('--tag'           , dest='tag'           , help='Tag used for the tag file name'              , default='Test')
+    parser.add_option('--sigset'        , dest='sigset'        , help='Model and mass point range'                  , default='')
+    parser.add_option('--limitoption'   , dest='limitOption'   , help='Observed (0), Expected (1), Blind (2) limit' , default='Blind')
+    parser.add_option('--sigmp'         , dest='signalMPcfg'   , help='Signal mass point cfg file'                  , default='./signalMassPoints.py') 
+    parser.add_option('--nomakehistos'  , dest='noMakeHistos'  , help='Do not make the mass scan histograms'        , default=False, action='store_true')
+    parser.add_option('--remakehistos'  , dest='reMakeHistos'  , help='Redo the mass scan histograms'               , default=False, action='store_true')
+    parser.add_option('--nofillempties' , dest='noFillEmpties' , help='Do not fill empty bins'                      , default=False, action='store_true')
+    parser.add_option('--makecontours'  , dest='makeContours'  , help='Make limit contours'                         , default=False, action='store_true')
+    parser.add_option('--remakecontours', dest='reMakeContours', help='Remake limit contours'                       , default=False, action='store_true')
+    parser.add_option('--compareto'     , dest='compareTo'     , help='Reference tag used for comparison'           , default='')
+    parser.add_option('--plotoption'    , dest='plotOption'    , help='-1 None, 0 Histograms, 1 Contours, 2 Final'  , default='-1')
     (opt, args) = parser.parse_args()
 
     if opt.years=='-1' or opt.years=='all' or opt.years=='All':
@@ -1120,9 +1106,9 @@ if __name__ == '__main__':
     if opt.limitOption=='0':
         limitOption = 'Observed'
     elif opt.limitOption=='1':
-        limitOption = 'Expected'
-    elif opt.limitOption=='2':
         limitOption = 'Expected-Observed'
+    elif opt.limitOption=='2':
+        limitOption = 'Expected'
     elif opt.limitOption=='3':
         limitOption = 'Blind'
     else:
