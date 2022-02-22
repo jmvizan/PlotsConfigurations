@@ -272,7 +272,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
     plot['ZZTo4L'] = {   
         'nameHR' : 'ZZ (#rightarrow 4' + sl +')',
-        'nameHR' : '\\ZZ ($\\to 4\ell$)',
+        'nameLatex' : '\\ZZ ($\\to 4\ell$)',
         'color': 49,   
         'isSignal' : 0,
         'isData'   : 0 ,

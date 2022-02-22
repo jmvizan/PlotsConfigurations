@@ -40,11 +40,10 @@ exec(open('./signalMassPoints.py').read())
 
 years = yearset.split('-')
 
-#inputtag = tag.replace('StatZero', '')
-#inputtag = tag.replace('NoStat0', '')
-inputtag = tag if '_' not in tag else tag.replace('_'+tag.split('_')[1], '')
+inputtag = tag.split('_')[0]
 
 for year in years:
+    print year
     os.system('mkdir -p ./Datacards/'+year+'/'+tag)
     for model in signalMassPoints:
         if model in sigset:
