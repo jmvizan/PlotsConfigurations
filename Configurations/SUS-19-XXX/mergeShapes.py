@@ -37,7 +37,7 @@ if __name__ == '__main__':
         years = opt.years.split('-')
    
     if len(years)==1 and 'BkgSF' not in opt.tag:
-        print 'Nothing to do with one year without BkgSF'
+        print 'mergeShapes: nothing to do with one year without BkgSF'
         exit()
 
     localnuisancesFile = opt.localNuisFile if opt.localNuisFile!=None else opt.nuisancesFile.replace('.py', '_'+'-'.join(years)+'_'+opt.tag+'_'+opt.sigset+'.py')
@@ -51,15 +51,21 @@ if __name__ == '__main__':
       exec(handle)
       handle.close()
 
-    variables = {}
-    if os.path.exists(opt.variablesFile) :
-      handle = open(opt.variablesFile,'r')
-      exec(handle)
-      handle.close()
+    if 'BkgSF' in opt.tag:
+        for year2merge in years:
+            if len(yearstag[year2merge].split('-'))>1:
+                print 'mergeShapes: cannot apply background scale factors to merged year', year2merge
+                exit()    
 
     cuts = {}
     if os.path.exists(opt.cutsFile) :
       handle = open(opt.cutsFile,'r')
+      exec(handle)
+      handle.close()
+
+    variables = {}
+    if os.path.exists(opt.variablesFile) :
+      handle = open(opt.variablesFile,'r')
       exec(handle)
       handle.close()
 
@@ -116,11 +122,9 @@ if __name__ == '__main__':
             #'ttZ'    : { '2016HIPM' : [1.179, 0.313] , '2016noHIPM' : [1.118, 0.322], '2017' : [1.553,0.223], '2018' : [1.553, 0.192]}
         }
         
-
     for cutName in cuts:
 
         outFile.mkdir(cutName)
-
         for variableName in variables:
             if 'cuts' not in variables[variableName] or cutName in variables[variableName]['cuts']:
 
@@ -134,7 +138,6 @@ if __name__ == '__main__':
                     inDirs.append([ infile[0].Get(folderName), infile[1] ])
 
                 for sample in samples:
-                    
                     if sample in globalScale.keys(): 
                        globalScale_i = globalScale[sample] 
                        if opt.verbose: print 'These are the global sF', globalScale_i,'for sample', sample
@@ -164,7 +167,6 @@ if __name__ == '__main__':
                                 shapeVar = shapeName if nuisance=='stat' else shapeName + '_' + allnuisances[nuisance]['name'] + var
                                   
                                 for idir, indir in enumerate(inDirs):
-
                                     if indir[0].GetListOfKeys().Contains(shapeVar):
                                         tmpHisto = indir[0].Get(shapeVar)
                                         tmpHisto.SetDirectory(0)   
@@ -173,7 +175,7 @@ if __name__ == '__main__':
                                     else:
 
                                         if not indir[0].GetListOfKeys().Contains(shapeName):
-                                            if 'EOY' not in sample and indir[1]+'_'+sample not in missingSampleList: 
+                                            if 'EOY' not in sample and indir[1]+'_'+sample not in missingSampleList:
                                                 print 'Warning:', sample, 'not in input shape file for', indir[1], 'year!'
                                                 missingSampleList.append(indir[1]+'_'+sample)
                                             for idir2, indir2 in enumerate(inDirs):

@@ -535,10 +535,12 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
     crcuts = { } 
     cutToRemove = [ ] 
 
+    isStrictDatacardOrPlot = isDatacardOrPlot and not hasattr(opt, 'skipLNN')
+
     for cut in cuts:
         if 'SR' in cut:
 
-            if not isDatacardOrPlot:
+            if not isStrictDatacardOrPlot:
                 cutToRemove.append(cut)
 
             if '_em' in cut: continue # Use only sf channel to avoid double counting
@@ -548,7 +550,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
             exprcut = exprcut.replace(' && '+DF, '')
             exprcut = exprcut.replace(' && '+SF, '')
 
-            if '_Tag_' in cut and ('FitCRttZ' in opt.tag or isDatacardOrPlot):
+            if '_Tag_' in cut and ('FitCRttZ' in opt.tag or isStrictDatacardOrPlot):
 
                 if isDatacardOrPlot: # Ugly, but in this case these variables are not used
                     ttZselectionLoose = ''
@@ -560,7 +562,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace(OC, ttZselectionLoose)
                 crcuts[crcut.replace('_sf', '_ttZ')] = { 'expr' : exprCR, 'weight' : btagweightmixtag }
 
-            if '_Tag_' not in cut and ('FitCRWZ' in opt.tag or isDatacardOrPlot):
+            if '_Tag_' not in cut and ('FitCRWZ' in opt.tag or isStrictDatacardOrPlot):
              
                 exprCR = exprcut.replace(OC, nLooseLepton+'==3 && ' + nTightLepton + '==3 && deltaMassZ_WZ<10. && ptmiss_WZ>=0.')
                 exprCR = exprCR.replace('ptmiss>', 'ptmiss_WZ>')
@@ -568,7 +570,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_WZ')
                 crcuts[crcut.replace('_sf', '_WZ')] = { 'expr' : exprCR, 'weight' : cuts[cut]['weight'] }
 
-            if '_Tag_' not in cut and ('FitCRZZ' in opt.tag or isDatacardOrPlot): 
+            if '_Tag_' not in cut and ('FitCRZZ' in opt.tag or isStrictDatacardOrPlot): 
 
                 exprCR = exprcut.replace(OC, nLooseLepton+'==4 && ' + nTightLepton + '>=3 && deltaMassZ_ZZ<15. && ptmiss_ZZ>=0.')
                 exprCR = exprCR.replace('ptmiss>', 'ptmiss_ZZ>')
@@ -604,7 +606,7 @@ if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):
 # For postfit plots
 
 if hasattr(opt, 'postFit'):
-    if opt.postFit!='n':
+    if opt.postFit!='n' and 'Fit' not in opt.postFit:
         if opt.tag!=opt.inputFile.split('/')[2]+opt.inputFile.split('/')[3]:
             
             cutList = [ ]

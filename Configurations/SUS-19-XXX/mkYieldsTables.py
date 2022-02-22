@@ -81,15 +81,15 @@ if __name__ == '__main__':
     opt.sigset = 'SM-' + opt.masspoints
 
     samples = { }
-    variables = { }
     cuts = { }
+    variables = { }
     plot = { } 
     groupPlot = { }
     legend = { }
 
     exec(open(opt.samplesFile).read())
-    exec(open(opt.variablesFile).read())
     exec(open(opt.cutsFile).read())
+    exec(open(opt.variablesFile).read())
     exec(open(opt.plotFile).read())
 
     samples['total_background'] = { 'isData' : 0, 'isSignal' : 0 }
@@ -122,12 +122,22 @@ if __name__ == '__main__':
         for year in yearset.split('-'):
             for cut in cuts:
                 if 'SR' in cut:
-       
+      
+                    if '_Tag_' in cut and 'Stop' not in tag: continue 
+                
                     tableName = outputDir+fittype+'_'+cut+'_'+year+'.tex'
                     table = open(tableName , 'w')
 
+                    # Here we are assuming one variable for cut!
                     for variable in variables:
-                        nbins = len(variables[variable]['range'][0])-1
+                        if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+                            fitvariable = variables[variable]
+
+                    if fitvariable==None:
+                        print 'mkYieldsTables: fit variable not found for cut', cut
+                        exit()
+
+                    nbins = len(fitvariable['range'][0])-1
 
                     #table.write('\\begin{center}\n')
                     table.write('\\begin{tabular}{l')
@@ -138,10 +148,9 @@ if __name__ == '__main__':
                 
                     table.write('\\mtll bin')
 
-                    for variable in variables:
-                        for ibin in range(nbins-1):
-                            table.write(' & '+str(variables[variable]['range'][0][ibin])+'-'+str(variables[variable]['range'][0][ibin+1]))
-                        table.write(' & $\\ge '+str(variables[variable]['range'][0][nbins-1])+'$')
+                    for ibin in range(nbins-1):
+                        table.write(' & '+str(fitvariable['range'][0][ibin])+'-'+str(fitvariable['range'][0][ibin+1]))
+                    table.write(' & $\\ge '+str(fitvariable['range'][0][nbins-1])+'$')
 
                     table.write(' \\\\\n')
                    
@@ -202,8 +211,23 @@ if __name__ == '__main__':
                         if siter<opt.maxsignallines:
                             table.write(signalPoint[siter]+signalYields[signalPoint[siter]]+' \\\\\n')
 
-                    table.write('\\hline\n')
+                    # TODO uncomment and remove when the comparison with EOY is over
+                    #table.write('\\hline\n')
 
-                    table.write('\\end{tabular}\n')
-                    #table.write('\\end{center}\n') 
- 
+                    #table.write('\\end{tabular}\n')
+                    ##table.write('\\end{center}\n') 
+
+                    eoyTableName = '/afs/cern.ch/user/s/scodella/Documents/notes/AN-19-256/EOY/tables/07/PROC'+year+'/'+fittype+'_'+cut+'_'+year+'.tex'
+                    if 'Chargino' in tag: eoyTableName = eoyTableName.replace('PROC','TChipm')
+                    if 'Stop' in tag: eoyTableName = eoyTableName.replace('PROC','T2')
+                    with open(eoyTableName) as f:
+      	                 lines = f.readlines()
+                         doPrint = False
+                         for line in lines:
+    	                     if "SM" in line and "Processes" in line:
+                                 line = line.replace("Processes", "Processes (EOY)")
+                                 doPrint = True
+                             if doPrint: table.write(line)
+                 
+                             
+

@@ -43,7 +43,7 @@ if __name__ == '__main__':
 
     for sam_k, sam_v in samples.iteritems():
 
-        if not sam_v['isSignal']: # Background samples
+        if not sam_v['isFastsim']: # Background samples
 
             if opt.verbose>=1:
                 print 'Deriving theory normalizations for sample', sam_k
@@ -178,6 +178,10 @@ if __name__ == '__main__':
             elif opt.verbose:                           
                 print 'Error: no pdf weights for sample', sam_k
 
+            if sam_v['isSignal']:
+                del theoryNormalizations[sam_k]['pdfStatus']
+                del theoryNormalizations[sam_k]['pdf']
+
         else: # Signal samples
 
             sam_j = sam_k.split('_')[0] + '_' + sam_k.split('_')[1].split('-')[1] + '_' + sam_k.split('_')[2].split('-')[1]
@@ -192,23 +196,29 @@ if __name__ == '__main__':
 
             for treeName in sam_v['name']:
 
-		chain = ROOT.TChain('Runs')		
+		chain = ROOT.TChain('Runs')
+                if 'rootd' not in treeName:
+                    treeName = treeName.replace('###', '')
+                treeName = treeName.replace('root://eoscms.cern.ch/', '')		
                 chain.Add(treeName)
 
                 for ev in range(chain.GetEntries()):
 
                     chain.GetEntry(ev)
-                    
-                    if hasattr(chain, 'nLHEScaleSumw_'+sam_j):
-                        if getattr(chain, 'nLHEScaleSumw_'+sam_j)==expectedScaleWeights:
+                 
+                    underscore = '_' if hasattr(chain, 'nLHEScaleSumw_'+sam_j) else ''
 
-                            LHEScaleSumw_ = getattr(chain, 'LHEScaleSumw_'+sam_j)
+                    if hasattr(chain, 'nLHEScaleSumw'+underscore+sam_j):
+                        if getattr(chain, 'nLHEScaleSumw'+underscore+sam_j)==expectedScaleWeights:
+
+                            LHEScaleSumw_ = getattr(chain, 'LHEScaleSumw'+underscore+sam_j)
                             
                             if not isinstance(LHEScaleSumw_, float):
 
-                                genWeight += getattr(chain, 'genEventSumw_'+sam_j)
+                                genWeight += getattr(chain, 'genEventSumw'+underscore+sam_j)
 
-                                for iqcd in range(expectedScaleWeights):                                                                                    qcdWeights[iqcd] += LHEScaleSumw_[iqcd]*getattr(chain, 'genEventSumw_'+sam_j)
+                                for iqcd in range(expectedScaleWeights):
+                                    qcdWeights[iqcd] += LHEScaleSumw_[iqcd]*getattr(chain, 'genEventSumw'+underscore+sam_j)
 
                                 qcdStatus = 3
 

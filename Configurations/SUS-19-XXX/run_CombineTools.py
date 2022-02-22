@@ -11,7 +11,7 @@ PWD     = os.getenv('PWD')
 CMSSW_v = PWD.split("CMSSW_")[1].split("/")[0]
 if(COMBINE is None): 
     COMBINE = PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'#'CMSSW_8_1_0/src/' # So ugly ... :p
-    if os.path.isdir(COMBINE) is False: COMBINE=PWD.split('CMSSW_')[0]+'CMSSW_8_1_0/src/'
+    #if os.path.isdir(COMBINE) is False: COMBINE=PWD.split('CMSSW_')[0]+'CMSSW_8_1_0/src/'
  
 #if(type(PWD) is None): PWD = " "
 
@@ -97,9 +97,8 @@ if __name__ == '__main__':
     samples   = {}
     cuts      = {}
     if (isSamsF):  exec(open(opt.samplesFile).read())
+    if (isCutsF):  exec(open(opt.cutsFile).read())
     if (isVarsF):  exec(open(opt.variablesFile).read())
-    if (isCutsF):  exec(open(opt.cutsFile).read())
-    if (isCutsF):  exec(open(opt.cutsFile).read())
     if (isSignF):  exec(open(opt.signalMPcfg).read())
     
     opt.tag = opt.tag.replace(opt.years, '')
@@ -134,6 +133,7 @@ if __name__ == '__main__':
                         print "Folder for ", cut, "Does not exist"
                         continue
                     for variable in variables:
+                        if 'cuts' in variables[variable] and cut not in variables[variable]['cuts']: continue
                         thisDC      = cutLoc+'/'+variable+"/datacard.txt"
                         tagDC       = cut #Could be changed to more complex in the future
                         dirDC      += tagDC+year+'='+thisDC+' '

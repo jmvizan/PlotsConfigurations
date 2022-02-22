@@ -15,49 +15,70 @@ SUS19 = dname
 
 if __name__ == '__main__':
     doDC=False
-    if len(sys.argv)<4:
+    args=sys.argv
+    if len(args)<4:
         print 'Please, specify year, tag and sigset values, in that order'
         sys.exit()
 
-    if sys.argv[1]=='-1':
+    if args[1]=='-1':
         yearset='2016-2017-2018'
-    elif sys.argv[1]=='0':
+    elif args[1]=='0':
         yearset='2016'
-    elif sys.argv[1]=='1':
+    elif args[1]=='1':
         yearset='2017'
-    elif sys.argv[1]=='2':
+    elif args[1]=='2':
         yearset='2018'
     else:
-        yearset=sys.argv[1]
+        yearset=args[1]
 
-    if   sys.argv[2]== '0':
+    if   args[2]== '0':
         tag='Preselection'
-    elif sys.argv[2]== '1':
+    elif args[2]== '1':
         tag='ValidationRegions'
-    elif sys.argv[2]=='2':
+    elif args[2]=='2':
         tag='StopSignalRegions'
     else:
-        tag=sys.argv[2]
+        tag=args[2]
 
-    #    tag=sys.argv[2]
+    #    tag=args[2]
 
-    sigset=sys.argv[3]
+    sigset    = args[3]
+    signm     = sigset.split('_')[0]
+    fileset   = sigset
+    allMP     = False
+    doDCopts  = ["dodatacards","dodc", "mkdc","makedatacards"]
 
-    dcIdx = 4
+    doDC      = ' '
+    argfloc   = 0
+    limrun    = ' '
+
+    print "before the loop"
+    for arg in args[4:]:
+        print "args", arg, sigset.split('_')[0]
+        if arg.lower() in doDCopts : doDC    = True
+        if signm       in arg      : fileset = arg
+        if "limrun=" in arg.lower():
+            limrun = arg.split("limrun=")[1].split(' ')[0]
+            print "this is limrun", limrun
+
+
+
+    #dcIdx = 4
+    '''
     if len(sys.argv)>=5:
         if os.getenv('USER') in sys.argv[4]:
             SUS19 = sys.argv[4]
             dcIdx = 5
-                                         
+    dcnms=  ["dodatacards","dodc","mkdc","makedatacards"]
     if len(sys.argv)==dcIdx+1:
-        if(sys.argv[dcIdx].lower()in ["dodatacards","dodc","mkdc","makedatacards"]):
+        if(sys.argv[dcIdx].lower()in dcnms):
             doDC=True
             fileset=sigset
         else:
             fileset=sys.argv[dcIdx]
     elif len(sys.argv)==dcIdx+2:
         fileset=sys.argv[dcIdx] 
-        if(sys.argv[dcIdx+1].lower()in ["dodatacards","dodc", "mkdc","makedatacards"]):
+        if(sys.argv[dcIdx+1].lower()in dcnms):
             doDC=True
     else:
         fileset=sigset
@@ -65,7 +86,10 @@ if __name__ == '__main__':
     if 'SM-' not in fileset:
         fileset = 'SM-' + fileset
     #print sys.argv[4].lower()
+    '''
     opts= "--years="+yearset+" --tag="+tag+" --sigset="+sigset 
+    if len(limrun)>1: opts+=" --limrun="+limrun
+    print "opts", opts
     cmdDatacards =' '
     if(doDC is True):    cmdDatacards += './run_mkDatacards.py '+yearset+' '+tag+ ' '+ sigset+' '+ fileset + ' ;'
     name='python run_CombineTools.py'

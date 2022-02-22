@@ -7,7 +7,8 @@ import LatinoAnalysis.Gardener.hwwtools as hwwtools
 
 PWD     = os.getenv('PWD')
 CMSSW_v = 'CMSSW_'+PWD.split('CMSSW_')[1].split('/')[0]
-COMBINE = PWD.split('CMSSW_')[0]+CMSSW_v
+#COMBINE = PWD.split('CMSSW_')[0]+CMSSW_v
+COMBINE = PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
 if os.path.isdir(COMBINE) is False: COMBINE=PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
 
 if __name__ == '__main__':
@@ -41,39 +42,41 @@ if __name__ == '__main__':
         yearset='2018'
     else:
         yearset=opt.years
-    print "so these are the years", yearset
-    opt.sigset = opt.masspoint
+
+    opt.sigset = 'SM'#opt.masspoint # TODO: put back when EOY is over
 
     if 'SM-' not in opt.fileset:
         opt.fileset = 'SM-' + opt.fileset
     
     print "enter"
     if not opt.nododatacards:
-        print "why dont you enter"
-        os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset)
-
+        os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset) # TODO: put back when EOY is over
+        #os.system('mkdir -p ./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint)
+        #os.system('mkDatacards.py --pycfg=configuration.py --tag='+yearset+opt.tag+' --sigset=SM --outputDirDatacard=./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint+' --inputFile=./Shapes/'+yearset+'/'+opt.tag+'/plots_'+opt.tag+'_SM.root')
+ 
     tag = opt.tag
     opt.tag = yearset.split('-')[0] + opt.tag
 
     samples = { }
-    variables = { }
     cuts = { }
-    opt.sigset = "SM-WJetsToLNu"
+    variables = { }
+
     exec(open(opt.samplesFile).read())
-    exec(open(opt.variablesFile).read())
     exec(open(opt.cutsFile).read())
-    opt.sigset = opt.masspoint
+    exec(open(opt.variablesFile).read())
+
     maxFitCommand = 'cd '+opt.combineLocation+' ;  eval `scramv1 runtime -sh` ; cd - ; combineCards.py '
 
     for year in yearset.split('-'):
         for cut in cuts:
             for variable in variables:
-                datacardName = PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+tag+'/'+opt.masspoint+'/'+cut+'/'+variable+'/datacard.txt'
-                if os.path.isfile(datacardName):
-                    maxFitCommand += cut+'_'+year+'='+datacardName + ' ' 
-                else:
-                   print 'Missing datacard:', datacardName 
-                   exit()
+                if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+                    datacardName = PWD+'/'+opt.outputDirDatacard+'/'+year+'/'+tag+'/'+opt.masspoint+'/'+cut+'/'+variable+'/datacard.txt'
+                    if os.path.isfile(datacardName):
+                        maxFitCommand += cut+'_'+year+'='+datacardName + ' ' # Here we are assuming one variable for cut!
+                    else:
+                       print 'Missing datacard:', datacardName 
+                       exit()
 
     outputDir = PWD+'/'+opt.outputDirMaxFit+'/'+yearset+'/'+tag+'/'+opt.masspoint+'/'    
     os.system('mkdir -p '+outputDir)

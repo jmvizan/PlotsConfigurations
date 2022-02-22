@@ -30,14 +30,15 @@ def writetolog(filename,line):
 
 #Function to create sub file                                                              
 def makeSubFile(filename,folder,sigset,arguments,flavour):
-    f = open(filename,"w+")
-    jobsent= '$('+sigset+')'
+    f       = open(filename,"w+")
+    jobsent = '$('+sigset+')'
+    year    = arguments.split(' ')[0]
     #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
-    f.write("output                = "+folder+"/"+jobsent+".$(ClusterId).out\n")
-    f.write("error                 = "+folder+"/"+jobsent+".$(ClusterId).err\n")
-    f.write("log                   = "+folder+"/"+jobsent+".$(ClusterId).log\n")
+    f.write("output                = "+folder+"/"+jobsent+year+".$(ClusterId).out\n")
+    f.write("error                 = "+folder+"/"+jobsent+year+".$(ClusterId).err\n")
+    f.write("log                   = "+folder+"/"+jobsent+year+".$(ClusterId).log\n")
     #f.write("+JobFlavour           = nextweek\n")
     f.write("+JobFlavour           = "+flavour+"\n")
     #f.write("+JobFlavour           = testmatch\n")
@@ -78,7 +79,7 @@ elif args[2] =='2':
     tag ='StopSignalRegions'                                                        
 else:                                                                              
     tag = args[2]
- 
+nMPs = 1 
 sigset    = args[3]
 signm     = sigset.split('_')[0]
 fileset   = sigset
@@ -91,14 +92,15 @@ flavopts  = {"0" : "espresso", "1" : "microcentury", "2" : "longlunch",
  
 doDC      = ' '
 argfloc   = 0
+limrun    = ' '
 print "before the loop"
 for arg in args[4:]:
-    print arg, sigset.split('_')[0]
+    print "args", arg, sigset.split('_')[0]
     if arg.lower() in doDCopts : doDC    = arg
     if arg.lower() in allMPopts: allMP   = True
     if signm       in arg      : fileset = arg
     if "nmp=" in arg.lower():
-        nMPi= arg.split("=")[1]
+        nMPi= arg.split("nmp=")[1].split(' ')[0]
         if nMPi.isdigit():
             nMPs = nMPi
             print "JOBS SPLIT EACH "+nMPi+" MASSPOINTS"
@@ -106,7 +108,7 @@ for arg in args[4:]:
             print "MASSPOINT NUMBER NOT VALID"
             exit()
     if "fl=" in arg.lower():
-        flvi=arg.split("=")[1]
+        flvi=arg.split("fl=")[1].split(' ')[0]
         print "FLVI", flvi
         if   flvi in flavopts:
             flavour = "\"" + flavopts[flvi] + "\""
@@ -115,7 +117,9 @@ for arg in args[4:]:
         else:
             print "flavour not recognised"
             exit()
-
+    if "limrun=" in arg.lower():
+        limrun = 'limrun='+arg.split("limrun=")[1].split(' ')[0]
+        print "this is limrun", limrun
 
 
 '''
@@ -145,7 +149,7 @@ if "nmp=" in args[len(args)-1].lower():
     if nMPi.isdigit():
         nMPs = nMPi
         print "JOBS SPLIT EACH "+nMPi+" MASSPOINTS"
-    else: 
+    else : 
         print "MASSPOINT NUMBER NOT VALID"
         exit()
 flloc=len(args)-1
@@ -192,10 +196,11 @@ missDC       = []
 
             
 for model in signalMassPoints:
-    print "Model:", model,"\tSignal set", sigset
+    print "Model:", model,"\tSignal set", sigset, bool(model in sigset)
     if model not in sigset:  continue
+    #print signalMassPoints[model]
     for massPoint in signalMassPoints[model]:
-        if(massPointInSignalSet(massPoint,sigset)):
+        if(massPointInSignalSet(massPoint,sigset.replace('EOY',''))):
 
             submitThis = True
 	    rootname   = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_Blind.AsymptoticLimits.mH120.root'
@@ -254,7 +259,7 @@ if len(missDCfolder) > 0 or len(missDC) > 0 or len(emptyDC) > 0:
     exit()
 
 
-#Make a more human-readable logfile if necessary
+#Make a more human-readable logfile in case its useful later
 sigsets     = sigset.split(',')
 firstsigset = sigsets[0].split('_')
 writesigset = firstsigset    
@@ -305,7 +310,7 @@ gridui   = False
 
 if 'gpfs' in PWD: 
     gridui  = True
-    gridfol = 'Limits/Jobs/'+fileset+'/'
+    gridfol = 'Limits/Jobs/'+fileset+'/'+year+'/'
     os.system('mkdir -p '+gridfol) 
 for ijob,job in enumerate(jobs):
     argsigset = ",".join(job)
@@ -313,8 +318,8 @@ for ijob,job in enumerate(jobs):
     #    submit="condor_submit "+subfilename+" >>"+logfile
     
     if gridui is True:
-        arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)
-        gridnm    = gridfol+argsigset
+        arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)+' '+limrun
+        gridnm    = gridfol+argsigset+'_limrun-'+limrun.split('=')[-1]
         gridcomm  = 'sbatch -o '+gridnm+'.out -e '+gridnm+'.err --qos=cms_high --partition=cloudcms '+gridnm+'.sh>'+gridnm+'.jid'
         f2 = open(gridnm+".sh","w+")
         f2.write("#!/bin/bash")

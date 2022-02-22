@@ -438,7 +438,7 @@ def fillEmptyBins(sigset, histo):
                 massX = histo.GetXaxis().GetBinCenter(xb)
                 for yb in range(1, histo.GetNbinsY()+1):
                     massY = histo.GetYaxis().GetBinCenter(yb)
-                    if massX-massY>7. and histo.GetBinContent(xb, yb)==0.:
+                    if massX-massY>7. and massY>=0. and histo.GetBinContent(xb, yb)==0.:
 
                         if iter==0:
                             stepY = 25 if massX-massY>=100. else 10
@@ -458,7 +458,7 @@ def fillEmptyBins(sigset, histo):
                                 yi = histo.GetYaxis().FindBin(25*int((massY-offDiagonal)/25)) + (xb-1)%5
                                 histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xb, yi, xb, yi+5))
                                 
-                        elif iter==2 and massX-massY>=100. and yb<=4:
+                        elif iter==2 and massX-massY>=100. and yb<=5:
                             massXref = 25*int(massX/25)
                             offDiagonal = massY - 25*int(massY/25)
                             xi = histo.GetXaxis().FindBin(massXref+offDiagonal)
@@ -467,10 +467,16 @@ def fillEmptyBins(sigset, histo):
                                 print '-->', massX, massY, xi, xf
                             histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xi, yb, xf, yb))
 
-                        elif iter==3 and massX-massY>=100. and yb<=4 and xb>histo.GetNbinsX()-5: # Far away corner, not much important
+                        elif iter==3 and massX-massY>=100. and yb<=5 and xb>histo.GetNbinsX()-5: # Far away corner, not much important
                             limitR = histo.SetBinContent(xb-1, yb)
                             limitS = histo.SetBinContent(xb, yb+5)/histo.SetBinContent(xb-1, yb+5)
                             histo.SetBinContent(xb, yb, limitR*limitS)
+
+        # Fill massY<0 bins
+        for yb in range(1, histo.GetNbinsY()+1):
+            if histo.GetYaxis().GetBinCenter(yb)<0.:
+                for xb in range(1, histo.GetNbinsX()+1):
+                    histo.SetBinContent(xb, yb, 0.9)
 
     elif 'TSlepSlep' in sigset:
 
@@ -660,7 +666,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
                                'TChipmSlepSnu' : { 'X' : { 'binWidth' : 25., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{#pm}_{1}} [GeV]' },
                                                    'Y' : { 'binWidth' : 25., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'   } },
                                'TChipmWW' : { 'X' : { 'binWidth' : 5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{#pm}_{1}} [GeV]' },
-                                              'Y' : { 'binWidth' : 5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'   } },
+                                              'Y' : { 'binWidth' : 5., 'minCenter' : 1.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'   } },
                                'TSlepSlep' : { 'X' : { 'binWidth' :  5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #font[12]{l}_{L,R}} [GeV]' },
                                                'Y' : { 'binWidth' :  5., 'minCenter' : 0.5,  'maxCenter' : 0.5, 'label' : 'M_{#tilde #Chi^{0}_{1}} [GeV]'       } }, 
                                # ...
@@ -688,6 +694,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
 
                 if massPointInSignalSet(massPoint, sigset): 
                     inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
+                    #inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption.replace('Observed','Both') + '.AsymptoticLimits.mH120.root'
                     inputFile = ROOT.TFile(inputFileName, 'READ')
                 
                     inputTree = inputFile.Get('limit')
@@ -830,7 +837,9 @@ def getMassScanContour(outputFileName, histo):
     graph.GetHistogram()
 
     outputContours = [ ] 
-    
+
+    gotContour = False    
+
     if graph.GetHistogram().GetMinimum()<1.:
  
         contourList = graph.GetContourList(1.);
@@ -842,8 +851,9 @@ def getMassScanContour(outputFileName, histo):
                 contour.SetName(histo.GetName().replace('histo' , 'graph'))
                 outputContours.append(contour)
                 maxPoints =  contour.GetN() 
+                gotContour = True
 
-    else:
+    if not gotContour:
 
         x, y = array( 'd' ), array( 'd' )
         x.append(1.); y.append(1.)
@@ -1048,7 +1058,7 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
 
     limitType = 'blind' if (limitOption=='Blind') else 'expected' 
     inputFileName = 'Limits/' + year + '/' + tag + '//massScan_' + tag + '_' + sigset + '_' + limitOptions[1] + '.root'
-    print "input file name", inputFileName
+
     lumi = 0.
     if '2016' in year:
         lumi += 35.92
@@ -1068,7 +1078,7 @@ def makeExclusionPlot(year, tag, sigset, limitOptions):
     outputDirectory = 'Plots/' + year + '/ExclusionPlots/'
     os.system('mkdir -p ' + outputDirectory)
     os.system('cp Plots/index.php ' + outputDirectory)
-    workingDirectory = 'cd ../../../../../CMSSW_8_1_0/src; eval `scramv1 runtime -sh`; cd - ;'
+    workingDirectory = 'cd ../../../../../CMSSW_10_6_20/src; eval `scramv1 runtime -sh`; cd - ;'
     os.system(workingDirectory + 'python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg ' + outputDirectory + cfgFileName) 
     os.system('rm Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg')
 
