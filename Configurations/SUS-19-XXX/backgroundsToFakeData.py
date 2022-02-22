@@ -90,4 +90,8 @@ if __name__ == '__main__':
                 outfile.cd()
             print "\nFinal Root file in", folder+outfilenm
             newplace = folder.replace(rmtag,'') + outfilenm.replace(rmtag,'')
-            print "Moving stuff to "+ newplace
+            print "Moving root file to "+ newplace
+            confirm()
+            os.system('rm '+newplace+outfilenm)
+            os.system('cp '+folder+outfilenm+' '+newplace)
+            print "check it works!" 

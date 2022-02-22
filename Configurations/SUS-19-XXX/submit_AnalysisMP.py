@@ -30,14 +30,15 @@ def writetolog(filename,line):
 
 #Function to create sub file                                                              
 def makeSubFile(filename,folder,sigset,arguments,flavour):
-    f = open(filename,"w+")
-    jobsent= '$('+sigset+')'
+    f       = open(filename,"w+")
+    jobsent = '$('+sigset+')'
+    year    = arguments.split(' ')[0]
     #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
-    f.write("output                = "+folder+"/"+jobsent+".$(ClusterId).out\n")
-    f.write("error                 = "+folder+"/"+jobsent+".$(ClusterId).err\n")
-    f.write("log                   = "+folder+"/"+jobsent+".$(ClusterId).log\n")
+    f.write("output                = "+folder+"/"+jobsent+year+".$(ClusterId).out\n")
+    f.write("error                 = "+folder+"/"+jobsent+year+".$(ClusterId).err\n")
+    f.write("log                   = "+folder+"/"+jobsent+year+".$(ClusterId).log\n")
     #f.write("+JobFlavour           = nextweek\n")
     f.write("+JobFlavour           = "+flavour+"\n")
     #f.write("+JobFlavour           = testmatch\n")
@@ -309,7 +310,7 @@ gridui   = False
 
 if 'gpfs' in PWD: 
     gridui  = True
-    gridfol = 'Limits/Jobs/'+fileset+'/'
+    gridfol = 'Limits/Jobs/'+fileset+'/'+year+'/'
     os.system('mkdir -p '+gridfol) 
 for ijob,job in enumerate(jobs):
     argsigset = ",".join(job)
@@ -318,7 +319,7 @@ for ijob,job in enumerate(jobs):
     
     if gridui is True:
         arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)+' '+limrun
-        gridnm    = gridfol+argsigset
+        gridnm    = gridfol+argsigset+'_limrun-'+limrun.split('=')[-1]
         gridcomm  = 'sbatch -o '+gridnm+'.out -e '+gridnm+'.err --qos=cms_high --partition=cloudcms '+gridnm+'.sh>'+gridnm+'.jid'
         f2 = open(gridnm+".sh","w+")
         f2.write("#!/bin/bash")

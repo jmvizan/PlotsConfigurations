@@ -1,3 +1,4 @@
+
 import os
 import subprocess
 import math
@@ -72,20 +73,12 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
-<<<<<<< HEAD
-    '''
-    if '2016' not in yeartag:
-        print 'nanoAODv9 trees for', yeartag, 'not available yet on cern, IGNORE ME FOR NOW, GOSH SAKE'
-=======
     if not skipTreesCheck:
         print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
->>>>>>> upstream/worker
         if not hasattr(opt, 'doHadd') or opt.doHadd:
             skipTreesCheck = True
         else:
-            1==1
-            #exit()
-    '''
+            exit()
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'

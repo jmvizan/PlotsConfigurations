@@ -42,48 +42,29 @@ if __name__ == '__main__':
         yearset='2018'
     else:
         yearset=opt.years
-<<<<<<< HEAD
-    print "so these are the years", yearset
-    opt.sigset = opt.masspoint
-=======
 
     opt.sigset = 'SM'#opt.masspoint # TODO: put back when EOY is over
->>>>>>> upstream/worker
 
     if 'SM-' not in opt.fileset:
         opt.fileset = 'SM-' + opt.fileset
     
     print "enter"
     if not opt.nododatacards:
-<<<<<<< HEAD
-        print "why dont you enter"
-        os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset)
-
-=======
         os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset) # TODO: put back when EOY is over
         #os.system('mkdir -p ./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint)
         #os.system('mkDatacards.py --pycfg=configuration.py --tag='+yearset+opt.tag+' --sigset=SM --outputDirDatacard=./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint+' --inputFile=./Shapes/'+yearset+'/'+opt.tag+'/plots_'+opt.tag+'_SM.root')
  
->>>>>>> upstream/worker
     tag = opt.tag
     opt.tag = yearset.split('-')[0] + opt.tag
 
     samples = { }
     cuts = { }
-<<<<<<< HEAD
-    opt.sigset = "SM-WJetsToLNu"
-=======
     variables = { }
 
->>>>>>> upstream/worker
     exec(open(opt.samplesFile).read())
     exec(open(opt.cutsFile).read())
-<<<<<<< HEAD
-    opt.sigset = opt.masspoint
-=======
     exec(open(opt.variablesFile).read())
 
->>>>>>> upstream/worker
     maxFitCommand = 'cd '+opt.combineLocation+' ;  eval `scramv1 runtime -sh` ; cd - ; combineCards.py '
 
     for year in yearset.split('-'):
