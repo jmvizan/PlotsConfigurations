@@ -62,11 +62,13 @@ PLOTDIR=./Plots/$YEAR/$TAG
 if [[ $SIGSET != 'SM' ]]; then
     PLOTDIR=./Plots/$YEAR/${TAG}/$SIGSET
 fi
-mkdir -p $PLOTDIR
 
-cp ./Plots/index.php ./Plots/$YEAR/
-cp ./Plots/index.php ./Plots/$YEAR/${TAG}/
-cp ./Plots/index.php $PLOTDIR/
+if [[ $NORM != *'PreFit'* ]] && [[ $NORM != *'PostFit'* ]]; then
+    mkdir -p $PLOTDIR
+    cp ./Plots/index.php ./Plots/$YEAR/
+    cp ./Plots/index.php ./Plots/$YEAR/${TAG}/
+    cp ./Plots/index.php $PLOTDIR/
+fi
 
 NUISANCES=nuisances.py
 if [[ $NORM == *'PreFit'* ]] || [[ $NORM == *'PostFit'* ]]; then
@@ -89,13 +91,13 @@ if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
             YEARLIST+=( $YEAR )
         fi
         for FITYEAR in "${YEARLIST[@]}"; do
-            PLOTDIR=./Plots/$YEAR/$NORM$TAG
+            PLOTDIR=./Plots/$YEAR/$NORM$TAG/$SIGSET
             CLEANDIR=$PLOTDIR
             mkdir -p $PLOTDIR
             cp ./Plots/index.php $PLOTDIR/
             if [[ $YEAR == *'-'* ]]; then
-                PLOTDIR=./Plots/$YEAR/$NORM$TAG/$FITYEAR
-                CLEANDIR=./Plots/$YEAR/$NORM$TAG/*/
+                PLOTDIR=./Plots/$YEAR/$NORM$TAG/$SIGSET/$FITYEAR
+                CLEANDIR=./Plots/$YEAR/$NORM$TAG/$SIGSET/*/
                 mkdir -p $PLOTDIR
                 cp ./Plots/index.php $PLOTDIR/
             fi
