@@ -931,11 +931,6 @@ for sample in samples:
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 8eb6e3f610f4afafc88f360e059f8177957efe14
-#samples['EOYWJets']['isSignal']  = 1
 ### Data
 
 if 'SM' in opt.sigset or 'Data' in opt.sigset:

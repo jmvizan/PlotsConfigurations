@@ -36,9 +36,9 @@ def makeSubFile(filename,folder,sigset,arguments,flavour):
     #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
-    f.write("output                = "+folder+"/"+jobsent+year+".$(ClusterId).out\n")
-    f.write("error                 = "+folder+"/"+jobsent+year+".$(ClusterId).err\n")
-    f.write("log                   = "+folder+"/"+jobsent+year+".$(ClusterId).log\n")
+    f.write("output                = "+folder+"/"+jobsent+".$(ClusterId).out\n")
+    f.write("error                 = "+folder+"/"+jobsent+".$(ClusterId).err\n")
+    f.write("log                   = "+folder+"/"+jobsent+".$(ClusterId).log\n")
     #f.write("+JobFlavour           = nextweek\n")
     f.write("+JobFlavour           = "+flavour+"\n")
     #f.write("+JobFlavour           = testmatch\n")

@@ -91,6 +91,7 @@ if __name__ == '__main__':
     if len(limrun)>1: opts+=" --limrun="+limrun
     print "opts", opts
     cmdDatacards =' '
+    print "i get to here", os.getcwd()
     if(doDC is True):    cmdDatacards += './run_mkDatacards.py '+yearset+' '+tag+ ' '+ sigset+' '+ fileset + ' ;'
     name='python run_CombineTools.py'
     command= ' '+name+' '+opts
