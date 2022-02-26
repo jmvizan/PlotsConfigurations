@@ -33,12 +33,13 @@ def makeSubFile(filename,folder,sigset,arguments,flavour):
     f       = open(filename,"w+")
     jobsent = '$('+sigset+')'
     year    = arguments.split(' ')[0]
+    limrun  = 'limrun-'arguments.split('limrun')[-1]
     #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
-    f.write("output                = "+folder+"/"+jobsent+year+".$(ClusterId).out\n")
-    f.write("error                 = "+folder+"/"+jobsent+year+".$(ClusterId).err\n")
-    f.write("log                   = "+folder+"/"+jobsent+year+".$(ClusterId).log\n")
+    f.write("output                = "+folder+"/"+jobsent+year+limrun+"-$(ClusterId).out\n")
+    f.write("error                 = "+folder+"/"+jobsent+year+limrun+"-$(ClusterId).err\n")
+    f.write("log                   = "+folder+"/"+jobsent+year+limrun+"-$(ClusterId).log\n")
     #f.write("+JobFlavour           = nextweek\n")
     f.write("+JobFlavour           = "+flavour+"\n")
     #f.write("+JobFlavour           = testmatch\n")
@@ -92,7 +93,7 @@ flavopts  = {"0" : "espresso", "1" : "microcentury", "2" : "longlunch",
  
 doDC      = ' '
 argfloc   = 0
-limrun    = ' '
+limrun    = 'Blind'
 print "before the loop"
 for arg in args[4:]:
     print "args", arg, sigset.split('_')[0]
@@ -298,17 +299,21 @@ flistname   = jobfolder+'/joblist.txt'
 
 
 os.system("mkdir -p "+jobfolder)
+
+jobs      = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
+flist     = open(flistname,"w+")
+gridui    = False
+arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)+' '+limrun
+
 logtitle(logfile,fileset)
-logline  =   "Input arguments:\t"+ year + ' ' + tag + ' ' + fileset + ' ' + doDC
-logline += "\nSample list    :\t" + flistname
-logline += "\nSubmission file:\t"+ subfilename
+logline   =   "Input arguments:\t" + arguments
+logline  += "\nSample list    :\t" + flistname
+logline  += "\nSubmission file:\t" + subfilename
 writetolog(logfile, logline)
 
-jobs     = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
-flist    = open(flistname,"w+")
-gridui   = False
-
+print PWD
 if 'gpfs' in PWD: 
+    print "Inside Gridui"
     gridui  = True
     gridfol = 'Limits/Jobs/'+fileset+'/'+year+'/'
     os.system('mkdir -p '+gridfol) 
@@ -318,7 +323,6 @@ for ijob,job in enumerate(jobs):
     #    submit="condor_submit "+subfilename+" >>"+logfile
     
     if gridui is True:
-        arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)+' '+limrun
         gridnm    = gridfol+argsigset+'_limrun-'+limrun.split('=')[-1]
         gridcomm  = 'sbatch -o '+gridnm+'.out -e '+gridnm+'.err --qos=cms_high --partition=cloudcms '+gridnm+'.sh>'+gridnm+'.jid'
         f2 = open(gridnm+".sh","w+")
@@ -327,16 +331,15 @@ for ijob,job in enumerate(jobs):
         f2.close()
         os.system(gridcomm)
         #print gridcomm
-    print "sending job",str(ijob)+":", argsigset# arguments  
+        print "sending job",str(ijob)+":", argsigset# arguments  
 flist.close()
 
 
-print PWD
 #exit()
 if 'cern.ch' in PWD: 
+    print "Inside lxplus"
     jobsent      = 'MPs'#Works since files MPs are already in joblist.txt
     argsent      = '$('+jobsent+')'
-    arguments    = year+' '+tag+' '+argsent+ ' ' +PWD+' '+fileset+' '+str(doDC)
     commandtorun = "condor_submit "+subfilename+">>"+logfile
     makeSubFile(subfilename,jobfolder,jobsent, arguments, flavour)
     os.system(commandtorun)
