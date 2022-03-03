@@ -498,7 +498,7 @@ SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeight['Lep']['
 
 normBackgrounds = {}
 
-if 'WWSF' in opt.tag:
+if 'WWSF' in opt.tag and "PseudoData" not in opt.tag:
     if '2016HIPM' in opt.tag:
         normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.142' : '0.191' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
     elif '2016noHIPM' in opt.tag:

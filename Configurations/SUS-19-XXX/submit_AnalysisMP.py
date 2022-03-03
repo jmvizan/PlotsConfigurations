@@ -33,13 +33,13 @@ def makeSubFile(filename,folder,sigset,arguments,flavour):
     f       = open(filename,"w+")
     jobsent = '$('+sigset+')'
     year    = arguments.split(' ')[0]
-    limrun  = 'limrun-'arguments.split('limrun')[-1]
+    limrun  = 'limrun-'+arguments.split('limrun=')[-1]
     #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
     f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
     f.write("arguments             = "+arguments+"\n")
-    f.write("output                = "+folder+"/"+jobsent+year+limrun+"-$(ClusterId).out\n")
-    f.write("error                 = "+folder+"/"+jobsent+year+limrun+"-$(ClusterId).err\n")
-    f.write("log                   = "+folder+"/"+jobsent+year+limrun+"-$(ClusterId).log\n")
+    f.write("output                = "+folder+"/"+jobsent+limrun+"-$(ClusterId).out\n")
+    f.write("error                 = "+folder+"/"+jobsent+limrun+"-$(ClusterId).err\n")
+    f.write("log                   = "+folder+"/"+jobsent+limrun+"-$(ClusterId).log\n")
     #f.write("+JobFlavour           = nextweek\n")
     f.write("+JobFlavour           = "+flavour+"\n")
     #f.write("+JobFlavour           = testmatch\n")
@@ -300,15 +300,15 @@ flistname   = jobfolder+'/joblist.txt'
 
 os.system("mkdir -p "+jobfolder)
 
-jobs      = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
-flist     = open(flistname,"w+")
-gridui    = False
-arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)+' '+limrun
+jobs     = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
+flist    = open(flistname,"w+")
+gridui   = False
+
 
 logtitle(logfile,fileset)
-logline   =   "Input arguments:\t" + arguments
-logline  += "\nSample list    :\t" + flistname
-logline  += "\nSubmission file:\t" + subfilename
+logline  =   "Input arguments:\t" + year+' '+tag+' '+PWD+' '+fileset+' '+str(doDC)+' '+limrun
+logline += "\nSample list    :\t" + flistname
+logline += "\nSubmission file:\t" + subfilename
 writetolog(logfile, logline)
 
 print PWD
@@ -319,6 +319,7 @@ if 'gpfs' in PWD:
     os.system('mkdir -p '+gridfol) 
 for ijob,job in enumerate(jobs):
     argsigset = ",".join(job)
+    arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)+' '+limrun
     flist.write(argsigset+'\n')
     #    submit="condor_submit "+subfilename+" >>"+logfile
     
@@ -340,6 +341,7 @@ if 'cern.ch' in PWD:
     print "Inside lxplus"
     jobsent      = 'MPs'#Works since files MPs are already in joblist.txt
     argsent      = '$('+jobsent+')'
+    arguments    = year+' '+tag+' '+argsent+' '+PWD+' '+fileset+' '+str(doDC)+' '+limrun
     commandtorun = "condor_submit "+subfilename+">>"+logfile
     makeSubFile(subfilename,jobfolder,jobsent, arguments, flavour)
     os.system(commandtorun)
