@@ -473,12 +473,27 @@ if hasattr(opt, 'outputDirDatacard'):
 ### Cleaning 
 
 nuisanceToRemove = [ ]
+
 for nuisance in nuisances:
+
     if 'cuts' in nuisances[nuisance]:
         if len(nuisances[nuisance]['cuts'])==0:
             nuisanceToRemove.append(nuisance)
+
     if nuisance!='stat' and nuisance not in nuisanceToRemove and 'samples' in nuisances[nuisance]:
         if len(nuisances[nuisance]['samples'])==0:
+            nuisanceToRemove.append(nuisance)
+
+    if '_noTreeNuisances' in opt.tag:
+        if nuisance not in nuisanceToRemove and 'kind' in nuisances[nuisance] and nuisances[nuisance]['kind']=='tree':
+            nuisanceToRemove.append(nuisance)
+
+    if '_noShapeNuisances' in opt.tag:
+        if nuisance not in nuisanceToRemove and 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='shape':
+            nuisanceToRemove.append(nuisance)
+
+    if '_nolnNNuisances' in opt.tag:
+        if nuisance not in nuisanceToRemove and 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='lnN':
             nuisanceToRemove.append(nuisance)
 
 for nuisance in nuisanceToRemove:
