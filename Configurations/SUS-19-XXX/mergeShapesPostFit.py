@@ -173,11 +173,18 @@ if __name__ == '__main__':
             for shape in shapeList:
 
                 for year in years.split('-'):
+<<<<<<< HEAD
                     print bool(shape not in shapes['cuts'][cut]), shape, shapes['cuts'][cut].keys()
                     if shape not in shapes['cuts'][cut]: shapes['cuts'][cut][shape] = shapes['cuts'][cut+'_'+year][shape]
                     else:
                         print bool( cut+year in shapes['cuts'].keys()), shapes['cuts'][cut+'_'+year].keys()
                         shapes['cuts'][cut][shape].Add(shapes['cuts'][cut+'_'+year][shape])
+=======
+                    if shape in shapes['cuts'][cut+'_'+year]:
+                        if shape not in shapes['cuts'][cut]: shapes['cuts'][cut][shape] = shapes['cuts'][cut+'_'+year][shape]
+                        else:
+                            shapes['cuts'][cut][shape].Add(shapes['cuts'][cut+'_'+year][shape])
+>>>>>>> upstream/worker
 
                 if shape=='histo_total' or (shape=='histo_total_background' and opt.postFit=='PostFit'):
                     for ibin in range(1, shapes['cuts'][cut][shape].GetNbinsX()+1):
