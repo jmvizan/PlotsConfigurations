@@ -693,11 +693,11 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fillemptybins, output
             for massPoint in sorted(signalMassPoints[model]):
 
                 if massPointInSignalSet(massPoint, sigset): 
-                    inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
-                    #print "inputfilename at this point", inputFileName
-                    #inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption.replace('Observed','Both') + '.AsymptoticLimits.mH120.root'
+                    #inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
+                    inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption.replace('Observed','Both') + '.AsymptoticLimits.mH120.root'
                     inputFile = ROOT.TFile(inputFileName, 'READ')
-                
+                    #print "inputfilename at this point", inputFileName
+                    
                     inputTree = inputFile.Get('limit')
                     
                     if inputTree:
@@ -938,31 +938,40 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
             
         tagFile = ROOT.TFile(tagFileName, 'READ')
         print "limit options", limitOptions, tagFile.GetListOfKeys(), "name", tagFileName
-        for key in tagFile.GetListOfKeys():
-            obj = key.ReadObj()
-            print obj.GetName(), limitOptions, obj.ClassName()
-            if limitOptions[0].lower() in obj.GetName() or "both" in limitOptions[0].lower():
-                print "i got inside the keys", obj.GetName()
-                if obj.ClassName()=='TH2F':
-                    obj.SetDirectory(0)
-                    if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
-                        continue
-                else:
-                    if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
-                        obj.SetLineStyle(2)
-                tagObj.append(obj)
+        limOptions_i = [limitOptions[0]]
 
+        if opt.tag == opt.compareto: limOptions_i = limitOptions
+        
+        for limitOption_i in limOptions_i:
+            
+            for key in tagFile.GetListOfKeys():
+                obj = key.ReadObj()
+#                print bool(limitOption_i.lower() not in obj.GetName()), obj.GetName(), limitOption_i, limitOptions 
+                if limitOption_i.lower() in obj.GetName(): 
+                    if obj.ClassName()=='TH2F':
+                        obj.SetDirectory(0)
+                        if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
+                            continue
+                    else:
+                        if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
+                            obj.SetLineStyle(2)
+                    print "i got inside the keys", limitOption_i , obj.GetName()
+
+                    tagObj.append(obj)
+        print "these are the tag obj", tagObj
     # Draw comparison
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
 
     plotCanvas = ROOT.TCanvas( 'plotCanvas', '', 1200, 900)
     tagnm      = tags[0]
-    if len(tags[1])>0:
-        tagnm+='_vs_'+tags[1]  
+    limOptnm   = limitOptions[0]
+    if opt.tag == opt.compareto and len(tags[1])>0:  limOptnm +='_vs_'+limitOptions[1]
+    if len(tags[1])>0 and opt.tag != opt.compareto: tagnm+='_vs_'+tags[1]
+    
     print "tagnms", tagnm
     print "tagobj", tagObj
-    plotName  = tagnm + '_' + sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
+    plotName  = tagnm + '_' + sigset + '_' + limOptnm + '_' + plotOption+ '_'+ year + emptyBinsOption
     plotTitle = sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
     if tags[1]!='':
         plotName.replace(tags[0], tags[0] + '_to_' + tags[1]) 
@@ -980,22 +989,18 @@ def plotLimits(year, tags, sigset, limitOptions, plotOption, fillemptybins):
     if plotOption=='Histograms':
         legend = ROOT.TLegend(0.12,0.8,0.55,0.88);
         legend.SetMargin(0.01)
-        print " am i working", tagObj[0], tagObj[1], bool("expected" in tagObj[0].GetName()),bool("expected" in tagObj[1].GetName())
+        #print " am i working", tagObj[0], tagObj[1], bool("expected" in tagObj[0].GetName()),bool("expected" in tagObj[1].GetName())
         
         if tags[1]!='':
-            inum = 0
-            iden = 1
-            if tags[1].lower() in  tagObj[0].GetName():
-                inum = 1
-                iden = 0
-            if 'both' in limitOption.lower():
-                legend.AddEntry(tagObj[iden],"ratio "+tags[0]+" #frac{"+tagObj[inum].GetName().split('_')[-1]+"}{"+tagObj[iden].GetName().split('_')[-1]+"}", '')
+            if opt.tag == opt.compareto :
+                print "im doing this thingy"
+                legend.AddEntry(tagObj[1],"ratio "+tags[0]+" #frac{"+tagObj[0].GetName().split('_')[-1]+"}{"+tagObj[1].GetName().split('_')[-1]+"}", '')
             else:
-                legend.AddEntry(tagObj[iden],"ratio  #frac{"+tags[inum]+"}{"+tags[iden]+"}", '')
-            
-            tagObj[inum].Divide(tagObj[1])
-            tagObj[inum].SetMinimum(0.5)
-            tagObj[inum].SetMaximum(1.5)
+                legend.AddEntry(tagObj[1],"ratio  #frac{"+tags[0]+"}{"+tags[1]+"}", '')
+            print "i am doing this ratio", tagObj[0].GetName(), tagObj[1].GetName()
+            tagObj[0].Divide(tagObj[1])
+            tagObj[0].SetMinimum(0.5)
+            tagObj[0].SetMaximum(1.5)
         else:
             legend.AddEntry(tagObj[0],tags[0], '')
             tagObj[0].SetMinimum(0)
@@ -1110,7 +1115,7 @@ if __name__ == '__main__':
     parser.add_option('--nofillempties' , dest='noFillEmpties' , help='Do not fill empty bins'                      , default=False, action='store_true')
     parser.add_option('--makecontours'  , dest='makeContours'  , help='Make limit contours'                         , default=False, action='store_true')
     parser.add_option('--remakecontours', dest='reMakeContours', help='Remake limit contours'                       , default=False, action='store_true')
-    parser.add_option('--compareto'     , dest='compareTo'     , help='Reference tag used for comparison'           , default='')
+    parser.add_option('--compareto'     , dest='compareto'     , help='Reference tag used for comparison'           , default='')
     parser.add_option('--plotoption'    , dest='plotOption'    , help='-1 None, 0 Histograms, 1 Contours, 2 Final'  , default='-1')
     (opt, args) = parser.parse_args()
 
@@ -1150,18 +1155,26 @@ if __name__ == '__main__':
         plotOption = 'Final'
     else:
         plotOption = opt.plotOption
+    if opt.compareto.lower() == 'same':
+        opt.compareto = opt.tag
+    
+    skipCompareScan = False
+    if opt.tag == opt.compareto or len(opt.compareto)<1: skipCompareScan = True 
+    print "this is compareto", opt.compareto, type(opt.compareto), bool(opt.compareto)
     
     if not opt.noMakeHistos:
         exec(open(opt.signalMPcfg).read())
         makeMassScanHistograms(year, opt.tag,       opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
-        if 'both' not in limitOption.lower(): makeMassScanHistograms(year, opt.compareTo, opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
+        if not skipCompareScan: 
+            print "IM IN THE COMPARISON"
+            makeMassScanHistograms(year, opt.compareto, opt.sigset, limitOptions[1], fillEmpties, opt.reMakeHistos)
 
     if opt.makeContours or opt.reMakeContours:
         makeMassScanContours(year, opt.tag,       opt.sigset, limitOptions[1], opt.reMakeContours)
-        makeMassScanContours(year, opt.compareTo, opt.sigset, limitOptions[1], opt.reMakeContours)
+        if not skipCompareScan: makeMassScanContours(year, opt.compareto, opt.sigset, limitOptions[1], opt.reMakeContours)
 
     if plotOption=='Histograms' or plotOption=='Contours':
-        plotLimits(year, [ opt.tag, opt.compareTo ], opt.sigset, limitOptions, plotOption, fillEmpties) 
+        plotLimits(year, [ opt.tag, opt.compareto ], opt.sigset, limitOptions, plotOption, fillEmpties) 
 
     if plotOption=='Final':
         makeExclusionPlot(year, opt.tag, opt.sigset, limitOptions)

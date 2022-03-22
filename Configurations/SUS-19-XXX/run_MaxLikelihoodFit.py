@@ -4,13 +4,15 @@ import optparse
 import sys  
 import os
 import LatinoAnalysis.Gardener.hwwtools as hwwtools
-
+print "beginning of the file"
+cmsenv = ' eval `scramv1 runtime -sh` ;'
+os.system(cmsenv)
 PWD     = os.getenv('PWD')
 CMSSW_v = 'CMSSW_'+PWD.split('CMSSW_')[1].split('/')[0]
 #COMBINE = PWD.split('CMSSW_')[0]+CMSSW_v
 COMBINE = PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
 if os.path.isdir(COMBINE) is False: COMBINE=PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
-
+print "got all the inputs"
 if __name__ == '__main__':
 
     usage = 'usage: %prog [options]'
@@ -66,7 +68,7 @@ if __name__ == '__main__':
     exec(open(opt.variablesFile).read())
 
     maxFitCommand = 'cd '+opt.combineLocation+' ;  eval `scramv1 runtime -sh` ; cd - ; combineCards.py '
-
+    print "this is combine location", opt.combineLocation
     for year in yearset.split('-'):
         for cut in cuts:
             for variable in variables:

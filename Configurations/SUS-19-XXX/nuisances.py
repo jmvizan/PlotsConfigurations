@@ -347,7 +347,7 @@ for treeNuisance in treeNuisances:
             del nuisances[treeNuisance+'Sig']
 
 ### rate parameters
-if 'WWSF' in opt.tag:
+if 'WWSF' in opt.tag and "PseudoData" not in opt.tag:
     rateparameters = {
         'Topnorm' :  { 
             'samples' : [ 'ttbar', 'tW', 'STtW' ],

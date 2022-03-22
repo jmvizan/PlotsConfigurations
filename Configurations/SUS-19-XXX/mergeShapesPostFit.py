@@ -134,7 +134,8 @@ if __name__ == '__main__':
                         shapeName = 'data' if samples[sample]['isDATA'] else sample
                         inputShape = inputFile.Get(fitdir+'/'+cut+'/'+shapeName)
                         shapes['cuts'][cut][sample] = fillShape(inputShape, 'histo_'+shapeName.replace('data', 'DATA'), fitvariable)
-                   
+                        del inputShape
+                        
                     for shapeName in [ 'total_background', 'total', 'total_signal' ]:
                         
                         outputShapeName = shapeName if opt.postFit==fitkindToOpt[fitkind] else shapeName+fitkind          
@@ -143,6 +144,9 @@ if __name__ == '__main__':
                             shapes['cuts'][cut][shapeName+fitkind] = fillShape(inputShape, 'histo_'+outputShapeName, fitvariable)
                         elif opt.verbose:
                             warnMissingShape(fitdir+'/'+cut+'/'+shapeName)
+                        del inputShape
+                        print "is it this what's annoying me?", shapeName
+                        
 
             for shapeName in [ 'total_overall', 'total_signal', 'total_background', 'total_data', 'overall_total_covar' ]:
                 
@@ -151,19 +155,17 @@ if __name__ == '__main__':
                 if inputShape:
                     inputShape.SetName('histo_'+outputShapeName)
                     inputShape.SetTitle('histo_'+outputShapeName)
-                    shapes['overall'][shapeName+fitkind] = inputShape 
+                    shapes['overall'][shapeName+fitkind] = inputShape
                 elif opt.verbose:
                     warnMissingShape(fitdir+'/'+shapeName)
-   
+                del inputShape
     if '-' in years and 'PostFit' in opt.postFit: # Use mergeShapes to merge prefit shapes across the years
    
         cutList = [ ]
         for cut in shapes['cuts'].keys():
             if years.split('-')[0] in cut:
                 cutList.append(cut.replace('_'+years.split('-')[0], ''))
-
         for cut in cutList:
-            
             shapeList = [ ]
             for shape in shapes['cuts'][cut+'_'+years.split('-')[0]].keys(): shapeList.append(shape)
 
@@ -171,8 +173,11 @@ if __name__ == '__main__':
             for shape in shapeList:
 
                 for year in years.split('-'):
+                    print bool(shape not in shapes['cuts'][cut]), shape, shapes['cuts'][cut].keys()
                     if shape not in shapes['cuts'][cut]: shapes['cuts'][cut][shape] = shapes['cuts'][cut+'_'+year][shape]
-                    else: shapes['cuts'][cut][shape].Add(shapes['cuts'][cut+'_'+year][shape])
+                    else:
+                        print bool( cut+year in shapes['cuts'].keys()), shapes['cuts'][cut+'_'+year].keys()
+                        shapes['cuts'][cut][shape].Add(shapes['cuts'][cut+'_'+year][shape])
 
                 if shape=='histo_total' or (shape=='histo_total_background' and opt.postFit=='PostFit'):
                     for ibin in range(1, shapes['cuts'][cut][shape].GetNbinsX()+1):
