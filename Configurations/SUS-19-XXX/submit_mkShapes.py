@@ -23,9 +23,9 @@ def readsamples(sigset):
         samples=sigfile.read().splitlines()
     return samples
 
-if __name__ == '__main__':
+def submit_shapes(args):
     doDC=False
-    args=sys.argv
+    
     if len(args)<4:
         print 'Please, specify year, tag and sigset values, in that order'
         sys.exit()
@@ -34,6 +34,8 @@ if __name__ == '__main__':
         yearset = ['2016HIPM', '2016noHIPM','2017','2018']
     elif args[1] == '0':
         yearset = ['2016']
+    elif args[1] == '0b':
+        yearset = ['2016HIPM', '2016noHIPM']
     elif args[1] == '1':
         yearset = ['2017']
     elif args[1] == '2':
@@ -160,3 +162,6 @@ if __name__ == '__main__':
         os.system(comm)#+" 2>&1 | tee -a "+shapes_file)
 
     #print "Shapes logfile in: \n"+shapes_file
+if __name__ == '__main__':
+    args=sys.argv
+    submit_shapes(args)

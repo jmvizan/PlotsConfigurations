@@ -29,6 +29,8 @@ if __name__ == '__main__':
         years = [ '2016', '2017', '2018' ]
     elif opt.years=='0':
         years = [ '2016' ]
+    elif opt.years == '0b':
+        yearset = ['2016HIPM', '2016noHIPM']
     elif opt.years=='1':
         years = [ '2017' ]
     elif opt.years=='2':
@@ -105,7 +107,6 @@ if __name__ == '__main__':
 
     outFileName = '/plots_' + localtag + '_' + opt.sigset + '.root'
     outFile = ROOT.TFile.Open(outDirName+outFileName, 'recreate') 
-
     inFiles = [ ]
     for year in years:
         inFiles.append([ ROOT.TFile('./Shapes/'+year+'/'+localtag.replace('BkgSF', '')+outFileName.replace('BkgSF', ''), 'READ') , year ])
@@ -221,3 +222,5 @@ if __name__ == '__main__':
                 #file.write('nuisances[\''+nuisance+'\'] = '+json.dumps(allnuisances[nuisance])+'\n\n')
                 file.write('nuisances[\''+nuisance+'\'] = '+repr(allnuisances[nuisance])+'\n\n')
 
+    print "Output file:", outDirName+outFileName
+    
