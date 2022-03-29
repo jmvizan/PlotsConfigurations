@@ -134,7 +134,7 @@ if __name__ == '__main__':
                         shapeName = 'data' if samples[sample]['isDATA'] else sample
                         inputShape = inputFile.Get(fitdir+'/'+cut+'/'+shapeName)
                         shapes['cuts'][cut][sample] = fillShape(inputShape, 'histo_'+shapeName.replace('data', 'DATA'), fitvariable)
-                        del inputShape
+                        #del inputShape
                         
                     for shapeName in [ 'total_background', 'total', 'total_signal' ]:
                         
@@ -144,7 +144,7 @@ if __name__ == '__main__':
                             shapes['cuts'][cut][shapeName+fitkind] = fillShape(inputShape, 'histo_'+outputShapeName, fitvariable)
                         elif opt.verbose:
                             warnMissingShape(fitdir+'/'+cut+'/'+shapeName)
-                        del inputShape
+                        #del inputShape
                         print "is it this what's annoying me?", shapeName
                         
 
@@ -158,7 +158,7 @@ if __name__ == '__main__':
                     shapes['overall'][shapeName+fitkind] = inputShape
                 elif opt.verbose:
                     warnMissingShape(fitdir+'/'+shapeName)
-                del inputShape
+                #del inputShape
     if '-' in years and 'PostFit' in opt.postFit: # Use mergeShapes to merge prefit shapes across the years
    
         cutList = [ ]
@@ -173,18 +173,10 @@ if __name__ == '__main__':
             for shape in shapeList:
 
                 for year in years.split('-'):
-<<<<<<< HEAD
-                    print bool(shape not in shapes['cuts'][cut]), shape, shapes['cuts'][cut].keys()
-                    if shape not in shapes['cuts'][cut]: shapes['cuts'][cut][shape] = shapes['cuts'][cut+'_'+year][shape]
-                    else:
-                        print bool( cut+year in shapes['cuts'].keys()), shapes['cuts'][cut+'_'+year].keys()
-                        shapes['cuts'][cut][shape].Add(shapes['cuts'][cut+'_'+year][shape])
-=======
                     if shape in shapes['cuts'][cut+'_'+year]:
                         if shape not in shapes['cuts'][cut]: shapes['cuts'][cut][shape] = shapes['cuts'][cut+'_'+year][shape]
                         else:
                             shapes['cuts'][cut][shape].Add(shapes['cuts'][cut+'_'+year][shape])
->>>>>>> upstream/worker
 
                 if shape=='histo_total' or (shape=='histo_total_background' and opt.postFit=='PostFit'):
                     for ibin in range(1, shapes['cuts'][cut][shape].GetNbinsX()+1):
@@ -206,7 +198,8 @@ if __name__ == '__main__':
     outputDir = opt.outputDir + '/' + years + '/' + tag + '/'
     os.system('mkdir -p ' + outputDir)
     outputFile = ROOT.TFile.Open(outputDir + 'plots_' + opt.postFit + tag + '_SM-' + opt.masspoint + '.root', 'recreate')
-
+    print "THIS IS THE OUTPUTFILE", outputDir + 'plots_' + opt.postFit + tag + '_SM-' + opt.masspoint + '.root'
+    #exit()
     for shapeName in [ 'total_overall', 'total_signal', 'total_background', 'total_data', 'overall_total_covar' ]:
         for fitkind in fitkindToOpt:
             if shapeName+fitkind in shapes['overall']:
