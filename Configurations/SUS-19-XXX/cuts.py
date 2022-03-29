@@ -487,7 +487,11 @@ if 'SignalRegion' in opt.tag:
         if 'TChipmWWSignalRegions' in opt.tag:
             ptmiss_cuts['SR1'] = ptmiss_cuts['SR1'].replace('ptmiss>=160', 'ptmiss>=140')
 
- 
+    SRlist = ptmiss_cuts.keys()
+    for sr in SRlist:
+        if '_no'+sr in opt.tag:
+            del ptmiss_cuts[sr]
+
     isrRegions = [ ]
     if 'StopSignalRegions' in opt.tag: 
         if 'NoISR' not in opt.tag: 

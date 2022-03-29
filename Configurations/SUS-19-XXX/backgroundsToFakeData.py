@@ -41,7 +41,7 @@ if __name__ == '__main__':
             print tag, year
             folder    = os.getcwd()+'/Shapes/'+year+'/'+tag+'/Samples/'
             infiles   = []
-            infiles   = [f for f in  os.listdir(folder) if tag in f and year in f and "DATA" not in f and "_TChi" not in f and "_T2tt" not in f and "_EOY" not in f]
+            infiles   = [f for f in  os.listdir(folder) if tag in f and year in f and "DATA" not in f and "_TChi" not in f and "_T2tt" not in f and "_EOY." not in f]
             outfilenm = 'plots_'+year+tag+'_ALL_DATA.root'
             outfile   = ROOT.TFile(folder+outfilenm,"RECREATE","Final merged one");
             print "Files over which we are looping\n",infiles
@@ -91,7 +91,7 @@ if __name__ == '__main__':
             print "\nFinal Root file in", folder+outfilenm
             newplace = folder.replace(rmtag,'') + outfilenm.replace(rmtag,'')
             print "Moving root file to "+ newplace
-            confirm()
-            os.system('rm '+newplace+outfilenm)
-            os.system('cp '+folder+outfilenm+' '+newplace)
-            print "check it works!" 
+            #confirm()
+            #os.system('rm '+newplace+outfilenm)
+            #os.system('cp '+folder+outfilenm+' '+newplace)
+            #print "check it works!" 
