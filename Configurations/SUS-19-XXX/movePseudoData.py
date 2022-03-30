@@ -77,5 +77,4 @@ if __name__ == '__main__':
                 ssh_command = 'scp -r '+fol_merge+file_f+' '+lxshapes+'/'+fol_merge.split('Shapes/')[-1]
                 print "this one", ssh_command
                 os.system(ssh_command)
-            exit()
         
