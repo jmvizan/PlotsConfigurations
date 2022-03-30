@@ -60,15 +60,15 @@ if __name__ == '__main__':
                         dict_i = outfile.mkdir(fol_i)
                         outfile.cd(fol_i)
                         h2     = h1.Clone("histo_DATA")
-                        h2.Write()
-                        if 'SR1_NoJet_em' in keynm: print "first bin", h2.GetBinContent(3)
-                        
+                        h2.Write() 
+                        if 'SR1_NoTag_em' in keynm: print "first bin", h2.GetBinContent(1)
+                       
                         
                     else:
                         outfile.cd(fol_i)
                         h4 = outfile.Get(keynm).Get(var).Get('histo_DATA')
                         h4.Add(h1)
-                        if 'SR1_NoJet_em' in keynm: print "first bin", h4.GetBinContent(3)
+                        if 'SR1_NoTag_em' in keynm: print "first bin", h4.GetBinContent(1)
                         h4.Write()
                     outfile.cd()
                     
@@ -85,7 +85,8 @@ if __name__ == '__main__':
                 h1  =  outfile.Get(keynm).Get('histo_DATA')
                 
                 for  i_bin in range(0, h1.GetNbinsX()+1):
-                    i_content = h1.GetBinContent(i_bin)
+                    i_content = round(h1.GetBinContent(i_bin))
+                    #if 'SR4_Veto_sf' in keynm and i_bin==5: print "first bin", i_content
                     h1.SetBinContent(i_bin, int(i_content))
                     h1.SetBinError(i_bin, np.sqrt(i_content))
                 h1.Write()
