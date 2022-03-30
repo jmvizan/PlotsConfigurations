@@ -41,7 +41,7 @@ if __name__ == '__main__':
             print tag, year
             folder    = os.getcwd()+'/Shapes/'+year+'/'+tag+'/Samples/'
             infiles   = []
-            infiles   = [f for f in  os.listdir(folder) if tag in f and year in f and "DATA" not in f and "_TChi" not in f and "_T2tt" not in f and "_EOY." not in f]
+            infiles   = [f for f in  os.listdir(folder) if tag in f and year in f and "DATA" not in f and "_TChi" not in f and "_T2tt" not in f and "_EOY." not in f and 'EOYWJets' not in f]
             outfilenm = 'plots_'+year+tag+'_ALL_DATA.root'
             outfile   = ROOT.TFile(folder+outfilenm,"RECREATE","Final merged one");
             print "Files over which we are looping\n",infiles
@@ -61,12 +61,14 @@ if __name__ == '__main__':
                         outfile.cd(fol_i)
                         h2     = h1.Clone("histo_DATA")
                         h2.Write()
+                        if 'SR1_NoJet_em' in keynm: print "first bin", h2.GetBinContent(3)
                         
                         
                     else:
                         outfile.cd(fol_i)
                         h4 = outfile.Get(keynm).Get(var).Get('histo_DATA')
                         h4.Add(h1)
+                        if 'SR1_NoJet_em' in keynm: print "first bin", h4.GetBinContent(3)
                         h4.Write()
                     outfile.cd()
                     
