@@ -30,7 +30,7 @@ if __name__ == '__main__':
     elif opt.years=='0':
         years = [ '2016' ]
     elif opt.years == '0b':
-        yearset = ['2016HIPM', '2016noHIPM']
+        years = ['2016HIPM', '2016noHIPM']
     elif opt.years=='1':
         years = [ '2017' ]
     elif opt.years=='2':
