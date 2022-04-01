@@ -133,7 +133,7 @@ dcyears = year.split('-')
 for dcyear in dcyears:
     str_SM = '_'
     if 'SM-' not in fileset: str_SM = '_SM-' 
-    inputfile='./Shapes/'+dcyear+'/'+tag+'/plots_'+tag+str_SM+fileset+'.root'
+    inputfile='./Shapes/'+dcyear+'/'+tag.split('_')[0]+'/plots_'+tag.split('_')[0]+str_SM+fileset+'.root'
     if os.path.exists(inputfile) is False:
         print 'ROOT File',inputfile,' doesn\'t exist, exiting'
         exit()

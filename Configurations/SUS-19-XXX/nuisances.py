@@ -358,6 +358,25 @@ if 'WWSF' in opt.tag and "PseudoData" not in opt.tag:
             'subcuts' : [ '' ],
         },
  }
+elif 'NoWWRate' in opt.tag:
+    rateparameters = {
+        'Topnorm' :  {
+            'samples' : [ 'ttbar', 'tW', 'STtW' ],
+            'subcuts' : [ '' ],
+        },
+        'NoJetRate_JetBack' : {
+            'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
+            'subcuts' : [ '_NoJet_' ],
+            'limits'  : '[0.5,1.5]',
+        },
+        'JetRate_JetBack' : {
+            'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
+            'subcuts'  : [ '_NoTag_' ],
+            'bondrate' : 'NoJetRate_JetBack',
+        },
+    }
+
+    
 else:
     rateparameters = {
         'Topnorm' :  { 
