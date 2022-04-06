@@ -854,20 +854,20 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 if kZZvariable in opt.tag:  
                     addSampleWeight(samples,'ZZTo4L','ZZTo4L'+ZZ4Lext, kZZvariable.replace('kZZ', 'kZZ_'))
 
-        if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJets' in opt.sigset:
-
-            samples['WJetsToLNu'] = { 'name' : getSampleFiles(directoryBkgEOY,'WJetsToLNu-LO'          , False,treePrefix,skipWJetsTreesCheck) +
-                                               getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT70_100'    , False,treePrefix,skipWJetsTreesCheck) + # Missing in 2016HIPM
-                                               getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT100_200'   , False,treePrefix,skipWJetsTreesCheck) + # Missing in 2018
-                                               getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT200_400'   , False,treePrefix,skipWJetsTreesCheck) +
-                                               getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT400_600'   , False,treePrefix,skipWJetsTreesCheck) +
-                                               getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT600_800'   , False,treePrefix,skipWJetsTreesCheck) +
-                                               getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT800_1200'  , False,treePrefix,skipWJetsTreesCheck) + # Missing in 2017
-                                               getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT1200_2500' , False,treePrefix,skipWJetsTreesCheck) +
-                                               getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT2500_inf'  , False,treePrefix,skipWJetsTreesCheck),
-                                      'weight' : XSWeight+'*'+SFweight ,
-                                      'isControlSample' : 1,
-                                     }
+        #if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJets' in opt.sigset:
+            
+        samples['WJetsToLNu'] = { 'name' : getSampleFiles(directoryBkg,'WJetsToLNu-LO'          , False,treePrefix,skipTreesCheck) +
+                                           getSampleFiles(directoryBkg,'WJetsToLNu_HT70_100'    , False,treePrefix,skipTreesCheck) + # Missing in 2016HIPM
+                                           getSampleFiles(directoryBkg,'WJetsToLNu_HT100_200'   , False,treePrefix,skipTreesCheck) + # Missing in 2018
+                                           getSampleFiles(directoryBkg,'WJetsToLNu_HT200_400'   , False,treePrefix,skipTreesCheck) +
+                                           getSampleFiles(directoryBkg,'WJetsToLNu_HT400_600'   , False,treePrefix,skipTreesCheck) +
+                                           getSampleFiles(directoryBkg,'WJetsToLNu_HT600_800'   , False,treePrefix,skipTreesCheck) +
+                                           getSampleFiles(directoryBkg,'WJetsToLNu_HT800_1200'  , False,treePrefix,skipTreesCheck) + # Missing in 2017
+                                           getSampleFiles(directoryBkg,'WJetsToLNu_HT1200_2500' , False,treePrefix,skipTreesCheck) +
+                                           getSampleFiles(directoryBkg,'WJetsToLNu_HT2500_inf'  , False,treePrefix,skipTreesCheck),
+                                  'weight' : XSWeight+'*'+SFweight ,
+                                  'isControlSample' : 1,
+                                 }
 
 
         #if 'SameSignValidationRegion' in opt.tag:
