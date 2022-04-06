@@ -4,7 +4,7 @@ import optparse
 import sys  
 import os
 import LatinoAnalysis.Gardener.hwwtools as hwwtools
-print "beginning of the file"
+
 cmsenv = ' eval `scramv1 runtime -sh` ;'
 os.system(cmsenv)
 PWD     = os.getenv('PWD')
@@ -12,7 +12,7 @@ CMSSW_v = 'CMSSW_'+PWD.split('CMSSW_')[1].split('/')[0]
 #COMBINE = PWD.split('CMSSW_')[0]+CMSSW_v
 COMBINE = PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
 if os.path.isdir(COMBINE) is False: COMBINE=PWD.split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
-print "got all the inputs"
+
 if __name__ == '__main__':
 
     usage = 'usage: %prog [options]'
@@ -50,7 +50,6 @@ if __name__ == '__main__':
     if 'SM-' not in opt.fileset:
         opt.fileset = 'SM-' + opt.fileset
     
-    print "enter"
     if not opt.nododatacards:
         os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset) # TODO: put back when EOY is over
         #os.system('mkdir -p ./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint)
@@ -68,6 +67,7 @@ if __name__ == '__main__':
     exec(open(opt.variablesFile).read())
 
     maxFitCommand = 'cd '+opt.combineLocation+' ;  eval `scramv1 runtime -sh` ; cd - ; combineCards.py '
+
     for year in yearset.split('-'):
         for cut in cuts:
             for variable in variables:

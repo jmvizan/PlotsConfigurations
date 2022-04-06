@@ -693,10 +693,9 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
             for massPoint in sorted(signalMassPoints[model]):
 
                 if massPointInSignalSet(massPoint, sigset): 
-                    #inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + limitOption + '.AsymptoticLimits.mH120.root'
                     inputFileName = inputDirectory + massPoint + '/higgsCombine_' + tag + '_' + fileOption + '.AsymptoticLimits.mH120.root'
-                    inputFile = ROOT.TFile(inputFileName, 'READ')
-                    inputTree = inputFile.Get('limit')
+                    inputFile     = ROOT.TFile(inputFileName, 'READ')
+                    inputTree     = inputFile.Get('limit')
                     
                     if inputTree:
 
@@ -741,7 +740,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
         histoBin[axis] = int((histoMax[axis] - histoMin[axis])/binWidth)
         
     massScanHistos = { } 
-    
+
     for massPoint in massPoints:
         for limit in massPoints[massPoint]['limits']:
 
@@ -757,7 +756,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
 
     crossSectionHistos = { } 
     for xSection in ['histo_X_'+limitType, 'histo_X_observed', 'histo_r_observed_up', 'histo_r_observed_down']:
-        if limitOption in ['Observed', 'Both']:# or limitType in xSection:
+        if (limitOption in ['Observed', 'Both']) or limitType in xSection:
             crossSectionHistos[xSection] = ROOT.TH2F(xSection, '', histoBin['X'], histoMin['X'], histoMax['X'], 
                                                                    histoBin['Y'], histoMin['Y'], histoMax['Y'])
 
@@ -775,12 +774,12 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
                     massY = crossSectionHistos[xSection].GetYaxis().GetBinCenter(yb);
                     if massY>=0. and massX-massY>0.:
                         crossSectionHistos[xSection].SetBinContent(xb, yb, massPointCrossSection)
+    
     # Save histogram file 
     outputFile = ROOT.TFile(outputFileName, 'recreate')
     for histo in massScanHistos:
 
-        if fillemptybins:
-            fillEmptyBins(sigset, massScanHistos[histo]) 
+        if fillemptybins: fillEmptyBins(sigset, massScanHistos[histo]) 
 
         massScanHistos[histo].Write()
         
@@ -790,6 +789,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
         crossSectionHistos[histo].Write()
 
     outputFile.Close()
+
 def makeMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillemptybins, reMakeHistos):
     if tag!='':
       
@@ -900,7 +900,6 @@ def makeMassScanContours(year, tag, sigset, limitOption, fileOption, reMakeConto
     if tag!='':
       
         outputFileName = getFileName('./Limits/' + year + '/' + tag +  '/Contours', 'massScan_' + tag + '_' + sigset + '_' + fileOption)
-        print "####", outputFileName
         if reMakeContours or not fileExist(outputFileName):
             getMassScanContours(outputFileName)
 
@@ -918,7 +917,7 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
     tagObj = [ ] 
 
     for i_tag,tag in enumerate(tags):
-    
+
         if (tag=='') or (i_tag>0 and 'both' in limitOption.lower()):
             continue
 
@@ -937,7 +936,6 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
             
             for key in tagFile.GetListOfKeys():
                 obj = key.ReadObj()
-#                print bool(limitOption_i.lower() not in obj.GetName()), obj.GetName(), limitOption_i, limitOptions 
                 if limitOption_i.lower() in obj.GetName(): 
                     if obj.ClassName()=='TH2F':
                         obj.SetDirectory(0)
@@ -946,10 +944,9 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
                     else:
                         if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
                             obj.SetLineStyle(2)
-                    print "i got inside the keys", limitOption_i , obj.GetName()
 
                     tagObj.append(obj)
-        print "these are the tag obj", tagObj
+
     # Draw comparison
     ROOT.gStyle.SetOptStat(ROOT.kFALSE)
     ROOT.gROOT.SetBatch(ROOT.kTRUE)
@@ -978,7 +975,6 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
     if plotOption=='Histograms':
         legend = ROOT.TLegend(0.12,0.8,0.55,0.88);
         legend.SetMargin(0.01)
-        #print " am i working", tagObj[0], tagObj[1], bool("expected" in tagObj[0].GetName()),bool("expected" in tagObj[1].GetName())
         
         if tags[1]!='':
             if opt.tag == opt.compareto :

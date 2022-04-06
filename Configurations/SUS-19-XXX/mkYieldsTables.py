@@ -6,7 +6,6 @@ import os
 import math
 import LatinoAnalysis.Gardener.hwwtools as hwwtools
 
-
 def _getSampleYields(sample, shape, SMyields):
 
     sampleYields = ''

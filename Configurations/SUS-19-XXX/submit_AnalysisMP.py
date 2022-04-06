@@ -115,9 +115,9 @@ for arg in args[4:]:
         flvi=arg.split('fl=')[1].split(' ')[0]
         print 'FLVI', flvi
         if   flvi in flavopts:
-            flavour = '\'' + flavopts[flvi] + '\''
+            flavour = '\"' + flavopts[flvi] + '\"'
         elif flvi in flavopts.values():
-            flavour = '\'' + flvi           + '\''
+            flavour = '\"' + flvi           + '\"'
         else:
             print 'flavour not recognised'
             exit()

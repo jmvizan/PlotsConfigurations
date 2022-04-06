@@ -134,7 +134,7 @@ if __name__ == '__main__':
                         shapeName = 'data' if samples[sample]['isDATA'] else sample
                         inputShape = inputFile.Get(fitdir+'/'+cut+'/'+shapeName)
                         shapes['cuts'][cut][sample] = fillShape(inputShape, 'histo_'+shapeName.replace('data', 'DATA'), fitvariable)
-                        
+
                     for shapeName in [ 'total_background', 'total', 'total_signal' ]:
                         
                         outputShapeName = shapeName if opt.postFit==fitkindToOpt[fitkind] else shapeName+fitkind          
@@ -142,8 +142,7 @@ if __name__ == '__main__':
                         if inputShape:
                             shapes['cuts'][cut][shapeName+fitkind] = fillShape(inputShape, 'histo_'+outputShapeName, fitvariable)
                         elif opt.verbose:
-                            warnMissingShape(fitdir+'/'+cut+'/'+shapeName)
-                        
+                            warnMissingShape(fitdir+'/'+cut+'/'+shapeName)                        
 
             for shapeName in [ 'total_overall', 'total_signal', 'total_background', 'total_data', 'overall_total_covar' ]:
                 
@@ -162,6 +161,7 @@ if __name__ == '__main__':
         for cut in shapes['cuts'].keys():
             if years.split('-')[0] in cut:
                 cutList.append(cut.replace('_'+years.split('-')[0], ''))
+
         for cut in cutList:
             shapeList = [ ]
             for shape in shapes['cuts'][cut+'_'+years.split('-')[0]].keys(): shapeList.append(shape)
@@ -195,8 +195,8 @@ if __name__ == '__main__':
     outputDir = opt.outputDir + '/' + years + '/' + tag + '/'
     os.system('mkdir -p ' + outputDir)
     outputFile = ROOT.TFile.Open(outputDir + 'plots_' + opt.postFit + tag + '_SM-' + opt.masspoint + '.root', 'recreate')
-    print "THIS IS THE OUTPUTFILE", outputDir + 'plots_' + opt.postFit + tag + '_SM-' + opt.masspoint + '.root'
-    #exit()
+    print "OutputFile:", outputDir + 'plots_' + opt.postFit + tag + '_SM-' + opt.masspoint + '.root'
+
     for shapeName in [ 'total_overall', 'total_signal', 'total_background', 'total_data', 'overall_total_covar' ]:
         for fitkind in fitkindToOpt:
             if shapeName+fitkind in shapes['overall']:
