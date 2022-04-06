@@ -44,7 +44,6 @@ inputtag = tag.split('_')[0]
 
 for year in years:
     os.system('mkdir -p ./Datacards/'+year+'/'+tag)
-    #print "this is signset", sigset,signalMassPoints
     if "wjets" in sigset.lower(): 
         massPoint = 'EOYWJets'
         os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+tag+'/\

@@ -91,6 +91,5 @@ if __name__ == '__main__':
     if doDC:
         for year in yearset.split('-'):
             for masspoint in sigset.split(','):
-                print "ee"
                 os.system('cd '+SUS19+'; rm -r ./Datacards/'+year+'/'+tag+'/'+masspoint)
 

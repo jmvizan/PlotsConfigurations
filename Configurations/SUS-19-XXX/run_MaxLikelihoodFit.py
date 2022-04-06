@@ -68,7 +68,6 @@ if __name__ == '__main__':
     exec(open(opt.variablesFile).read())
 
     maxFitCommand = 'cd '+opt.combineLocation+' ;  eval `scramv1 runtime -sh` ; cd - ; combineCards.py '
-    print "this is combine location", opt.combineLocation
     for year in yearset.split('-'):
         for cut in cuts:
             for variable in variables:
