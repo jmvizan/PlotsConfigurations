@@ -1115,7 +1115,7 @@ if __name__ == '__main__':
 
     if opt.limitOption=='0':
         limitOption = 'Observed'
-    elif opt.limitOption=='1':
+    elif opt.limitOption=='1' or opt.limitOption=='Both':
         limitOption = 'Expected-Observed' #We could give this as input if we want to compare the same tag
     elif opt.limitOption=='2':
         limitOption = 'Expected'
