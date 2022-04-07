@@ -5,8 +5,7 @@ import sys
 import os
 import LatinoAnalysis.Gardener.hwwtools as hwwtools
 
-cmsenv = ' eval `scramv1 runtime -sh` ;'
-os.system(cmsenv)
+os.system(' eval `scramv1 runtime -sh` ;')
 PWD     = os.getenv('PWD')
 CMSSW_v = 'CMSSW_'+PWD.split('CMSSW_')[1].split('/')[0]
 #COMBINE = PWD.split('CMSSW_')[0]+CMSSW_v
