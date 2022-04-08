@@ -71,7 +71,14 @@ if [[ $NORM != *'PreFit'* ]] && [[ $NORM != *'PostFit'* ]]; then
 fi
 
 NUISANCES=nuisances.py
- mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None --showIntegralLegend=1 
+if [[ $NORM == *'PreFit'* ]] || [[ $NORM == *'PostFit'* ]]; then
+    ./mergeShapesPostFit.py --years=$YEAR --tag=$TAG --masspoint=$SIGSET --postFit=$NORM
+elif [[ $NORM == *'-'* ]]; then
+    ./mergeShapes.py --years=$NORM --tag=$TAG --sigset=$SIGSET --outputDir=./Shapes/$YEAR/$TAG/ --skipLNN
+elif [[ $YEAR == *'-'* ]] || [[ $TAG == *'BkgSF'* ]]; then
+    NUISANCES=nuisances_${YEAR}_${TAG}_${SIGSET}.py
+    ./mergeShapes.py --years=$YEAR --tag=$TAG --sigset=$SIGSET --localNuisFile=$NUISANCES --saveNuisances
+fi
 
 if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
     if [ $NORM == 'Norm' ]; then
@@ -105,11 +112,6 @@ if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
 	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=$NUISANCES  --showDataVsBkgOnly  #--plotSmearVariation=1 #--fileFormats='png,root,C'
     fi
 else 
-    if [[ $NORM == *'PostFit'* ]]; then
-	INPUTFILE=./Shapes/$YEAR/$TAG/plots_PostFit${TAG}_$FILESET.root
-    else
-	INPUTFILE=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root
-    fi
     mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=$INPUTFILE --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None --showIntegralLegend=1 
 fi 
 
