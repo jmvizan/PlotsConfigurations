@@ -363,7 +363,7 @@ rateparameters = {
         'bondrate' : 'NoJetRate_JetBack',
     }
 }
-if 'NoWWRate' not in opt.tag: 
+if '_NoWWRate' not in opt.tag: 
     rateparameters['WWnorm'] = {
         'samples' : [ 'WW' ],
         'subcuts' : [ '' ],
@@ -373,7 +373,6 @@ if 'NoWWRate' not in opt.tag:
         'subcuts' : [ '_NoJet_' ],
         'limits'  : '[0.7,1.3]'
     }
-
     rateparameters['JetRate_DibosonBack'] = {
         'samples' : [ 'WW', 'WZ' ],
         'subcuts' : [ '_NoTag_' ],
