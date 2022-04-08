@@ -71,14 +71,7 @@ if [[ $NORM != *'PreFit'* ]] && [[ $NORM != *'PostFit'* ]]; then
 fi
 
 NUISANCES=nuisances.py
-if [[ $NORM == *'PreFit'* ]] || [[ $NORM == *'PostFit'* ]]; then
-    ./mergeShapesPostFit.py --years=$YEAR --tag=$TAG --masspoint=$SIGSET --postFit=$NORM
-elif [[ $NORM == *'-'* ]]; then
-    ./mergeShapes.py --years=$NORM --tag=$TAG --sigset=$SIGSET --outputDir=./Shapes/$YEAR/$TAG/ --skipLNN
-elif [[ $YEAR == *'-'* ]] || [[ $TAG == *'BkgSF'* ]]; then
-    NUISANCES=nuisances_${YEAR}_${TAG}_${SIGSET}.py
-    ./mergeShapes.py --years=$YEAR --tag=$TAG --sigset=$SIGSET --localNuisFile=$NUISANCES --saveNuisances
-fi
+ mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile=None --showIntegralLegend=1 
 
 if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
     if [ $NORM == 'Norm' ]; then
