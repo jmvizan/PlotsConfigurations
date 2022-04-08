@@ -38,7 +38,7 @@ if __name__ == '__main__':
     else:
         years = opt.years.split('-')
    
-    if len(opt.years)==1 and 'BkgSF' not in opt.tag:
+    if len(years)==1 and 'BkgSF' not in opt.tag:
         print 'mergeShapes: nothing to do with one year without BkgSF'
         exit()
 

@@ -382,48 +382,6 @@ if not ('WWSF' in opt.tag and "PseudoData" not in opt.tag):
             'subcuts' : [ '_NoTag_' ],
             'bondrate' : 'NoJetRate_DibosonBack',
         }
-'''
-    if 'PseudoData' not in opt.tag:
-        rateparameters[
-'''
-elif 'NoWWRate' in opt.tag:
-    rateparameters = {
-        'NoJetRate_JetBack' : {
-            'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
-            'subcuts' : [ '_NoJet_' ],
-            'limits'  : '[0.5,1.5]',
-        },
-        'JetRate_JetBack' : {
-            'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
-            'subcuts'  : [ '_NoTag_' ],
-            'bondrate' : 'NoJetRate_JetBack',
-        },
-    }
-
-    
-else:
-    rateparameters = {
-        'NoJetRate_JetBack' : {
-            'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
-            'subcuts' : [ '_NoJet_' ],
-            'limits'  : '[0.5,1.5]',
-        },
-        'JetRate_JetBack' : {
-            'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
-            'subcuts'  : [ '_NoTag_' ],
-            'bondrate' : 'NoJetRate_JetBack',
-        },
-        'NoJetRate_DibosonBack' : {
-            'samples' : [ 'WW', 'WZ' ],
-            'subcuts' : [ '_NoJet_' ],
-            'limits'  : '[0.7,1.3]'
-        },
-        'JetRate_DibosonBack' : {
-            'samples' : [ 'WW', 'WZ' ],
-            'subcuts' : [ '_NoTag_' ],
-            'bondrate' : 'NoJetRate_DibosonBack',
-        },
-    }
 
 if 'FitCR' in opt.tag:
     backgroundCRs = { 'ttZ' : { 'samples' : [ 'ttZ' ],

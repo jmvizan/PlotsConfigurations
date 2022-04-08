@@ -712,7 +712,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
                         massPointLimits = { } 
 
                         for event in inputTree :
-                            if inputTree.quantileExpected==-1. and limitOption in ['Observed', 'Both']:
+                            if inputTree.quantileExpected==-1. and limitOption == 'Observed':
                                 massPointLimits['histo_r_observed'] = roundBin(inputTree.limit)
                             elif inputTree.quantileExpected==0.5:
                                 massPointLimits['histo_r_'+limitType] = roundBin(inputTree.limit)
@@ -756,7 +756,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
 
     crossSectionHistos = { } 
     for xSection in ['histo_X_'+limitType, 'histo_X_observed', 'histo_r_observed_up', 'histo_r_observed_down']:
-        if (limitOption in ['Observed', 'Both']) or limitType in xSection:
+        if (limitOption == 'Observed') or limitType in xSection:
             crossSectionHistos[xSection] = ROOT.TH2F(xSection, '', histoBin['X'], histoMin['X'], histoMax['X'], 
                                                                    histoBin['Y'], histoMin['Y'], histoMax['Y'])
 
@@ -1099,7 +1099,7 @@ if __name__ == '__main__':
     parser.add_option('--remakecontours', dest='reMakeContours', help='Remake limit contours'                       , default=False, action='store_true')
     parser.add_option('--compareto'     , dest='compareto'     , help='Reference tag used for comparison'           , default='')
     parser.add_option('--plotoption'    , dest='plotOption'    , help='-1 None, 0 Histograms, 1 Contours, 2 Final'  , default='-1')
-    parser.add_option('--fileoption'    , dest='fileOption'    , help='in case input file different to both/blind'  , default=None)
+    parser.add_option('--fileoption'    , dest='fileOption'    , help='in case input file different to both/blind'  , default='Both')
     (opt, args) = parser.parse_args()
 
     if opt.years=='-1' or opt.years=='all' or opt.years=='All':
@@ -1141,12 +1141,10 @@ if __name__ == '__main__':
     if opt.compareto.lower() == 'same':
         opt.compareto = opt.tag
     
-    if opt.fileOption:
-        fileOption = opt.fileOption
-    elif limitOption == 'Blind': 
+    if limitOption == 'Blind': 
         fileOption = limitOption
-    else: 
-        fileOption = 'Both'
+    else:
+        fileOption = opt.fileOption
     
     skipCompareScan = False
     if opt.tag == opt.compareto or len(opt.compareto)<1: skipCompareScan = True 
