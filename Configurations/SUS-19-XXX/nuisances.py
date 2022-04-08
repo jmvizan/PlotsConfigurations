@@ -348,40 +348,37 @@ for treeNuisance in treeNuisances:
 
 ### rate parameters
 rateparameters = {
-        'Topnorm' :  { 
-            'samples' : [ 'ttbar', 'tW', 'STtW' ],
-            'subcuts' : [ '' ],
-        },
+    'Topnorm' :  { 
+        'samples' : [ 'ttbar', 'tW', 'STtW' ],
+        'subcuts' : [ '' ],
+    },
+    'NoJetRate_JetBack' : {
+        'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
+        'subcuts' : [ '_NoJet_' ],
+        'limits'  : '[0.5,1.5]',
+    },
+    'JetRate_JetBack' : {
+        'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
+        'subcuts'  : [ '_NoTag_' ],
+        'bondrate' : 'NoJetRate_JetBack',
+    }
 }
 if 'NoWWRate' not in opt.tag: 
     rateparameters['WWnorm'] = {
         'samples' : [ 'WW' ],
         'subcuts' : [ '' ],
     }
+    rateparameters['NoJetRate_DibosonBack'] = {
+        'samples' : [ 'WW', 'WZ' ],
+        'subcuts' : [ '_NoJet_' ],
+        'limits'  : '[0.7,1.3]'
+    }
 
-if not ('WWSF' in opt.tag and "PseudoData" not in opt.tag):
-    rateparameters['NoJetRate_JetBack'] = {
-            'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
-            'subcuts' : [ '_NoJet_' ],
-            'limits'  : '[0.5,1.5]',
-        }
-    rateparameters['JetRate_JetBack'] = {
-            'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
-            'subcuts'  : [ '_NoTag_' ],
-            'bondrate' : 'NoJetRate_JetBack',
-        }
-    if 'NoWWRate' not in opt.tag:
-        rateparameters['NoJetRate_DibosonBack'] = {
-            'samples' : [ 'WW', 'WZ' ],
-            'subcuts' : [ '_NoJet_' ],
-            'limits'  : '[0.7,1.3]'
-        }
-
-        rateparameters['JetRate_DibosonBack'] = {
-            'samples' : [ 'WW', 'WZ' ],
-            'subcuts' : [ '_NoTag_' ],
-            'bondrate' : 'NoJetRate_DibosonBack',
-        }
+    rateparameters['JetRate_DibosonBack'] = {
+        'samples' : [ 'WW', 'WZ' ],
+        'subcuts' : [ '_NoTag_' ],
+        'bondrate' : 'NoJetRate_DibosonBack',
+    }
 
 if 'FitCR' in opt.tag:
     backgroundCRs = { 'ttZ' : { 'samples' : [ 'ttZ' ],
