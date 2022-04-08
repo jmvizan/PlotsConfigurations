@@ -29,6 +29,8 @@ if __name__ == '__main__':
         years = [ '2016', '2017', '2018' ]
     elif opt.years=='0':
         years = [ '2016' ]
+    elif opt.years == '0b':
+        years = ['2016HIPM', '2016noHIPM']
     elif opt.years=='1':
         years = [ '2017' ]
     elif opt.years=='2':
@@ -105,7 +107,6 @@ if __name__ == '__main__':
 
     outFileName = '/plots_' + localtag + '_' + opt.sigset + '.root'
     outFile = ROOT.TFile.Open(outDirName+outFileName, 'recreate') 
-
     inFiles = [ ]
     for year in years:
         inFiles.append([ ROOT.TFile('./Shapes/'+year+'/'+localtag.replace('BkgSF', '')+outFileName.replace('BkgSF', ''), 'READ') , year ])
@@ -122,11 +123,9 @@ if __name__ == '__main__':
             #'ttZ'    : { '2016HIPM' : [1.179, 0.313] , '2016noHIPM' : [1.118, 0.322], '2017' : [1.553,0.223], '2018' : [1.553, 0.192]}
         }
         
-
     for cutName in cuts:
 
         outFile.mkdir(cutName)
-
         for variableName in variables:
             if 'cuts' not in variables[variableName] or cutName in variables[variableName]['cuts']:
 
@@ -140,7 +139,6 @@ if __name__ == '__main__':
                     inDirs.append([ infile[0].Get(folderName), infile[1] ])
 
                 for sample in samples:
-                    
                     if sample in globalScale.keys(): 
                        globalScale_i = globalScale[sample] 
                        if opt.verbose: print 'These are the global sF', globalScale_i,'for sample', sample
@@ -170,7 +168,6 @@ if __name__ == '__main__':
                                 shapeVar = shapeName if nuisance=='stat' else shapeName + '_' + allnuisances[nuisance]['name'] + var
                                   
                                 for idir, indir in enumerate(inDirs):
-
                                     if indir[0].GetListOfKeys().Contains(shapeVar):
                                         tmpHisto = indir[0].Get(shapeVar)
                                         tmpHisto.SetDirectory(0)   
@@ -179,7 +176,7 @@ if __name__ == '__main__':
                                     else:
 
                                         if not indir[0].GetListOfKeys().Contains(shapeName):
-                                            if 'EOY' not in sample and indir[1]+'_'+sample not in missingSampleList: 
+                                            if 'EOY' not in sample and indir[1]+'_'+sample not in missingSampleList:
                                                 print 'Warning:', sample, 'not in input shape file for', indir[1], 'year!'
                                                 missingSampleList.append(indir[1]+'_'+sample)
                                             for idir2, indir2 in enumerate(inDirs):
@@ -225,3 +222,5 @@ if __name__ == '__main__':
                 #file.write('nuisances[\''+nuisance+'\'] = '+json.dumps(allnuisances[nuisance])+'\n\n')
                 file.write('nuisances[\''+nuisance+'\'] = '+repr(allnuisances[nuisance])+'\n\n')
 
+    print "Output file:", outDirName+outFileName
+    

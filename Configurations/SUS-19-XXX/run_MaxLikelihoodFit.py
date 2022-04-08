@@ -5,6 +5,7 @@ import sys
 import os
 import LatinoAnalysis.Gardener.hwwtools as hwwtools
 
+os.system(' eval `scramv1 runtime -sh` ;')
 PWD     = os.getenv('PWD')
 CMSSW_v = 'CMSSW_'+PWD.split('CMSSW_')[1].split('/')[0]
 #COMBINE = PWD.split('CMSSW_')[0]+CMSSW_v
@@ -47,7 +48,7 @@ if __name__ == '__main__':
 
     if 'SM-' not in opt.fileset:
         opt.fileset = 'SM-' + opt.fileset
-
+    
     if not opt.nododatacards:
         os.system('./run_mkDatacards.py '+yearset+' '+opt.tag+' '+opt.masspoint+' '+opt.fileset) # TODO: put back when EOY is over
         #os.system('mkdir -p ./Datacards/'+yearset+'/'+opt.tag+'/'+opt.masspoint)

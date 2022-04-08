@@ -41,14 +41,26 @@ if __name__ == '__main__':
 
     #    tag=sys.argv[2]
 
-    sigset=sys.argv[3]
+    sigset    = sys.argv[3]
+    doDCopts  = ["dodatacards","dodc", "mkdc","makedatacards"]
+    dcIdx     = 4
+    signm     = sigset.split('_')[0]
 
-    dcIdx = 4
     if len(sys.argv)>=5:
         if os.getenv('USER') in sys.argv[4]:
             SUS19 = sys.argv[4]
             dcIdx = 5
-                                         
+
+    for arg in sys.argv[4:]:
+        print "args", arg, sigset.split('_')[0]
+        if arg.lower() in doDCopts : doDC    = True
+        if signm       in arg      : fileset = arg
+        if "limrun=" in arg.lower():
+            limrun = arg.split("limrun=")[1].split(' ')[0]
+            print "this is limrun", limrun
+            
+                
+    '''
     if len(sys.argv)==dcIdx+1:
         if(sys.argv[dcIdx].lower()in ["dodatacards","dodc","mkdc","makedatacards"]):
             doDC=True
@@ -61,15 +73,17 @@ if __name__ == '__main__':
             doDC=True
     else:
         fileset=sigset
-
+    '''
     if 'SM-' not in fileset:
         fileset = 'SM-' + fileset
     #print sys.argv[4].lower()
-    opts= "--years="+yearset+" --tag="+tag+" --sigset="+sigset 
+    command= "python run_CombineTools.py --years="+yearset+" --tag="+tag+" --sigset="+sigset
+    if len(limrun)>1: 
+        command += " --limrun="+limrun
+        if 'maxfit' in limrun.lower(): command = "python run_MaxLikelihoodFit.py --years="+yearset+" --tag="+tag+" --masspoint="+sigset+' --fileset='+fileset+' --nododatacards --saveCovMatrix'
+    
     cmdDatacards =' '
     if(doDC is True):    cmdDatacards += './run_mkDatacards.py '+yearset+' '+tag+ ' '+ sigset+' '+ fileset + ' ;'
-    name='python run_CombineTools.py'
-    command= ' '+name+' '+opts
     print "Command sent:\t", command,'\n','CWD:', os.getcwd()
     if doDC: print " datacards:\n", cmdDatacards
     else: print "datacards are not made"
@@ -79,4 +93,3 @@ if __name__ == '__main__':
             for masspoint in sigset.split(','):
                 os.system('cd '+SUS19+'; rm -r ./Datacards/'+year+'/'+tag+'/'+masspoint)
 
-    years = yearset.split('-')

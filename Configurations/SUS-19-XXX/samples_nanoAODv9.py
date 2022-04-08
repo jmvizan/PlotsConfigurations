@@ -455,7 +455,7 @@ for lep_i in ['Lep']:
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
         else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
 
-# nonprompt lepton rate TODO:
+# nonprompt lepton rate TODO?:
 
 if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.07', 'rateUp' : '1.16', 'rateDown' : '0.97' } 
 elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.09', 'rateUp' : '1.30', 'rateDown' : '0.91' } 
@@ -496,6 +496,16 @@ SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeight['Lep']['
 # background cross section uncertainties and normalization scale factors
 
 normBackgrounds = {}
+
+if 'WWSF' in opt.tag and "PseudoData" not in opt.tag:
+    if '2016HIPM' in opt.tag:
+        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.142' : '0.191' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+    elif '2016noHIPM' in opt.tag:
+        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.416' : '0.189' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+    elif '2017' in opt.tag:
+        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.333' : '0.140' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+    elif '2018' in opt.tag:
+        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.395' : '0.167' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
 
 if 'SignalRegions' in opt.tag or 'BackSF' in opt.tag:
 
@@ -843,44 +853,21 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 if kZZvariable in opt.tag:  
                     addSampleWeight(samples,'ZZTo4L','ZZTo4L'+ZZ4Lext, kZZvariable.replace('kZZ', 'kZZ_'))
 
-        if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJetsToLNu' in opt.sigset:
+        if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJets' in opt.sigset:
+            
+            samples['WJetsToLNu'] = { 'name' : getSampleFiles(directoryBkg,'WJetsToLNu-LO'          , False,treePrefix,skipTreesCheck) +
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT70_100'    , False,treePrefix,skipTreesCheck) + # Missing in 2016HIPM
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT100_200'   , False,treePrefix,skipTreesCheck) + # Missing in 2018
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT200_400'   , False,treePrefix,skipTreesCheck) +
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT400_600'   , False,treePrefix,skipTreesCheck) +
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT600_800'   , False,treePrefix,skipTreesCheck) +
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT800_1200'  , False,treePrefix,skipTreesCheck) + # Missing in 2017
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT1200_2500' , False,treePrefix,skipTreesCheck) +
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT2500_inf'  , False,treePrefix,skipTreesCheck),
+                                      'weight' : XSWeight+'*'+SFweight ,
+                                      'isControlSample' : 1,
+                                     }
 
-            if 'EOY' not in opt.tag: # TODO too small to care about it before all available
-                samples['WJetsToLNu'] = { 'name' : getSampleFiles(directoryBkgEOY,'WJetsToLNu-LO'          , False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT70_100'    , False,treePrefix,skipWJetsTreesCheck) + # Missing in 2016HIPM
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT100_200'   , False,treePrefix,skipWJetsTreesCheck) + # Missing in 2018
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT200_400'   , False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT400_600'   , False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT600_800'   , False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT800_1200'  , False,treePrefix,skipWJetsTreesCheck) + # Missing in 2017
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT1200_2500' , False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT2500_inf'  , False,treePrefix,skipWJetsTreesCheck),
-                                          'weight' : XSWeight+'*'+SFweight ,
-                                          'isControlSample' : 1,
-                                         }
-
-
-            if 'EOY' in opt.tag:
-
-                WJetsext, WJetsHT70ext, WJetsHT100ext, WJetsHT200ext, WJetsHT400ext, WJetsHT600ext, WJetsHT800ext, WJetsHT1200ext, WJetsHT2500ext = '', '', '', '', '', '', '', '', ''
-                if '2016' in yeartag:
-                    WJetsext, WJetsHT100ext, WJetsHT200ext = '_ext2', '_ext2', '_ext2'
-                    WJetsHT400ext, WJetsHT600ext, WJetsHT800ext, WJetsHT1200ext, WJetsHT2500ext = '_ext1', '_ext1', '_ext1', '_ext1', '_ext1'
-                elif '2017' in yeartag:
-                    WJetsext = '_ext1'
-                skipWJetsTreesCheck = True if 'cern' in SITE else skipTreesCheck
-                samples['EOYWJets'] = { 'name'   : getSampleFiles(directoryBkgEOY,'WJetsToLNu-LO'         +WJetsext,      False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT70_100'   +WJetsHT70ext,  False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT100_200'  +WJetsHT100ext, False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT200_400'  +WJetsHT200ext, False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT400_600'  +WJetsHT400ext, False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT600_800'  +WJetsHT600ext, False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT800_1200' +WJetsHT800ext, False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT1200_2500'+WJetsHT1200ext,False,treePrefix,skipWJetsTreesCheck) +
-                                                   getSampleFiles(directoryBkgEOY,'WJetsToLNu_HT2500_inf' +WJetsHT2500ext,False,treePrefix,skipWJetsTreesCheck),
-                                        'weight' : XSWeight+'*'+SFweight ,
-                                        'isControlSample' : 1,
-                                       }
 
         #if 'SameSignValidationRegion' in opt.tag:
     

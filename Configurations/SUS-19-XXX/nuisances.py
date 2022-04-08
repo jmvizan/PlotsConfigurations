@@ -347,14 +347,9 @@ for treeNuisance in treeNuisances:
             del nuisances[treeNuisance+'Sig']
 
 ### rate parameters
-
 rateparameters = {
     'Topnorm' :  { 
         'samples' : [ 'ttbar', 'tW', 'STtW' ],
-        'subcuts' : [ '' ],
-    },
-    'WWnorm'  : {
-        'samples' : [ 'WW' ],
         'subcuts' : [ '' ],
     },
     'NoJetRate_JetBack' : {
@@ -366,18 +361,23 @@ rateparameters = {
         'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
         'subcuts'  : [ '_NoTag_' ],
         'bondrate' : 'NoJetRate_JetBack',
-    },
-    'NoJetRate_DibosonBack' : {
+    }
+}
+if '_NoWWRate' not in opt.tag: 
+    rateparameters['WWnorm'] = {
+        'samples' : [ 'WW' ],
+        'subcuts' : [ '' ],
+    }
+    rateparameters['NoJetRate_DibosonBack'] = {
         'samples' : [ 'WW', 'WZ' ],
         'subcuts' : [ '_NoJet_' ],
         'limits'  : '[0.7,1.3]'
-    },
-    'JetRate_DibosonBack' : {
+    }
+    rateparameters['JetRate_DibosonBack'] = {
         'samples' : [ 'WW', 'WZ' ],
         'subcuts' : [ '_NoTag_' ],
         'bondrate' : 'NoJetRate_DibosonBack',
-    },
-}
+    }
 
 if 'FitCR' in opt.tag:
     backgroundCRs = { 'ttZ' : { 'samples' : [ 'ttZ' ],

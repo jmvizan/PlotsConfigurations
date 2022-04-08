@@ -134,7 +134,7 @@ if __name__ == '__main__':
                         shapeName = 'data' if samples[sample]['isDATA'] else sample
                         inputShape = inputFile.Get(fitdir+'/'+cut+'/'+shapeName)
                         shapes['cuts'][cut][sample] = fillShape(inputShape, 'histo_'+shapeName.replace('data', 'DATA'), fitvariable)
-                   
+
                     for shapeName in [ 'total_background', 'total', 'total_signal' ]:
                         
                         outputShapeName = shapeName if opt.postFit==fitkindToOpt[fitkind] else shapeName+fitkind          
@@ -142,7 +142,7 @@ if __name__ == '__main__':
                         if inputShape:
                             shapes['cuts'][cut][shapeName+fitkind] = fillShape(inputShape, 'histo_'+outputShapeName, fitvariable)
                         elif opt.verbose:
-                            warnMissingShape(fitdir+'/'+cut+'/'+shapeName)
+                            warnMissingShape(fitdir+'/'+cut+'/'+shapeName)                        
 
             for shapeName in [ 'total_overall', 'total_signal', 'total_background', 'total_data', 'overall_total_covar' ]:
                 
@@ -151,10 +151,10 @@ if __name__ == '__main__':
                 if inputShape:
                     inputShape.SetName('histo_'+outputShapeName)
                     inputShape.SetTitle('histo_'+outputShapeName)
-                    shapes['overall'][shapeName+fitkind] = inputShape 
+                    shapes['overall'][shapeName+fitkind] = inputShape
                 elif opt.verbose:
                     warnMissingShape(fitdir+'/'+shapeName)
-   
+                
     if '-' in years and 'PostFit' in opt.postFit: # Use mergeShapes to merge prefit shapes across the years
    
         cutList = [ ]
@@ -163,7 +163,6 @@ if __name__ == '__main__':
                 cutList.append(cut.replace('_'+years.split('-')[0], ''))
 
         for cut in cutList:
-            
             shapeList = [ ]
             for shape in shapes['cuts'][cut+'_'+years.split('-')[0]].keys(): shapeList.append(shape)
 
@@ -196,6 +195,7 @@ if __name__ == '__main__':
     outputDir = opt.outputDir + '/' + years + '/' + tag + '/'
     os.system('mkdir -p ' + outputDir)
     outputFile = ROOT.TFile.Open(outputDir + 'plots_' + opt.postFit + tag + '_SM-' + opt.masspoint + '.root', 'recreate')
+    print "OutputFile:", outputDir + 'plots_' + opt.postFit + tag + '_SM-' + opt.masspoint + '.root'
 
     for shapeName in [ 'total_overall', 'total_signal', 'total_background', 'total_data', 'overall_total_covar' ]:
         for fitkind in fitkindToOpt:

@@ -7,42 +7,48 @@ PWD = os.getenv('PWD')+'/'
     
 nMPs    = 3
 server  = os.uname()[1]
-flavour = "\"workday\""
+flavour = '\"workday\"'
 if 'ifca' in server.lower():
-    flavour = "cms_high"
+    flavour = 'cms_high'
 #write header to logfile
 def logtitle(filename,sigset):
-    if(os.path.exists(filename) is False):  print "creating log file"
-    f = open(filename,"a")
+    if(os.path.exists(filename) is False):  print 'creating log file'
+    f = open(filename,'a')
     # Textual month, day and year
     now = datetime.now()
-    d2  = now.strftime("%d %B, %Y, at %H:%M:%S")
-    f.write(d2+"\nCALCULATING LIMITS FOR:\t "+ sigset+"\n")
+    d2  = now.strftime('%d %B, %Y, at %H:%M:%S')
+    f.write(d2+'\nCALCULATING LIMITS FOR:\t '+ sigset+'\n')
     f.close()
 
 
 #Create log file
 def writetolog(filename,line):
-    f = open(filename,"a")
+    f = open(filename,'a')
     f.write(line+'\n')
     f.close()
-    #print "line", line
+    #print 'line', line
 
 #Function to create sub file                                                              
 def makeSubFile(filename,folder,sigset,arguments,flavour):
-    f = open(filename,"w+")
-    jobsent= '$('+sigset+')'
-    #print "creating "+filename+" \t ARGUMENTS:\n ",arguments, "\n"                       
-    f.write("executable            = "+PWD+"run_AnalysisMP.py \n")
-    f.write("arguments             = "+arguments+"\n")
-    f.write("output                = "+folder+"/"+jobsent+".$(ClusterId).out\n")
-    f.write("error                 = "+folder+"/"+jobsent+".$(ClusterId).err\n")
-    f.write("log                   = "+folder+"/"+jobsent+".$(ClusterId).log\n")
-    #f.write("+JobFlavour           = nextweek\n")
-    f.write("+JobFlavour           = "+flavour+"\n")
-    #f.write("+JobFlavour           = testmatch\n")
-    #f.write("+JobFlavour           = tomorrow\n")
-    f.write("queue "+sigset+' from '+folder+'/joblist.txt \n')
+    f       = open(filename,'w+')
+    jobsent = '$('+sigset+')'
+    year    = arguments.split(' ')[0]
+    limrun  = 'limrun-'+arguments.split('limrun=')[-1]
+    script  = 'run_AnalysisMP.py'
+    if 'makeFit' in limrun: 
+        limrun = 'maxFit'
+        #script = 'run_MaxLikelihoodFit.py'
+    print 'creating '+filename+' \t ARGUMENTS:\n ',arguments, '\n'                       
+    f.write('executable            = '+PWD+script+' \n')
+    f.write('arguments             = '+arguments +' \n')
+    f.write('output                = '+folder+'/'+jobsent+limrun+'-$(ClusterId).out\n')
+    f.write('error                 = '+folder+'/'+jobsent+limrun+'-$(ClusterId).err\n')
+    f.write('log                   = '+folder+'/'+jobsent+limrun+'-$(ClusterId).log\n')
+    #f.write('+JobFlavour           = nextweek\n')
+    f.write('+JobFlavour           = '+flavour+'\n')
+    #f.write('+JobFlavour           = testmatch\n')
+    #f.write('+JobFlavour           = tomorrow\n')
+    f.write('queue '+sigset+' from '+folder+'/joblist.txt \n')
     f.close()
 
 
@@ -78,111 +84,61 @@ elif args[2] =='2':
     tag ='StopSignalRegions'                                                        
 else:                                                                              
     tag = args[2]
- 
+nMPs = 1 
 sigset    = args[3]
 signm     = sigset.split('_')[0]
 fileset   = sigset
 allMP     = False
 allMPopts = ['doallmp', 'doall','allmp', 'allmasspoints', 'alllims']
-doDCopts  = ["dodatacards","dodc", "mkdc","makedatacards"]
-flavopts  = {"0" : "espresso", "1" : "microcentury", "2" : "longlunch", 
-             "3" : "workday" , "4" : "tomorrow"    , "5" : "testmatch", 
-             "7" : "nextweek"}
+doDCopts  = ['dodatacards','dodc', 'mkdc','makedatacards']
+flavopts  = {'0' : 'espresso', '1' : 'microcentury', '2' : 'longlunch', 
+             '3' : 'workday' , '4' : 'tomorrow'    , '5' : 'testmatch', 
+             '7' : 'nextweek'}
  
 doDC      = ' '
 argfloc   = 0
-print "before the loop"
+limrun    = 'Blind'
+makeFit   = False
 for arg in args[4:]:
-    print arg, sigset.split('_')[0]
     if arg.lower() in doDCopts : doDC    = arg
     if arg.lower() in allMPopts: allMP   = True
     if signm       in arg      : fileset = arg
-    if "nmp=" in arg.lower():
-        nMPi= arg.split("=")[1]
+    if 'nmp=' in arg.lower():
+        nMPi= arg.split('nmp=')[1].split(' ')[0]
         if nMPi.isdigit():
             nMPs = nMPi
-            print "JOBS SPLIT EACH "+nMPi+" MASSPOINTS"
+            print 'JOBS SPLIT EACH '+nMPi+' MASSPOINTS'
         else:
-            print "MASSPOINT NUMBER NOT VALID"
+            print 'MASSPOINT NUMBER NOT VALID'
             exit()
-    if "fl=" in arg.lower():
-        flvi=arg.split("=")[1]
-        print "FLVI", flvi
+    if 'fl=' in arg.lower():
+        flvi=arg.split('fl=')[1].split(' ')[0]
+        print 'FLVI', flvi
         if   flvi in flavopts:
-            flavour = "\"" + flavopts[flvi] + "\""
+            flavour = '\"' + flavopts[flvi] + '\"'
         elif flvi in flavopts.values():
-            flavour = "\"" + flvi           + "\""
+            flavour = '\"' + flvi           + '\"'
         else:
-            print "flavour not recognised"
+            print 'flavour not recognised'
             exit()
+    if 'limrun=' in arg.lower():
+        limrun = 'limrun='+arg.split('limrun=')[1].split(' ')[0]
+        print 'this is limrun', limrun
+        if 'maxfit' in limrun.lower(): makeFit = True
 
 
 
-'''
-if(len(args)>4):
-    if   args[4].lower() in allMPopts:
-        allMP = True
-    
-    elif args[4].lower()in doDCopts  :
-        print "in here"
-        doDC    = args[4]
-        fileset = sigset
-    else:
-        fileset = args[4]
-        
-    if len(args) > 5:
-        if args[5].lower() in allMPopts:
-            allMP = True
-        else:
-            doDC = args[5]
-            if len(args)>6 and args[6].lower() in allMPopts:
-                allMP = True
-else: fileset = sigset
-
-nMPi=None
-if "nmp=" in args[len(args)-1].lower():
-    nMPi = args[len(args)-1].split("=")[1]
-    if nMPi.isdigit():
-        nMPs = nMPi
-        print "JOBS SPLIT EACH "+nMPi+" MASSPOINTS"
-    else: 
-        print "MASSPOINT NUMBER NOT VALID"
-        exit()
-flloc=len(args)-1
-if nMPi: flloc=len(args)-2 
-if "fl=" in args[flloc]:
-    flvi = args[flloc].split("=")[1]
-    if   flvi in flavopts:
-        flavour = "\"" + flavopts[flvi] + "\""
-    elif flvi in flavopts.values():
-        flavour = "\"" + flvi           + "\"" 
-    else:
-        print "flavour not recognised"
-        exit()
-
-
-if args[flloc] in flavopts:
-    flavour = "\""+args[flloc]+"\""
-'''
-
-
-print flavour, "MP", nMPs
-print year, tag, sigset,"\n MISSING ARGUMENTS:", doDC, fileset, flavour
-#exit()
-
-
-exec(open("signalMassPoints.py").read())
+exec(open('signalMassPoints.py').read())
 dcyears = year.split('-')
 for dcyear in dcyears:
-    print dcyears, dcyear
     str_SM = '_'
     if 'SM-' not in fileset: str_SM = '_SM-' 
-    inputfile='./Shapes/'+dcyear+'/'+tag+'/plots_'+tag+str_SM+fileset+'.root'
+    inputfile='./Shapes/'+dcyear+'/'+tag.split('_')[0]+'/plots_'+tag.split('_')[0]+str_SM+fileset+'.root'
     if os.path.exists(inputfile) is False:
-        print "ROOT File",inputfile," doesn't exist, exiting"
+        print 'ROOT File',inputfile,' doesn\'t exist, exiting'
         exit()
     else:
-        print "Reading:",inputfile
+        print 'Reading:',inputfile
 
 #Look for masspoints in the sigset
 missDCfolder = []
@@ -192,24 +148,26 @@ missDC       = []
 
             
 for model in signalMassPoints:
-    print "Model:", model,"\tSignal set", sigset
+    print 'Model:', model,'\tSignal set', sigset, bool(model in sigset)
     if model not in sigset:  continue
+    #print signalMassPoints[model]
     for massPoint in signalMassPoints[model]:
-        if(massPointInSignalSet(massPoint,sigset)):
+        if(massPointInSignalSet(massPoint,sigset.replace('EOY',''))):
 
             submitThis = True
-	    rootname   = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_Blind.AsymptoticLimits.mH120.root'
+	    rootname   = './Limits/' + year + '/' + tag + '/' + massPoint + '/higgsCombine_' + tag + '_'+limrun+'.AsymptoticLimits.mH120.root'
             #Only do empty files unless otherwise implied
             if os.path.isfile(rootname) and allMP is False:  
                 if os.path.getsize(rootname)>6500:
                     submitThis = False
-                    print "ignored", massPoint
+                    print 'ignored', massPoint
             if submitThis is False: continue
             mpInSigset.append(massPoint)
-            #print massPoint, dcyear#, os.listdir(dclocs)
-            
+            print massPoint, dcyear#, os.listdir(dclocs)
+            print 'check this', bool(massPoint in sigset)
+        
             #Pick datacards if necessary 
-            if(doDC.lower() in doDCopts): continue
+            if makeFit or doDC.lower() in doDCopts: continue
             print '#####################\nDC', 
             for dcyear in year.split('-'):
                 dcfolder = './Datacards/'+dcyear+'/'+tag+'/'+massPoint+'/'
@@ -226,35 +184,36 @@ for model in signalMassPoints:
                     dcsize = os.path.getsize(whichdc+'datacard.txt')
                     if(dcsize<5000 and doDC not in doDCopts): emptyDC.append(whichDC)
                                                 
-            print "missing datacards:", len(missDC)+len(emptyDC)
+            print 'missing datacards:', len(missDC)+len(emptyDC)
             
-        if massPoint not in sigset: continue
-        print "Mass Point:", massPoint 
+        #if massPoint not in sigset: continue
+        #print 'Mass Point:', massPoint 
 
 #Print missing MP/DC
-print "Total datacards missing", len(missDC)
-if len(mpInSigset) == 0: 
-    print "no masspoints in the given sigset. Exiting"
-    exit()
-missDCmessage="please use the doDC option, or check the DC themselves"
-if len(missDCfolder) > 0:
-    print "missing datacard folders:"
-    for dcfolder in missDCfolder: print dcfolder
-    print missDCmessage
-if len(missDC)  > 0:
-    print "missing datacards:"
-    for dc in missDC: print dc
-    print missDCmessage
-if len(emptyDC) > 0:
-    print "unfilled datacards:"
-    for dc in emptyDC: print dc
-    print missDCmessage
-if len(missDCfolder) > 0 or len(missDC) > 0 or len(emptyDC) > 0:
-    print "exiting..."
-    exit()
+if makeFit is False:
+    print 'Total datacards missing', len(missDC)
+    if len(mpInSigset) == 0: 
+        print 'no masspoints in the given sigset. Exiting'
+        exit()
+    missDCmessage = 'please use the doDC option, or check the DC themselves'
+    if len(missDCfolder) > 0:
+        print 'missing datacard folders:'
+        for dcfolder in missDCfolder: print dcfolder
+        print missDCmessage
+    if len(missDC)  > 0:
+        print 'missing datacards:'
+        for dc in missDC: print dc
+        print missDCmessage
+    if len(emptyDC) > 0:
+        print 'unfilled datacards:'
+        for dc in emptyDC: print dc
+        print missDCmessage
+    if len(missDCfolder) > 0 or len(missDC) > 0 or len(emptyDC) > 0:
+        print 'exiting...'
+        exit()
 
 
-#Make a more human-readable logfile if necessary
+#Make a more human-readable logfile in case its useful later
 sigsets     = sigset.split(',')
 firstsigset = sigsets[0].split('_')
 writesigset = firstsigset    
@@ -277,7 +236,7 @@ try:
 except IndexError:
     nmS = 0
     nmX = 0
-    print "either no mS or mX specified"
+    print 'either no mS or mX specified'
 
     if   nmS>1: writesigset[1] = rreplace(writesigset[1] , 'mS', '', nmS - 1)
     elif nmX>1: writesigset[2] = rreplace(writesigset[2] , 'mX', '', nmX - 1)
@@ -286,57 +245,77 @@ except IndexError:
 
 #divide masspoints in sets of nMPs and send jobs
 lognm       = '_'.join(writesigset)
-jobfolder   = "./Condor/"+year+'/'+tag
-logfile     = jobfolder + '/'+lognm+".log"
-subfilename = jobfolder + '/'+lognm+".sub"
+jobfolder   = './Condor/'+year+'/'+tag
+logfile     = jobfolder + '/'+lognm+'.log'
+subfilename = jobfolder + '/'+lognm+'.sub'
 flistname   = jobfolder+'/joblist.txt'
+scriptname  = 'run_AnalysisMP.py'
+if makeFit: 
+    logfile     = logfile.replace('.log','_madFit.log')
+os.system('mkdir -p '+jobfolder)
 
-
-os.system("mkdir -p "+jobfolder)
-logtitle(logfile,fileset)
-logline  =   "Input arguments:\t"+ year + ' ' + tag + ' ' + fileset + ' ' + doDC
-logline += "\nSample list    :\t" + flistname
-logline += "\nSubmission file:\t"+ subfilename
-writetolog(logfile, logline)
+print mpInSigset
 
 jobs     = [sorted(mpInSigset)[x:x+nMPs] for x in xrange(0, len(mpInSigset), nMPs)]
-flist    = open(flistname,"w+")
+flist    = open(flistname,'w+')
 gridui   = False
+print 'jobs', jobs
+#exit() 
+
+logtitle(logfile,fileset)
+logline  =   'Input arguments:\t' + year+' '+tag+' '+PWD+' '+fileset+' '+str(doDC)+' '+limrun
+logline += '\nSample list    :\t' + flistname
+logline += '\nSubmission file:\t' + subfilename
+writetolog(logfile, logline)
 
 if 'gpfs' in PWD: 
+    print 'Inside Gridui'
     gridui  = True
-    gridfol = 'Limits/Jobs/'+fileset+'/'
+    gridfol = 'Limits/Jobs/'+fileset+'/'+year+'/'
     os.system('mkdir -p '+gridfol) 
 for ijob,job in enumerate(jobs):
-    argsigset = ",".join(job)
+    argsigset = ','.join(job)
+    arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)+' '+limrun
     flist.write(argsigset+'\n')
-    #    submit="condor_submit "+subfilename+" >>"+logfile
+    #    submit='condor_submit '+subfilename+' >>'+logfile
     
     if gridui is True:
-        arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)
-        gridnm    = gridfol+argsigset
+        gridnm    = gridfol+argsigset+'_limrun-'+limrun.split('=')[-1]
         gridcomm  = 'sbatch -o '+gridnm+'.out -e '+gridnm+'.err --qos=cms_high --partition=cloudcms '+gridnm+'.sh>'+gridnm+'.jid'
-        f2 = open(gridnm+".sh","w+")
-        f2.write("#!/bin/bash")
-        f2.write("\npython run_AnalysisMP.py "+arguments)
+        f2 = open(gridnm+'.sh','w+')
+        f2.write('#!/bin/bash')
+        f2.write('\npython run_AnalysisMP.py '+arguments)
         f2.close()
         os.system(gridcomm)
         #print gridcomm
-    print "sending job",str(ijob)+":", argsigset# arguments  
+        print 'sending job',str(ijob)+':', argsigset# arguments  
 flist.close()
 
-
-print PWD
-#exit()
 if 'cern.ch' in PWD: 
+    print 'Inside lxplus'
     jobsent      = 'MPs'#Works since files MPs are already in joblist.txt
     argsent      = '$('+jobsent+')'
-    arguments    = year+' '+tag+' '+argsent+ ' ' +PWD+' '+fileset+' '+str(doDC)
-    commandtorun = "condor_submit "+subfilename+">>"+logfile
+    arguments    = year+' '+tag+' '+argsent+' '+PWD+' '+fileset+' '+str(doDC)+' '+limrun
+    '''
+    if makeFit:  
+        for ijob, job in enumerate(jobs):
+            print "job", job
+            arguments = '--year='+year+' --tag='+tag+' --masspoint='+','.join(job)+ ' --fileset='+fileset
+            print "arguments", arguments
+            subfilename = subfilename.replace('.sub','_maxFit'+str(ijob)+'.sub') 
+            commandtorun = 'condor_submit '+subfilename+'>>'+logfile
+            makeSubFile(subfilename,jobfolder,jobsent, arguments, flavour)
+            os.system(commandtorun)                                                                            
+            print 'jobs sent:\n', commandtorun
+            writetolog(logfile,'----------------------------------')
+            exit()
+    else:
+    '''
+    commandtorun = 'condor_submit '+subfilename+'>>'+logfile
     makeSubFile(subfilename,jobfolder,jobsent, arguments, flavour)
     os.system(commandtorun)
-    print "jobs sent:\n", commandtorun
-    writetolog(logfile,"----------------------------------")
+    print 'jobs sent:\n', commandtorun
+    writetolog(logfile,'----------------------------------')
 
-print "LIMITS SENT\nlog file:\t"+logfile,"\nsub file:\t"+subfilename,"\njob list:\t"+flistname 
-
+print 'LIMITS SENT\nlog file:\t'+logfile,'\nsub file:\t'+subfilename,'\njob list:\t'+flistname 
+print "list", os.system('cat '+flistname)

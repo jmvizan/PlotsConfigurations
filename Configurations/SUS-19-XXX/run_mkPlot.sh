@@ -87,7 +87,7 @@ if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
 	mkPlot.py --pycfg=configuration.py --tag=$YEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --plotNormalizedCRratio=1 --nuisancesFile=$NUISANCES
     elif [[ $NORM == *'PreFit'* ]] || [[ $NORM == *'PostFit'* ]]; then
         IFS=- read -ra YEARLIST <<< $YEAR
-        if [[ $YEAR == *'-'* ]]; then
+	if [[ $YEAR == *'-'* ]]; then
             YEARLIST+=( $YEAR )
         fi
         for FITYEAR in "${YEARLIST[@]}"; do
@@ -104,7 +104,7 @@ if [[ $SIGSET == 'SM'* ]] || [[ $SIGSET == 'Backgrounds'* ]]; then
             if [[ $NORM == *'PostFitS'* ]]; then
                 mkPlot.py --pycfg=configuration.py --tag=$FITYEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_$NORM${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --postFit=p --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=None
             else
-                mkPlot.py --pycfg=configuration.py --tag=$FITYEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_$NORM${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --postFit=p --showDataVsBkgOnly --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=None
+		mkPlot.py --pycfg=configuration.py --tag=$FITYEAR$TAG --sigset=$SIGSET --inputFile=./Shapes/$YEAR/$TAG/plots_$NORM${TAG}_$FILESET.root --outputDirPlots=$PLOTDIR --postFit=p --showDataVsBkgOnly --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --showIntegralLegend=1  --nuisancesFile=None
             fi
         done
         PLOTDIR=$CLEANDIR

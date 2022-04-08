@@ -64,8 +64,7 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    print "2016 samples not yet available"
-    exit()
+    print "2016 samples not yet available, BE CAREFUL"
     ProductionMC   = 'Summer20UL16_106X_nAODv8_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8__MCSusyNomin2016v8'
     ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
     ProductionData = 'Run2016_106X_nAODv8_Full2016v8/DATASusy2016v8__hadd'
