@@ -218,6 +218,8 @@ lep2idx = '2'
 
 nLooseLepton = 'nLepton'
 nTightLepton = 'Sum$(('+ElectronWP+'+'+MuonWP+')==1)'
+#nTightPromptLepton = 'Sum$((('+ElectronWP+'+'+MuonWP+')*Lepton_promptgenmatched)==1)'
+nTightPromptLepton = '(('+ElectronWP+'[0]+'+MuonWP+'[0])*Lepton_promptgenmatched[0]+('+ElectronWP+'[1]+'+MuonWP+'[1])*Lepton_promptgenmatched[1])'
 
 pxll   = '(Lepton_pt['+lep0idx+']*cos(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*cos(Lepton_phi['+lep1idx+']))'
 pyll   = '(Lepton_pt['+lep0idx+']*sin(Lepton_phi['+lep0idx+'])+Lepton_pt['+lep1idx+']*sin(Lepton_phi['+lep1idx+']))'
@@ -277,6 +279,7 @@ SS  = nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_
 SSP = nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
 SSM = nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]>0 && Lepton_pdgId[1]>0'
 
+if 'SameSign' in opt.tag: OC = SS
 if 'AppWJets' in opt.tag: OC = OC.replace('==2 && mll', '==1 && mll')
 
 LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
@@ -468,7 +471,7 @@ if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the
     elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.48', 'rateDown' : '0.52' } 
     elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.30', 'rateDown' : '0.70' } 
 
-if 'SameSignValidationRegion' in opt.tag:
+if 'SameSign' in opt.tag or 'AppWJets' in opt.tag:
     nonpromptLepSF      = '1.'
     nonpromptLepSF_Up   = '1.'
     nonpromptLepSF_Down = '1.'
@@ -858,18 +861,31 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJets' in opt.sigset:
             
             samples['WJetsToLNu'] = { 'name' : getSampleFiles(directoryBkg,'WJetsToLNu-LO'          , False,treePrefix,skipTreesCheck) +
-                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT70_100'    , False,treePrefix,skipTreesCheck) + # Missing in 2016HIPM
-                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT100_200'   , False,treePrefix,skipTreesCheck) + # Missing in 2018
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT70_100'    , False,treePrefix,skipTreesCheck) +
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT100_200'   , False,treePrefix,skipTreesCheck) +
                                                getSampleFiles(directoryBkg,'WJetsToLNu_HT200_400'   , False,treePrefix,skipTreesCheck) +
                                                getSampleFiles(directoryBkg,'WJetsToLNu_HT400_600'   , False,treePrefix,skipTreesCheck) +
                                                getSampleFiles(directoryBkg,'WJetsToLNu_HT600_800'   , False,treePrefix,skipTreesCheck) +
-                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT800_1200'  , False,treePrefix,skipTreesCheck) + # Missing in 2017
+                                               getSampleFiles(directoryBkg,'WJetsToLNu_HT800_1200'  , False,treePrefix,skipTreesCheck) +
                                                getSampleFiles(directoryBkg,'WJetsToLNu_HT1200_2500' , False,treePrefix,skipTreesCheck) +
                                                getSampleFiles(directoryBkg,'WJetsToLNu_HT2500_inf'  , False,treePrefix,skipTreesCheck),
-                                      'weight' : XSWeight+'*'+SFweight ,
-                                      'isControlSample' : 1,
+                                      'weight' : XSWeight+'*'+SFweight.replace('*' + nonpromptLepSF, '') ,
+                                      #'isControlSample' : 1,
                                      }
+            addSampleWeight(samples,'WJetsToLNu','WJetsToLNu-LO', 'LHE_HT<70.0')
 
+            if 'AppWJetsSplit' in opt.tag:
+
+                samples['WJetsPrompt'] = {}
+                samples['WJetsFake'] = {}
+                for samkey in samples['WJetsToLNu']:
+                    samples['WJetsPrompt'][samkey] = samples['WJetsToLNu'][samkey]
+                    samples['WJetsFake'][samkey] = samples['WJetsToLNu'][samkey]
+
+                samples['WJetsPrompt']['weight'] += '*'+nTightPromptLepton
+                samples['WJetsFake']['weight'] += '*(1.-'+nTightPromptLepton+')'
+
+                del samples['WJetsToLNu']
 
         #if 'SameSignValidationRegion' in opt.tag:
     
@@ -895,6 +911,9 @@ if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrou
             if 'EOY' not in sample:
                 sampleToRemove.append(sample)
             if sample=='EOYWJets':
+                sampleToRemove.append(sample)
+        elif 'BackgroundsWJetsToLNu'== opt.sigset:
+            if sample!='WJetsToLNu' and sample!='WJetsPrompt' and sample!='WJetsFake':
                 sampleToRemove.append(sample)
         elif 'Backgrounds'+sample!= opt.sigset:
             sampleToRemove.append(sample)

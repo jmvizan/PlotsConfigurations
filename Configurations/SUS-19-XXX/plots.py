@@ -146,6 +146,22 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'samples'  : ['WJetsToLNu']
     }
 
+    groupPlot['WJetsPrompt']  = {
+        'nameHR' : 'W+jets prompt',
+        'nameLatex' : '\\PW+jets prompt',
+        'isSignal' : 0,
+        'color': 38,
+        'samples'  : ['WJetsPrompt']
+    }
+
+    groupPlot['WJetsFake']  = {
+        'nameHR' : 'W+jets fake',
+        'nameLatex' : '\\PW+jets fake',
+        'isSignal' : 0,
+        'color': 39,
+        'samples'  : ['WJetsFake']
+    }
+
     groupPlot['EOYWJets']  = {
         'nameHR' : 'EOY W+jets (#rightarrow ' + sl + '#nu)',
         'nameLatex' : 'EOY \\PW+jets ($\\to\\ell\\nu$)',
@@ -283,6 +299,24 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameHR' : 'W+jets (#rightarrow ' + sl + '#nu)',
         'nameLatex' : '\\PW+jets ($\\to\\ell\\nu$)',
         'color': 38,
+        'isSignal' : 0,
+        'isData'   : 0 ,
+        'scale'    : 1.0
+    }
+
+    plot['WJetsPrompt'] = {
+        'nameHR' : 'W+jets prompt',
+        'nameLatex' : '\\PW+jets prompt',
+        'color': 38,
+        'isSignal' : 0,
+        'isData'   : 0 ,
+        'scale'    : 1.0
+    }
+ 
+    plot['WJetsFake'] = {
+        'nameHR' : 'W+jets fake',
+        'nameLatex' : '\\PW+jets fake',
+        'color': 39,
         'isSignal' : 0,
         'isData'   : 0 ,
         'scale'    : 1.0
