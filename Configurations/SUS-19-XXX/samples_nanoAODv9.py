@@ -830,14 +830,16 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO',  'LHE_HT<70.0')
         addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')
 
-        samples['Higgs']   = {  'name'   : getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'   , False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu_M125', False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125'   , False,treePrefix,skipTreesCheck) +
-                                           getSampleFiles(directoryBkg,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125'     , False,treePrefix,skipTreesCheck) +  
-                                           getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125' , False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125'    , False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125', False,treePrefix,skipTreesCheck) ,
+        samples['Higgs']   = {  'name'   : getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'      , False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu_M125'   , False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125'      , False,treePrefix,skipTreesCheck) +
+                                           getSampleFiles(directoryBkg,'VBFHToTauTau_M125'         , False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125'        , False,treePrefix,skipTreesCheck) +  
+                                           getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125'    , False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125'       , False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125'   , False,treePrefix,skipTreesCheck) +
+                                           getSampleFiles(directoryBkg,'HZJ_HToWW_M125'            , False,treePrefix,skipTreesCheck) +
+                                           getSampleFiles(directoryBkg,'GluGluZH_HToWWTo2L2Nu_M125', False,treePrefix,skipTreesCheck),
                                 'weight' : XSWeight+'*'+SFweight ,
                                }
 
