@@ -70,6 +70,7 @@ def massPointInSignalSet(massPoint, sigSet):
     signalSet = sigSet.replace('SM-', '')
     signalSet = signalSet.replace('Backgrounds-', '')
     signalSet = signalSet.replace('Data-', '')
+    signalSet = signalSet.replace('WJets-', '')
 
     sigSetList = signalSet.split(',')
 

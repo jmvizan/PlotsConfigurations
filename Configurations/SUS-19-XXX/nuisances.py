@@ -45,7 +45,7 @@ for background in normBackgroundNuisances:
         for region in normBackgroundNuisances[background]:
             nuisancename = normBackgroundNuisances[background][region]['name']
             nuisances[nuisancename]  = {
-                'name'    : nuisancename+year, 
+                'name'    : nuisancename+year.replace('noHIPM','').replace('HIPM',''), 
                 'samples' : normBackgroundNuisances[background][region]['samples'],
                 'cuts'    : normBackgroundNuisances[background][region]['cuts'], 
                 'type'    : normBackgroundNuisances[background][region]['type'],
@@ -505,15 +505,17 @@ nuisanceToRemove = [ ]
 
 if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag:
 
-    if ('nanoAODv6' in opt.samplesFile and 'ctrl' in regionName and 'cern' in SITE) or ('nanoAODv9' in opt.samplesFile and '2016' not in year and 'cern' in SITE): 
+    if ('nanoAODv6' in opt.samplesFile and 'ctrl' in regionName and 'cern' in SITE) or ('nanoAODv9' in opt.samplesFile and 'cern' in SITE): 
  
         if hasattr(opt, 'batchSplit'): # Remove only when running shapes, so can make shapes in gridui and plots+datacards in lxplus
             for nuisance in nuisances:
                 if 'jesTotal' in nuisance or 'unclustEn' in nuisance: 
                     nuisanceToRemove.append(nuisance)
         
-    else:
-        pass
+    if 'SignalRegion' not in opt.tag:
+        for nuisance in nuisances:
+            if nuisance!='stat' and 'norm' in nuisances[nuisance]['name']:
+                nuisanceToRemove.append(nuisance)
 
 else:
 

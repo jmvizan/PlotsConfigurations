@@ -207,6 +207,14 @@ if 'LeptonL2TRate' in opt.tag:
             if 'JetHTElectron' in pdtrg:
                 effectiveTriggerLuminosity[yearkey][pdtrg.replace('Electron', 'Muon')]  = effectiveTriggerLuminosity[yearkey][pdtrg]
 
+directoryBkgEOY = directoryBkg.replace('Summer20UL16_106X_nAODv9_HIPM', 'Summer16_102X_nAODv6').replace('Summer20UL16_106X_nAODv9_noHIPM', 'Summer16_102X_nAODv6').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose').replace('noHIPM','').replace('HIPM','') 
+if 'cern' in SITE:
+    if '2016' in yeartag:
+        directoryBkgEOY = directoryBkgEOY.replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
+    elif 'EOY' in opt.sigset: 
+        print 'Set directoryBkgEOY for', yeartag, 'year'
+        exit()
+
 # nuisance parameters
 
 removeZeros = 1 if 'StatZero' in opt.tag else 0
@@ -230,7 +238,7 @@ for treeNuisance in treeNuisances:
     treeNuisances[treeNuisance]['BkgToSig'] = True if not fastsimSignal else True # ???
 
 treeNuisanceDirs = { }
-treeNuisanceSuffix = '__hadd' if 'cern' in SITE else ''
+treeNuisanceSuffix = '__hadd' if ('cern' in SITE and 'EOY' in opt.sigset) else ''
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'Bkg' : { }, 'Sig' : { }, }
     if treeNuisance=='nosmear' or treeNuisance=='smaer':
@@ -247,6 +255,12 @@ for treeNuisance in treeNuisances:
         for variation in [ 'Down', 'Up' ]:
             treeNuisanceDirs[treeNuisance]['Bkg'][variation]  = directoryBkgTemp.replace('variation', variation[:2])
             treeNuisanceDirs[treeNuisance]['Sig'][variation]  = directorySigTemp.replace('variation', variation[:2])
+    if 'EOY' in opt.sigset:
+        treeNuisanceDirs[treeNuisance]['Bkg']['Up']   = treeNuisanceDirs[treeNuisance]['Bkg']['Up'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        treeNuisanceDirs[treeNuisance]['Bkg']['Down'] = treeNuisanceDirs[treeNuisance]['Bkg']['Down'].replace('Summer20UL16_106X_nAODv9_', 'Summer16_102X_nAODv6').replace('noHIPM', '').replace('HIPM','').replace('Summer20UL17_106X_nAODv9', 'Fall2017_102X_nAODv6').replace('Summer20UL18_106X_nAODv9', 'Autumn18_102X_nAODv6').replace('v8', 'v6loose')
+        if 'cern' in SITE:
+            treeNuisanceDirs[treeNuisance]['Bkg']['Up']   = treeNuisanceDirs[treeNuisance]['Bkg']['Up'].replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
+            treeNuisanceDirs[treeNuisance]['Bkg']['Down'] = treeNuisanceDirs[treeNuisance]['Bkg']['Down'].replace('/eos/cms/store/group/phys_susy/Chargino/Nano/', '/eos/cms/store/user/scodella/SUSY/Nano/')
 
 globalNuisances = { }
 globalNuisances['trigger'] = { 'name' : 'trigger_yeartag', 'value' : trigger_uncertainty }
@@ -381,9 +395,8 @@ MET_significance = 'MET_significance'
 btagAlgo   = 'deepcsv'
 btagDisc   = 'btagDeepB'
 bTagWP     = '_M'
-if 'EOY' in opt.sigset:
+if 'EOY' in opt.sigset and 'EOYWJets' not in opt.sigset:
     btagAlgo   = 'btagDeepB'
-    print "Algo", btagAlgo
     bTagWP     = 'M'
 bTagPtCut  = '20.'
 if 'ptb25' in opt.tag: bTagPtCut  = '25.' 
@@ -430,7 +443,6 @@ btagWeight2tag = btagWeight1tag.replace('_1tag_', '_2tag_')
 ISRCut     = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
-print "btagWeight1tag", btagWeight1tag
 
 ### MET Filters 
 
@@ -540,17 +552,16 @@ for lep_i in ['Lep']:
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
         else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
 
-# nonprompt lepton rate TODO (updaten to full UL):
+# nonprompt lepton rate TODO?:
 
-if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.03', 'rateUp' : '1.12', 'rateDown' : '0.94' } 
-elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.12', 'rateUp' : '1.30', 'rateDown' : '0.95' } 
-elif '2017'       in yeartag: nonpromptLep = { 'rate' : '1.39', 'rateUp' : '1.47', 'rateDown' : '1.30' } 
-elif '2018'       in yeartag: nonpromptLep = { 'rate' : '1.28', 'rateUp' : '1.36', 'rateDown' : '1.20' } 
-if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the limits
-    if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.03', 'rateDown' : '0.97' } 
-    elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.12', 'rateDown' : '0.88' }
-    elif '2017'       in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.39', 'rateDown' : '0.61' } 
-    elif '2018'       in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.28', 'rateDown' : '0.72' } 
+if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.07', 'rateUp' : '1.16', 'rateDown' : '0.97' } 
+elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.09', 'rateUp' : '1.30', 'rateDown' : '0.91' } 
+elif '2017'       in yeartag: nonpromptLep = { 'rate' : '1.38', 'rateUp' : '1.46', 'rateDown' : '1.29' } 
+elif '2018'       in yeartag: nonpromptLep = { 'rate' : '1.28', 'rateUp' : '1.37', 'rateDown' : '1.21' } 
+if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the limits (EOY values)
+    if   '2016' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.23', 'rateDown' : '0.77' } 
+    elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.48', 'rateDown' : '0.52' } 
+    elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.30', 'rateDown' : '0.70' } 
 
 if 'SameSign' in opt.tag or 'AppWJets' in opt.tag or 'LeptonL2TRate' in opt.tag:
     nonpromptLepSF      = '1.'
@@ -583,7 +594,7 @@ SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeight['Lep']['
 
 normBackgrounds = {}
 
-if 'WWSF' in opt.tag and "PseudoData" not in opt.tag: # not updated to UL with no EOY mix
+if 'WWSF' in opt.tag and "PseudoData" not in opt.tag:
     if '2016HIPM' in opt.tag:
         normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.142' : '0.191' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
     elif '2016noHIPM' in opt.tag:
@@ -593,7 +604,7 @@ if 'WWSF' in opt.tag and "PseudoData" not in opt.tag: # not updated to UL with n
     elif '2018' in opt.tag:
         normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.395' : '0.167' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
 
-if 'WJetsCorr' in opt.sigset: # not updated to UL with no EOY mix
+if 'WJetsCorr' in opt.sigset:
 
     if '2016HIPM' in opt.tag:
         normBackgrounds['WJetsCorr']      = { 'nojet'   : { 'scalefactor' : { '1.00' : '0.' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' }, 
@@ -608,7 +619,7 @@ if 'WJetsCorr' in opt.sigset: # not updated to UL with no EOY mix
         normBackgrounds['WJetsCorr']      = { 'nojet'   : { 'scalefactor' : { '1.34' : '0.' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' },
                                               'notag'   : { 'scalefactor' : { '1.25' : '0.' }, 'cuts' : [ '_NoTag', '_Veto' ], 'selection' : '(nCleanJet>=1)' } }
 
-if 'SignalRegions' in opt.tag:
+if 'SignalRegions' in opt.tag or 'BackSF' in opt.tag:
 
     normBackgrounds['STtW']      = { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selection' : '1.' } }
     normBackgrounds['ttW']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
@@ -618,43 +629,70 @@ if 'SignalRegions' in opt.tag:
     normBackgrounds['DY']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
     normBackgrounds['ttSemilep'] = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
 
-if 'BackSF' in opt.tag:
+    if 'BackSF' in opt.tag: # To be updated to UL if one wants to use them
 
-    if '2016' in yeartag:
+        if '2016' in yeartag:
+            normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.08' }, 'selection' : '1.' } }
+            normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.29' : '0.28' }, 'selection' : '1.' } }
+            normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.13' : '0.31' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
+                                             'notag' : { 'scalefactor' : { '1.25' : '0.23' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
+                                           }
+            if 'kZZmass' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '1.00' : '0.27' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.12' : '0.20' }
+                #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '1.08' : '0.16' }
+            elif 'kZZpt' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.91' : '0.25' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.85' : '0.16' }
+            elif 'kZZdphi' in opt.tag: 
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '1.00' : '0.27' } 
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '1.13' : '0.21' } 
 
-        normBackgrounds['ZZTo2L2Nu'] = {"zz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.649104423235": "0.830079538826"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"1.10015223967": "0.639054591041"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.21260279299": "0.495018876864"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.04511093598": "0.280972069937"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
-        normBackgrounds['ZZTo4L'] = {"zz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.649104423235": "0.830079538826"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"1.10015223967": "0.639054591041"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.21260279299": "0.495018876864"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.04511093598": "0.280972069937"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
-        normBackgrounds['ttZ'] = {"tz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.410986796075": "0.713816527989"}, "cuts": ["ttZ"]}, "tz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"2.14496536263": "2.54559598018"}, "cuts": ["ttZ"]}, "tz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.19117240414": "1.48502261596"}, "cuts": ["ttZ"]}, "tz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"-0.435429767554": "3.50561191569"}, "cuts": ["ttZ"]}}
-        if 'WZtoWW' in opt.tag:
-            normBackgrounds['WZ'] = {"ww10": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.869018971171": "0.148991525902"}, "cuts": ["WZtoWW_Zcut10"]}, "ww15": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.857045132977": "0.150257713488"}, "cuts": ["WZtoWW_Zcut15"]}, "ww40": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.93499152749": "0.340915597372"}, "cuts": ["WZtoWW_Zcut10"]}, "ww45": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.883591590928": "0.323882874887"}, "cuts": ["WZtoWW_Zcut15"]}, "ww20": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.12183147546": "0.234153717195"}, "cuts": ["WZtoWW_Zcut10"]}, "ww30": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.941007008656": "0.267920068303"}, "cuts": ["WZtoWW_Zcut10"]}, "ww25": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.12195838515": "0.233500184334"}, "cuts": ["WZtoWW_Zcut15"]}, "ww35": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.917902503939": "0.260233513704"}, "cuts": ["WZtoWW_Zcut15"]}}
-        elif 'ZLeps' in opt.tag:
-            normBackgrounds['WZ'] = {"wz2k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.0679570316": "0.268804462088"}, "cuts": ["WZ_3LepZ"]}, "wz4z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.996832566661": "0.434224330997"}, "cuts": ["WZ_3Lep_"]}, "wz1k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.899261880448": "0.156767243775"}, "cuts": ["WZ_3LepZ"]}, "wz2z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.08921484096": "0.265951659141"}, "cuts": ["WZ_3Lep_"]}, "wz4k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.746591084221": "0.40351239747"}, "cuts": ["WZ_3LepZ"]}, "wz3z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.745113687456": "0.276616032756"}, "cuts": ["WZ_3Lep_"]}, "wz1z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.915654450784": "0.161063578425"}, "cuts": ["WZ_3Lep_"]}, "wz3k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.770956177236": "0.295963845173"}, "cuts": ["WZ_3LepZ"]}}
-        else:
-            normBackgrounds['WZ'] = {"wz4": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.94338667091": "0.413956073507"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz2": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.06384425988": "0.257389748858"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz3": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.88050773132": "0.289701399511"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz4p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.734944849811": "0.397958327618"}, "cuts": ["WZ_3LepZ"]}, "wz1p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.898471910523": "0.154804779366"}, "cuts": ["WZ_3LepZ"]}, "wz2p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.03470431501": "0.260096877544"}, "cuts": ["WZ_3LepZ"]}, "wz1": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.962406585463": "0.163089215331"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz3p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.819234568768": "0.299554898246"}, "cuts": ["WZ_3LepZ"]}}
+        elif '2017' in yeartag:
+            normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '1.04' : '0.08' }, 'selection' : '1.' } }
+            normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.45' : '0.27' }, 'selection' : '1.' } }
+            normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '0.83' : '0.25' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },  
+                                             'notag' : { 'scalefactor' : { '0.94' : '0.18' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
+                                           }
+            if 'kZZmass' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.84' : '0.16' }
+                #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '0.81' : '0.13' }
+            elif 'kZZpt' in opt.tag: 
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.68' : '0.20' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.66' : '0.12' }
+            elif 'kZZdphi' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.74' : '0.22' } 
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.86' : '0.16' }        
 
-    elif '2017' in yeartag:
+        elif '2018' in yeartag:
+            normBackgrounds['WZ']        = { 'all'   : { 'scalefactor' : { '0.86' : '0.06' }, 'selection' : '1.' } }
+            normBackgrounds['ttZ']       = { 'all'   : { 'scalefactor' : { '1.43' : '0.22' }, 'selection' : '1.' } }
+            normBackgrounds['ZZTo2L2Nu'] = { 'nojet' : { 'scalefactor' : { '1.08' : '0.23' }, 'cuts' : [ '_NoJet', '_Veto' ],         'selection' : '(nCleanJet==0)' },
+                                             'notag' : { 'scalefactor' : { '0.83' : '0.14' }, 'cuts' : [ '_NoTag', '_Tag', '_Veto' ], 'selection' : '(nCleanJet>=1)' },
+                                           }
+            if 'kZZmass' in opt.tag:   
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.95' : '0.20' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.75' : '0.13' }
+                #normBackgrounds['ZZTo2L2Nu']['veto']['scalefactor'] = { '0.81' : '0.11' }
+            elif 'kZZpt' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.88' : '0.19' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.58' : '0.10' }
+            elif 'kZZdphi' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['scalefactor'] = { '0.96' : '0.20' }
+                normBackgrounds['ZZTo2L2Nu']['notag']['scalefactor'] = { '0.76' : '0.13' }
 
-        normBackgrounds['ZZTo2L2Nu'] = {"zz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.251541583785": "0.589762439519"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.646435134089": "0.465004206203"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.23138954901": "0.427169237222"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.0329228803": "0.229940136296"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
-        normBackgrounds['ZZTo4L'] = {"zz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.251541583785": "0.589762439519"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.646435134089": "0.465004206203"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.23138954901": "0.427169237222"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.0329228803": "0.229940136296"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
-        normBackgrounds['ttZ'] = {"tz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"2.07097233633": "0.999780334581"}, "cuts": ["ttZ"]}, "tz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"3.45190155521": "2.43924240613"}, "cuts": ["ttZ"]}, "tz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.01263878518": "1.31867362966"}, "cuts": ["ttZ"]}, "tz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"-0.653130182769": "3.29220677094"}, "cuts": ["ttZ"]}}
-        if 'WZtoWW' in opt.tag:
-            normBackgrounds['WZ'] = {"ww10": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.18029325011": "0.14539093975"}, "cuts": ["WZtoWW_Zcut10"]}, "ww15": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.1709185035": "0.14461761427"}, "cuts": ["WZtoWW_Zcut15"]}, "ww40": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.800698699674": "0.272415100909"}, "cuts": ["WZtoWW_Zcut10"]}, "ww45": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.799438044352": "0.265909771474"}, "cuts": ["WZtoWW_Zcut15"]}, "ww20": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.00841545684": "0.185195158746"}, "cuts": ["WZtoWW_Zcut10"]}, "ww30": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.994812905174": "0.216973921745"}, "cuts": ["WZtoWW_Zcut10"]}, "ww25": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.966344071062": "0.179142877141"}, "cuts": ["WZtoWW_Zcut15"]}, "ww35": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.983544607706": "0.212435453023"}, "cuts": ["WZtoWW_Zcut15"]}}
-        elif 'ZLeps' in opt.tag:
-            normBackgrounds['WZ'] = {"wz2k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.12050634483": "0.225013712147"}, "cuts": ["WZ_3LepZ"]}, "wz4z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.921592606766": "0.357468144389"}, "cuts": ["WZ_3Lep_"]}, "wz1k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.20352174437": "0.154469642712"}, "cuts": ["WZ_3LepZ"]}, "wz2z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.19555904621": "0.226193146789"}, "cuts": ["WZ_3Lep_"]}, "wz4k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.695356207903": "0.334872883156"}, "cuts": ["WZ_3LepZ"]}, "wz3z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.999531210805": "0.279394479598"}, "cuts": ["WZ_3Lep_"]}, "wz1z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.20997876796": "0.151131083915"}, "cuts": ["WZ_3Lep_"]}, "wz3k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.895420351333": "0.27562757297"}, "cuts": ["WZ_3LepZ"]}}
-        else:
-            normBackgrounds['WZ'] = {"wz4": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.87171547334": "0.338767787273"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz2": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.27663807844": "0.230427704637"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz3": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"1.08102721049": "0.28168075023"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz4p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.677606551694": "0.326552146864"}, "cuts": ["WZ_3LepZ"]}, "wz1p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.17150206705": "0.150278891347"}, "cuts": ["WZ_3LepZ"]}, "wz2p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.15867593147": "0.226937010093"}, "cuts": ["WZ_3LepZ"]}, "wz1": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.22074429045": "0.148963096365"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz3p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.923888111641": "0.275128308041"}, "cuts": ["WZ_3LepZ"]}}
-
-    elif '2018' in yeartag:
-
-        normBackgrounds['ZZTo2L2Nu'] = {"zz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"1.11252027454": "0.685953714115"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.753620561097": "0.395047856574"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.712418368326": "0.280521588409"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.943111858876": "0.18310080517"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
-        normBackgrounds['ZZTo4L'] = {"zz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"1.11252027454": "0.685953714115"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.753620561097": "0.395047856574"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.712418368326": "0.280521588409"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.943111858876": "0.18310080517"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
-        normBackgrounds['ttZ'] = {"tz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.786846503712": "0.603528597619"}, "cuts": ["ttZ"]}, "tz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"1.20506857156": "1.52033313191"}, "cuts": ["ttZ"]}, "tz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.03137129004": "1.0081855125"}, "cuts": ["ttZ"]}, "tz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"-0.626323399885": "2.23065249957"}, "cuts": ["ttZ"]}}
-        if 'WZtoWW' in opt.tag:
-            normBackgrounds['WZ'] = {"ww10": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.04154481149": "0.12357924323"}, "cuts": ["WZtoWW_Zcut10"]}, "ww15": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.05342602279": "0.124906118528"}, "cuts": ["WZtoWW_Zcut15"]}, "ww40": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.544930747351": "0.204770962189"}, "cuts": ["WZtoWW_Zcut10"]}, "ww45": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.602400389081": "0.209310756935"}, "cuts": ["WZtoWW_Zcut15"]}, "ww20": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.72536386896": "0.138412820402"}, "cuts": ["WZtoWW_Zcut10"]}, "ww30": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.767691660535": "0.16826422566"}, "cuts": ["WZtoWW_Zcut10"]}, "ww25": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.718765085657": "0.136462095585"}, "cuts": ["WZtoWW_Zcut15"]}, "ww35": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.813895534032": "0.170241174621"}, "cuts": ["WZtoWW_Zcut15"]}}
-        elif 'ZLeps' in opt.tag:
-            normBackgrounds['WZ'] = {"wz2k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.59456780543": "0.141401299763"}, "cuts": ["WZ_3LepZ"]}, "wz4z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.798249998332": "0.289859255283"}, "cuts": ["WZ_3Lep_"]}, "wz1k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.00685903596": "0.118378196855"}, "cuts": ["WZ_3LepZ"]}, "wz2z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.677875837058": "0.148273927762"}, "cuts": ["WZ_3Lep_"]}, "wz4k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.622386586274": "0.269996864937"}, "cuts": ["WZ_3LepZ"]}, "wz3z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.631887581905": "0.183508851491"}, "cuts": ["WZ_3Lep_"]}, "wz1z": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.00448036602": "0.119037415274"}, "cuts": ["WZ_3Lep_"]}, "wz3k": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.595959165965": "0.18535875614"}, "cuts": ["WZ_3LepZ"]}}
-        else:
-            normBackgrounds['WZ'] = {"wz4": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.824736094173": "0.287695847012"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz2": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.70585791045": "0.147774638538"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz3": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.715889296429": "0.189599360458"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz4p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.613360364119": "0.266251340649"}, "cuts": ["WZ_3LepZ"]}, "wz1p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.993550909344": "0.116318464058"}, "cuts": ["WZ_3LepZ"]}, "wz2p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.592671868527": "0.138971652882"}, "cuts": ["WZ_3LepZ"]}, "wz1": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.01466465046": "0.118682185794"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "WZ_3Lep_"]}, "wz3p": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.578602729": "0.18136298403"}, "cuts": ["WZ_3LepZ"]}}
+        if 'BackSF' in opt.tag: 
+            if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag:
+                normBackgrounds['ZZTo2L2Nu']['nojet']['cuts'] = [ 'ptmiss-160' ]
+                normBackgrounds['ZZTo2L2Nu']['notag']['cuts'] = [ 'ptmiss-160' ]
+                normBackgrounds['ZZTo2L2Nu']['nojet']['selection'] = '(nCleanJet==0 && ptmiss'+ctrltag+'>=160.)'
+                normBackgrounds['ZZTo2L2Nu']['notag']['selection'] = '(nCleanJet>=1 && ptmiss'+ctrltag+'>=160.)'
+                normBackgrounds['ZZTo4L'] = normBackgrounds['ZZTo2L2Nu']
+                normBackgrounds['ttZ']['all']['cuts'] = [ 'ptmiss-160' ] 
+                normBackgrounds['ttZ']['all']['selection'] = '(ptmiss'+ctrltag+'>=160.)'
+                normBackgrounds['WZ']['all']['cuts'] = [ 'ptmiss-160' ]
+                normBackgrounds['WZ']['all']['selection'] = '(ptmiss'+ctrltag+'>=160.)'
 
 # top pt reweighting
 
@@ -663,8 +701,6 @@ centralTopPt = Top_pTrw
 systematicTopPt = '1.'
 
 ### Data info
-
-dataSampleVersions = { }
 
 if '2016' in yeartag or '2017' in yeartag :
 
@@ -676,14 +712,12 @@ if '2016' in yeartag or '2017' in yeartag :
             ['E','Run2016E_HIPM_UL2016-v1'],
             ['F','Run2016F_HIPM_UL2016-v1']
         ]
-        dataSampleVersions['DoubleEG'] = { 'B' : [ '-v1', '-v2' ] } 
     elif '2016noHIPM' in yeartag :
         DataRun = [
             ['F','Run2016F_UL2016-v1'],
             ['G','Run2016G_UL2016-v1'],
             ['H','Run2016H_UL2016-v1']
         ]
-        dataSampleVersions['DoubleMuon'] = { 'G' : [ '-v1', '-v2' ] }
     elif '2017' in yeartag :
         DataRun = [ 
             ['B','Run2017B-UL2017_MiniAODv2_NanoAODv9-v1'],
@@ -692,6 +726,7 @@ if '2016' in yeartag or '2017' in yeartag :
             ['E','Run2017E-UL2017_MiniAODv2_NanoAODv9-v1'],
             ['F','Run2017F-UL2017_MiniAODv2_NanoAODv9-v1'],
         ]
+
     DataSets = ['MuonEG','DoubleMuon','SingleMuon','DoubleEG','SingleElectron']
 
     DataTrig = {
@@ -710,12 +745,6 @@ elif '2018' in yeartag :
         ['C','Run2018C-UL2018_MiniAODv2_NanoAODv9-v1'] ,
         ['D','Run2018D-UL2018_MiniAODv2_NanoAODv9-v1'] ,
     ]
-
-    dataSampleVersions['DoubleMuon'] = { 'ABCD' : [ '-v1', '_GT36-v1' ] }
-    dataSampleVersions['EGamma']     = { 'D'    : [ '-v1',      '-v3' ] }
-    dataSampleVersions['MuonEG']     = { 'ABCD' : [ '-v1', '_GT36-v1' ] }
-    dataSampleVersions['SingleMuon'] = { 'BCD'  : [ '-v1', '_GT36-v1' ], 
-                                         'A'    : [ '-v1', '_GT26-v1' ] }
 
     if '2018AB' in opt.tag :
         DataRun.remove( ['C','Run2018C-UL2018_MiniAODv2_NanoAODv9-v1'] )
@@ -799,25 +828,40 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                             }
 
-        samples['WZ'] = { 'name'   : getSampleFiles(directoryBkg,'WZTo3LNu',False,treePrefix,skipTreesCheck),
-                          'weight' : XSWeight+'*'+SFweight ,
-                         }
+        WZext = ''#'_mllmin01' # placeholder TODO: change it when final datasets available
+        if '2016HIPM' in yeartag and 'EOY' in opt.tag:
+            samples['EOYVZ']  = { 'name'   : getSampleFiles(directoryBkgEOY,'WZTo3LNu'+WZext,False,treePrefix,skipTreesCheck),
+                                  'weight' : XSWeight+'*'+SFweight ,
+                                  }
+        if '2016HIPM' not in yeartag or (isDatacardOrPlot and skipTreesCheck and len(yeartag.split('-'))>1):
+            samples['WZ'] = { 'name'   : getSampleFiles(directoryBkg,'WZTo3LNu'+WZext,False,treePrefix,skipTreesCheck),
+                              'weight' : XSWeight+'*'+SFweight ,
+                             }
+        #if '_mllmin01' in WZext: # not processed in nAODv9
+        #    addSampleWeight(samples,'WZ','WZTo3LNu'+WZext, '4.42965/(58.59*0.601644)') # Wrong gridpack: mll>4 not mll>0.1
 
-        samples['ZZTo2L2Nu']  = {  'name'   : getSampleFiles(directoryBkg,'ZZTo2L2Nu', False,treePrefix,skipTreesCheck) +
-                                              getSampleFiles(directoryBkg,'ggZZ2e2n', False,treePrefix,skipTreesCheck) +
-                                              getSampleFiles(directoryBkg,'ggZZ2m2n', False,treePrefix,skipTreesCheck),  
+        samples['ZZTo2L2Nu']  = {  'name'   : getSampleFiles(directoryBkg,'ZZTo2L2Nu', False,treePrefix,skipTreesCheck), # +
+                                              #getSampleFiles(directoryBkg,'ggZZ2e2n', False,treePrefix,skipTreesCheck) +
+                                              #getSampleFiles(directoryBkg,'ggZZ2m2n', False,treePrefix,skipTreesCheck),  
                                    'weight' : XSWeight+'*'+SFweight ,
                                  }
+        if '2016HIPM' in yeartag and 'EOY' in opt.tag:
+            samples['EOYVZ']['name'] +=  getSampleFiles(directoryBkgEOY,'ggZZ2e2n', False,treePrefix,skipTreesCheck)
+            samples['EOYVZ']['name'] +=  getSampleFiles(directoryBkgEOY,'ggZZ2m2n', False,treePrefix,skipTreesCheck)
+        elif '2016HIPM' not in yeartag:
+            samples['ZZTo2L2Nu']['name'] += getSampleFiles(directoryBkg,'ggZZ2e2n', False,treePrefix,skipTreesCheck)  
+            samples['ZZTo2L2Nu']['name'] += getSampleFiles(directoryBkg,'ggZZ2m2n', False,treePrefix,skipTreesCheck)  
         
         addSampleWeight(samples,'ZZTo2L2Nu','ZZTo2L2Nu', '9.738e-01/6.008e-01') # From GenXSecAnalyzer: EOY mll>40 / UL mll>4
 
-        samples['DY'] = { 'name' :   getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck) +
-                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-70to100' , False,treePrefix,skipTreesCheck) +
-                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-100to200', False,treePrefix,skipTreesCheck) +
-                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-200to400', False,treePrefix,skipTreesCheck) +
-                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-400to600', False,treePrefix,skipTreesCheck) +
-                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-600toInf', False,treePrefix,skipTreesCheck) +
-                                     getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'           , False,treePrefix,skipTreesCheck) +
+        # TODO missing HT binned samples
+        samples['DY'] = { 'name' :   #getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-70to100' , False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-100to200', False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-200to400', False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-400to600', False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_M-4to50_HT-600toInf', False,treePrefix,skipTreesCheck) +
+                                     #getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'           , False,treePrefix,skipTreesCheck) +
                                      getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-70to100'   , False,treePrefix,skipTreesCheck) +
                                      getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-100to200'  , False,treePrefix,skipTreesCheck) +
                                      getSampleFiles(directoryBkg,'DYJetsToLL_M-50_HT-200to400'  , False,treePrefix,skipTreesCheck) +
@@ -829,26 +873,60 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                           'weight' : XSWeight+'*'+SFweight ,
                         }  
 
-        addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO',  'LHE_HT<70.0')
-        addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')
+        if '2016' in yeartag and 'EOY' in opt.tag:
+            samples['EOYDrellYan'] = { 'name'   : getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-10to50-LO' , False,treePrefix,skipTreesCheck),
+                                       'weight' : XSWeight+'*'+SFweight ,
+                                   }
+            if '2016noHIPM' in yeartag: 
+                samples['EOYDrellYan']['name'] += getSampleFiles(directoryBkgEOY,'DYJetsToLL_M-50-LO_ext2', False,treePrefix,skipTreesCheck)
+                addSampleWeight(samples,'EOYDrellYan','DYJetsToLL_M-50-LO_ext2', 'LHE_HT<70.0')
 
-        samples['Higgs']   = {  'name'   : getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'      , False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu_M125'   , False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125'      , False,treePrefix,skipTreesCheck) +
-                                           getSampleFiles(directoryBkg,'VBFHToTauTau_M125'         , False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125'        , False,treePrefix,skipTreesCheck) +  
-                                           getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125'    , False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125'       , False,treePrefix,skipTreesCheck) + 
-                                           getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125'   , False,treePrefix,skipTreesCheck) +
-                                           getSampleFiles(directoryBkg,'HZJ_HToWW_M125'            , False,treePrefix,skipTreesCheck) +
-                                           getSampleFiles(directoryBkg,'GluGluZH_HToWWTo2L2Nu_M125', False,treePrefix,skipTreesCheck),
+        if '2016HIPM' in yeartag or '2017' in yeartag or '2018' in yeartag:
+            if '2017' in yeartag or '2018' in yeartag:
+                samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-10to50-LO'       , False,treePrefix,skipTreesCheck)
+            samples['DY']['name'] += getSampleFiles(directoryBkg,'DYJetsToLL_M-50-LO'           , False,treePrefix,skipTreesCheck)
+            addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')
+
+        #addSampleWeight(samples,'DY','DYJetsToLL_M-10to50-LO',  'LHE_HT<70.0') # TODO uncomment when DY M-4to50 samples available
+        #addSampleWeight(samples,'DY','DYJetsToLL_M-50-LO', 'LHE_HT<70.0')i     # TODO uncomment when DY M-50-LO samples available for all years
+
+        # TODO missing
+        samples['Higgs']   = {  'name'   : getSampleFiles(directoryBkg,'GluGluHToTauTau_M125'   , False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'GluGluHToWWTo2L2Nu_M125', False,treePrefix,skipTreesCheck) + 
+                                           getSampleFiles(directoryBkg,'VBFHToWWTo2L2Nu_M125'   , False,treePrefix,skipTreesCheck), #+
+                                           #getSampleFiles(directoryBkg,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck) + 
+                                           #getSampleFiles(directoryBkg,'HWplusJ_HToWW_M125'     , False,treePrefix,skipTreesCheck) +  
+                                           #getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125' , False,treePrefix,skipTreesCheck) + 
+                                           #getSampleFiles(directoryBkg,'HWminusJ_HToWW_M125'    , False,treePrefix,skipTreesCheck) + 
+                                           #getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125', False,treePrefix,skipTreesCheck) ,
                                 'weight' : XSWeight+'*'+SFweight ,
                                }
 
-        samples['VZ'] = { 'name'   : getSampleFiles(directoryBkg,'WZTo2L2Q',False,treePrefix,skipTreesCheck) +
-                                     getSampleFiles(directoryBkg,'ZZTo2L2Q',False,treePrefix,skipTreesCheck) ,
-                          'weight' : XSWeight+'*'+SFweight
-                         }
+        if '2016HIPM' not in yeartag:
+            samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWminusJ_HToTauTau_M125', False,treePrefix,skipTreesCheck)
+            samples['Higgs']['name'] += getSampleFiles(directoryBkg,'HWplusJ_HToTauTau_M125' , False,treePrefix,skipTreesCheck)
+            samples['Higgs']['name'] += getSampleFiles(directoryBkg,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck)
+            
+        if 'EOY' in opt.tag: 
+            samples['EOYH']   = {  'name'   : getSampleFiles(directoryBkgEOY,'HWplusJ_HToWW_M125'  , False,treePrefix,skipTreesCheck) +
+                                              getSampleFiles(directoryBkgEOY,'HWminusJ_HToWW_M125' , False,treePrefix,skipTreesCheck),
+                                   'weight' : XSWeight+'*'+SFweight ,
+                                   }
+            if '2016HIPM' in yeartag:
+                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWminusJ_HToTauTau_M125', False,treePrefix,skipTreesCheck)
+                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'HWplusJ_HToTauTau_M125'     , False,treePrefix,skipTreesCheck)
+                samples['EOYH']['name'] += getSampleFiles(directoryBkgEOY,'VBFHToTauTau_M125'      , False,treePrefix,skipTreesCheck)
+
+        if 'EOY' not in opt.tag: # Missing WZ for HIPM and 2017 -> negligible backgrounds, will be added when full UL availble
+            samples['VZ'] = { 'name'   : getSampleFiles(directoryBkg,'WZTo2L2Q',False,treePrefix,skipTreesCheck) +
+                                         getSampleFiles(directoryBkg,'ZZTo2L2Q',False,treePrefix,skipTreesCheck) ,
+                              'weight' : XSWeight+'*'+SFweight
+                             }
+        if 'EOY' in opt.tag:
+            samples['EOYQQ']    = {    'name'   :   getSampleFiles(directoryBkgEOY,'WZTo2L2Q',False,treePrefix,skipTreesCheck) + 
+                                                    getSampleFiles(directoryBkgEOY,'ZZTo2L2Q',False,treePrefix,skipTreesCheck) ,
+                                       'weight' : XSWeight+'*'+SFweight
+                                   }
         
         samples['VVV']   = {    'name'   :   getSampleFiles(directoryBkg,'WWW',False,treePrefix,skipTreesCheck) + 
                                              getSampleFiles(directoryBkg,'WWZ',False,treePrefix,skipTreesCheck) + 
@@ -860,23 +938,53 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
         if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot) or 'TheoryNormalizations' in opt.tag:
         
-            samples['ZZTo4L']   = {    'name'  :    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'              , False,treePrefix,skipTreesCheck) +
+            samples['ZZTo4L']   = {    'name'  :    #getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'              , False,treePrefix,skipTreesCheck) +
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2m'            , False,treePrefix,skipTreesCheck) +
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2t'            , False,treePrefix,skipTreesCheck) +
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2m2t'            , False,treePrefix,skipTreesCheck) + 
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4e'              , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4m'              , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4t'              , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'VBFHToZZTo4L_M125'   , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'GluGluHToZZTo4L_M125', False,treePrefix,skipTreesCheck),
+                                                    #getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4m'              , False,treePrefix,skipTreesCheck) +
+                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4t'              , False,treePrefix,skipTreesCheck),# +
+                                                    #getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'VBFHToZZTo4L_M125'   , False,treePrefix,skipTreesCheck) +
+                                                    #getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'GluGluHToZZTo4L_M125', False,treePrefix,skipTreesCheck),
                                        'weight' : XSWeight+'*'+SFweight ,
                                        'JobsPerSample' : 6,
                                        'isControlSample' : 1,
                                    }
-             
+     
+            missingZZ4L = { '2016HIPM'   : [ 'ZZTo4L', 'ggZZ4m', 'VBFHToZZTo4L_M125', 'GluGluHToZZTo4L_M125' ],
+                            '2016noHIPM' : [ 'ZZTo4L'                                                        ], 
+                            '2017'       : [                                                                 ],
+                            '2018'       : [                                                                 ] } 
+                                       
+            for yyeeaarr in missingZZ4L:
+                if yyeeaarr in yeartag:
+                    for addingZZ4L in [ 'ZZTo4L', 'ggZZ4m', 'VBFHToZZTo4L_M125', 'GluGluHToZZTo4L_M125' ]:
+                        if addingZZ4L not in missingZZ4L[yyeeaarr]:
+                            samples['ZZTo4L']['name'] += getSampleFiles(directoryBkg.replace('reco', 'ctrl'), addingZZ4L, False,treePrefix,skipTreesCheck)
+            
+            del missingZZ4L['2017']
+            del missingZZ4L['2018']
+            
+            if 'EOY' in opt.tag:
+                for yyeeaarr in missingZZ4L:
+                    if yyeeaarr in yeartag:
+                        firstMissingZZ4L = missingZZ4L[yyeeaarr][0]
+                        ZZ4Lstr = '' 
+                        if '2016' in yeartag and 'ZZTo4L' in firstMissingZZ4L: ZZ4Lstr+='_ext1'
+
+                        samples['EOYZZ4L']   = { 'name'   : getSampleFiles(directoryBkgEOY,firstMissingZZ4L+ZZ4Lstr,False,treePrefix,skipTreesCheck),
+                                                 'weight' : XSWeight+'*'+SFweight ,
+                                                  'isControlSample' : 1,
+                                                }
+ 
+                        for addingZZ4L in missingZZ4L[yyeeaarr]:
+                            if addingZZ4L!=firstMissingZZ4L:
+                                samples['EOYZZ4L']['name'] += getSampleFiles(directoryBkgEOY.replace('reco', 'ctrl'), addingZZ4L, False,treePrefix,skipTreesCheck)
+
             for kZZvariable in [ 'kZZmass', 'kZZdphi', 'kZZpt' ]:
                 if kZZvariable in opt.tag:  
-                    addSampleWeight(samples,'ZZTo4L','ZZTo4L', kZZvariable.replace('kZZ', 'kZZ_'))
+                    addSampleWeight(samples,'ZZTo4L','ZZTo4L'+ZZ4Lext, kZZvariable.replace('kZZ', 'kZZ_'))
 
         nameWJets = 'WJetsToLNu'
         if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJets' in opt.sigset:
@@ -925,6 +1033,16 @@ if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrou
         if 'Veto' in opt.sigset:
             if sample in opt.sigset:
                 sampleToRemove.append(sample)
+            if 'EOY' in sample: 
+                sampleToRemove.append(sample)
+        elif 'EOYWJets' in opt.sigset:
+            if sample!='EOYWJets':
+                sampleToRemove.append(sample)
+        elif 'BackgroundsEOY'==opt.sigset:
+            if 'EOY' not in sample:
+                sampleToRemove.append(sample)
+            if sample=='EOYWJets':
+                sampleToRemove.append(sample)
         elif 'BackgroundsWJets' in opt.sigset:
             if sample!=nameWJets and sample!='WJetsPrompt' and sample!='WJetsFake':
                 sampleToRemove.append(sample)
@@ -933,7 +1051,6 @@ if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrou
 
     for sample in sampleToRemove:
         del samples[sample]
-
 for sample in samples:
     samples[sample]['isSignal']  = 0
     samples[sample]['isDATA']    = 0
@@ -953,16 +1070,24 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'isSignal'  : 0,
                            'isDATA'    : 1, 
                            'isFastsim' : 0
-                         }
+                       }
+    v1v2samples = { 'SingleMuon'     : ['Run2018B','Run2018C'],
+                    'DoubleMuon'     : ['Run2016G_UL2016', 'Run2018D'],
+                    'DoubleEG'       : ['Run2016B-ver2_HIPM']
+              }
 
+    v1v3samples = { 'EGamma' : ['Run2018D'] }
+    
     for Run in DataRun :
         for DataSet in DataSets :
-
             datasetName = DataSet+'_'+Run[1]
-            if DataSet in dataSampleVersions:
-                for vrun in dataSampleVersions[DataSet]:
-                    if Run[0] in vrun:
-                        datasetName = datasetName.replace(dataSampleVersions[DataSet][vrun][0], dataSampleVersions[DataSet][vrun][1])
+            for v1v2sample in v1v2samples:
+                if DataSet != v1v2sample: continue
+                for v1v2run in v1v2samples[v1v2sample]:
+                    if v1v2run in Run[1]: datasetName = datasetName.replace('-v1', '-v2') 
+            if DataSet in v1v3samples:
+                for v1v3run in v1v3samples[DataSet]:
+                    if v1v3run in Run[1]: datasetName = datasetName.replace('-v1', '-v3')
 
             FileTarget = getSampleFiles(directoryData,datasetName,True,treePrefix,skipTreesCheck)
             for iFile in FileTarget:
@@ -1000,9 +1125,8 @@ elif 'MET' in opt.sigset:
     for Run in DataRun :
         datasetName = 'MET_'+Run[1]
         if 'Run2016F_UL2016' in Run[1]: datasetName = datasetName.replace('-v1', '-v2')
-        if 'Run2018A-UL2018' in Run[1]: datasetName = datasetName.replace('-v1', '_GT36-v1')
-        if 'Run2018B-UL2018' in Run[1]: datasetName = datasetName.replace('-v1', '_GT36-v1')
-
+        if 'Run2018A-UL2018' in Run[1]: datasetName = datasetName.replace('-v1', '-v2')
+        if 'Run2018B-UL2018' in Run[1]: datasetName = datasetName.replace('-v1', '-v2')
         FileTarget = getSampleFiles(directoryMET,datasetName,True,treePrefix,skipTreesCheck)
         for iFile in FileTarget:
             samples['MET']['name'].append(iFile)
@@ -1019,7 +1143,7 @@ elif 'LeptonL2TRateJetHT' in opt.tag and 'JetHT' in opt.sigset:
                           'isFastsim' : 0
                          }
 
-    verSamples = { 'Run2018A' : [ '-v1', '-v2' ], 'Run2018C' : [ '-v1', '_GT36-v1' ], 'Run2018D' : [ '-v1', '-v2' ] }
+    verSamples = { '_HIPM' : '-v2', 'Run2018A' : '-v2', 'Run2018C' : '_GT36-v1', 'Run2018D' : '-v2'}
 
     del leptonL2TRateTriggers['SingleElectron']
     del leptonL2TRateTriggers['SingleMuon']
@@ -1033,7 +1157,7 @@ elif 'LeptonL2TRateJetHT' in opt.tag and 'JetHT' in opt.sigset:
 
         datasetName = 'JetHT_'+Run[1]
         for verrun in verSamples:
-            if verrun in Run[1]: datasetName = datasetName.replace(verSamples[verrun][0], verSamples[verrun][1])
+            if verrun in Run[1]: datasetName = datasetName.replace('-v1', verSamples[verrun])
 
         FileTarget = getSampleFiles(directoryData,datasetName,True,treePrefix,skipTreesCheck)
         for iFile in FileTarget:
@@ -1043,6 +1167,11 @@ elif 'LeptonL2TRateJetHT' in opt.tag and 'JetHT' in opt.sigset:
 
 elif 'LeptonL2TRate' in opt.tag and 'Single' in opt.sigset:
  
+    verSamples = { 'SingleMuon'     :  { 'Run2018A' : '-v2', 'Run2018B' : '_GT36-v1', 'Run2018C' : '_GT36-v1', '_HIPM' : '-v2' },
+                   'SingleElectron' :  { '_HIPM'    : '-v2' },
+                   'EGamma'         :  { 'Run2018D' : '-v3' },
+                  }
+
     if 'SingleLepton' not in opt.sigset:
         if 'SingleElectron' in opt.sigset: del leptonL2TRateTriggers['SingleMuon']
         if 'SingleMuon' in opt.sigset: del leptonL2TRateTriggers['SingleElectron']
@@ -1074,10 +1203,9 @@ elif 'LeptonL2TRate' in opt.tag and 'Single' in opt.sigset:
                 if DataSet=='SingleElectron' and 'Run2017B' in Run[1]: continue
 
                 datasetName = DataSet+'_'+Run[1]
-                if DataSet in dataSampleVersions:
-                    for vrun in dataSampleVersions[DataSet]:
-                        if Run[0] in vrun:
-                            datasetName = datasetName.replace(dataSampleVersions[DataSet][vrun][0], dataSampleVersions[DataSet][vrun][1])
+                if DataSet in verSamples:
+                    for verrun in verSamples[DataSet]:
+                        if verrun in Run[1]: datasetName = datasetName.replace('-v1', verSamples[DataSet][verrun])
 
                 FileTarget = getSampleFiles(directoryData,datasetName,True,treePrefix,skipTreesCheck)
                 for iFile in FileTarget:

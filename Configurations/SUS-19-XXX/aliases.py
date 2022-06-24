@@ -39,7 +39,24 @@ if recoFlag=='_UL' and 'TrigLatino' not in opt.tag and 'Trigger' not in opt.tag 
                 aliases['triggerWeightBTag']['samples'].append(sample)
                 aliases['triggerWeightVeto']['samples'].append(sample)
             samples[sample]['weight'] = samples[sample]['weight'].replace(TriggerEff, trW)
-     
+    
+## Lepton LooseToTight Rates
+
+if recoFlag=='_UL':
+
+    wpFlag = 'Tight' if 'TightLep' in opt.tag else ''
+    leptonL2TRateFile = os.getenv('PWD')+'/Data/'+yeartag+'/'+wpFlag+'LeptonL2TRate.root'
+
+    aliases['leptonL2TWeight'] = {
+            'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/leptonL2TWeightReader.cc+' ],
+            'class': 'LeptonL2TWeightReader',
+            'args': ( leptonL2TRateFile, 'mediumRelIsoTight', 'cutBasedMediumPOG'),
+            'samples': [ ]
+    }
+    if 'WJetsCorr' in samples:
+        aliases['leptonL2TWeight']['samples'].append('WJetsCorr')
+        samples['WJetsCorr']['weight'] += '*leptonL2TWeight'
+ 
 ## FastSim lepton scale factors
 
 fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag.replace('noHIPM','').replace('HIPM','')+'/fastsimLeptonWeights.root' # TODO switch to UL scale factors when FastSim available

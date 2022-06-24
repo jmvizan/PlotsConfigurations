@@ -8,7 +8,7 @@ SF    = LL+' && '+vetoZ
 NoJets = 'Alt$(CleanJet_pt[0],0)<' +jetPtCut
 HasJet = 'Alt$(CleanJet_pt[0],0)>='+jetPtCut
  
-if 'Data' in opt.sigset:
+if 'Data' in opt.sigset or 'SingleLepton' in opt.sigset: # from nAODv9 it should't matter anymore 
     btagWeightNoCut = '1.'
     btagWeight1tag = bTagPass
     btagWeight0tag = bTagVeto
@@ -282,6 +282,23 @@ if 'LatinoControlRegion' in opt.tag:
     cuts['Top_sf'] = { 'expr' : '('+OC+' && '+SF+' && ptmiss>=50 && mll>25 && mll<76 && '+pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40)', 'weight' : btagWeight1tag }
     cuts['DY_sf']  = { 'expr' : '('+OC+' && '+LL+' && ptmiss>=50 && '+Zcut.replace('ZCUT','15')+'&& '+pTll+'>30 && '+dRll+'<2.5 && '+mTllptmiss+'>40)', 'weight' : btagWeight0tag }
 
+if 'LeptonL2TRate' in opt.tag:
+
+    mTLep1MET = 'sqrt(2*Lepton_pt[0]*MET_pt*(1.-cos(Lepton_phi[0]-MET_phi)))'
+    hadronCut = 'nCleanJet>=1 && CleanJet_pt[0]>25. && sqrt((Lepton_eta[0]-CleanJet_eta[0])*(Lepton_eta[0]-CleanJet_eta[0])+acos(cos(Lepton_phi[0]-CleanJet_phi[0]))*acos(cos(Lepton_phi[0]-CleanJet_phi[0])))>1.'
+    LeptonL2TRateSelection = nLooseLepton+'==1 && MET_pt<20. && '+mTLep1MET+'<20. && '+hadronCut+' && Lepton_pt[0]>=20. && abs(Lepton_eta[0])<2.4'
+
+    tightIDcut = nTightLepton+'==1'
+    if 'TightLep' in opt.tag: tightIDcut += ' && (Lepton_isTightElectron_cutBasedTightPOG[0]+(abs(Lepton_pdgId[0])==13)*Alt$(Muon_tightId[abs(Lepton_muonIdx[0])],0))==1' 
+
+    for dataSet in leptonL2TRateTriggers:
+        for ptrange in leptonL2TRateTriggers[dataSet]:
+            leptonIdCut = 'fabs(Lepton_pdgId[0])==11' if (dataSet=='SingleElectron' or 'Electron' in ptrange) else 'fabs(Lepton_pdgId[0])==13'
+            triggerCut = leptonL2TRateTriggers[dataSet][ptrange]
+            effLumi = '*'+effectiveTriggerLuminosity[yeartag][dataSet+ptrange] if 'EWK' in opt.sigset else ''
+            cuts[dataSet+ptrange+'Loose'] = { 'expr' : LeptonL2TRateSelection+' && '+leptonIdCut+' && '+triggerCut,                  'weight' : btagWeight0tag+effLumi }
+            cuts[dataSet+ptrange+'Tight'] = { 'expr' : LeptonL2TRateSelection+' && '+leptonIdCut+' && '+triggerCut+' && '+tightIDcut,'weight' : btagWeight0tag+effLumi }
+
 if 'HighPtMissOptimisationRegion' in opt.tag:
 
     cuts['VR1_Tag_em']   = { 'expr' : '(' + OC+' && '+DF+' && ptmiss>=100)', 'weight' : btagWeight1tag }
@@ -357,7 +374,7 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
         if 'WZValidationRegionZLeps' in opt.tag:
             WZselection += ' && (mt2llfake0+mt2llfake1+mt2llfake2-mt2ll_WZ)>0.'
 
-        cuts['WZ_3Lep']             = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
+        cuts['WZ_3Lep_']            = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3LepZ']            = { 'expr' : '(' + WZselection.replace('ZCUT',  '15.').replace('METCUT',   '0') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3Lep_ptmiss-140']  = { 'expr' : '(' + WZselection.replace('ZCUT', '999.').replace('METCUT', '140') + ')', 'weight' : btagWeight0tag }
         cuts['WZ_3LepZ_ptmiss-140'] = { 'expr' : '(' + WZselection.replace('ZCUT',  '15.').replace('METCUT', '140') + ')', 'weight' : btagWeight0tag }
@@ -667,7 +684,12 @@ if normBackgrounds is not None:
 
             normBackgroundNuisances[background] = { }
 
+            exclusiveSelection = True
+
             for region in normBackgrounds[background]:
+
+                if 'exclusiveSelection' in normBackgrounds[background][region] and not normBackgrounds[background][region]['exclusiveSelection']: 
+                    exclusiveSelection = False
 
                 cutList = [ ]
                 if 'cuts' not in normBackgrounds[background][region]:
@@ -689,6 +711,14 @@ if normBackgrounds is not None:
                     normBackgroundNuisances[background][region]['cuts'] = cutList
                     normBackgroundNuisances[background][region]['scalefactorFromData'] = False if (region=='all' and scaleFactor=='1.00') else True
 
+            if not exclusiveSelection and hasattr(opt, 'doHadd') and not opt.doHadd:
+                # Tricky because we can't define a weight for one sample and one cut!
+                # We need to run only on the background to which the SF apply. For other samples, L673 saves us!
+                for othersample in samples:
+                    if othersample!=background:
+                        print 'Error: scale factors for', background, 'do not have exclusive selection: please run on this sample separately!'
+                        exit()
+
             for region in normBackgrounds[background]:    
                 if region in normBackgroundNuisances[background]:
 
@@ -706,7 +736,15 @@ if normBackgrounds is not None:
                                 nuisanceType = 'shape'
 
                     if normBackgroundNuisances[background][region]['scalefactorFromData']:
-                        samples[background]['weight'] += '*'+regionWeight
+                        if exclusiveSelection:
+                            samples[background]['weight'] += '*'+regionWeight
+                        else:
+                            for cut in cuts:                       
+                                if cut in normBackgroundNuisances[background][region]['cuts']:
+                                    if 'weight' in cuts[cut]:
+                                        cuts[cut]['weight'] += '*'+regionWeight           
+                                    else:
+                                        cuts[cut]['weight'] = regionWeight
 
                     normBackgroundNuisances[background][region]['type'] = nuisanceType
 
