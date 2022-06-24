@@ -4,6 +4,8 @@ if [ $# -lt 2 ]; then
     exit
 fi
 
+SHAPEDIR=./Shapes
+
 intag=$2
 
 addCR=0
@@ -33,15 +35,15 @@ for year in "${yearlist[@]}"; do
 
     if [[ $year == '2016'* ]] || [ $year == '2017' ] || [ $year == '2018' ]; then
 
-        mkdir -p ./Shapes/$year/$intag
-        filename=./Shapes/$year/$intag/plots_${intag}
+        mkdir -p $SHAPEDIR/$year/$intag
+        filename=$SHAPEDIR/$year/$intag/plots_${intag}
 
         infile=${filename}_SM.root
         if test -f "$infile"; then
             echo "$infile exists, will use it."
         else
             smtag="${intag/FitCR/}"
-            infile=./Shapes/$year/$smtag/plots_${smtag}_SM.root
+            infile=$SHAPEDIR/$year/$smtag/plots_${smtag}_SM.root
         fi
    
         # Check if tag was already merged
@@ -54,16 +56,16 @@ for year in "${yearlist[@]}"; do
             if [ $addCR == '1' ]; then
                 sigtag="${intag/FitCR/}"
             fi
-            sigfile=./Shapes/$year/$sigtag/plots_${sigtag}_$sample.root
+            sigfile=$SHAPEDIR/$year/$sigtag/plots_${sigtag}_$sample.root
         
             wztag="${intag/FitCR/FitCRWZ}"
-            wzfile=./Shapes/$year/$wztag/plots_${wztag}_SM.root
+            wzfile=$SHAPEDIR/$year/$wztag/plots_${wztag}_SM.root
         
             zztag="${intag/FitCR/FitCRZZ}"
-            zzfile=./Shapes/$year/$zztag/plots_${zztag}_SM.root   
+            zzfile=$SHAPEDIR/$year/$zztag/plots_${zztag}_SM.root   
 
             ttztag="${intag/FitCR/FitCRttZ}"
-            ttzfile=./Shapes/$year/$ttztag/plots_${ttztag}_SM.root
+            ttzfile=$SHAPEDIR/$year/$ttztag/plots_${ttztag}_SM.root
             if [ $addCR == '1' ]; then    
                 ../../../LatinoAnalysis//Tools/scripts/haddfast --compress $outfile $infile $sigfile $wzfile $zzfile $ttzfile
             else

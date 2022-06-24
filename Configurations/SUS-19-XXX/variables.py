@@ -281,6 +281,27 @@ elif 'DYMeasurements' in opt.tag:
                                     'xaxis' : 'number of jets',        #   x axis name
                                     'fold'  : overflow                 #   fold overflow
                                 }
+
+elif 'LeptonL2TRate' in opt.tag:
+
+    variables['leppt']          = { 'name'  : 'Lepton_pt[0]',          #   variable name
+                                    'range' : ([20, 25, 30, 40, 50, 70, 100, 150, 200],[1]),  #   variable range
+                                    'xaxis' : 'lepton ' + pt + gv,     #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['lepeta']         = { 'name'  : 'abs(Lepton_eta[0])',    #   variable name
+                                    'range' : (6, 0.0, 2.4),           #   variable range
+                                    'xaxis' : 'lepton |#eta|',         #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['leppteta']       = { 'name'  : 'abs(Lepton_eta[0]):Lepton_pt[0]',        #   variable name
+                                    'range' : ([20, 25, 30, 40, 50, 70, 100, 150, 200],[0.,0.8,1.6,2.4]),    #   variable range
+                                    'xaxis' : 'lepton 2D',             #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
 elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag or 'More' in opt.tag:
 
     variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    

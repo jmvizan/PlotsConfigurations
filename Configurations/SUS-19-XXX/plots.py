@@ -138,12 +138,12 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
         groupPlot['ttbar']['samples'].extend(['ttSemilep'])
 
-    groupPlot['WJetsToLNu']  = {
+    groupPlot[nameWJets]  = {
         'nameHR' : 'W+jets (#rightarrow ' + sl + '#nu)',
         'nameLatex' : '\\PW+jets ($\\to\\ell\\nu$)',
         'isSignal' : 0,
         'color': 38,
-        'samples'  : ['WJetsToLNu']
+        'samples'  : [nameWJets]
     }
 
     groupPlot['WJetsPrompt']  = {
@@ -295,7 +295,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'scale'    : 1.0
     }
 
-    plot['WJetsToLNu'] = {
+    plot[nameWJets] = {
         'nameHR' : 'W+jets (#rightarrow ' + sl + '#nu)',
         'nameLatex' : '\\PW+jets ($\\to\\ell\\nu$)',
         'color': 38,
@@ -322,15 +322,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'scale'    : 1.0
     }
 
-    if 'EOY' in opt.tag:
-        plot['EOYZZ4L']       = plot['ZZTo4L'].copy()
-        plot['EOYH']          = plot['Higgs'].copy()
-        plot['EOYQQ']         = plot['VZ'].copy()
-        plot['EOYGluGlu']     = plot['WW'].copy()
-        plot['EOYVZ']         = plot['WZ'].copy()
-        plot['EOYDrellYan']   = plot['DY'].copy()
-        plot['EOY3V']         = plot['VVV'].copy()
-        plot['EOYWJets']      = plot['WJetsToLNu'].copy()
+    #if 'EOY' in opt.tag:
+    plot['EOYZZ4L']       = plot['ZZTo4L'].copy()
+    plot['EOYH']          = plot['Higgs'].copy()
+    plot['EOYQQ']         = plot['VZ'].copy()
+    plot['EOYGluGlu']     = plot['WW'].copy()
+    plot['EOYVZ']         = plot['WZ'].copy()
+    plot['EOYDrellYan']   = plot['DY'].copy()
+    plot['EOY3V']         = plot['VVV'].copy()
+    plot['EOYWJets']      = plot[nameWJets].copy()
 
     # Backward compatibility for background names
     plot['tW']  = plot['STtW']
