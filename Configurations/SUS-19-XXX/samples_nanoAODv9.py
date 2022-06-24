@@ -277,6 +277,7 @@ SS  = nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_
 SSP = nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]<0 && Lepton_pdgId[1]<0'
 SSM = nTightLepton + '==2 && mll'+ctrltag+'>=20. && Lepton_pt[0]>=25. && Lepton_pt[1]>=20. && Lepton_pdgId[0]>0 && Lepton_pdgId[1]>0'
 
+if 'SameSign' in opt.tag and 'HighPtMiss' in opt.tag: OC = SS
 if 'AppWJets' in opt.tag: OC = OC.replace('==2 && mll', '==1 && mll')
 
 LL = 'fabs(Lepton_pdgId[0])==fabs(Lepton_pdgId[1])'
@@ -302,6 +303,7 @@ btagDisc   = 'btagDeepB'
 bTagWP     = '_M'
 if 'EOY' in opt.sigset and 'EOYWJets' not in opt.sigset:
     btagAlgo   = 'btagDeepB'
+    print "Algo", btagAlgo
     bTagWP     = 'M'
 bTagPtCut  = '20.'
 if 'ptb25' in opt.tag: bTagPtCut  = '25.' 
@@ -348,6 +350,7 @@ btagWeight2tag = btagWeight1tag.replace('_1tag_', '_2tag_')
 ISRCut     = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
+print "btagWeight1tag", btagWeight1tag
 
 ### MET Filters 
 
@@ -468,7 +471,7 @@ if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the
     elif '2017' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.48', 'rateDown' : '0.52' } 
     elif '2018' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.30', 'rateDown' : '0.70' } 
 
-if 'SameSignValidationRegion' in opt.tag:
+if 'SameSign' in opt.tag:
     nonpromptLepSF      = '1.'
     nonpromptLepSF_Up   = '1.'
     nonpromptLepSF_Down = '1.'
@@ -855,7 +858,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                 if kZZvariable in opt.tag:  
                     addSampleWeight(samples,'ZZTo4L','ZZTo4L'+ZZ4Lext, kZZvariable.replace('kZZ', 'kZZ_'))
 
-        if 'SameSignValidationRegion' in opt.tag or 'DYMeasurements' in opt.tag or 'WJets' in opt.sigset:
+        if 'SameSign' in opt.tag or 'DYMeasurements' in opt.tag or 'WJets' in opt.sigset:
             
             samples['WJetsToLNu'] = { 'name' : getSampleFiles(directoryBkg,'WJetsToLNu-LO'          , False,treePrefix,skipTreesCheck) +
                                                getSampleFiles(directoryBkg,'WJetsToLNu_HT70_100'    , False,treePrefix,skipTreesCheck) + # Missing in 2016HIPM

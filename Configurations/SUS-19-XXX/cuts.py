@@ -247,19 +247,20 @@ if 'DYDarkMatterControlRegion' in opt.tag:
     cuts['DY_mm_pfmet'] = '(' + DY+' && '+MM+') && Alt$(CleanJet_pt[1],0)>=30. && ptmiss>=50.'
 
 if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.tag:
+    print btagWeightNoCut, btagWeight1tag, btagWeight0tag
+    #
+    cuts['VR1_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+    cuts['VR1_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
 
-    cuts['VR1_em']   = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeightNoCut }
-    cuts['VR1_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeightNoCut }
+    cuts['VR1_Tag_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
+    cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
+    cuts['VR1_Tag_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
+    cuts['VR1_Veto_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
 
-    cuts['VR1_Tag_em']   = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight1tag }
-    cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight0tag }
-    cuts['VR1_Tag_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight1tag }
-    cuts['VR1_Veto_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140', 'weight' : btagWeight0tag }
-
-    cuts['VR1_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+HasJet, 'weight' : btagWeight0tag }
-    cuts['VR1_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+HasJet, 'weight' : btagWeight0tag }
-    cuts['VR1_NoJet_em']  = { 'expr' : OC+' && '+DF+' && ptmiss>=100 && ptmiss<140 && '+NoJets, 'weight' : btagWeight0tag }
-    cuts['VR1_NoJet_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss>=100 && ptmiss<140 && '+NoJets, 'weight' : btagWeight0tag }
+    cuts['VR1_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
+    cuts['VR1_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
+    cuts['VR1_NoJet_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+NoJets, 'weight' : btagWeight0tag }
+    cuts['VR1_NoJet_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+NoJets, 'weight' : btagWeight0tag }
 
 if 'JetSelectionRegions' in opt.tag: # To optimize jet selections 
 
@@ -328,6 +329,15 @@ if 'SameSignValidationRegion' in opt.tag:
     cuts['SS_ptmiss_160']        = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
     cuts['SS_ptmiss_160_plus']   = { 'expr' : '('+SSP+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
     cuts['SS_ptmiss_160_minus']  = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
+
+if 'SameSignVetoValidationRegion' in opt.tag:
+
+    cuts['SS_ptmiss']            = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=0  )', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_100to140']   = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_140']        = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=140)', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_160']        = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_160_plus']   = { 'expr' : '('+SSP+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_160_minus']  = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight0tag }
 
 if 'FakeValidationRegion' in opt.tag:
     
