@@ -383,7 +383,6 @@ btagDisc   = 'btagDeepB'
 bTagWP     = '_M'
 if 'EOY' in opt.sigset:
     btagAlgo   = 'btagDeepB'
-    print "Algo", btagAlgo
     bTagWP     = 'M'
 bTagPtCut  = '20.'
 if 'ptb25' in opt.tag: bTagPtCut  = '25.' 
@@ -430,7 +429,6 @@ btagWeight2tag = btagWeight1tag.replace('_1tag_', '_2tag_')
 ISRCut     = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
 ISRCutData = ' '+ISRCut+' && '
 ISRCutMC   = '&& '+ISRCut
-print "btagWeight1tag", btagWeight1tag
 
 ### MET Filters 
 
