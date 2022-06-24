@@ -542,8 +542,8 @@ for lep_i in ['Lep']:
 
 if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.03', 'rateUp' : '1.12', 'rateDown' : '0.94' } 
 elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.12', 'rateUp' : '1.30', 'rateDown' : '0.95' } 
-elif '2017'       in yeartag: nonpromptLep = { 'rate' : '1.39', 'rateUp' : '1.47', 'rateDown' : '1.30' } 
-elif '2018'       in yeartag: nonpromptLep = { 'rate' : '1.28', 'rateUp' : '1.36', 'rateDown' : '1.20' } 
+elif '2017'       in yeartag: nonpromptLep = { 'rate' : '1.38', 'rateUp' : '1.47', 'rateDown' : '1.30' } 
+elif '2018'       in yeartag: nonpromptLep = { 'rate' : '1.28', 'rateUp' : '1.36', 'rateDown' : '1.22' } 
 if 'nonpromptSF' in opt.tag: # To check that mismodelling doesnt change much the limits
     if   '2016HIPM'   in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.03', 'rateDown' : '0.97' } 
     elif '2016noHIPM' in yeartag: nonpromptLep = { 'rate' : '1.00', 'rateUp' : '1.12', 'rateDown' : '0.88' }

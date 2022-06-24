@@ -346,6 +346,15 @@ if 'SameSignValidationRegion' in opt.tag:
     cuts['SS_ptmiss_160_plus']   = { 'expr' : '('+SSP+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
     cuts['SS_ptmiss_160_minus']  = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight1tag }
 
+if 'SameSignVetoValidationRegion' in opt.tag:
+
+    cuts['SS_ptmiss']            = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=0  )', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_100to140']   = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_140']        = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=140)', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_160']        = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_160_plus']   = { 'expr' : '('+SSP+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight0tag }
+    cuts['SS_ptmiss_160_minus']  = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=160)', 'weight' : btagWeight0tag }
+
 if 'FakeValidationRegion' in opt.tag:
     
     Fake = LepId2of3 + ' && ' + OCT
