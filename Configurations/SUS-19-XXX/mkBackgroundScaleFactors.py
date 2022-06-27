@@ -12,7 +12,7 @@ backgroundProcess = sys.argv[1] if (len(sys.argv)>=2 and sys.argv[1]!='All') els
 years = sys.argv[2] if len(sys.argv)>=3 else '2016HIPM-2016noHIPM-2017-2018'
 
 commonFlag = 'VetoesUL'
-plotArea = './PlotsV9mineos/'
+plotArea = './Plots/'
 
 backgroundInfo = { 'ZZ' : { 'validationRegion'   : 'ZZValidationRegion',
                             'signal'             : 'ZZTo4L',
