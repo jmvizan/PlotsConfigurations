@@ -710,54 +710,56 @@ if normBackgrounds is not None:
                     normBackgroundNuisances[background][region]['cuts'] = cutList
                     normBackgroundNuisances[background][region]['scalefactorFromData'] = False if (region=='all' and scaleFactor=='1.00') else True
 
-            if not exclusiveSelection and hasattr(opt, 'doHadd') and not opt.doHadd:
-                # Tricky because we can't define a weight for one sample and one cut!
-                # We need to run only on the background to which the SF apply. For other samples, L673 saves us!
-                for othersample in samples:
-                    if othersample!=background:
-                        print 'Error: scale factors for', background, 'do not have exclusive selection: please run on this sample separately!'
-                        exit()
+            if len(normBackgroundNuisances[background].keys())>0:
 
-            for region in normBackgrounds[background]:    
-                if region in normBackgroundNuisances[background]:
+                if not exclusiveSelection and hasattr(opt, 'doHadd') and not opt.doHadd:
+                    # Tricky because we can't define a weight for one sample and one cut!
+                    # We need to run only on the background to which the SF apply. For other samples, L673 saves us!
+                    for othersample in samples:
+                        if othersample!=background:
+                            print 'Error: scale factors for', background, 'do not have exclusive selection: please run on this sample separately!'
+                            exit()
 
-                    scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]  
-                    scaleFactorError = normBackgrounds[background][region]['scalefactor'][scaleFactor]
-                    scaleFactorRelativeError = float(scaleFactorError)/float(scaleFactor)                    
+                for region in normBackgrounds[background]:    
+                    if region in normBackgroundNuisances[background]:
 
-                    regionCut = normBackgrounds[background][region]['selection']
-                    regionWeight = scaleFactor if regionCut=='1.' else '((!'+regionCut+')+('+regionCut+')*'+scaleFactor+')'
+                        scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]  
+                        scaleFactorError = normBackgrounds[background][region]['scalefactor'][scaleFactor]
+                        scaleFactorRelativeError = float(scaleFactorError)/float(scaleFactor)                    
 
-                    nuisanceType = 'lnN'
-                    for cut in normBackgroundNuisances[background][region]['cuts']:
-                        for otherregion in normBackgroundNuisances[background]:
-                            if otherregion!=region and cut in normBackgroundNuisances[background][otherregion]['cuts']:
-                                nuisanceType = 'shape'
+                        regionCut = normBackgrounds[background][region]['selection']
+                        regionWeight = scaleFactor if regionCut=='1.' else '((!'+regionCut+')+('+regionCut+')*'+scaleFactor+')'
 
-                    if normBackgroundNuisances[background][region]['scalefactorFromData']:
-                        if exclusiveSelection:
-                            samples[background]['weight'] += '*'+regionWeight
+                        nuisanceType = 'lnN'
+                        for cut in normBackgroundNuisances[background][region]['cuts']:
+                            for otherregion in normBackgroundNuisances[background]:
+                                if otherregion!=region and cut in normBackgroundNuisances[background][otherregion]['cuts']:
+                                    nuisanceType = 'shape'
+
+                        if normBackgroundNuisances[background][region]['scalefactorFromData']:
+                            if exclusiveSelection:
+                                samples[background]['weight'] += '*'+regionWeight
+                            else:
+                                for cut in cuts:                       
+                                    if cut in normBackgroundNuisances[background][region]['cuts']:
+                                        if 'weight' in cuts[cut]:
+                                            cuts[cut]['weight'] += '*'+regionWeight           
+                                        else:
+                                            cuts[cut]['weight'] = regionWeight
+
+                        normBackgroundNuisances[background][region]['type'] = nuisanceType
+   
+                        if nuisanceType=='lnN':
+
+                            normBackgroundNuisances[background][region]['samples'] = { background : str(1.+scaleFactorRelativeError) }
+                         
                         else:
-                            for cut in cuts:                       
-                                if cut in normBackgroundNuisances[background][region]['cuts']:
-                                    if 'weight' in cuts[cut]:
-                                        cuts[cut]['weight'] += '*'+regionWeight           
-                                    else:
-                                        cuts[cut]['weight'] = regionWeight
+ 
+                            regionWeightUp   = '((!'+regionCut+')+('+regionCut+')*'+str(1.+scaleFactorRelativeError)+')'
+                            regionWeightDown = '((!'+regionCut+')+('+regionCut+')*'+str(1.-scaleFactorRelativeError)+')' 
 
-                    normBackgroundNuisances[background][region]['type'] = nuisanceType
-
-                    if nuisanceType=='lnN':
-
-                        normBackgroundNuisances[background][region]['samples'] = { background : str(1.+scaleFactorRelativeError) }
-                      
-                    else:
-
-                        regionWeightUp   = '((!'+regionCut+')+('+regionCut+')*'+str(1.+scaleFactorRelativeError)+')'
-                        regionWeightDown = '((!'+regionCut+')+('+regionCut+')*'+str(1.-scaleFactorRelativeError)+')' 
-
-                        normBackgroundNuisances[background][region]['kind'] = 'weight'
-                        normBackgroundNuisances[background][region]['samples'] = { background : [ regionWeightUp, regionWeightDown ] }
-
+                            normBackgroundNuisances[background][region]['kind'] = 'weight'
+                            normBackgroundNuisances[background][region]['samples'] = { background : [ regionWeightUp, regionWeightDown ] }
+   
 
 
