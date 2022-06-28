@@ -100,7 +100,7 @@ def submit_shapes(args):
     keepsplit = False
     allsam    = None
     bkgs      = ['ttbar','tW','ttW','VZ','VVV','WZ','ttZ','ZZ', 'DY', 'Higgs']
-    bkgsend   = ['BackgroundsVetoDYVetottbar','Backgroundsttbar','BackgroundsDY','BackgroundsZZTo4L', 'BackgroundsEOY']
+    bkgsend   = ['BackgroundsVetoDYVetottbarVetoWZ','Backgroundsttbar','BackgroundsDY','BackgroundsZZTo4L', 'BackgroundsWZ']
     smsend    = bkgsend+ ['Data']
     for signal in sigset.split('__'):
         print "sample:",signal
