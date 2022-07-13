@@ -8,7 +8,7 @@ import optparse
 import json
 from array import *
 
-backgroundProcess = sys.argv[1] if (len(sys.argv)>=2 and sys.argv[1]!='All') else 'ZZ-ttZ-WW-WZZ-WZ'
+backgroundProcess = sys.argv[1] if (len(sys.argv)>=2 and sys.argv[1]!='All') else 'ZZ-ttZ-WZW-WZZ-WZ'
 years = sys.argv[2] if len(sys.argv)>=3 else '2016HIPM-2016noHIPM-2017-2018'
 
 commonFlag = 'VetoesUL'
@@ -116,27 +116,43 @@ backgroundInfo = { 'ZZ' : { 'validationRegion'   : 'ZZValidationRegion',
                            }, 
                    'ttZ': { 'validationRegion'   : 'ttZValidationRegion',
                             'signal'             : 'ttZ',
-                            'exclusiveSelection' : 1,
-                            'measurementRegions' : { 'tz1' : { 'plot'      : 'ttZ_ptmissSR',
+                            'exclusiveSelection' : 0,
+                            'measurementRegions' : { 'tz10': { 'plot'      : 'ttZ_Zcut10_ptmissSR',
                                                                'bin'       : 8,
-                                                               'cuts'      : [ 'ttZ' ],
+                                                               'cuts'      : [ 'ttZ_Zcut10' ],
                                                                'selection' : '(ptmiss\'+ctrltag+\'>=160 && ptmiss\'+ctrltag+\'<220)' } ,
-                                                     'tz2' : { 'plot'      : 'ttZ_ptmissSR',
+                                                     'tz20': { 'plot'      : 'ttZ_Zcut10_ptmissSR',
                                                                'bin'       : 9,
-                                                               'cuts'      : [ 'ttZ' ],
+                                                               'cuts'      : [ 'ttZ_Zcut10' ],
                                                                'selection' : '(ptmiss\'+ctrltag+\'>=220 && ptmiss\'+ctrltag+\'<280)' } ,
-                                                     'tz3' : { 'plot'      : 'ttZ_ptmissSR',
+                                                     'tz30': { 'plot'      : 'ttZ_Zcut10_ptmissSR',
                                                                'bin'       : 10,
-                                                               'cuts'      : [ 'ttZ' ],
+                                                               'cuts'      : [ 'ttZ_Zcut10' ],
                                                                'selection' : '(ptmiss\'+ctrltag+\'>=280 && ptmiss\'+ctrltag+\'<380)' } ,
-                                                     'tz4' : { 'plot'      : 'ttZ_ptmissSR',
+                                                     'tz40': { 'plot'      : 'ttZ_Zcut10_ptmissSR',
                                                                'bin'       : 11,
-                                                               'cuts'      : [ 'ttZ' ],
+                                                               'cuts'      : [ 'ttZ_Zcut10' ],
+                                                               'selection' : '(ptmiss\'+ctrltag+\'>=380)' },
+                                                     'tz15': { 'plot'      : 'ttZ_Zcut15_ptmissSR',
+                                                               'bin'       : 8,
+                                                               'cuts'      : [ 'ttZ_Zcut15' ],
+                                                               'selection' : '(ptmiss\'+ctrltag+\'>=160 && ptmiss\'+ctrltag+\'<220)' } ,
+                                                     'tz25': { 'plot'      : 'ttZ_Zcut15_ptmissSR',
+                                                               'bin'       : 9,
+                                                               'cuts'      : [ 'ttZ_Zcut15' ],
+                                                               'selection' : '(ptmiss\'+ctrltag+\'>=220 && ptmiss\'+ctrltag+\'<280)' } ,
+                                                     'tz35': { 'plot'      : 'ttZ_Zcut15_ptmissSR',
+                                                               'bin'       : 10,
+                                                               'cuts'      : [ 'ttZ_Zcut15' ],
+                                                               'selection' : '(ptmiss\'+ctrltag+\'>=280 && ptmiss\'+ctrltag+\'<380)' } ,
+                                                     'tz45': { 'plot'      : 'ttZ_Zcut15_ptmissSR',
+                                                               'bin'       : 11,
+                                                               'cuts'      : [ 'ttZ_Zcut15' ],
                                                                'selection' : '(ptmiss\'+ctrltag+\'>=380)' }
                                                     },
                             'samples'            : [ 'ttZ' ],
                            },
-                   'WW': { 'validationRegion'   : 'WZtoWWValidationRegion',
+                   'WZW': { 'validationRegion'   : 'WZtoWWValidationRegion',
                             'signal'             : 'WZ',
                             'exclusiveSelection' : 0,
                             'measurementRegions' : { 'ww10': { 'plot'      : 'WZtoWW_Zcut10_ptmissSR',
@@ -175,9 +191,17 @@ backgroundInfo = { 'ZZ' : { 'validationRegion'   : 'ZZValidationRegion',
 
                             'samples'            : [ 'WZ' ],
                            },
+                   'WW' : { 'validationRegion'   : 'HighPtMissValidationRegion',
+                            'signal'             : 'WW',
+                            'exclusiveSelection' : 1,
+                            'measurementRegions' : { 'nojet': {'plot'      : 'VR1_NoJet_em_mt2llOptim',
+                                                               'bin'       : -1,
+                                                               'cuts'      : [ 'VR1' ],
+                                                               'selection' : '(Alt$(CleanJet_pt[0],0)<\'+jetPtCut+\')' } ,
+                                                    },
+                            'samples'            : [ 'WW' ],
+                           },
                   }
-
-
 
 def getYieldsFromHistogram(histo, binNumber):
 

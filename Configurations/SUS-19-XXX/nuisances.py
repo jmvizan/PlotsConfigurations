@@ -182,7 +182,7 @@ for sample in samples.keys():
 mt2llRegions = [ ]
 for cut in cuts:
     ptmissCut = cut.split('_')[0]+'_'
-    if 'SR' in ptmissCut and ptmissCut not in mt2llRegions:
+    if ('SR' in ptmissCut or 'VR1' in ptmissCut) and ptmissCut not in mt2llRegions:
         mt2llRegions.append(ptmissCut)
 
 mt2llBins = [ ]
@@ -206,6 +206,7 @@ if not hasattr(opt, 'outputDirDatacard') or mt2llNuisances:
         mt2llSystematics = [0.20, 0.30] # placeholders            
 
 for mt2llregion in mt2llRegions: 
+    if 'VR1' in mt2llregion: continue
     for mt2llbin in range(len(mt2llBins)):
 
         mt2llsystname = mt2llregion + mt2llBins[mt2llbin]
@@ -307,7 +308,7 @@ for yeartomerge in yearstaglist:
                 nuisances['pdf']['samples'][sample] = qcdScaleVariations
 
 for cut in cuts: # TODO: Why only in the signal regions? 
-    if 'SR' in cut.split('_')[0]:
+    if 'SR' in cut.split('_')[0]: #or 'SM' in opt.sigset:
         nuisances['qcdScale']['cuts'].append(cut)
         nuisances['pdf']['cuts'].append(cut)
 
@@ -437,7 +438,7 @@ if hasattr(opt, 'outputDirDatacard'):
                     nuisances[sample+rateparamname]['limits'] = rateparameters[rateparam]['limits'] 
                     
                 for cut in cuts.keys():
-                    if (mt2llregion in cut and not isControlSample) or (mt2llregion.replace('SR', 'CR') in cut and 'CR_' in rateparam and rateparam.split('_')[2]==cut.split('_')[2]):
+                    if (mt2llregion in cut and not isControlSample) or (mt2llregion.replace('SR', 'CR').replace('VR1', 'CR0') in cut and 'CR_' in rateparam and rateparam.split('_')[2]==cut.split('_')[2]):
                         for subcut in rateparameters[rateparam]['subcuts']:
                             if subcut in cut:
                                 nuisances[sample+rateparamname]['cuts'].append(cut)

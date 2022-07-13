@@ -248,13 +248,16 @@ if 'DYDarkMatterControlRegion' in opt.tag:
 
 if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.tag:
 
-    cuts['VR1_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
-    cuts['VR1_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+    if not hasattr(opt, 'outputDirDatacard'):
+
+        cuts['VR1_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+        cuts['VR1_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+
+        cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
+        cuts['VR1_Veto_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
 
     cuts['VR1_Tag_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
-    cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
     cuts['VR1_Tag_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
-    cuts['VR1_Veto_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
 
     cuts['VR1_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
     cuts['VR1_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
@@ -397,9 +400,15 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
         ttZselection = sel4Lep + ' && deltaMassZ'+ctrltag+'<10. && ptmiss'+ctrltag+'>=METCUT && nCleanJet>=2 && CleanJet_pt[1]>='+jetPtCut
 
-        cuts['ttZ']            = { 'expr' : '(' + ttZselection.replace('METCUT',   '0') + ')', 'weight' : btagWeight1tag }
-        cuts['ttZ_ptmiss-140'] = { 'expr' : '(' + ttZselection.replace('METCUT', '140') + ')', 'weight' : btagWeight1tag }
-        cuts['ttZ_ptmiss-160'] = { 'expr' : '(' + ttZselection.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut10']            = { 'expr' : '(' + ttZselection.replace('METCUT',   '0') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut10_ptmiss-140'] = { 'expr' : '(' + ttZselection.replace('METCUT', '140') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut10_ptmiss-160'] = { 'expr' : '(' + ttZselection.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+
+        ttZselectionLarge = ttZselection.replace('deltaMassZ'+ctrltag+'<10.', 'deltaMassZ'+ctrltag+'<15.')
+
+        cuts['ttZ_Zcut15']            = { 'expr' : '(' + ttZselectionLarge.replace('METCUT',   '0') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut15_ptmiss-140'] = { 'expr' : '(' + ttZselectionLarge.replace('METCUT', '140') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut15_ptmiss-160'] = { 'expr' : '(' + ttZselectionLarge.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
 
     elif 'ZZValidationRegion' in opt.tag:
 
@@ -568,14 +577,14 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
     isStrictDatacardOrPlot = isDatacardOrPlot and not hasattr(opt, 'skipLNN')
 
     for cut in cuts:
-        if 'SR' in cut:
+        if 'SR' in cut or 'VR1' in cut:
 
             if not isStrictDatacardOrPlot:
                 cutToRemove.append(cut)
 
             if '_em' in cut: continue # Use only sf channel to avoid double counting
 
-            crcut = cut.replace('SR', 'CR')
+            crcut = cut.replace('SR', 'CR').replace('VR1', 'CR0')
             exprcut = cuts[cut]['expr']
             exprcut = exprcut.replace(' && '+DF, '')
             exprcut = exprcut.replace(' && '+SF, '')
@@ -654,14 +663,14 @@ if hasattr(opt, 'postFit'):
 
 # For structure and plot cfg files
 
-if 'SignalRegion' in opt.tag:
+if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag:
 
     for sample in samples:
 
         cutToRemove = [ ]
 
         for cut in cuts:
-            if ('SR' in cut and 'isControlSample' in samples[sample] and samples[sample]['isControlSample']==1) or ('CR' in cut and samples[sample]['isSignal']==1):
+            if (('SR' in cut or 'VR1' in cut) and 'isControlSample' in samples[sample] and samples[sample]['isControlSample']==1) or ('CR' in cut and samples[sample]['isSignal']==1):
                 cutToRemove.append(cut)
 
         if len(cutToRemove)>0:

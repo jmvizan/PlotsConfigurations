@@ -554,6 +554,9 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
         # Some other mt2ll binning for validation regions
         if 'ValidationRegion' in opt.tag:
 
+            if hasattr(opt, 'outputDirDatacard') or hasattr(opt, '--skipBOnlyFit') or hasattr(opt, 'prefitSignal'):
+                del variables['mt2ll']
+
             variables['mt2llOptim'] = {   'name'  : mt2ll,                  #   variable name    
                                           'range' : (mt2llOptimBin,[1]),    #   variable range
                                           'xaxis' : mt2 + pll + gv,         #   x axis name
