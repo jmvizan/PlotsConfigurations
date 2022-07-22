@@ -603,7 +603,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
 
             if '_Tag_' not in cut and ('FitCRWZ' in opt.tag or isStrictDatacardOrPlot):
              
-                exprCR = exprcut.replace(OC, nLooseLepton+'==3 && ' + nTightLepton + '==3 && deltaMassZ_WZ<10. && ptmiss_WZ>=0.')
+                exprCR = exprcut.replace(OC, nLooseLepton+'==3 && ' + nTightLepton + '==3 && deltaMassZ_WZ<999. && ptmiss_WZ>=0.')
                 exprCR = exprCR.replace('ptmiss>', 'ptmiss_WZ>')
                 exprCR = exprCR.replace('ptmiss<', 'ptmiss_WZ<')
                 exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_WZ')
