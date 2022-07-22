@@ -41,8 +41,8 @@ if __name__ == '__main__':
             print tag, year
             folder    = os.getcwd()+'/Shapes/'+year+'/'+tag+'/Samples/'
             infiles   = []
-            infiles   = [f for f in  os.listdir(folder) if tag in f and year in f and "DATA" not in f and "_TChi" not in f and "_T2tt" not in f and "_EOY." not in f and 'EOYWJets' not in f]
-            outfilenm = 'plots_'+year+tag+'_ALL_DATA.root'
+            infiles   = [f for f in  os.listdir(folder) if tag in f and year in f and "DATA" not in f and 'S2tt' not in f and 'SChipm' not in f and "_TChi" not in f and "_T2tt" not in f and 'TSlep' not in f and "_EOY." not in f and 'EOYWJets' not in f]
+            outfilenm = 'plots_'+year+tag+'_ALL_PseudoDATA.root'
             outfile   = ROOT.TFile(folder+outfilenm,"RECREATE","Final merged one");
             print "Files over which we are looping\n",infiles
             for infilenm in infiles:
@@ -59,14 +59,15 @@ if __name__ == '__main__':
                     if bool(outfile.FindObject(keynm)) is False:
                         dict_i = outfile.mkdir(fol_i)
                         outfile.cd(fol_i)
-                        h2     = h1.Clone("histo_DATA")
+                        h2     = h1.Clone("histo_PseudoDATA")
+                        h2.SetTitle('histo_PseudoDATA')
                         h2.Write() 
                         if 'SR1_NoTag_em' in keynm: print "first bin", h2.GetBinContent(1)
                        
                         
                     else:
                         outfile.cd(fol_i)
-                        h4 = outfile.Get(keynm).Get(var).Get('histo_DATA')
+                        h4 = outfile.Get(keynm).Get(var).Get('histo_PseudoDATA')
                         h4.Add(h1)
                         if 'SR1_NoTag_em' in keynm: print "first bin", h4.GetBinContent(1)
                         h4.Write()
@@ -82,7 +83,7 @@ if __name__ == '__main__':
 
                 keynm  = key.GetTitle()
                 outfile.cd(keynm)
-                h1  =  outfile.Get(keynm).Get('histo_DATA')
+                h1  =  outfile.Get(keynm).Get('histo_PseudoDATA')
                 
                 for  i_bin in range(0, h1.GetNbinsX()+1):
                     i_content = round(h1.GetBinContent(i_bin))
