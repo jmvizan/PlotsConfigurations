@@ -35,7 +35,8 @@ else:
     fileset=sigset
 if 'SM-' not in fileset:
     fileset = 'SM-' + fileset
-datatype = fileset.replace(fileset.split('-')[-1], '')
+datatype = 'SM-'
+if 'PseudoData' in fileset: datatype += 'PseudoData-'
 
 exec(open('./signalMassPoints.py').read())
 
