@@ -187,8 +187,8 @@ for cut in cuts:
         mt2llRegions.append(ptmissCut)
 
 mt2llBins = [ ]
-mt2llNuisance = False
-if not isDatacardOrPlot or mt2llNuisance:
+mt2llNuisances = False
+if not isDatacardOrPlot or mt2llNuisances:
     if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
         mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
         mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
