@@ -76,7 +76,7 @@ else
     fi
 fi
 
-SHAPEDIR=./ShapesV9/$YEAR/$TAG
+SHAPEDIR=./Shapes/$YEAR/$TAG
 mkdir -p $SHAPEDIR/$SPLIT
 
 if [ $BATCH == True ]; then
