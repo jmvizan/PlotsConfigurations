@@ -149,12 +149,13 @@ for sample in samples.keys():
 
 # top pt reweighting
 
-nuisances['toppt']  = {
-    'name'  : 'toppt', # assuming the mismodeling is correlated through the years 
-    'samples'  : { 'ttbar' : [ systematicTopPt+'/'+centralTopPt, '1.' ] },
-    'kind'  : 'weight',
-    'type'  : 'shape',
-}
+if 'ttbar' in samples:
+    nuisances['toppt']  = {
+        'name'  : 'toppt', # assuming the mismodeling is correlated through the years 
+        'samples'  : { 'ttbar' : [ systematicTopPt+'/'+centralTopPt, '1.' ] },
+        'kind'  : 'weight',
+        'type'  : 'shape',
+    }
 
 # isr fastsim
 
@@ -186,8 +187,8 @@ for cut in cuts:
         mt2llRegions.append(ptmissCut)
 
 mt2llBins = [ ]
-mt2llNuisances = False
-if not hasattr(opt, 'outputDirDatacard') or mt2llNuisances:
+mt2llNuisance = False
+if not isDatacardOrPlot or mt2llNuisance:
     if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
         mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
         mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']

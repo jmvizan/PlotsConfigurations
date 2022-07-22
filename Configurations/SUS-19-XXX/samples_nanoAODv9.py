@@ -507,7 +507,7 @@ if 'WZtoWW' in opt.tag or 'WZVal' in opt.tag or 'ZZVal' in opt.tag or 'ttZ' in o
 
 # generation weights
 
-XSWeight       = 'baseW*genWeight'
+XSWeight       = 'baseW*genWeight*((ptmiss'+ctrltag+'-MET_pt)<10000.)'
 
 # lepton weights
 
@@ -537,6 +537,22 @@ for lep_i in ['Lep']:
         lepW_i = LepWeight[lep_i][weight_i]
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
         else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
+        if weight_i=='Extra':
+            if '2016HIPM' in yeartag or '2016noHIPM' in yeartag:
+                if lep_i=='Lep' or lep_i=='Ele':
+                    extraElectronSF    = ElectronSF+'_ExtraSF[lepIDX]'
+                    extraElectronSFvar = ElectronSF+'_ExtraSF_VAR[lepIDX]' 
+                    extraSFcorrection  = '(('+extraElectronSFvar+'*(abs('+extraElectronSF+'-'+extraElectronSFvar+')<0.4))+(FIXERR*'+extraElectronSF+'*(abs('+extraElectronSF+'-'+extraElectronSFvar+')>=0.4)))'
+                    extraElectronSF0up = extraSFcorrection.replace('lepIDX', '0').replace('VAR', 'Up').replace('FIXERR', '1.1')
+                    extraElectronSF1up = extraSFcorrection.replace('lepIDX', '1').replace('VAR', 'Up').replace('FIXERR', '1.1')
+                    extraElectronSF0do = extraSFcorrection.replace('lepIDX', '0').replace('VAR', 'Down').replace('FIXERR', '0.9')
+                    extraElectronSF1do = extraSFcorrection.replace('lepIDX', '1').replace('VAR', 'Down').replace('FIXERR', '0.9')
+                    leptonSFExtraUp = leptonSF[lep_i.lower()+weight_i]['weight'][0].replace(ElectronSF+'_ExtraSF_Up[0]',   extraElectronSF0up).replace(ElectronSF+'_ExtraSF_Up[1]',   extraElectronSF1up)
+                    leptonSF[lep_i.lower()+weight_i]['weight'][0] = leptonSFExtraUp 
+                    leptonSFExtraDo = leptonSF[lep_i.lower()+weight_i]['weight'][1].replace(ElectronSF+'_ExtraSF_Down[0]', extraElectronSF0do).replace(ElectronSF+'_ExtraSF_Down[1]', extraElectronSF1do)
+                    leptonSF[lep_i.lower()+weight_i]['weight'][1] = leptonSFExtraDo
+
+
 
 # nonprompt lepton rate:
 
@@ -944,14 +960,16 @@ for sample in samples:
 
 if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
-    samples['DATA']  = {   'name': [ ] ,    
-                           'weight' : METFilters_Data+'*'+VetoHEMdata+'*'+VetoEENoise, 
-                           'weights' : [ ],
-                           'isData': ['all'],
-                           'isSignal'  : 0,
-                           'isDATA'    : 1, 
-                           'isFastsim' : 0
-                         }
+    dataSampleName = 'DATA' if 'Pseudo' not in opt.sigset else 'PseudoDATA'
+
+    samples[dataSampleName]  = { 'name': [ ] ,    
+                                 'weight' : METFilters_Data+'*'+VetoHEMdata+'*'+VetoEENoise, 
+                                 'weights' : [ ],
+                                 'isData': ['all'],
+                                 'isSignal'  : 0,
+                                 'isDATA'    : 1, 
+                                 'isFastsim' : 0
+                                }
 
     for Run in DataRun :
         for DataSet in DataSets :
@@ -964,8 +982,8 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
             FileTarget = getSampleFiles(directoryData,datasetName,True,treePrefix,skipTreesCheck)
             for iFile in FileTarget:
-                samples['DATA']['name'].append(iFile)
-                samples['DATA']['weights'].append(DataTrig[DataSet])
+                samples[dataSampleName]['name'].append(iFile)
+                samples[dataSampleName]['weights'].append(DataTrig[DataSet])
 
 elif 'MET' in opt.sigset:
 
