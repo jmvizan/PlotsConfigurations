@@ -350,7 +350,7 @@ if __name__ == '__main__':
         for systematic in systematicInDictionaryList:
 
             if len(systematicInDictionaryList)>1:
-                print 'Warning: systematic legend to be complited in case of split uncertainty'
+                print 'Warning: systematic legend to be completed in case of split uncertainty'
 
             table += '    '+systematicDictionary[systematicInDictionary]
 
