@@ -107,7 +107,7 @@ systematicDictionary['nonpromptLep'] =  'Nonprompt leptons'
 systematicDictionary['toppt']        = '\\ttbar \\pt reweighting'
 systematicDictionary['isrFS']        = 'ISR reweighting'
 systematicDictionary['leptonIdIsoFS']= 'Lepton ident./isolation (\\FastSim)'
-systematicDictionary['btagFS']       = 'b tagging (\\FastSim'
+systematicDictionary['btagFS']       = 'b tagging (\\FastSim)'
 systematicDictionary['ptmissfastsim']= '\\ptmiss (\\FastSim)'
 
 if __name__ == '__main__':
@@ -178,6 +178,8 @@ if __name__ == '__main__':
         for centralShape in centralShapes:
             if centralShape.GetBinContent(centralShape.GetNbinsX()+1)!=0.: print 'HORROR'
             if centralShape.Integral()==0.: continue
+            if opt.debugcut!='XXX' and opt.debugcut not in centralShape.GetName(): continue
+            if opt.debugsyst!='XXX' and opt.debugsyst not in 'stat': continue
             systematics['stat'][datayear+'_'+centralShape.GetName()] = { }
             centralIntegralError = ROOT.double(); centralIntegral = centralShape.IntegralAndError(-1, -1, centralIntegralError)
             systematics['stat'][datayear+'_'+centralShape.GetName()]['integralUncertainty'] = 100.*centralIntegralError/centralIntegral
@@ -231,7 +233,16 @@ if __name__ == '__main__':
                     if doShape.GetName()==cut:
                         break
 
-                if opt.debugcut in cut or opt.debugsyst in systematic:
+                printDebug = False
+                if opt.debugcut!='XXX':
+                    if opt.debugcut in cut: printDebug = True
+                    else: continue
+                if opt.debugsyst!='XXX':
+                    if opt.debugsyst in systematic: printDebug = True
+                    else: continue
+
+                if printDebug:
+
                     print systematic, cut
                     print 'Integral', centralShape.Integral(), upShape.Integral(), doShape.Integral()
                     print 'Entries', centralShape.GetEntries(), upShape.GetEntries(), doShape.GetEntries()
@@ -260,7 +271,7 @@ if __name__ == '__main__':
                         fixedDoContent = 1. if doShape.GetBinContent(ib+1)==0. else 1.; doShape.SetBinContent(ib+1, fixedUpContent)
                     if opt.sigset!='SM' and (ib+1<5 or centralShape.GetBinContent(ib+1)<0.3):
                         continue
-                    if opt.usemaxshape:
+                    if opt.usemaxshape and 'ptmiss' not in systematic:
                         shapeUncertainty = max(100.*abs(upShape.GetBinContent(ib+1) - 1.), shapeUncertainty)
                         shapeUncertainty = max(100.*abs(doShape.GetBinContent(ib+1) - 1.), shapeUncertainty)
                     else:
