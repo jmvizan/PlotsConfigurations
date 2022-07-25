@@ -125,7 +125,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
         groupPlot['ttSemilep']  = {
             'nameHR' : 't#bar{t} Semilep.',
-            'nameLatex' : '\\ttbar$ Semilep.',
+            'nameLatex' : '\\ttbar Semilep.',
             'isSignal' : 0,
             'color': 401,   # kYellow+1
             'samples'  : ['ttSemilep'] 
@@ -243,7 +243,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
     
     plot['ttSemilep'] = {   
         'nameHR' : 't#bar{t} Semilep.',
-        'nameLatex' : '$\\ttbar Semilep.',
+        'nameLatex' : '\\ttbar Semilep.',
         'color': 401,   # kYellow+1
         'isSignal' : 0,
         'isData'   : 0 ,
