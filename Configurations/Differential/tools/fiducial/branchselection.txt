@@ -1,9 +1,0 @@
-drop *
-keep genWeight
-keep nGenPart
-keep GenPart*
-keep nGenDressedLepton
-keep GenDressedLepton*
-keep nGenJet
-keep GenJet*
-keep GenMET*

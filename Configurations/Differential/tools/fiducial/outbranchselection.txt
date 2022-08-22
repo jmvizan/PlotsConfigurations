@@ -1,5 +1,0 @@
-drop *
-keep genWeight
-keep GenMET*
-#keep GenPtH
-#keep GenJetClean*
