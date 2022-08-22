@@ -16,14 +16,48 @@ legend['sqrt'] = '#sqrt{s} = '+opt.CME+' TeV'
 # If not defined, normal plots is used
 #
 
-# ... your groupPlot here ...
+# ...
 
 ## #plot = {}
 
 # keys here must match keys in samples.py    
 #    
 
-# ... your plot here ...
+if 'SM' in opt.sigset or 'MC' in opt.sigset:
+
+    plot['QCDMu']       = { 'nameHR' : 'QCD MuEnriched',
+                            'nameLatex' : '\\QCDMu',
+                            'color': 4,  
+                            'isSignal' : 0,
+                            'isData'   : 0, 
+                            'scale'    : 1.,
+                           }
+
+    lightName = 'udsg' if 'cjets' in samples else 'udsg + c'
+
+    plot['light']       = { 'nameHR' : lightName,
+                            'nameLatex' : lightName,
+                            'color': 600, #'kBlue',
+                            'isSignal' : 0,
+                            'isData'   : 0,
+                            'scale'    : 1.,
+                           }
+
+    plot['cjets']       = { 'nameHR' : 'c',
+                            'nameLatex' : 'c',
+                            'color': 416, #'kGreen',
+                            'isSignal' : 0,
+                            'isData'   : 0,
+                            'scale'    : 1.,
+                           }
+ 
+    plot['bjets']       = { 'nameHR' : 'b',
+                            'nameLatex' : 'b',
+                            'color': 632, #'kRed',
+                            'isSignal' : 0,
+                            'isData'   : 0,
+                            'scale'    : 1.,
+                           }
 
 ### samples and groups to be removed from plots               
 
@@ -48,7 +82,18 @@ for group in groupPlot:
 for group in groupToRemoveFromPlot:
     del groupPlot[group]
 
-### BSM signals
+### data
+
+if 'SM' in opt.sigset or 'Data' in opt.sigset:
+
+    plot['DATA']             = { 'nameHR' : 'Data',
+                                 'color': 1 ,  
+                                 'isSignal' : 0,
+                                 'isData'   : 1,
+                                 #'isBlind'  : 1
+                                }
+
+### Signal  
 
 ### cuts to be removed from group
 
