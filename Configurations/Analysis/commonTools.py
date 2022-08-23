@@ -175,6 +175,26 @@ def deletePlots(opt):
 
 # jobs
 
+def checkProxy(opt):
+
+    cmd='voms-proxy-info'
+    proc=subprocess.Popen(cmd, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
+    out, err = proc.communicate()
+
+    if 'Proxy not found' in err :
+        print 'WARNING: No GRID proxy -> Get one first with:'
+        print 'voms-proxy-init -voms cms -rfc --valid 168:0'
+        exit()
+
+    timeLeft = 0
+    for line in out.split("\n"):
+        if 'timeleft' in line : timeLeft = int(line.split(':')[1])
+
+    if timeLeft < 24 :
+        print 'WARNING: Your proxy is only valid for ',str(timeLeft),' hours -> Renew it with:'
+        print 'voms-proxy-init -voms cms -rfc --valid 168:0'
+        exit()
+
 def getProcessIdList(opt):
 
     processIdList = { }

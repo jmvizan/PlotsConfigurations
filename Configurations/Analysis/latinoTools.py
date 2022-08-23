@@ -160,16 +160,35 @@ def plots(opt):
 
 ### Datacards
 
-def datacards(opt):
+def getPerSignalSigset(fileset, sigset):
 
     fileset = commonTools.setFileset(opt.fileset, opt.sigset)
 
-    if '-' in fileset:                       # This is SUSY like 
+    if '-' in fileset:                       # This is SUSY like
         sigset = fileset.replace(fileset.split('-')[-1], '').replace('_','')+'MASSPOINT'
     elif opt.sigset=='' or opt.sigset=='SM': # This should work for SM searches
         sigset = opt.sigset
     else:                                    # Guessing latinos' usage
         sigset = 'MASSPOINT'
+
+    return fileset, sigset
+
+def cleanDatacards((opt, dryRun=False):
+
+    samples = commonTools.getSamples(opt)
+
+    for year in opt.year.split('-'):
+        for sample in samples:
+            if samples[sample]['isSignal']:
+
+                cleanDatacardCommand = 'rm -r '+'/'.join([opt.cardsdir, year, opt.tag, sample])
+
+                if dryRun: return cleanDatacardCommand
+                else: os.system(cleanDatacardCommand)
+
+def datacards(opt, dryRun=False):
+
+    fileset, sigset = getPerSignalSigset(opt.fileset, opt.sigset)
 
     samples = commonTools.getSamples(opt)
 
@@ -178,6 +197,9 @@ def datacards(opt):
     for year in opt.year.split('-'):
         for sample in samples:
             if samples[sample]['isSignal']:
-           
-                os.system('mkDatacards.py --pycfg='+opt.configuration+' --tag='+year+opt.tag+' --sigset='+sigset.replace('MASSPOINT',sample)+' --outputDirDatacard='+opt.cardsdir+'/'+year+'/'+opt.tag+'/'+sigset.split('-')[-1].replace(opt.sigset,'').replace('MASSPOINT',sample)+' --inputFile='+commonTools.getShapeFileName(opt.shapedir, year, inputtag, '', fileset))
+
+                datacardCommand = 'mkDatacards.py --pycfg='+opt.configuration+' --tag='+year+opt.tag+' --sigset='+sigset.replace('MASSPOINT',sample)+' --outputDirDatacard='+'/'.join([opt.cardsdir, year, opt.tag, sample])+' --inputFile='+commonTools.getShapeFileName(opt.shapedir, year, inputtag, '', fileset)
+
+                if dryRun: return datacardCommand 
+                else: os.system(datacardCommand)
 
