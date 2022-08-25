@@ -148,17 +148,22 @@ def getLogFileList(opt, extension):
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
-            samples = getSamplesInLoop(opt.configuration, year, tag, opt.sigset)
+            logFileList += glob.glob(getLogDir(opt, year, tag, '')+'/*'+extension)
 
-            for sample in samples:
-                logFileList += glob.glob(getLogDir(opt, year, tag, sample)+'/*.'+extension)
+            for sample in getSamplesInLoop(opt.configuration, year, tag, opt.sigset):
+                logFileList += glob.glob(getLogDir(opt, year, tag, sample)+'/*'+extension)
 
     return logFileList
 
 def printJobErrors(opt):
 
     for errFile in getLogFileList(opt, 'err'):
-        print '\n\n\n###### '+errFile.split('__')[1]+' '+errFile.split('__')[5]+' ######\n'
+
+        logprocess = errFile.replace('./','').split('__')[0].split('/')[1] if '*' in opt.logprocess else ''
+        sample = errFile.split('__')[-1].split('.')[0]
+        yeartag = errFile.split('__')[1].split('/')[0]
+
+        print '\n\n\n###### '+' '.join([ logprocess, sample, yeartag ])+' ######\n'
         os.system('cat '+errFile)
 
 def printKilledJobs(opt):
@@ -304,7 +309,7 @@ def getProcessIdList(opt):
   
                 yearJob, tagJob = year, tag
                 if '*' in year or '*' in tag:
-                    yeartag = jidFile.split('__')[1].split('*/')[0]
+                    yeartag = jidFile.split('__')[1].split('/')[0]
                     if '*' in year and '*' in tag:
                         yearJob, tagJob = yeartag, yeartag
                     elif '*' in year: yearJob = yeartag.replace(tag, '')
@@ -329,7 +334,8 @@ def checkJobs(opt):
     processIdList = getProcessIdList(opt) 
 
     if len(processIdList.keys())==0:
-        print 'No job running for year='+opt.year+', tag='+opt.tag+', and sigset='+opt.sigset
+        logprocessInfo = 'logprocess='+opt.logprocess+', ' if opt.logprocess!='*' else ''
+        print 'No job running for '+logprocessInfo+'year='+opt.year+', tag='+opt.tag+', sigset='+opt.sigset
         exit()
 
     process=subprocess.Popen(checkCommand, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)

@@ -1,6 +1,6 @@
 import os
 import ROOT
-import commonTools
+import PlotsConfigurations.Tools.commonTools
 from array import array
 
 ### Analysis defaults
