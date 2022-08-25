@@ -13,6 +13,7 @@ opt.lumi = 41.48
 treePrefix= 'nanoLatino_'
 
 isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit')
+isPlot = hasattr(opt, 'postFit')
 
 ### Directories
 
@@ -78,7 +79,7 @@ if 'ProdFine' in opt.tag:
                  }
 elif 'ProdRun2' in opt.tag:
     jetPtBins = { 'Pt20to30'    : [   '20.',   '30.' ], 'Pt30to50'    : [   '30.',   '50.' ], 'Pt50to70'    : [   '50.',   '70.' ], 'Pt70to100'  : [   '70.',  '100.' ], 
-                  'Pt100to140'  : [  '100.',  '140.' ], 'Pt140to200 ' : [  '140.',  '200.' ], 'Pt200to300'  : [  '200.',  '300.' ], 'Pt300to600' : [  '300.',  '600.' ], 
+                  'Pt100to140'  : [  '100.',  '140.' ], 'Pt140to200' : [  '140.',  '200.' ], 'Pt200to300'  : [  '200.',  '300.' ], 'Pt300to600' : [  '300.',  '600.' ], 
                   'Pt600to1000' : [  '600.', '1000.' ], 'Pt1000'      : [ '1000.', '1400.' ], 
                  }
 elif opt.method+'Data' in opt.tag:
@@ -176,6 +177,7 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
 
         samples['QCDMu'] = { 'name'     : qcdmuTrees ,
                              'weight'   : XSWeight+'*'+SFweight ,
+                             'isSignal' : 0 ,
                              'split'    : 'AsMuchAsPossible'
                             }  
 
@@ -183,11 +185,13 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
 
         samples['bjets'] = { 'name'     : qcdmuTrees ,
                              'weight'   : XSWeight+'*'+SFweight+'*'+muJetFromB ,
+                             'isSignal' : 1 ,
                              'split'    : 'AsMuchAsPossible'
                             }
     
         samples['light'] = { 'name'     : qcdmuTrees ,
                              'weight'   : XSWeight+'*'+SFweight+'*'+muJetNotFromB ,
+                             'isSignal' : 0 ,
                              'split'    : 'AsMuchAsPossible'
                             }
 
@@ -200,13 +204,13 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
 for sample in samples:
 
     samples[sample]['isDATA']    = 0
-    samples[sample]['isSignal']  = 0
     samples[sample]['isFastsim'] = 0
     samples[sample]['treeType']  = 'MC'
     samples[sample]['suppressNegative']          = ['all']
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
     samples[sample]['JobsPerSample'] = 20
+    if isPlot: samples[sample]['isSignal']  = 0
 
 ### Data
 
