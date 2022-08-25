@@ -59,9 +59,10 @@ def prepareDatacards(opt, dryRun=False):
         for cfgFile in [ 'configuration', 'samples*', 'cuts', 'variables', 'nuisances', 'structure' ]:
             os.system('cp '+cfgFile+'.py '+opt.combineSignalDir) 
 
-        os.system(' ; '.join([ 'cd '+opt.combineSignalDir, 'ln -s '+opt.baseDir+'/Data', 'cd '+opt.baseDir ]))
+        os.system(' ; '.join([ 'cd '+opt.combineSignalDir, 'ln -s -f '+opt.baseDir+'/Data', 'cd '+opt.baseDir ]))
 
     opt.cardsdir = commonTools.mergeDirPaths(opt.baseDir, opt.cardsdir)
+    opt.shapedir = commonTools.mergeDirPaths(opt.baseDir, opt.shapedir)
 
     prepareDatacardCommandList.append(latinoTools.datacards(opt, True))
 

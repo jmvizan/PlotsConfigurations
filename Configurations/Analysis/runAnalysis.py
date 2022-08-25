@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import optparse
 
-import commonTools
-import latinoTools
-import combineTools
+import PlotsConfigurations.Tools.commonTools as commonTools
+import PlotsConfigurations.Tools.latinoTools as latinoTools
+import PlotsConfigurations.Tools.combineTools as combineTools
 import analysisTools
 
 if __name__ == '__main__':
