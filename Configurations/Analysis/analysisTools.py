@@ -3,6 +3,12 @@ import ROOT
 import commonTools
 from array import array
 
+### Analysis defaults
+
+def setAnalysisDefaults(opt):
+
+    opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src' 
+
 ### Loops on analysis years and tags
 
 ### Analysis specific weights, efficiencies, scale factors, etc.
