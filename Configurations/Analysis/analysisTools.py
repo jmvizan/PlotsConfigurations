@@ -8,6 +8,7 @@ from array import array
 def setAnalysisDefaults(opt):
 
     opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src' 
+    if opt.year=='test' or opt.year=='*': opt.year = 'UL17nano'
 
 ### Loops on analysis years and tags
 

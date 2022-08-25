@@ -1,68 +1,202 @@
 import os
+import copy
 import commonTools
 import latinoTools
 from LatinoAnalysis.Tools.batchTools import *
 
-def submit(opt):
+def submitCombineJobs(opt, combineJobs):
 
-    use_singularity = True if 'slc7' in os.environ['SCRAM_ARCH'] else False
+    opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
+    nThreads = 1
+    splitBatch =  'Targets'
+    jobSplit = True if opt.sigset!='' and opt.sigset!='SM' else False
 
-    jobs = batchJobs('combine',opt.tag,['ALL'],['T2tt','T2bW'],'Targets','',JOB_DIR_SPLIT_READY=True,USE_SINGULARITY=use_singularity)
+    for year in combineJobs:
+        for tag in combineJobs[year]:
 
-def combineDatacards(opt):
-    pass
+            targetList = combineJobs[year][tag].keys()
 
-def runCombine(opt, combineOption=''):
+            if len(targetList)==0:
+                print 'Noting left to submit for tag', tag, 'in year', year
+                continue
 
-    if 'iterative' not in opt.option:
+            else:
+
+                jobs = batchJobs(opt.combineAction,year+tag,['ALL'],targetList,splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
+
+                jobs.nThreads = nThreads
+
+                for signal in targetList:
+                    jobs.Add('ALL', signal, combineJobs[year][tag][signal])
+
+                jobs.Sub(opt.batchQueue,opt.IiheWallTime,True)                
+
+def setupCombineCommand(opt):
+
+    return '\n'.join([ 'cd '+opt.combineLocation, 'eval `scramv1 runtime -sh`', 'cd '+opt.baseDir ])
+
+def getLimitRun(unblind):
+
+    return 'Both' if unblind else 'Blind'
+
+def getCombineOutputFileName(opt, signal):
+
+    outputFileName = commonTools.getSignalDir(opt, opt.year, opt.tag, signal, 'combineOutDir')
+
+    if opt.combineAction=='limits': outputFileName += 'higgsCombine_'+opt.tag+'_'+getLimitRun(opt.unblind)+'.AsymptoticLimits.mH120.root'
+    else: outputFileName += 'fitDiagnostics_'+opt.tag+'.root'
+
+    return outputFileName
+
+def prepareDatacards(opt, dryRun=False):
+
+    prepareDatacardCommandList = [ ]
+
+    if 'interactive' not in opt.option:
+
+        prepareDatacardCommandList.append('cd '+commonTools.mergeDirPaths(opt.baseDir, opt.combineSignalDir)) 
+
+        for cfgFile in [ 'configuration', 'samples*', 'cuts', 'variables', 'nuisances', 'structure' ]:
+            os.system('cp '+cfgFile+'.py '+opt.combineSignalDir) 
+
+        os.system(' ; '.join([ 'cd '+opt.combineSignalDir, 'ln -s '+opt.baseDir+'/Data', 'cd '+opt.baseDir ]))
+
+    opt.cardsdir = commonTools.mergeDirPaths(opt.baseDir, opt.cardsdir)
+
+    prepareDatacardCommandList.append(latinoTools.datacards(opt, True))
+
+    prepareDatacardCommand = '\n'.join(prepareDatacardCommandList)
+
+    if dryRun: return prepareDatacardCommand
+    else: os.system(prepareDatacardCommand)
+
+def combineDatacards(opt, signal, dryRun=False):
+
+    combineDatacardCommandList = [ setupCombineCommand(opt) ]
+
+    combineDatacardCommandList.append('cd '+opt.combineSignalDir)
+
+    datacardList = [ ]
+
+    for year in opt.year.split('-'):
+
+        inputDatacardDir = commonTools.mergeDirPaths(opt.baseDir, commonTools.getSignalDir(opt, year, opt.tag, signal, 'cardsdir'))
+
+        samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, opt.sigset, 'variables')
+
+        for cut in cuts:
+            for variable in variables:
+                if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+                    datacardFile = '/'.join([ inputDatacardDir, cut, variable, 'datacard.txt' ])   
+                    datacardList.append(cut+'_'+year+'='+datacardFile)
+
+    combineDatacardCommandList.append('combineCards.py '+' '.join(datacardList)+' > combinedDatacard.txt')
+
+    combineDatacardCommand = '\n'.join(combineDatacardCommandList)
+ 
+    if dryRun: return combineDatacardCommand
+    else: os.system(combineDatacardCommand)
+
+def runCombine(opt):
+
+    if not commonTools.foundShapeFiles(opt): exit()
+
+    if 'interactive' not in opt.option and opt.action!='writeDatacards':
         commonTools.checkProxy(opt)
 
-    if combineOption=='':
+    if not hasattr(opt, 'combineAction'):
         if 'limit' in opt.option: limits(opt)
         elif 'fit' in opt.option: mlfits(opt)
         else: print 'Please, speficy if you want to compute limits or make ML fits'
         exit()
 
-    if opt.combineLocation=='COMBINE': opt.combineLocation = os.getenv('PWD').split('CMSSW_')[0]+'CMSSW_10_2_14/src/'
+    if opt.combineLocation=='COMBINE': opt.combineLocation = os.getenv('PWD').split('/src/')[0]+'/src/'
 
-    makeDatacards  = 'skipdatacard' not in opt.option.lower() and 'skipdc' not opt.option.lower()
-    cleanDatacards = 'keepdatacard' not in opt.option.lower() and 'keepdc' not opt.option.lower()
+    makeDatacards  = 'skipdatacard' not in opt.option.lower() and 'skipdc' not in opt.option.lower()
+    cleanDatacards = 'keepdatacard' not in opt.option.lower() and 'keepdc' not in opt.option.lower()
+    runCombineJob  = 'onlydatacard' not in opt.option.lower() and 'onlydc' not in opt.option.lower()
+
+    if not runCombineJob:
+        opt.option += 'interactive'
+        cleanDatacards = False
+
+    combineJobs = { }
 
     opt2 = commonTools.Object()
-    opt2 = opt
+    opt2 = copy.deepcopy(opt)
 
-    opt2.fileset, sigset = getPerSignalSigset(opt.fileset, opt.sigset)
+    opt2.baseDir = os.getenv('PWD')
+    opt2.fileset, sigset = latinoTools.getPerSignalSigset(opt.fileset, opt.sigset)
 
     samples = commonTools.getSamples(opt)
 
-    yearList = opt.year.split('-') if 'split' in opt.option else opt.year
+    yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
 
     for year in yearList:
 
         opt2.year = year
+        combineJobs[year] = { }
 
-        for sample in samples:
-            if samples[sample]['isSignal']:
+        for tag in opt.tag.split('-'):
 
-                opt2.sigset = sigset.replace('MASSPOINT', sample):
+            opt2.tag = tag
+            combineJobs[year][tag] = { }
 
-                if 'iterative' in opt.option:
+            for sample in samples:
+                if samples[sample]['isSignal']:
 
-                    if makeDatacards: latinoTools.datacards(opt2)
-                    combineDatacards(opt2)
-                    if cleanDatacards: latinoTools.cleanDatacards(opt2)
+                    opt2.sigset = sigset.replace('MASSPOINT', sample)
+                    opt2.combineSignalDir = commonTools.getSignalDir(opt2, year, tag, sample, 'combineOutDir')
+                   
+                    if runCombineJob:
+                        if 'reset' in opt.option: 
+                            commonTools.deleteDirectory(opt2.combineSignalDir)
+                        elif os.path.isfile(getCombineOutputFileName(opt2, sample)): 
+                            continue
 
-                else: 
+                    os.system('mkdir -p '+opt2.combineSignalDir)
 
-                    if makeDatacards:  combineCommand  = latinoTools.datacards(opt2, True)
-                    combineCommand += combineDatacards(opt2, True)
-                    if cleanDatacards: combineCommand += latinoTools.cleanDatacards(opt2, True)
+                    combineCommandList = [ ]   
+
+                    if makeDatacards:  combineCommandList.append(prepareDatacards(opt2, True))
+                    combineCommandList.append(combineDatacards(opt2, sample, True))
+                    if runCombineJob:  combineCommandList.append(' '.join(['combine', opt.combineOption, 'combinedDatacard.txt' ]))
+                    combineCommandList.append( 'cd '+opt2.baseDir )
+                    if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, tag, sample, True))
+
+                    combineCommand = '\n'.join(combineCommandList) 
+
+                    if 'debug' in opt.option: print combineCommand
+                    elif 'interactive' in opt.option: os.system(combineCommand)
+                    else: combineJobs[year][tag][sample] = combineCommand
+
+    if 'debug' not in opt.option and 'interactive' not in opt.option: 
+        submitCombineJobs(opt, combineJobs)
+  
+def writeDatacards(opt):
+
+    opt.combineAction = 'datacard'
+    opt.option        += 'onlydatacards'
+    opt.combineOption  = 'dummy'
+    opt.combineOutDir  = opt.cardsdir
+
+    runCombine(opt)
 
 def limits(opt):
 
-    runCombine(opt, combineOption='cacca')
+    opt.combineAction = 'limits'
+    limitRun = getLimitRun(opt.unblind)
+    opt.combineOption = ' '.join([ '-M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun ])
+    opt.combineOutDir = opt.limitdir
+
+    runCombine(opt)
 
 def mlfits(opt):
 
-    runCombine(opt, combineOption='culo')
+    opt.combineAction = 'mlfits'
+    skipBOnlyFit = '--skipBOnlyFit' if 'skipbonly' in opt.option.lower() else ''
+    opt.combineOption = ' '.join(['-M FitDiagnostics', '--saveShapes', '--saveWithUncertainties', skipBOnlyFit, '--saveOverallShapes' ])
+    opt.combineOutDir = opt.mlfitdir
+
+    runCombine(opt)
 
