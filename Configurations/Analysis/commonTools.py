@@ -68,6 +68,14 @@ def setFileset(fileset, sigset):
     else:
         return '_'+fileset.replace('_','')
 
+def getSignalDir(opt, year, tag, signal, directory):
+
+    inputtag = tag.split('_')[0] if directory=='shapedir' else tag
+    signalDir = '/'.join([ getattr(opt, directory), year, inputtag ])
+    if opt.sigset!='' and opt.sigset!='SM': signalDir += '/'+signal
+
+    return signalDir
+
 def isExotics(opt):
 
     process=subprocess.Popen('grep "isExotics" '+opt.configuration, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
@@ -78,18 +86,42 @@ def plotAsExotics(opt):
 
     return 'notexotics' not in opt.option and (isExotics(opt) or 'isexotics' in opt.option)    
 
-### Cleaning logs, shapes, plots and jobs
+def mergeDirPaths(baseDir, subDir):
+    
+    baseDirOriginal, subDirOriginal = baseDir, subDir
+    if subDir[0]=='/': return subDir
+    if subDir[0]!='.': return baseDir+'/'+subDir
+    if subDir[:2]=='./': subDir = subDir[2:]
+    while subDir[:3]=='../':
+        baseDir = baseDir.replace('/'+baseDir.split('/')[-1], '')
+        subDir = subDir[3:]
+    if baseDir!='' and subDir[0]!='.' and subDir[0]!='/': return baseDir+'/'+subDir 
+    print 'Error: something pathological in mergeDirName:',  baseDirOriginal, subDirOriginal, '->', baseDir, subDir
+ 
+### Tools to check or clean logs, shapes, plots, datacards and jobs
 
 # logs
 
+def getLogDir(opt, year, tag, sample=''):
+
+    logDir = opt.logs+'/'+opt.logprocess+'__'+year+tag+'*'
+    if sample!='': logDir += '/*'+sample+'*'
+
+    return logDir
+
 def cleanDirectory(directory):
 
-    if os.path.isdir(directory):
-        os.system('rmdir --ignore-fail-on-non-empty '+directory)
+    for extension in [ '', '__ALL' ]:
+        if os.path.isdir(directory.replace('*', extension)):
+            os.system('rmdir --ignore-fail-on-non-empty '+directory)
 
-def cleanSampleLogs(logs, year, tag, sample):
+def deleteDirectory(directory):
 
-    os.system('rm -r -f '+logs+'/mkShapes__'+year+tag+'__ALL/'+sample+'*')
+    os.system('rm -r -f '+directory)
+
+def cleanSampleLogs(opt, year, tag, sample):
+
+    deleteDirectory(getLogDir(opt, year, tag, sample))
 
 def cleanLogs(opt):
 
@@ -99,17 +131,19 @@ def cleanLogs(opt):
             samples = getSamplesInLoop(opt.configuration, year, tag, opt.sigset)
 
             for sample in samples:
-                cleanSampleLogs(opt.logs, year, tag, sample)
+                cleanSampleLogs(opt, year, tag, sample)
   
-            cleanDirectory(opt.logs+'/mkShapes__'+year+tag+'__ALL')
+            cleanDirectory(getLogDir(opt, year, tag))
 
 def deleteLogs(opt):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
-            os.system('rm -r '+opt.logs+'/mkShapes__'+year+tag+'__ALL')
+            deleteDirectory(getLogDir(opt, year, tag))
 
-def printError(opt):
+def getLogFileList(opt, extension):
+
+    logFileList = [ ]
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
@@ -117,16 +151,31 @@ def printError(opt):
             samples = getSamplesInLoop(opt.configuration, year, tag, opt.sigset)
 
             for sample in samples:
+                logFileList += glob.glob(getLogDir(opt, year, tag, sample)+'/*.'+extension)
 
-                errFileList = glob.glob(opt.logs+'/mkShapes__'+year+tag+'__ALL/'+sample+'*/*err')
+    return logFileList
 
-                for errFile in errFileList:
-                    print '\n\n\n###### '+errFile.split('__')[1]+' '+errFile.split('__')[5]+' ######\n'
-                    os.system('cat '+errFile)
+def printJobErrors(opt):
+
+    for errFile in getLogFileList(opt, 'err'):
+        print '\n\n\n###### '+errFile.split('__')[1]+' '+errFile.split('__')[5]+' ######\n'
+        os.system('cat '+errFile)
+
+def printKilledJobs(opt):
+
+    killString = '\'Job removed\'' if 'cern' in os.uname()[1] else 'TODO' 
+
+    for logFile in getLogFileList(opt, 'log'):
+                 
+        process=subprocess.Popen(' '.join(['grep', killString, logFile]), stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
+        processOutput, processError = process.communicate()
+
+        if processOutput:
+            print '\n###### '+logFile.split('__')[1]+' '+logFile.split('__')[5]+processOutput
 
 def purgeLogs(opt):
 
-    os.system('rm -r '+opt.logs+'/*')
+    deleteDirectory(opt.logs+'/'+opt.logprocess+'__*')
 
 # shapes
 
@@ -155,14 +204,13 @@ def cleanShapes(opt):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
-            os.system('rm -r '+'/'.join([ opt.shapedir, year, tag, 'AsMuchAsPossible' ]))
+            deleteDirectory('/'.join([ opt.shapedir, year, tag, 'AsMuchAsPossible' ]))
 
 def deleteShapes(opt):
 
     for year in opt.year.split('-'):
-
         for tag in opt.tag.split('-'):
-            os.system('rm -r '+'/'.join([ opt.shapedir, year, tag ]))
+            deleteDirectory('/'.join([ opt.shapedir, year, tag ]))
 
         cleanDirectory('/'.join([ opt.shapedir, year ]))
 
@@ -173,7 +221,49 @@ def deletePlots(opt):
     opt.shapedir = opt.plotsdir
     deleteShapes(opt)
 
+# Datacards
+
+def cleanSignalDatacards(opt, year, tag, signal, dryRun=False):
+
+    cleanSignalDatacardCommand = 'rm -r -f '+getSignalDir(opt, year, tag, signal, 'cardsdir')
+
+    if dryRun: return cleanSignalDatacardCommand
+    else: os.system(cleanSignalDatacardCommand)
+
+def cleanDatacards(opt):
+
+    for year in opt.year.split('-'):
+        for tag in opt.tag.split('-'):
+
+            samples = getSamples(opt)
+
+            for sample in samples:
+                if samples[sample]['isSignal']:
+                    cleanSignalDatacards(opt, year, tag, sample)
+
+def deleteDatacards(opt):
+
+    opt.shapedir = opt.cardsdir
+    deleteShapes(opt)
+
+def purgeDatacards(opt):
+
+    deleteDirectory(opt.cardsdir+'/*')
+
 # jobs
+
+def batchQueue(batchQueue):
+
+    if 'ifca' in os.uname()[1] or 'cloud' in os.uname()[1]:
+        if batchQueue not in [ 'cms_main', 'cms_med', 'cms_high' ]: 
+            print 'Batch queue', batchQueue, 'not available in gridui. Setting it to cms_high'
+            return 'cms_high'
+    else: # cern
+        if batchQueue not in ['espresso', 'microcentury', 'longlunch', 'workday', 'tomorrow', 'testmatch', 'nextweek' ]:
+            print 'Batch queue', batchQueue, 'not available in lxplus. Setting it to workday'
+            return 'workday'
+
+    return batchQueue
 
 def checkProxy(opt):
 
@@ -202,31 +292,33 @@ def getProcessIdList(opt):
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
-            samples = getSamplesInLoop(opt.configuration, year, tag, opt.sigset)
+            jidFileList = glob.glob(getLogDir(opt, year, tag, '')+'/*jid')
 
-            for sample in samples:
+            for sample in getSamplesInLoop(opt.configuration, year, tag, opt.sigset):
+                jidFileList += glob.glob(getLogDir(opt, year, tag, sample)+'/*jid')
 
-                jidFileList = glob.glob(opt.logs+'/mkShapes__'+year+tag+'__ALL/'+sample+'*/*jid')
+            for jidFile in jidFileList:
 
-                for jidFile in jidFileList:
-                    
-                    yearJob, tagJob = year, tag
-                    if '*' in year or '*' in tag:
-                        yeartag = jidFile.split('__')[1]
-                        if '*' in year and '*' in tag:
-                            yearJob, tagJob = yeartag, yeartag
-                        elif '*' in year: yearJob = yeartag.replace(tag, '')
-                        elif '*' in tag:  tagJob  = yeartag.replace(year,'')
+                logprocess = jidFile.replace('./','').split('__')[0].split('/')[1]
+                sample = jidFile.split('__')[-1].split('.')[0]                  
+  
+                yearJob, tagJob = year, tag
+                if '*' in year or '*' in tag:
+                    yeartag = jidFile.split('__')[1].split('*/')[0]
+                    if '*' in year and '*' in tag:
+                        yearJob, tagJob = yeartag, yeartag
+                    elif '*' in year: yearJob = yeartag.replace(tag, '')
+                    elif '*' in tag:  tagJob  = yeartag.replace(year,'')
 
-                    process=subprocess.Popen('cat '+jidFile, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
-                    processOutput, processError = process.communicate()
+                process=subprocess.Popen('cat '+jidFile, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
+                processOutput, processError = process.communicate()
 
-                    if processOutput:
+                if processOutput:
 
-                        processId = processOutput.split('\n')[0].split('.')[0]
-                        if processId not in processIdList.keys(): 
-                            processIdList[processId] = { 'year' : yearJob, 'tag' : tagJob, 'samples' : [] }
-                        if sample not in processIdList[processId]['samples']: processIdList[processId]['samples'].append(sample)    
+                    processId = processOutput.split('\n')[0].split('.')[0]
+                    if processId not in processIdList.keys(): 
+                        processIdList[processId] = { 'logprocess' : logprocess, 'year' : yearJob, 'tag' : tagJob, 'samples' : [] }
+                    if sample not in processIdList[processId]['samples']: processIdList[processId]['samples'].append(sample)    
 
     return processIdList 
 
@@ -245,6 +337,9 @@ def checkJobs(opt):
 
     if processError: print processError
     
+    jobInfoList = [ 'year', 'tag' ]
+    if '*' in opt.logprocess: jobInfoList.insert(0, 'logprocess') 
+
     if processOutput:
 
         for processLine in processOutput.split('\n'):
@@ -252,8 +347,8 @@ def checkJobs(opt):
             else:
                 for processId in processIdList:
                     if processId in processLine:
-                        jobInfo = processIdList[processId]
-                        print processLine+' year='+jobInfo['year']+', tag='+jobInfo['tag']+', samples='+','.join(jobInfo['samples'])
+                        jobInfos = ', '.join([ x+'='+processIdList[processId][x] for x in jobInfoList ])
+                        print processLine+' '+jobInfos+', samples='+','.join(processIdList[processId]['samples'])
 
 def killJobs(opt):
 
@@ -275,6 +370,18 @@ def killJobs(opt):
 def getShapeFileName(shapeDir, year, tag, sigset, fileset, tagoption=''):
 
     return '/'.join([ shapeDir, year, tag, 'plots_'+tagoption+tag+setFileset(fileset, sigset)+'.root' ])
+
+def foundShapeFiles(opt):
+
+    missingShapeFiles = False
+
+    for year in opt.year.split('-'):
+        for tag in opt.tag.split('-'):
+            if not os.path.isfile(getShapeFileName(opt.shapedir, year, tag, opt.sigset, opt.fileset)): 
+                print 'Error: input shape file', etShapeFileName(opt.shapeDir, year, tag, opt.sigset, opt.fileset), 'is missing'
+                missingShapeFiles = True
+     
+    return not missingShapeFiles
 
 def openShapeFile(shapeDir, year, tag, sigset, fileset):
 

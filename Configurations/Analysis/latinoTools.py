@@ -1,12 +1,12 @@
 import os
+import copy
 import commonTools
 
 ### Shapes
 
 def mkShapesMulti(opt, splits):
 
-    if 'cms_' in opt.queue and 'ifca' not in os.uname()[1] and 'cloud' not in os.uname()[1]:
-        opt.queue = 'longlunch'
+    opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
@@ -15,7 +15,8 @@ def mkShapesMulti(opt, splits):
 
             shapeMultiCommand = 'mkShapesMulti.py --pycfg='+opt.configuration+' --treeName=Events --tag='+year+tag+' --sigset=SIGSET'
             if 'shapes' in opt.action:
-                shapeMultiCommand += ' --doBatch=True --batchQueue='+opt.queue
+                shapeMultiCommand += ' --doBatch=True --batchQueue='+opt.batchQueue
+                if opt.dryRun: shapeMultiCommand += ' --dryRun '
             else:
                 shapeMultiCommand += ' --doHadd=True --doNotCleanup'
 
@@ -124,7 +125,8 @@ def mergedPlots(opt):
     for tag in opt.tag.split('-'):
 
         opt2 = commonTools.Object()
-        opt2.configuration, opt2.year, opt2.tag, opt2.sigset, opt2.fileset = opt.configuration, opt.year, tag, opt.sigset, opt.fileset                
+        opt2 = copy.deepcopy(opt)
+        opt2.tag = tag           
         opt2.nuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
         commonTools.mergeShapes(opt2) 
         
@@ -152,6 +154,8 @@ def plots(opt):
     elif 'fit' in opt.option.lower(): postfitPlots(opt)
     else: 
 
+        if not commonTools.foundShapeFiles(opt): exit()
+
         nuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
 
         for year in opt.year.split('-'):
@@ -160,46 +164,43 @@ def plots(opt):
 
 ### Datacards
 
-def getPerSignalSigset(fileset, sigset):
+def getPerSignalSigset(inputfileset, inputsigset):
 
-    fileset = commonTools.setFileset(opt.fileset, opt.sigset)
+    fileset = commonTools.setFileset(inputfileset, inputsigset)
 
     if '-' in fileset:                       # This is SUSY like
         sigset = fileset.replace(fileset.split('-')[-1], '').replace('_','')+'MASSPOINT'
-    elif opt.sigset=='' or opt.sigset=='SM': # This should work for SM searches
-        sigset = opt.sigset
+    elif inputsigset=='' or inputsigset=='SM': # This should work for SM searches
+        sigset = inputsigset
     else:                                    # Guessing latinos' usage
         sigset = 'MASSPOINT'
 
     return fileset, sigset
 
-def cleanDatacards((opt, dryRun=False):
-
-    samples = commonTools.getSamples(opt)
-
-    for year in opt.year.split('-'):
-        for sample in samples:
-            if samples[sample]['isSignal']:
-
-                cleanDatacardCommand = 'rm -r '+'/'.join([opt.cardsdir, year, opt.tag, sample])
-
-                if dryRun: return cleanDatacardCommand
-                else: os.system(cleanDatacardCommand)
-
 def datacards(opt, dryRun=False):
+
+    if not commonTools.foundShapeFiles(opt): exit()
+
+    commonTools.cleanDatacards(opt)
 
     fileset, sigset = getPerSignalSigset(opt.fileset, opt.sigset)
 
     samples = commonTools.getSamples(opt)
 
-    inputtag = opt.tag.split('_')[0]
-
     for year in opt.year.split('-'):
-        for sample in samples:
-            if samples[sample]['isSignal']:
+        for tag in opt.tag.split('-'):
+ 
+            inputtag = tag.split('_')[0]
 
-                datacardCommand = 'mkDatacards.py --pycfg='+opt.configuration+' --tag='+year+opt.tag+' --sigset='+sigset.replace('MASSPOINT',sample)+' --outputDirDatacard='+'/'.join([opt.cardsdir, year, opt.tag, sample])+' --inputFile='+commonTools.getShapeFileName(opt.shapedir, year, inputtag, '', fileset)
+            for sample in samples:
+                if samples[sample]['isSignal']:
 
-                if dryRun: return datacardCommand 
-                else: os.system(datacardCommand)
+                    outputDir = commonTools.getSignalDir(opt, year, tag, sample, 'cardsdir')
+
+                    os.system('mkdir -p '+outputDir)
+
+                    datacardCommand = 'mkDatacards.py --pycfg='+opt.configuration+' --tag='+year+opt.tag+' --sigset='+sigset.replace('MASSPOINT',sample)+' --outputDirDatacard='+outputDir+' --inputFile='+commonTools.getShapeFileName(opt.shapedir, year, inputtag, '', fileset)
+
+                    if dryRun: return datacardCommand 
+                    else: os.system(datacardCommand)
 
