@@ -23,7 +23,6 @@ def submitCombineJobs(opt, combineJobs):
             else:
 
                 jobs = batchJobs(opt.combineAction,year+tag,['ALL'],targetList,splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
-
                 jobs.nThreads = nThreads
 
                 for signal in targetList:
@@ -79,22 +78,29 @@ def combineDatacards(opt, signal, dryRun=False):
 
     datacardList = [ ]
 
+    addYearToDatacardName = len(opt.year.split('-'))>1
+
     for year in opt.year.split('-'):
 
         inputDatacardDir = commonTools.mergeDirPaths(opt.baseDir, commonTools.getSignalDir(opt, year, opt.tag, signal, 'cardsdir'))
 
         samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, opt.sigset, 'variables')
 
+        datacardNameStructure = commonTools.getDatacardNameStructure(addYearToDatacardName, len(cuts.keys())>1, len(variables.keys())>1)
+        datacardNameStructure = latinoTools.datacardNameStructure.replace('year', year)
+
         for cut in cuts:
             for variable in variables:
                 if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+
+                    datacardName = datacardNameStructure.replace('cut', cut).replace('variable', variable)
                     datacardFile = '/'.join([ inputDatacardDir, cut, variable, 'datacard.txt' ])   
-                    datacardList.append(cut+'_'+year+'='+datacardFile)
+                    datacardList.append(datacardName+'='+datacardFile)
 
     combineDatacardCommandList.append('combineCards.py '+' '.join(datacardList)+' > combinedDatacard.txt')
 
     combineDatacardCommand = '\n'.join(combineDatacardCommandList)
- 
+
     if dryRun: return combineDatacardCommand
     else: os.system(combineDatacardCommand)
 
@@ -123,7 +129,6 @@ def runCombine(opt):
 
     combineJobs = { }
 
-    opt2 = commonTools.Object()
     opt2 = copy.deepcopy(opt)
 
     opt2.baseDir = os.getenv('PWD')
@@ -169,7 +174,9 @@ def runCombine(opt):
 
                     if 'debug' in opt.option: print combineCommand
                     elif 'interactive' in opt.option: os.system(combineCommand)
-                    else: combineJobs[year][tag][sample] = combineCommand
+                    else:
+                        commonTools.cleanLogs(opt2) 
+                        combineJobs[year][tag][sample] = combineCommand
 
     if 'debug' not in opt.option and 'interactive' not in opt.option: 
         submitCombineJobs(opt, combineJobs)

@@ -1,5 +1,6 @@
 import os
 import glob
+import copy
 import ROOT
 import subprocess
 
@@ -16,18 +17,21 @@ def getCfgFileName(opt, cfgName):
     processOutput, processError = process.communicate()
 
     if not processOutput: 
-        print 'getCfgFileName error: '+cfgName+'File line not found in '+opt.configuration
+        print 'getCfgFileName error: '+cfgName+' File line not found in '+opt.configuration
         exit() 
 
     return processOutput.split('=')[1].replace(' ','').replace('\'','').split('.')[0]+'.py'
 
-def getDictionaries(opt, lastDictionary='nuisances'):
+def getDictionaries(optOrig, lastDictionary='nuisances'):
 
     dictionaryList = [ 'samples', 'cuts', 'variables', 'nuisances' ]
 
     lastDictionaryIndex = dictionaryList.index(lastDictionary)
 
     samples, cuts, variables, nuisances = {}, {}, {}, {}
+
+    opt = copy.deepcopy(optOrig)
+    opt.tag = optOrig.year+optOrig.tag
 
     for dic in range(lastDictionaryIndex+1):
 
@@ -411,10 +415,6 @@ def systematicsTables(opt):
     print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkSystematicsTables.py :('
 
 ### Modules for analyzing results from combine
-
-def postfitShapes(opt):
-
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mergeShapesPostFit.py :('
 
 def massScanLimits(opt):
 

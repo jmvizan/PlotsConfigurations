@@ -9,3 +9,16 @@ nuisances['stat']  = {
               'samples'       : {}
              }
 
+### rate parameters
+
+for cut in cuts:
+    for sample in samples:
+        if not samples[sample]['isDATA']:
+ 
+            nuisances[sample+'_'+cut]  = { 'name'  : sample+'_'+cut,
+                                           'samples'  : { sample : '1.' },
+                                           'type'  : 'rateParam',
+                                           'cuts'  : [ cut ] 
+                                          }
+
+

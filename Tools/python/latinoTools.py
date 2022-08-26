@@ -80,20 +80,27 @@ def mergeall(opt):
 
 ### Plots
 
-def mkPlot(opt, year, tag, nuisances):
+def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
 
     plotAsExotics = commonTools.plotAsExotics(opt)
 
-    fileyear, fitType = year, ''
-    if 'fit' in opt.option.lower():
-        fileyear = opt.year
-        fitType  = commmonTools.fitType(opt.option)
-        if fitType=='PostFitS': plotAsExotics = False
+    fileyear, fitoption = year, ''
 
-    shapeFileName = commonTools.getShapeFileName(opt.shapedir, fileyear, tag, opt.sigset, opt.fileset, fitType)
-    plotsDir = '/'.join([ opt.plotsdir, fileyear, fitType+tag ])
-    if fileyear!=year: plotsDir += '/'+year
-    if opt.sigset!='SM': plotsDir += '/'+opt.sigset
+    plotsDirList = [ opt.plotsdir, year ]
+
+    if fitoption=='':
+        fileset = opt.fileset
+        plotsDirList.append(tag)
+
+    else:
+        fileset = ''
+        plotsDirList.extend([ fitoption+tag, yearInFit ])
+        if fitoption=='PostFitS': plotAsExotics = False
+
+    if sigset!='SM': plotsDirList.append(sigset)
+    plotsDir = '/'.join(plotsDirList)
+
+    shapeFileName = commonTools.getShapeFileName(opt.shapedir, year, tag, sigset, fileset, fitoption+yearInFit) 
 
     os.system('mkdir -p '+plotsDir+' ; cp ../../index.php '+opt.plotsdir)
 
@@ -103,7 +110,7 @@ def mkPlot(opt, year, tag, nuisances):
             subDir += '/'+subdir
             os.system('cp ../../index.php '+subDir)
 
-    plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+year+tag+' --sigset='+opt.sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
+    plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+year+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
 
     if 'normalizedCR' in opt.option: plotCommand += ' --plotNormalizedCRratio=1' # This is not yet re-implemented in latino's mkPlot.py
     elif 'normalized' in opt.option: plotCommand += ' --plotNormalizedDistributions=1'
@@ -120,11 +127,12 @@ def mkPlot(opt, year, tag, nuisances):
         for plot2delete in [ plotToDelete, 'log_'+plotToDelete, 'cdifference_', 'log_cdifference_' ]:
             os.system('rm '+plotsDir+'/'+plot2delete+'*')
 
+# Plots merging different data taking periods (years) without combine (e.g. control regions)
+
 def mergedPlots(opt):
 
     for tag in opt.tag.split('-'):
 
-        opt2 = commonTools.Object()
         opt2 = copy.deepcopy(opt)
         opt2.tag = tag           
         opt2.nuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
@@ -133,20 +141,100 @@ def mergedPlots(opt):
         mkPlot(opt, opt.year, tag, opt2.nuisances)
         os.system('rm -f nuisances_*.py')
 
-def postfitPlots(opt):
+# Tools for making plots from combine fits
 
-    if 'fit' not in opt.option.lower():
-        print 'plotsPostFit error: please chose a fit option (prefit, postfit, postfits)'
+def getDatacardNameStructure(addYearToDatacardName, addCutToDatacardName, addVariableToDatacardName):
+
+    datacardNameStructureList = [ ]
+    if addYearToDatacardName: datacardNameStructureList.append('year')
+    if addCutToDatacardName: datacardNameStructureList.append('cut')
+    if addVariableToDatacardName: datacardNameStructureList.append('variable')
+    return '_'.join(datacardNameStructureList)
+
+def getCombineFitFileName(opt, year, tag, signal):
+
+    combineFitFileNameList = [ opt.mlfitdir, year, tag+'Save', 'fitDiagnostics.root' ]
+    if opt.sigset!='' and opt.sigset!='SM': combineFitFileNameList.insert(3, signal)
+    return '/'.join(combineFitFileNameList)
+
+def mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, signal, sigset, datacardNameStructure):
+
+    fitkind = 'p' if fitoption=='PreFit' else fitoption[7:].lower()
+    postFitPlotCommandList = [ '--kind='+fitkind, '--structureFile='+commonTools.getCfgFileName(opt, 'structure') ]
+    postFitPlotCommandList.extend([ '--tag='+tag, '--sigset='+sigset ])
+
+    postFitPlotCommandList.extend([ '--cutNameInOriginal='+cut, '--variable='+variable ])
+    #postFitPlotCommandList.append('--cut='+datacardNameStructure.replace('year', year).replace('cut', cut).replace('variable', variable))
+    postFitPlotCommandList.append('--cut='+cut+'_'+year)
+    if fitoption=='PostFitB': postFitPlotCommandList.append('--getSignalFromPrefit=1')
+
+    postFitPlotCommandList.append('--inputFileCombine='+getCombineFitFileName(opt, fittedYear, tag, signal))
+    postFitPlotCommandList.append('--inputFile='+commonTools.getShapeFileName(opt.shapedir, year, tag, opt.sigset, opt.fileset))
+    postFitPlotCommandList.append('--outputFile='+commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', fitoption))
+
+    os.system('mkPostFitPlot.py '+' '.join(postFitPlotCommandList))
+
+def postFitPlots(opt, convertShapes=True, makePlots=True):
+
+    fitoption = ''
+    if 'prefit' in opt.option.lower(): fitoption = 'PreFit'
+    elif 'postfitb' in opt.option.lower(): fitoption = 'PostFitB'
+    elif 'postfits' in opt.option.lower(): fitoption = 'PostFitS'
+
+    if fitoption=='':
+        print 'plotsPostFit error: please choose a fit option (prefit, postfitb, postfits)'
         exit()
 
-    commonTools.postfitShapes(opt)
+    fittedYearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
+    if 'splitandcomb' in opt.option: fittedYearList.append(opt.year)
 
-    yearList = opt.year.split('-')
-    if len(yearList)>1:
-        yearList.append(opt.year)
+    for tag in opt.tag.split('-'):
+        for fittedYear in fittedYearList:
+        
+            yearInFitList = fittedYear.split('-')
+            if 'mergeyear' in opt.option: yearInFitList.append('') 
 
-    for year in yearList:
-        mkPlot(opt, year, opt.tag, 'None')
+            signals = commonTools.getDictionariesInLoop(opt.configuration, yearInFitList[0], tag, opt.sigset, 'samples')
+            for signal in signales:
+                if signals[signal]['isSignal']:
+
+                    sigset = opt.sigset if opt.sigset=='' or opt.sigset=='SM' else 'SM-'+signal if 'SM' in opt.sigset else signal
+
+                    for year in yearInFitList:
+
+                        postFitShapeFile = commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', fitoption+year)
+    
+                        if convertShapes or not os.path.isfile(postFitShapeFile):
+
+                            os.system('rm -f '+postFitShapeFile)
+
+                            if year!='':
+
+                                samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, tag, sigset, 'variables')
+                                datacardNameStructure = getDatacardNameStructure(len(fittedYear.split('-'))>1, len(cuts.keys())>1, len(variables.keys())>1)
+
+                                for cut in cuts:
+                                    if 'Pt100to140_DeepJetT_Fail' not in cut: continue
+                                    for variable in variables:
+                                        if 'cuts' not in variables[variable] or cut in  variables[variable]['cuts']:
+                                            mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, sample, sigset, datacardNameStructure)
+
+                            else:
+                                pass
+
+                        if makePlots:
+                            mkPlot(opt, fittedYear, tag, sigset, None, fitoption, year):
+
+def postFitShapes(opt):
+
+    convertShapes = True if 'noreset' not in opt.option else False
+    postFitPlots(opt, convertShapes, False) 
+
+def postFitPlotsOnly(opt):
+
+    postFitPlots(opt, False, True)
+
+# Generic plots from mkShapes output
 
 def plots(opt):
 
@@ -160,7 +248,7 @@ def plots(opt):
 
         for year in opt.year.split('-'):
             for tag in opt.tag.split('-'):
-                mkPlot(opt, year, tag, nuisances)
+                mkPlot(opt, year, tag, opt.sigset, nuisances)
 
 ### Datacards
 
