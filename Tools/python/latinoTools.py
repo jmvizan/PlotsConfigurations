@@ -223,7 +223,7 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
                                 pass
 
                         if makePlots:
-                            mkPlot(opt, fittedYear, tag, sigset, None, fitoption, year):
+                            mkPlot(opt, fittedYear, tag, sigset, None, fitoption, year)
 
 def postFitShapes(opt):
 
