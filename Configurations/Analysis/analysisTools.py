@@ -1,6 +1,9 @@
 import os
+import copy
 import ROOT
 import PlotsConfigurations.Tools.commonTools as commonTools
+import PlotsConfigurations.Tools.latinoTools as latinoTools
+import PlotsConfigurations.Tools.combineTools as combineTools
 from array import array
 
 ### Analysis defaults
@@ -8,9 +11,94 @@ from array import array
 def setAnalysisDefaults(opt):
 
     opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src' 
+
     if opt.year=='test' or opt.year=='*': opt.year = 'UL17nano'
 
+    opt.btagWPs = [ 'DeepCSVL', 'DeepCSVM', 'DeepCSVT', 'DeepJetL', 'DeepJetM', 'DeepJetT' ]
+    opt.ptBins = ['Pt20to30', 'Pt30to50', 'Pt50to70','Pt70to100','Pt100to140','Pt140to200','Pt200to300','Pt300to600', 'Pt600to1000', 'Pt1000to1400']
+
+    if '_btag' in opt.tag:
+        btagToKeepString = opt.tag.split('_btag')[1].split('_')[0]
+        btagToKeep = []
+        for btagWP in opt.btagWPs:
+            if btagToKeepString in btagWP:
+                btagToKeep.append(btagWP)
+        opt.btagWPs = btagToKeep
+
+    if '_Pt' in opt.tag:
+        ptbinToKeep = []
+        for ptbin in opt.ptBins:
+            if ptbin in opt.tag:
+                ptbinToKeep.append(ptbin)
+        opt.ptBins = ptbinToKeep
+        
 ### Loops on analysis years and tags
+
+# PtRel
+
+def ptRelShapes(opt):
+
+    if 'step' not in opt.option:
+        print 'Error in ptRelShapes: please choose a step'
+        exit()
+
+    opt2 = copy.deepcopy(opt)
+    
+    if 'step0' in opt2.option:
+        opt2.tag = 'PtRelKinematics'
+    elif 'step1' in opt2.option:
+        opt2.tag = 'PtRelKinematics:mujetpt'
+    elif 'step2' in opt2.option:
+        opt2.tag = 'PtRelKinematics:mujetpt:mujeteta'
+    elif 'step3' in opt2.option:
+        opt2.tag = 'PtRelTemplatesKinematics:mujetpt:mujeteta'
+    else:
+        print 'Error in ptRelShapes: please choose an existing step'
+        exit()
+
+    if 'kinematicWeights' in opt2.option:
+        if ':' not in opt2.tag or 'Templates' in opt2.tag:
+            print 'Error in ptRelShapes:', opt2.tag, ' not a good choice for kinematicWeights'
+            exit()
+        kinematicWeights(opt2)
+    elif 'plots' in opt2.option:
+        latinoTools.plots(opt2)
+    else:
+        latinoTools.shapes(opt2)
+
+def ptRelAnalysis(opt, action):
+
+    opt2 = copy.deepcopy(opt)
+    rawTag = opt2.tag.split('__')[0]
+
+    for btagWP in opt.btagWPs:
+        for ptbin in opt.ptBins:
+
+            opt2.tag = '_'.join([ rawTag, '_btag'+btagWP, '___'+ptbin ])
+
+            if action=='fit': 
+  
+                opt2.batchQueue = 'nextweek'
+                opt2.option += 'resetskipbonly'
+                combineTools.mlfits(opt2)
+
+            elif latinoTools.goodCombineFit(opt2, opt2.year, opt2.tag, '', 'PostFitS'):
+            
+                opt2.option += 'postfits'   
+                if action=='postfitshapes':  latinoTools.postFitShapes(opt2) 
+                elif action=='postfitplots': latinoTools.postFitPlots(opt2)
+ 
+def ptRelFits(opt):
+
+    ptRelAnalysis(opt, 'fit')
+
+def ptRelPostFitShapes(opt):
+
+    ptRelAnalysis(opt, 'postfitshapes')
+
+def ptRelPostFitPlots(opt):
+
+    ptRelAnalysis(opt, 'postfitplots')
 
 ### Analysis specific weights, efficiencies, scale factors, etc.
 

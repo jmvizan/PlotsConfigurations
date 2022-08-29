@@ -106,14 +106,19 @@ awayDeltaPhi = 'acos(cos(Jet_phi-muJet_phi))'
 awayDeltaEta = '(Jet_eta-muJet_eta)'
 awayDeltaR   = 'sqrt('+awayDeltaPhi+'*'+awayDeltaPhi+'+'+awayDeltaEta+'*'+awayDeltaEta+')'
 
-awayJet = 'Sum$('+jetSel+' && '+jetPt+'>=AWAYJETPTCUT && '+awayDeltaR+'>AWAYDRCUT && Jet_BTAGDISC>BTAGCUT)'
+awayJet = 'Sum$('+jetSel+' && '+jetPt+'>=AWAYJETPTCUT && '+awayDeltaR+'>AWAYDRCUT && Jet_BTAGDISC>BTAGAWAYJETCUT)'
 
 if 'PtRel' in opt.method:
+        
+    btagAwayJetVariations = { 'Central' : '0.8838',  'AwayJetDown' : '0.5803' , 'AwayJetUp' : '0.9693' }
+
     awayJetCut = awayJet.replace('AWAYDRCUT', '1.5')+'==1'
-    if 'Kinematics' in opt.tag: awayJetCut = awayJetCut.replace('BTAGDISC>BTAGCUT', 'btagCSVV2>0.8838')
+    awayJetCut = awayJetCut.replace('BTAGDISC>BTAGAWAYJETCUT', 'btagCSVV2>'+btagAwayJetVariations['Central'])
+
 elif 'System8' in opt.method:
+
     awayJetCut = awayJet.replace('AWAYDRCUT', '0.2')+'>=1'
-    if 'Kinematics' in opt.tag: awayJetCut = awayJetCut.replace(' && Jet_BTAGDISC>BTAGCUT', '')
+    if 'Templates' not in opt.tag: awayJetCut = awayJetCut.replace(' && Jet_BTAGDISC>BTAGAWAYJETCUT', '')
 
 ### Weights and filters
 

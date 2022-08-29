@@ -9,16 +9,23 @@ nuisances['stat']  = {
               'samples'       : {}
              }
 
-### rate parameters
+if 'Templates' in opt.tag:
 
-for cut in cuts:
-    for sample in samples:
-        if not samples[sample]['isDATA']:
+    ### rate parameters
+
+    for cut in cuts:
+        for sample in samples:
+            if not samples[sample]['isDATA']:
  
-            nuisances[sample+'_'+cut]  = { 'name'  : sample+'_'+cut,
-                                           'samples'  : { sample : '1.' },
-                                           'type'  : 'rateParam',
-                                           'cuts'  : [ cut ] 
-                                          }
+                nuisances[sample+'_'+cut]  = { 'name'  : sample+'_'+cut,
+                                               'type'  : 'rateParam',
+                                               'samples'  : { sample : '1.' },
+                                               'limits'  : '[0.01,20]',
+                                               'cuts'  : [ cut ] 
+                                              }
+
+
+
+
 
 
