@@ -161,16 +161,6 @@ def getDatacardNameStructure(addYearToDatacardName, addCutToDatacardName, addVar
     if addVariableToDatacardName: datacardNameStructureList.append('variable')
     return '_'.join(datacardNameStructureList)
 
-def getCombineFitFileName(opt, year, tag, signal):
-
-    return commonTools.getSignalDir(opt, year, tag, signal, 'mlfitdir')+'/fitDiagnostics.root'
-
-def goodCombineFit(opt, year, tag, signal, fitoption):
-
-    fitFile = commonTools.openRootFile(getCombineFitFileName(opt, year, tag, signal))
-    if not fitFile.Get('shapes_'+fitoption.lower().replace('postfit','fit_')): return False
-    return True
-
 def mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, signal, sigset, datacardNameStructure):
 
     fitkind = 'p' if fitoption=='PreFit' else fitoption[7:].lower()
@@ -182,7 +172,7 @@ def mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, signal, 
     if fitoption=='PostFitB': postFitPlotCommandList.append('--getSignalFromPrefit=1')
 
     tagoption = fitoption if year==fittedYear else fitoption+year
-    postFitPlotCommandList.append('--inputFileCombine='+getCombineFitFileName(opt, fittedYear, tag, signal))
+    postFitPlotCommandList.append('--inputFileCombine='+commonTools.getCombineFitFileName(opt, signal, fittedYear, tag)
     postFitPlotCommandList.append('--inputFile='+commonTools.getShapeFileName(opt.shapedir, year, tag.split('_')[0], opt.sigset, opt.fileset))
     postFitPlotCommandList.append('--outputFile='+commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', tagoption))
 
@@ -212,7 +202,7 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
             for signal in signals:
                 if signals[signal]['isSignal']:
 
-                    if not goodCombineFit(opt, fittedYear, tag, signal, fitoption):
+                    if not commonTools.goodCombineFit(opt, fittedYear, tag, signal, fitoption):
                         print 'Warning in postFitPlots: no good fit for year='+fittedYear+', tag='+tag+', signal='+signal+', fitoption='+fitoption
 
                     sigset = opt.sigset if opt.sigset=='' or opt.sigset=='SM' else 'SM-'+signal if 'SM' in opt.sigset else signal

@@ -38,15 +38,6 @@ def getLimitRun(unblind):
 
     return 'Both' if unblind else 'Blind'
 
-def getCombineOutputFileName(opt, signal):
-
-    outputFileName = commonTools.getSignalDir(opt, opt.year, opt.tag, signal, 'combineOutDir')
-
-    if opt.combineAction=='limits': outputFileName += '/higgsCombine_'+getLimitRun(opt.unblind)+'.AsymptoticLimits.mH120.root'
-    else: outputFileName += '/fitDiagnostics.root'
-
-    return outputFileName
-
 def prepareDatacards(opt, dryRun=False):
 
     prepareDatacardCommandList = [ ]
@@ -158,7 +149,7 @@ def runCombine(opt):
                     if runCombineJob:
                         if 'reset' in opt.option: 
                             commonTools.deleteDirectory(opt2.combineSignalDir)
-                        elif os.path.isfile(getCombineOutputFileName(opt2, sample)): 
+                        elif os.path.isfile(commonTools.getCombineOutputFileName(opt2, sample)): 
                             continue
 
                     os.system('mkdir -p '+opt2.combineSignalDir)
