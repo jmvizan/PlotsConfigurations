@@ -1,5 +1,6 @@
 import os
 import glob
+import copy
 import ROOT
 import subprocess
 
@@ -16,18 +17,21 @@ def getCfgFileName(opt, cfgName):
     processOutput, processError = process.communicate()
 
     if not processOutput: 
-        print 'getCfgFileName error: '+cfgName+'File line not found in '+opt.configuration
+        print 'getCfgFileName error: '+cfgName+' File line not found in '+opt.configuration
         exit() 
 
     return processOutput.split('=')[1].replace(' ','').replace('\'','').split('.')[0]+'.py'
 
-def getDictionaries(opt, lastDictionary='nuisances'):
+def getDictionaries(optOrig, lastDictionary='nuisances'):
 
     dictionaryList = [ 'samples', 'cuts', 'variables', 'nuisances' ]
 
     lastDictionaryIndex = dictionaryList.index(lastDictionary)
 
     samples, cuts, variables, nuisances = {}, {}, {}, {}
+
+    opt = copy.deepcopy(optOrig)
+    opt.tag = optOrig.year+optOrig.tag
 
     for dic in range(lastDictionaryIndex+1):
 
@@ -70,11 +74,15 @@ def setFileset(fileset, sigset):
 
 def getSignalDir(opt, year, tag, signal, directory):
 
-    inputtag = tag.split('_')[0] if directory=='shapedir' else tag
-    signalDir = '/'.join([ getattr(opt, directory), year, inputtag ])
-    if opt.sigset!='' and opt.sigset!='SM': signalDir += '/'+signal
+    signalDirList = [ getattr(opt, directory), year ]
+    tag = tag.replace('___','_')
+    if '__' in tag:
+        signalDirList.append(tag.replace('__','/'))
+    else:
+        signalDirList.append(tag) 
+    if opt.sigset!='' and opt.sigset!='SM': signalDirList.append(signal)
 
-    return signalDir
+    return '/'.join(signalDirList)
 
 def isExotics(opt):
 
@@ -104,10 +112,18 @@ def mergeDirPaths(baseDir, subDir):
 
 def getLogDir(opt, year, tag, sample=''):
 
-    logDir = opt.logs+'/'+opt.logprocess+'__'+year+tag+'*'
-    if sample!='': logDir += '/*'+sample+'*'
+    logDirBase = opt.logs+'/'+opt.logprocess+'__'+year+tag+'EXT'
+    if sample!='': logDirBase += '/*'+sample+'*'
 
-    return logDir
+    logDirList = [ ]
+
+    if opt.logprocess=='mkShapes' or (opt.sigset!='' and opt.sigset!='SM') or opt.logprocess=='*':
+        logDirList.append(logDirBase.replace('EXT','__ALL'))        
+
+    if opt.logprocess!='mkShapes' and (opt.sigset=='' or opt.sigset=='SM'):
+        logDirList.append(logDirBase.replace('EXT',''))
+
+    return ' '.join(logDirList)
 
 def cleanDirectory(directory):
 
@@ -148,35 +164,14 @@ def getLogFileList(opt, extension):
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
-            logFileList += glob.glob(getLogDir(opt, year, tag, '')+'/*'+extension)
-
+            logDirList = getLogDir(opt, year, tag, '').split(' ')
             for sample in getSamplesInLoop(opt.configuration, year, tag, opt.sigset):
-                logFileList += glob.glob(getLogDir(opt, year, tag, sample)+'/*'+extension)
+                logDirList += getLogDir(opt, year, tag, sample).split(' ')
+
+            for logDir in logDirList:
+                logFileList += glob.glob(logDir+'/*'+extension)
 
     return logFileList
-
-def printJobErrors(opt):
-
-    for errFile in getLogFileList(opt, 'err'):
-
-        logprocess = errFile.replace('./','').split('__')[0].split('/')[1] if '*' in opt.logprocess else ''
-        sample = errFile.split('__')[-1].split('.')[0]
-        yeartag = errFile.split('__')[1].split('/')[0]
-
-        print '\n\n\n###### '+' '.join([ logprocess, sample, yeartag ])+' ######\n'
-        os.system('cat '+errFile)
-
-def printKilledJobs(opt):
-
-    killString = '\'Job removed\'' if 'cern' in os.uname()[1] else 'TODO' 
-
-    for logFile in getLogFileList(opt, 'log'):
-                 
-        process=subprocess.Popen(' '.join(['grep', killString, logFile]), stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
-        processOutput, processError = process.communicate()
-
-        if processOutput:
-            print '\n###### '+logFile.split('__')[1]+' '+logFile.split('__')[5]+processOutput
 
 def purgeLogs(opt):
 
@@ -297,10 +292,14 @@ def getProcessIdList(opt):
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
-            jidFileList = glob.glob(getLogDir(opt, year, tag, '')+'/*jid')
+            jidFileList = [ ]
 
+            logDirList = getLogDir(opt, year, tag, '').split(' ')
             for sample in getSamplesInLoop(opt.configuration, year, tag, opt.sigset):
-                jidFileList += glob.glob(getLogDir(opt, year, tag, sample)+'/*jid')
+                logDirList += getLogDir(opt, year, tag, sample).split(' ')
+
+            for logDir in logDirList:
+                jidFileList += glob.glob(logDir+'/*jid')
 
             for jidFile in jidFileList:
 
@@ -363,7 +362,8 @@ def killJobs(opt):
     processIdList = getProcessIdList(opt)
 
     if len(processIdList.keys())==0:
-        print 'No job running for year='+opt.year+', tag='+opt.tag+', and sigset='+opt.sigset
+        logprocessInfo = 'logprocess='+opt.logprocess+', ' if opt.logprocess!='*' else ''
+        print 'No job running for '+logprocessInfo+'year='+opt.year+', tag='+opt.tag+', and sigset='+opt.sigset
         
     else:
         for processId in processIdList:    
@@ -371,27 +371,70 @@ def killJobs(opt):
 
     cleanLogs(opt)
 
+def printJobErrors(opt):
+
+    for errFile in getLogFileList(opt, 'err'):
+
+        logprocess = errFile.replace('./','').split('__')[0].split('/')[1] if '*' in opt.logprocess else ''
+        sample = errFile.split('__')[-1].split('.')[0]
+        yeartag = errFile.split('__')[1].split('/')[0]
+
+        print '\n\n\n###### '+' '.join([ logprocess, sample, yeartag ])+' ######\n'
+        os.system('cat '+errFile)
+
+def printKilledJobs(opt):
+
+    killString = '\'Job removed\'' if 'cern' in os.uname()[1] else 'TODO'
+
+    for logFile in getLogFileList(opt, 'log'):
+
+        process=subprocess.Popen(' '.join(['grep', killString, logFile]), stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
+        processOutput, processError = process.communicate()
+
+        if processOutput:
+
+            logprocess = logFile.replace('./','').split('__')[0].split('/')[1] if '*' in opt.logprocess else ''
+            sample = logFile.split('__')[-1].split('.')[0]
+            yeartag = logFile.split('__')[1].split('/')[0]
+
+            print '\n###### '+' '.join([ logprocess, sample, yeartag ])+processOutput
+
 ### Methods for analyzing shapes 
 
-def getShapeFileName(shapeDir, year, tag, sigset, fileset, tagoption=''):
+def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
 
-    return '/'.join([ shapeDir, year, tag, 'plots_'+tagoption+tag+setFileset(fileset, sigset)+'.root' ])
+    shapeDirList = [ shapeDir, year, tag.split('_')[0], fitoption ]
 
-def foundShapeFiles(opt):
+    if fitoption!='':
+        tag = tag.replace('___','_')
+        if '__' in tag:
+            shapeDirList.append(tag.replace(tag.split('__')[0],'').replace('__','/'))
+            tag = tag.split('__')[0]
+            
+    os.system('mkdir -p '+'/'.join(shapeDirList))
+    return '/'.join(shapeDirList)+'/plots_'+tag+setFileset(fileset, sigset)+'.root'
+
+def foundShapeFiles(opt, rawShapes=False):
 
     missingShapeFiles = False
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
-            if not os.path.isfile(getShapeFileName(opt.shapedir, year, tag, opt.sigset, opt.fileset)): 
-                print 'Error: input shape file', etShapeFileName(opt.shapeDir, year, tag, opt.sigset, opt.fileset), 'is missing'
+            rawtag = tag.split('_')[0] if rawShapes else tag
+
+            if not os.path.isfile(getShapeFileName(opt.shapedir, year, rawtag, opt.sigset, opt.fileset)): 
+                print 'Error: input shape file', getShapeFileName(opt.shapedir, year, rawtag, opt.sigset, opt.fileset), 'is missing'
                 missingShapeFiles = True
      
     return not missingShapeFiles
 
+def openRootFile(fileName, mode='READ'):
+
+    return ROOT.TFile(fileName, mode)
+
 def openShapeFile(shapeDir, year, tag, sigset, fileset):
 
-    return ROOT.TFile(getShapeFileName(shapeDir, year, tag, sigset, fileset), 'READ')
+    return openRootFile(getShapeFileName(shapeDir, year, tag, sigset, fileset))
 
 def mergeShapes(opt):
 
@@ -412,9 +455,23 @@ def systematicsTables(opt):
 
 ### Modules for analyzing results from combine
 
-def postfitShapes(opt):
+def deleteLimits(opt):
 
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mergeShapesPostFit.py :('
+    opt.shapedir = opt.limitdir
+    deleteShapes(opt)
+
+def purgeLimits(opt):
+
+    deleteDirectory(opt.limitdir+'/*')
+
+def deleteMLFits(opt):
+
+    opt.shapedir = opt.mlfitdir
+    deleteShapes(opt)
+
+def purgeMLFits(opt):
+
+    deleteDirectory(opt.mlfitdir+'/*')
 
 def massScanLimits(opt):
 

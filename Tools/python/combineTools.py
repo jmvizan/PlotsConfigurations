@@ -23,7 +23,6 @@ def submitCombineJobs(opt, combineJobs):
             else:
 
                 jobs = batchJobs(opt.combineAction,year+tag,['ALL'],targetList,splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
-
                 jobs.nThreads = nThreads
 
                 for signal in targetList:
@@ -43,8 +42,8 @@ def getCombineOutputFileName(opt, signal):
 
     outputFileName = commonTools.getSignalDir(opt, opt.year, opt.tag, signal, 'combineOutDir')
 
-    if opt.combineAction=='limits': outputFileName += 'higgsCombine_'+opt.tag+'_'+getLimitRun(opt.unblind)+'.AsymptoticLimits.mH120.root'
-    else: outputFileName += 'fitDiagnostics_'+opt.tag+'.root'
+    if opt.combineAction=='limits': outputFileName += '/higgsCombine_'+getLimitRun(opt.unblind)+'.AsymptoticLimits.mH120.root'
+    else: outputFileName += '/fitDiagnostics.root'
 
     return outputFileName
 
@@ -79,28 +78,35 @@ def combineDatacards(opt, signal, dryRun=False):
 
     datacardList = [ ]
 
+    addYearToDatacardName = len(opt.year.split('-'))>1
+
     for year in opt.year.split('-'):
 
         inputDatacardDir = commonTools.mergeDirPaths(opt.baseDir, commonTools.getSignalDir(opt, year, opt.tag, signal, 'cardsdir'))
 
         samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, opt.sigset, 'variables')
 
+        datacardNameStructure = latinoTools.getDatacardNameStructure(addYearToDatacardName, len(cuts.keys())>1, len(variables.keys())>1)
+        datacardNameStructure = datacardNameStructure.replace('year', year)
+
         for cut in cuts:
             for variable in variables:
                 if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+
+                    datacardName = datacardNameStructure.replace('cut', cut).replace('variable', variable)
                     datacardFile = '/'.join([ inputDatacardDir, cut, variable, 'datacard.txt' ])   
-                    datacardList.append(cut+'_'+year+'='+datacardFile)
+                    datacardList.append(datacardName+'='+datacardFile)
 
     combineDatacardCommandList.append('combineCards.py '+' '.join(datacardList)+' > combinedDatacard.txt')
 
     combineDatacardCommand = '\n'.join(combineDatacardCommandList)
- 
+
     if dryRun: return combineDatacardCommand
     else: os.system(combineDatacardCommand)
 
 def runCombine(opt):
 
-    if not commonTools.foundShapeFiles(opt): exit()
+    if not commonTools.foundShapeFiles(opt, True): exit()
 
     if 'interactive' not in opt.option and opt.action!='writeDatacards':
         commonTools.checkProxy(opt)
@@ -111,6 +117,7 @@ def runCombine(opt):
         else: print 'Please, speficy if you want to compute limits or make ML fits'
         exit()
 
+    opt.logprocess = opt.combineAction
     if opt.combineLocation=='COMBINE': opt.combineLocation = os.getenv('PWD').split('/src/')[0]+'/src/'
 
     makeDatacards  = 'skipdatacard' not in opt.option.lower() and 'skipdc' not in opt.option.lower()
@@ -123,7 +130,6 @@ def runCombine(opt):
 
     combineJobs = { }
 
-    opt2 = commonTools.Object()
     opt2 = copy.deepcopy(opt)
 
     opt2.baseDir = os.getenv('PWD')
@@ -148,7 +154,7 @@ def runCombine(opt):
 
                     opt2.sigset = sigset.replace('MASSPOINT', sample)
                     opt2.combineSignalDir = commonTools.getSignalDir(opt2, year, tag, sample, 'combineOutDir')
-                   
+
                     if runCombineJob:
                         if 'reset' in opt.option: 
                             commonTools.deleteDirectory(opt2.combineSignalDir)
@@ -169,7 +175,9 @@ def runCombine(opt):
 
                     if 'debug' in opt.option: print combineCommand
                     elif 'interactive' in opt.option: os.system(combineCommand)
-                    else: combineJobs[year][tag][sample] = combineCommand
+                    else:
+                        commonTools.cleanLogs(opt2) 
+                        combineJobs[year][tag][sample] = combineCommand
 
     if 'debug' not in opt.option and 'interactive' not in opt.option: 
         submitCombineJobs(opt, combineJobs)
