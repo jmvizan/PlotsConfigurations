@@ -35,6 +35,14 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
 
     lightName = 'udsg' if 'cjets' in samples else 'udsg + c'
 
+    plot['bjets']       = { 'nameHR' : 'b',
+                            'nameLatex' : 'b',
+                            'color': 632, #'kRed',
+                            'isSignal' : 0,
+                            'isData'   : 0,
+                            'scale'    : 1.,
+                           }
+
     plot['light']       = { 'nameHR' : lightName,
                             'nameLatex' : lightName,
                             'color': 600, #'kBlue',
@@ -46,14 +54,6 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
     plot['cjets']       = { 'nameHR' : 'c',
                             'nameLatex' : 'c',
                             'color': 416, #'kGreen',
-                            'isSignal' : 0,
-                            'isData'   : 0,
-                            'scale'    : 1.,
-                           }
- 
-    plot['bjets']       = { 'nameHR' : 'b',
-                            'nameLatex' : 'b',
-                            'color': 632, #'kRed',
                             'isSignal' : 0,
                             'isData'   : 0,
                             'scale'    : 1.,
