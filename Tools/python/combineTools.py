@@ -42,8 +42,8 @@ def getCombineOutputFileName(opt, signal):
 
     outputFileName = commonTools.getSignalDir(opt, opt.year, opt.tag, signal, 'combineOutDir')
 
-    if opt.combineAction=='limits': outputFileName += 'higgsCombine_'+opt.tag+'_'+getLimitRun(opt.unblind)+'.AsymptoticLimits.mH120.root'
-    else: outputFileName += 'fitDiagnostics_'+opt.tag+'.root'
+    if opt.combineAction=='limits': outputFileName += '/higgsCombine_'+getLimitRun(opt.unblind)+'.AsymptoticLimits.mH120.root'
+    else: outputFileName += '/fitDiagnostics.root'
 
     return outputFileName
 
@@ -86,8 +86,8 @@ def combineDatacards(opt, signal, dryRun=False):
 
         samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, opt.sigset, 'variables')
 
-        datacardNameStructure = commonTools.getDatacardNameStructure(addYearToDatacardName, len(cuts.keys())>1, len(variables.keys())>1)
-        datacardNameStructure = latinoTools.datacardNameStructure.replace('year', year)
+        datacardNameStructure = latinoTools.getDatacardNameStructure(addYearToDatacardName, len(cuts.keys())>1, len(variables.keys())>1)
+        datacardNameStructure = datacardNameStructure.replace('year', year)
 
         for cut in cuts:
             for variable in variables:
@@ -106,7 +106,7 @@ def combineDatacards(opt, signal, dryRun=False):
 
 def runCombine(opt):
 
-    if not commonTools.foundShapeFiles(opt): exit()
+    if not commonTools.foundShapeFiles(opt, True): exit()
 
     if 'interactive' not in opt.option and opt.action!='writeDatacards':
         commonTools.checkProxy(opt)
@@ -117,6 +117,7 @@ def runCombine(opt):
         else: print 'Please, speficy if you want to compute limits or make ML fits'
         exit()
 
+    opt.logprocess = opt.combineAction
     if opt.combineLocation=='COMBINE': opt.combineLocation = os.getenv('PWD').split('/src/')[0]+'/src/'
 
     makeDatacards  = 'skipdatacard' not in opt.option.lower() and 'skipdc' not in opt.option.lower()
@@ -153,7 +154,7 @@ def runCombine(opt):
 
                     opt2.sigset = sigset.replace('MASSPOINT', sample)
                     opt2.combineSignalDir = commonTools.getSignalDir(opt2, year, tag, sample, 'combineOutDir')
-                   
+
                     if runCombineJob:
                         if 'reset' in opt.option: 
                             commonTools.deleteDirectory(opt2.combineSignalDir)
