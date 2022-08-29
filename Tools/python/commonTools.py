@@ -455,6 +455,36 @@ def systematicsTables(opt):
 
 ### Modules for analyzing results from combine
 
+def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
+
+    if year=='': year = opt.year
+    if tag=='': tag = opt.tag
+
+    if hasattr(opt, combineAction):
+        combineAction = opt.combineAction
+
+    if combineAction=='limits':
+        combineOutDir = 'limitdir'
+        outputFileName = 'higgsCombine_'+getLimitRun(opt.unblind)+'.AsymptoticLimits.mH120.root'
+    elif combineAction=='mlfits': 
+        combineOutDir = 'mlfitdir'
+        outputFileName = 'fitDiagnostics.root'
+    else:
+        'Error in getCombineOutputFileName: please speficy if you want the output from a limit or a ML fit'
+        exit()
+
+    return getSignalDir(opt, year, tag, signal, combineOutDir)+'/'+outputFileName
+
+def getCombineFitFileName(opt, signal, year='', tag=''):
+
+    return getCombineOutputFileName(opt, signal, year, tag, 'mlfits')
+
+def goodCombineFit(opt, year, tag, signal, fitoption):
+
+    fitFile = openRootFile(getCombineFitFileName(opt, signal, year, tag))
+    if not fitFile.Get('shapes_'+fitoption.lower().replace('postfit','fit_')): return False
+    return True
+
 def deleteLimits(opt):
 
     opt.shapedir = opt.limitdir
