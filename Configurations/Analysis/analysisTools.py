@@ -1,8 +1,8 @@
 import os
 import copy
 import ROOT
-import PlotsConfigurations.Tools.commonTools as commonTools
-import PlotsConfigurations.Tools.latinoTools as latinoTools
+import PlotsConfigurations.Tools.commonTools  as commonTools
+import PlotsConfigurations.Tools.latinoTools  as latinoTools
 import PlotsConfigurations.Tools.combineTools as combineTools
 from array import array
 
@@ -32,9 +32,9 @@ def setAnalysisDefaults(opt):
                 ptbinToKeep.append(ptbin)
         opt.ptBins = ptbinToKeep
         
-### Loops on analysis years and tags
+### PtRel tools
 
-# PtRel
+# shapes
 
 def ptRelShapes(opt):
 
@@ -66,6 +66,8 @@ def ptRelShapes(opt):
     else:
         latinoTools.shapes(opt2)
 
+# fits
+
 def ptRelAnalysis(opt, action):
 
     opt2 = copy.deepcopy(opt)
@@ -82,7 +84,7 @@ def ptRelAnalysis(opt, action):
                 opt2.option += 'resetskipbonly'
                 combineTools.mlfits(opt2)
 
-            elif latinoTools.goodCombineFit(opt2, opt2.year, opt2.tag, '', 'PostFitS'):
+            elif commonTools.goodCombineFit(opt2, opt2.year, opt2.tag, '', 'PostFitS'):
             
                 opt2.option += 'postfits'   
                 if action=='postfitshapes':  latinoTools.postFitShapes(opt2) 
@@ -99,6 +101,8 @@ def ptRelPostFitShapes(opt):
 def ptRelPostFitPlots(opt):
 
     ptRelAnalysis(opt, 'postfitplots')
+
+# 
 
 ### Analysis specific weights, efficiencies, scale factors, etc.
 
