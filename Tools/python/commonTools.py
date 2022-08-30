@@ -308,7 +308,7 @@ def getProcessIdList(opt):
   
                 yearJob, tagJob = year, tag
                 if '*' in year or '*' in tag:
-                    yeartag = jidFile.split('__')[1].split('/')[0]
+                    yeartag = jidFile.split('s__')[1].split('/')[0].replace('__ALL','')
                     if '*' in year and '*' in tag:
                         yearJob, tagJob = yeartag, yeartag
                     elif '*' in year: yearJob = yeartag.replace(tag, '')
