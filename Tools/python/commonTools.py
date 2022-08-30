@@ -475,6 +475,18 @@ def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
 
     return getSignalDir(opt, year, tag, signal, combineOutDir)+'/'+outputFileName
 
+def openCombineLimitFile(opt, signal, year='', tag=''):
+
+    return openRootFile(getCombineLimitFileName(opt, signal, year, tag))
+
+def getCombineLimitFileName(opt, signal, year='', tag=''):
+
+    return getCombineOutputFileName(opt, signal, year, tag, 'limits')
+
+def openCombineFitFile(opt, signal, year='', tag=''):
+
+    return openRootFile(getCombineFitFileName(opt, signal, year, tag))
+
 def getCombineFitFileName(opt, signal, year='', tag=''):
 
     return getCombineOutputFileName(opt, signal, year, tag, 'mlfits')
