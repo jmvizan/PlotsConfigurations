@@ -3,13 +3,122 @@ import glob
 import copy
 import ROOT
 import subprocess
+from array import array
+import LatinoAnalysis.ShapeAnalysis.tdrStyle as tdrStyle
 
 ### General utilities
+
+tdrStyle.setTDRStyle()
 
 class Object(object):
     pass
 
-### Utilities for reading and setting parameters
+### Plot utilities
+
+def bookHistogram(name, xBins, yBins=(), title='', style=''):
+
+    if len(yBins)==0:
+        if len(xBins)==1:
+            histogram = ROOT.TH1F(name, title, len(xBins[0])-1, array('d',xBins[0]))
+        elif len(xBins)==3:
+            histogram = ROOT.TH1F(name, title, xBins[0], xBins[1], xBins[2])
+    elif len(yBins)==1:
+        if len(xBins)==1:
+            histogram = ROOT.TH2F(name, title, len(xBins[0])-1, array('d',xBins[0]), len(yBins[0])-1, array('d',yBins[0]))
+        elif len(xBins)==3:
+            histogram = ROOT.TH2F(name, title, xBins[0], xBins[1], xBins[2], len(yBins[0])-1, array('d',yBins[0]))
+    elif len(yBins)==3:
+        if len(xBins)==1:
+            histogram = ROOT.TH2F(name, title, len(xBins[0])-1, array('d',xBins[0]), yBins[0], yBins[1], yBins[2])
+        elif len(xBins)==3:
+            histogram = ROOT.TH2F(name, title, xBins[0], xBins[1], xBins[2], yBins[0], yBins[1], yBins[2])
+
+    histogram.SetTitle('')
+
+    #histogram.GetXaxis().SetLabelFont(42)
+    #histogram.GetYaxis().SetLabelFont(42)
+    #histogram.GetXaxis().SetTitleFont(42)
+    #histogram.GetYaxis().SetTitleFont(42)
+
+    if style=='btv':
+
+        histogram.GetXaxis().SetLabelSize(0.05)
+        histogram.GetYaxis().SetLabelSize(0.05)
+        histogram.GetXaxis().SetTitleSize(0.06)
+        histogram.GetYaxis().SetTitleSize(0.06)
+
+        histogram.GetXaxis().SetLabelOffset(0.015)
+        histogram.GetYaxis().SetLabelOffset(0.01)
+        histogram.GetXaxis().SetTitleOffset(0.95)
+        histogram.GetYaxis().SetTitleOffset(1.25)
+
+    elif style=='latino':
+
+        histogram.GetXaxis().SetLabelSize(0.035)
+        histogram.GetYaxis().SetLabelSize(0.035)
+        histogram.GetXaxis().SetTitleSize(0.035)
+        histogram.GetYaxis().SetTitleSize(0.045)
+
+        histogram.GetXaxis().SetLabelOffset(0.015)
+        histogram.GetYaxis().SetLabelOffset(0.01)
+        histogram.GetXaxis().SetTitleOffset(1.35)
+        histogram.GetYaxis().SetTitleOffset(1.55)
+
+        histogram.GetXaxis().SetNdivisions(505)
+        histogram.GetYaxis().SetNdivisions(505)
+
+    return histogram
+
+def bookCanvas(name, xSize, ySize, title=''):
+
+    canvas = ROOT.TCanvas(name, title, xSize, ySize)
+
+    canvas.Range(0,0,1,1)
+
+    #canvas.SetFillColor(10)
+    #canvas.SetFillStyle(4000)
+
+    #canvas.SetBorderMode(0)
+    #canvas.SetBorderSize(2)
+
+    #canvas.SetTickx(1)
+    #canvas.SetTicky(1)
+
+    #canvas.SetLeftMargin(0.16)
+    #canvas.SetRightMargin(0.02)
+    #canvas.SetTopMargin(0.05)
+    #canvas.SetBottomMargin(0.13)
+
+    #canvas.SetFrameFillColor(0)
+    #canvas.SetFrameFillStyle(0)
+    #canvas.SetFrameBorderMode(0)
+
+    return canvas
+
+def bookPad(name, xlow, ylow, xup, yup, title=''):
+
+    pad = ROOT.TPad(name, title, xlow, ylow, xup, yup)
+
+    #pad.SetFillColor(0)
+
+    #pad.SetBorderMode(0)
+    #pad.SetBorderSize(2)
+
+    #pad.SetTickx(1)
+    #pad.SetTicky(1)
+
+    #pad.SetLeftMargin(0.16)
+    #pad.SetRightMargin(0.02)
+    #pad.SetTopMargin(0.065)
+    #pad.SetBottomMargin(0.13)
+
+    #pad.SetFrameFillColor(0)
+    #pad.SetFrameFillStyle(0)
+    #pad.SetFrameBorderMode(0)
+
+    return pad
+
+### Utilities for reading and setting cfg parameters
 
 def getCfgFileName(opt, cfgName):
 
@@ -216,6 +325,14 @@ def deleteShapes(opt):
 
 # plots
 
+def copyIndexForPlots(mainPlotdir, finalPlotDir):
+
+    subDir = mainPlotdir
+    for subdir in finalPlotDir.split('/'):
+        if subdir not in subDir:
+            subDir += '/'+subdir
+            os.system('cp ../../index.php '+subDir)
+
 def deletePlots(opt):
 
     opt.shapedir = opt.plotsdir
@@ -295,8 +412,12 @@ def getProcessIdList(opt):
             jidFileList = [ ]
 
             logDirList = getLogDir(opt, year, tag, '').split(' ')
-            for sample in getSamplesInLoop(opt.configuration, year, tag, opt.sigset):
-                logDirList += getLogDir(opt, year, tag, sample).split(' ')
+           
+            if opt.sigset=='*':
+                logDirList += getLogDir(opt, year, tag, '*').split(' ')
+            else:
+                for sample in getSamplesInLoop(opt.configuration, year, tag, opt.sigset):
+                    logDirList += getLogDir(opt, year, tag, sample).split(' ')
 
             for logDir in logDirList:
                 jidFileList += glob.glob(logDir+'/*jid')

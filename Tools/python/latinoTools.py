@@ -113,12 +113,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
     shapeFileName = commonTools.getShapeFileName(opt.shapedir, year, tag, sigset, fileset, fitoption+yearInFit) 
 
     os.system('mkdir -p '+plotsDir+' ; cp ../../index.php '+opt.plotsdir)
-
-    subDir = opt.plotsdir
-    for subdir in plotsDir.split('/'):
-        if subdir not in subDir:
-            subDir += '/'+subdir
-            os.system('cp ../../index.php '+subDir)
+    commonTools.copyIndexForPlots(opt.plotsdir, plotsDir)
 
     plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+year+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
 
