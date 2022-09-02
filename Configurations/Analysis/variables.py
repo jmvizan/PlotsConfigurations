@@ -69,16 +69,18 @@ elif opt.method+'Kinematics' in opt.tag:
                                               }
 
         variables['mujetpteta_'+cut]      = { 'name'  : 'muJet_eta:muJet_pt',                                                
-                                                  'range' : (muJetPt2DBins, muJetEta2DBins),
-                                                  'xaxis' : '2D #mu-jet eta:'+pt,   
-                                                  'fold'  : overflow,
-                                                  'cuts'  : [ cut ]          
-                                                 }
+                                              'range' : (muJetPt2DBins, muJetEta2DBins),
+                                              'xaxis' : '2D #mu-jet eta:'+pt,   
+                                              'fold'  : overflow,
+                                              'cuts'  : [ cut ]          
+                                             }
 
 elif opt.method+'Templates' in opt.tag:
 
+        ptrelRange = (50, 0., 4.) if opt.method=='PtRel' else (70, 0., 7.)
+
         variables['ptrel']       = { 'name'  : 'muJet_ptrel',
-                                     'range' : (50, 0., 4.),
+                                     'range' : ptrelRange,
                                      'xaxis' : '#mu-jet '+ptrel+gv,
                                      'fold'  : overflow
                                     }

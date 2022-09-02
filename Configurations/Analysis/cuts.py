@@ -8,6 +8,8 @@ def orCuts(cutList, operator = ' || '):
 
 for ptbin in jetPtBins:
 
+    if '_Pt' in opt.tag and ptbin not in opt.tag: continue
+
     jetPtMin, jetPtMax = jetPtBins[ptbin][0], jetPtBins[ptbin][1]
 
     binMuJetCuts = [ 'muJet_pt>='+jetPtMin, 'muJet_pt<'+jetPtMax, muJetSel ]
@@ -41,21 +43,26 @@ for ptbin in jetPtBins:
         cuts[ptbin]['expr'] = andCuts([ binMuJetCut, binAwayJetCut, binTriggerCut ])
         if opt.method+'Data' in opt.tag: cuts[ptbin]['weight'] = '0.'
 
+if '_btag' in opt.tag:
+
+   btagWPToRemove = []
+   btagWPSelection = opt.tag.split('_btag')[1].split('_')[0]
+
+   for btagwp in bTagWorkingPoints:
+       if btagWPSelection not in btagwp: 
+           btagWPToRemove.append(btagwp)
+           
+   for btagwp in btagWPToRemove:
+       del bTagWorkingPoints[btagwp]
+
 if 'PtRelTemplates' in opt.tag:
 
     for ptbin in jetPtBins:
-
-        if '_Pt' in opt.tag and ptbin not in opt.tag: 
-            del cuts[ptbin]
-            continue
-
+        if ptbin not in cuts: continue
         for btagwp in bTagWorkingPoints:
-
-            if '_btag' in opt.tag and btagwp not in opt.tag: continue
-
             for btagselection in [ 'Pass', 'Fail' ]:
 
-                cutName = '_'.join([ ptbin, btagwp, btagselection ])
+                cutName = '_'.join([ btagwp, ptbin, btagselection ])
                 discCut  = 'Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'[muJet_idx]>='+bTagWorkingPoints[btagwp]['cut'] 
                 if btagselection=='Fail': discCut = discCut.replace('>=', '<')
 
@@ -67,7 +74,7 @@ if 'PtRelTemplates' in opt.tag:
                     for btagAwayJetVariation in btagAwayJetVariations:
                         if btagAwayJetVariation!='Central':
  
-                            cutAwayJetName = '_'.join([ ptbin, btagwp, btagAwayJetVariation, btagselection ])
+                            cutAwayJetName = '_'.join([ btagwp, ptbin, btagAwayJetVariation, btagselection ])
                             ptbinAwayJetCut = cuts[ptbin]['expr'].replace(btagAwayJetVariations['Central'], btagAwayJetVariations[btagAwayJetVariation])                     
 
                             cuts[cutAwayJetName] = {}
@@ -76,5 +83,25 @@ if 'PtRelTemplates' in opt.tag:
 
         del cuts[ptbin]
 
+elif 'System8Templates' in opt.tag:
 
+     for ptbin in jetPtBins:
 
+         if ptbin not in cuts: continue 
+         
+         cutName = ptbin+'_AwayJetTag'
+         cuts[cutName] = {}
+         cuts[cutName]['expr'] = cuts[ptbin]['expr'].replace('>-999999.','>'+btagAwayJetVariations['Central'])
+         if 'weight' in cuts[ptbin]: cuts[cutName]['weight'] = cuts[ptbin]['weight']
+
+         for awayJetSelection in [ '', '_AwayJetTag' ]:
+             for btagwp in bTagWorkingPoints: 
+
+                 refCut = ptbin+awayJetSelection
+                 cutName = '_'.join([ refCut, btagwp ])
+                 discCut  = 'Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'[muJet_idx]>='+bTagWorkingPoints[btagwp]['cut']
+
+                 cuts[cutName] = {}
+                 cuts[cutName]['expr'] = andCuts([ cuts[refCut]['expr'], discCut ])
+                 if 'weight' in cuts[refCut]: cuts[cutName]['weight'] = cuts[refCut]['weight']
+             

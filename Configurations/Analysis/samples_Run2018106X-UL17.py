@@ -6,7 +6,7 @@ from LatinoAnalysis.Tools.commonTools import *
 
 ### Generals
 
-opt.method = 'Systemm8' if 'Systemm8' in opt.tag else 'PtRel'
+opt.method = 'System8' if 'System8' in opt.tag else 'PtRel'
 opt.campaign = 'UL17nano'
 opt.CME = '13'
 opt.lumi = 41.48
@@ -71,21 +71,21 @@ bTagWorkingPoints = { 'DeepCSVL' : { 'discriminant' : 'btagDeepB'     , 'cut' : 
                      }
 
 if 'ProdFine' in opt.tag:
-    jetPtBins = { 'Pt20to30'    : [   '20.',   '30.' ], 'Pt30to40'    : [   '30.',   '40.' ], 'Pt40to50'    : [   '40.',   '50.' ], 'Pt50to60'   : [   '50.',   '60.' ], 
-                  'Pt60to70'    : [   '60.',   '70.' ], 'Pt70to80'    : [   '70.',   '80.' ], 'Pt80to100'   : [   '80.',  '100.' ], 'Pt100to120' : [  '100.',  '120.' ], 
-                  'Pt120to140'  : [  '120.',  '140.' ], 'Pt140to160'  : [  '140.',  '160.' ], 'Pt160to200'  : [  '160.',  '200.' ], 'Pt200to260' : [  '200.',  '260.' ], 
-                  'Pt260to300'  : [  '260.',  '300.' ], 'Pt300to320'  : [  '300.',  '320.' ], 'Pt320to400'  : [  '320.',  '400.' ], 'Pt400to500' : [  '400.',  '500.' ], 
-                  'Pt500to600'  : [  '500.',  '600.' ], 'Pt600to800'  : [  '600.',  '800.' ], 'Pt800to1000' : [  '800.', '1000.' ], 'Pt1000'     : [ '1000.', '1400.' ], 
+    jetPtBins = { 'Pt20to30'    : [   '20.',   '30.' ], 'Pt30to40'     : [   '30.',   '40.' ], 'Pt40to50'    : [   '40.',   '50.' ], 'Pt50to60'     : [   '50.',   '60.' ], 
+                  'Pt60to70'    : [   '60.',   '70.' ], 'Pt70to80'     : [   '70.',   '80.' ], 'Pt80to100'   : [   '80.',  '100.' ], 'Pt100to120'   : [  '100.',  '120.' ], 
+                  'Pt120to140'  : [  '120.',  '140.' ], 'Pt140to160'   : [  '140.',  '160.' ], 'Pt160to200'  : [  '160.',  '200.' ], 'Pt200to260'   : [  '200.',  '260.' ], 
+                  'Pt260to300'  : [  '260.',  '300.' ], 'Pt300to320'   : [  '300.',  '320.' ], 'Pt320to400'  : [  '320.',  '400.' ], 'Pt400to500'   : [  '400.',  '500.' ], 
+                  'Pt500to600'  : [  '500.',  '600.' ], 'Pt600to800'   : [  '600.',  '800.' ], 'Pt800to1000' : [  '800.', '1000.' ], 'Pt1000to1400' : [ '1000.', '1400.' ], 
                  }
 elif 'ProdRun2' in opt.tag:
-    jetPtBins = { 'Pt20to30'    : [   '20.',   '30.' ], 'Pt30to50'    : [   '30.',   '50.' ], 'Pt50to70'    : [   '50.',   '70.' ], 'Pt70to100'  : [   '70.',  '100.' ], 
-                  'Pt100to140'  : [  '100.',  '140.' ], 'Pt140to200' : [  '140.',  '200.' ], 'Pt200to300'  : [  '200.',  '300.' ], 'Pt300to600' : [  '300.',  '600.' ], 
-                  'Pt600to1000' : [  '600.', '1000.' ], 'Pt1000'      : [ '1000.', '1400.' ], 
+    jetPtBins = { 'Pt20to30'    : [   '20.',   '30.' ], 'Pt30to50'     : [   '30.',   '50.' ], 'Pt50to70'    : [   '50.',   '70.' ], 'Pt70to100'    : [   '70.',  '100.' ], 
+                  'Pt100to140'  : [  '100.',  '140.' ], 'Pt140to200'   : [  '140.',  '200.' ], 'Pt200to300'  : [  '200.',  '300.' ], 'Pt300to600'   : [  '300.',  '600.' ], 
+                  'Pt600to1000' : [  '600.', '1000.' ], 'Pt1000to1400' : [ '1000.', '1400.' ], 
                  }
 elif opt.method+'Data' in opt.tag:
     jetPtBins = { }
     for trigger in triggerInfos:
-        jetPtBins[trigger] = triggerInfos[trigger] = [ str(minJetPt), str(maxJetPt) ] 
+        jetPtBins[trigger] = [ str(minJetPt), str(maxJetPt) ] 
 else: 
     jetPtBins = { }
     for trigger in triggerInfos:
@@ -108,17 +108,22 @@ awayDeltaR   = 'sqrt('+awayDeltaPhi+'*'+awayDeltaPhi+'+'+awayDeltaEta+'*'+awayDe
 
 awayJet = 'Sum$('+jetSel+' && '+jetPt+'>=AWAYJETPTCUT && '+awayDeltaR+'>AWAYDRCUT && Jet_BTAGDISC>BTAGAWAYJETCUT)'
 
+btagAwayJetVariations = { 'Central' : '0.8838',  'AwayJetDown' : '0.5803' , 'AwayJetUp' : '0.9693' }
+
 if 'PtRel' in opt.method:
-        
-    btagAwayJetVariations = { 'Central' : '0.8838',  'AwayJetDown' : '0.5803' , 'AwayJetUp' : '0.9693' }
 
     awayJetCut = awayJet.replace('AWAYDRCUT', '1.5')+'==1'
     awayJetCut = awayJetCut.replace('BTAGDISC>BTAGAWAYJETCUT', 'btagCSVV2>'+btagAwayJetVariations['Central'])
 
 elif 'System8' in opt.method:
 
-    awayJetCut = awayJet.replace('AWAYDRCUT', '0.2')+'>=1'
-    if 'Templates' not in opt.tag: awayJetCut = awayJetCut.replace(' && Jet_BTAGDISC>BTAGAWAYJETCUT', '')
+    awayJetCut = awayJet.replace('AWAYDRCUT', '0.05')+'>=1'
+
+    isTaggedLeadingJet = jetPt+'=='+jetPt+'[0] && Jet_btagCSVV2>-999999.'
+    isTaggedTrailingJet = jetPt+'=='+jetPt+'[1] && Jet_btagCSVV2>-999999.'
+    muJetIsLeadingJet = 'muJet_pt==Jet_pt[0]'
+    isTaggedAwayJet = '( ('+isTaggedLeadingJet+') || ('+isTaggedTrailingJet+' && '+muJetIsLeadingJet+') )'
+    awayJetCut = awayJetCut.replace('Jet_BTAGDISC>BTAGAWAYJETCUT', isTaggedAwayJet)
 
 ### Weights and filters
 
@@ -215,7 +220,7 @@ for sample in samples:
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
     samples[sample]['JobsPerSample'] = 20
-    if isPlot: samples[sample]['isSignal']  = 0
+    if isPlot or opt.method!='PtRel': samples[sample]['isSignal']  = 0
 
 ### Data
 
