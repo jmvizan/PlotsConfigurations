@@ -872,7 +872,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
 
-        if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot) or 'TheoryNormalizations' in opt.tag:
+        if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWW' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot) or 'TheoryNormalizations' in opt.tag:
         
             samples['ZZTo4L']   = {    'name'  :    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'              , False,treePrefix,skipTreesCheck) +
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2m'            , False,treePrefix,skipTreesCheck) +
@@ -933,16 +933,18 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
 if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
 
+    shortset = opt.sigset.split('-')[0]
+
     sampleToRemove = [ ] 
 
     for sample in samples:
-        if 'Veto' in opt.sigset:
-            if sample in opt.sigset:
+        if 'Veto' in shortset:
+            if sample in shortset:
                 sampleToRemove.append(sample)
-        elif 'BackgroundsWJets' in opt.sigset:
+        elif 'BackgroundsWJets' in opt.sigset or 'Backgrounds:WJets' in opt.sigset:
             if sample!=nameWJets and sample!='WJetsPrompt' and sample!='WJetsFake':
                 sampleToRemove.append(sample)
-        elif 'Backgrounds'+sample!= opt.sigset:
+        elif sample not in shortset: # Be sure this sample's name is not substring of other samples' names ####'Backgrounds'+sample!= opt.sigset:
             sampleToRemove.append(sample)
 
     for sample in sampleToRemove:
@@ -955,6 +957,9 @@ for sample in samples:
     samples[sample]['suppressNegative'] = ['all']
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
+    samples[sample]['treeType']  = 'Backgrounds' 
+    if sample in [ 'ttbar', 'DY', 'ZZTo2L2Nu', 'ZZTo4L', 'VZ' ]:
+        samples[sample]['split'] = 'AsMuchAsPossible'
 
 ### Data
 
@@ -968,7 +973,9 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                                  'isData': ['all'],
                                  'isSignal'  : 0,
                                  'isDATA'    : 1, 
-                                 'isFastsim' : 0
+                                 'isFastsim' : 0,
+                                 'treeType'  : 'Data'
+                                 'split' : 'AsMuchAsPossible'
                                 }
 
     for Run in DataRun :
@@ -1113,18 +1120,19 @@ for sample in samples:
 exec(open('./signalMassPoints.py').read())
 
 for model in signalMassPoints:
-    if model in opt.sigset.replace('EOY', ''):
+    if model in opt.sigset.replace('EOY:', '').replace('EOY', ''):
 
         isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
 
         for massPoint in signalMassPoints[model]:
-            if massPointInSignalSet(massPoint, opt.sigset.replace('EOY', '')):
+            if massPointInSignalSet(massPoint, opt.sigset.replace('EOY:', '').replace('EOY', '')):
 
                 samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
                                        'FilesPerJob' : 2 ,
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
                                        'suppressZeroTreeNuisances' : ['all'],
+                                       'treeType' : 'EOY'
                                        'isrObservable' : isrObservable,
                                        'isSignal'  : 1,
                                        'isDATA'    : 0,
