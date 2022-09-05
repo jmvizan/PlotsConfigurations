@@ -72,7 +72,7 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
-    if not skipTreesCheck:
+    if not skipTreesCheck and 'EOY' not in opt.sigset:
         print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
         if not hasattr(opt, 'doHadd') or opt.doHadd:
             skipTreesCheck = True
@@ -974,7 +974,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                                  'isSignal'  : 0,
                                  'isDATA'    : 1, 
                                  'isFastsim' : 0,
-                                 'treeType'  : 'Data'
+                                 'treeType'  : 'Data',
                                  'split' : 'AsMuchAsPossible'
                                 }
 
@@ -1117,33 +1117,41 @@ for sample in samples:
 
 ### Signals
 
-exec(open('./signalMassPoints.py').read())
+#exec(open('./signalMassPoints.py').read())
+import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
 
-for model in signalMassPoints:
+for model in signalMassPoints.signalMassPoints:
     if model in opt.sigset.replace('EOY:', '').replace('EOY', ''):
 
         isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
 
-        for massPoint in signalMassPoints[model]:
-            if massPointInSignalSet(massPoint, opt.sigset.replace('EOY:', '').replace('EOY', '')):
+        for massPoint in signalMassPoints.signalMassPoints[model]:
+            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset.replace('EOY:', '').replace('EOY', '')):
 
-                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
+                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
                                        'FilesPerJob' : 2 ,
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
                                        'suppressZeroTreeNuisances' : ['all'],
-                                       'treeType' : 'EOY'
+                                       'treeType' : 'EOY',
                                        'isrObservable' : isrObservable,
                                        'isSignal'  : 1,
                                        'isDATA'    : 0,
                                      }
                   
                 if fastsimSignal:
-                    samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
                     samples[massPoint]['isFastsim'] = 1
                 else:
-                    samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
                     samples[massPoint]['isFastsim'] = 0
 
-            
+### Nasty clean up for eos
+
+if 'cern' in SITE:
+    for sample in samples:
+        for ifile in range(len(samples[sample]['name'])):
+            samples[sample]['name'][ifile] = samples[sample]['name'][ifile].replace('root://eoscms.cern.ch/', '')
+
+
 

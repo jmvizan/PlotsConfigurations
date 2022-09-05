@@ -507,7 +507,7 @@ nuisanceToRemove = [ ]
 
 if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag:
 
-    if ('nanoAODv6' in opt.samplesFile and 'ctrl' in regionName and 'cern' in SITE) or ('nanoAODv9' in opt.samplesFile and 'cern' in SITE): 
+    if ('nanoAODv6' in opt.samplesFile and 'ctrl' in regionName and 'cern' in SITE): 
  
         if hasattr(opt, 'batchSplit'): # Remove only when running shapes, so can make shapes in gridui and plots+datacards in lxplus
             for nuisance in nuisances:
