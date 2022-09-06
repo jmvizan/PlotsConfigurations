@@ -72,6 +72,10 @@ def setAnalysisDefaults(opt):
 
 ### Shapes
 
+def signalShapes(opt):
+
+    
+
 def mergeFitCR(opt):
 
     for year in opt.year.split('-'):
@@ -137,7 +141,6 @@ def splitSignalMassPoints(opt, massPointForSubset=300):
                         signalSubsets[baseSignal].append(signalSubset)
                         minSubsetPromptMass = promptMass + promptMassStep
                         break
->>>>>>> fa4d3dd57e00cd62fe1c6e63f800dc5ed15822a2
 
     for signal in signalSubsets:
         print 'signalSubsets[\''+signal+'\'] = '+repr(signalSubsets[signal])+'\n\n'               
