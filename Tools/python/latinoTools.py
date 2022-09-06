@@ -5,12 +5,12 @@ import commonTools
 
 ### Shapes
 
-def mkShapesMulti(opt, year, tag, splits):
+def mkShapesMulti(opt, year, tag, splits, action):
 
     mainDir = '/'.join([ opt.shapedir, year, tag ])
 
     shapeMultiCommand = 'mkShapesMulti.py --pycfg='+opt.configuration+' --treeName=Events --tag='+year+tag+' --sigset=SIGSET'
-    if 'shapes' in opt.action:
+    if 'shapes' in action:
         shapeMultiCommand += ' --doBatch=True --batchQueue='+opt.batchQueue
         if opt.dryRun: shapeMultiCommand += ' --dry-run '
     else:
@@ -24,19 +24,19 @@ def mkShapesMulti(opt, year, tag, splits):
 
             splitCommand = shapeMultiCommand+' --outputDir='+splitDir+' --batchSplit='+split
  
-            if 'merge' in opt.action:
+            if 'merge' in action:
 
                 sampleFlag = '_SIGSET' if 'worker' in commonTools.getBranch() else '' 
-                outputDir = mainDir if 'mergeall' in opt.action else mainDir+'/Samples'
+                outputDir = mainDir if 'mergeall' in action else mainDir+'/Samples'
                 splitCommand += ' ; mkdir -p '+outputDir+' ; mv '+splitDir+'/plots_'+year+tag+sampleFlag+'.root '+outputDir
-                if 'mergesingle' in opt.action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
+                if 'mergesingle' in action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
                 else: splitCommand += '/plots_'+tag+commonTools.setFileset('',opt.sigset)+'.root'
 
             for sample in splits[split]:
                 commonTools.resetShapes(opt, split, year, tag, sample, 'reset' in opt.option)
                 os.system(splitCommand.replace('SIGSET', sample).replace('SAMPLE', sample.split(':')[-1]))
 
-def getSplits(opt, year, tag):
+def getSplits(opt, year, tag, action):
 
     splits = { 'Samples' : [ ], 'AsMuchAsPossible' : [ ] }
 
@@ -52,7 +52,7 @@ def getSplits(opt, year, tag):
                 if jobsForSamples>0:
                     if commonTools.countedSampleShapeFiles(opt.shapedir, year, tag, sample)==jobsForSamples: continue
             splits['AsMuchAsPossible'].append(treeType+sample)
-        elif 'shapes' in opt.action:
+        elif 'shapes' in action:
             if 'recover' in opt.option and commonTools.foundSampleShapeFile(opt.shapedir, year, tag, sample): continue
             if 'split' in samples[sample] and samples[sample]['split']=='Single':
                 splits['Samples'].append(treeType+':'+sample)
@@ -79,15 +79,15 @@ def shapes(opt):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
-            splits = getSplits(opt, year, tag)
-            mkShapesMulti(opt, year, tag, splits)
+            splits = getSplits(opt, year, tag, 'shapes')
+            mkShapesMulti(opt, year, tag, splits, 'shapes')
 
 def mergesingle(opt):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
-            splits = getSplits(opt, year, tag)
-            mkShapesMulti(opt, year, tag, splits)
+            splits = getSplits(opt, year, tag, 'mergesingle')
+            mkShapesMulti(opt, year, tag, splits, 'mergesingle')
 
 def mergeall(opt):
 
@@ -95,7 +95,7 @@ def mergeall(opt):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
-            mkShapesMulti(opt, year, tag, splits)
+            mkShapesMulti(opt, year, tag, splits, 'mergeall')
 
 ### Plots
 

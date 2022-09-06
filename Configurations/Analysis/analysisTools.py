@@ -1,6 +1,9 @@
 import os
 import ROOT
+import copy
 import PlotsConfigurations.Tools.commonTools as commonTools
+import PlotsConfigurations.Tools.latinoTools as latinoTools
+import PlotsConfigurations.Tools.combineTools as combineTools
 from array import array
 
 ### Analysis defaults
@@ -74,7 +77,22 @@ def setAnalysisDefaults(opt):
 
 def signalShapes(opt):
 
-    pass    
+    for year in opt.year.split('-'):
+        for tag in opt.tag.split('-'):
+            for sr in opt.signalRegionMap:
+                if tag==opt.signalRegionMap[sr]['tag']:   
+                    signalList = opt.signalRegionMap[sr]['signals'] if opt.sigset=='SM' else opt.sigset.split(',')
+                    for signal in signalList:
+
+                        opt2 = copy.deepcopy(opt)
+                        opt2.year, opt2.tag = year, tag
+                        print year, tag, signal
+                        samples = commonTools.getSamplesInLoop(opt.configuration, year, tag, 'EOY'+signal) 
+
+                        for sample in samples:
+                            print 'submit', sample
+                            opt2.sigset = 'EOY'+sample 
+                            latinoTools.shapes(opt2)
 
 def mergeFitCR(opt):
 
