@@ -322,6 +322,7 @@ def cleanShapes(opt):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
+
             deleteDirectory('/'.join([ opt.shapedir, year, tag, 'AsMuchAsPossible' ]))
 
 def deleteShapes(opt):
