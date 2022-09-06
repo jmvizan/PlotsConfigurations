@@ -74,7 +74,7 @@ def setAnalysisDefaults(opt):
 
 def signalShapes(opt):
 
-    
+    pass    
 
 def mergeFitCR(opt):
 
