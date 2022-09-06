@@ -1,5 +1,6 @@
 import os
 import copy
+import math
 import commonTools
 
 ### Shapes
@@ -25,13 +26,13 @@ def mkShapesMulti(opt, year, tag, splits):
  
             if 'merge' in opt.action:
 
+                sampleFlag = '_SIGSET' if 'worker' in commonTools.getBranch() else '' 
                 outputDir = mainDir if 'mergeall' in opt.action else mainDir+'/Samples'
-                splitCommand += ' ; mkdir -p '+outputDir+' ; mv '+splitDir+'/plots_'+year+tag+'.root '+outputDir
+                splitCommand += ' ; mkdir -p '+outputDir+' ; mv '+splitDir+'/plots_'+year+tag+sampleFlag+'.root '+outputDir
                 if 'mergesingle' in opt.action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
                 else: splitCommand += '/plots_'+tag+commonTools.setFileset('',opt.sigset)+'.root'
 
             for sample in splits[split]:
-
                 commonTools.resetShapes(opt, split, year, tag, sample, 'reset' in opt.option)
                 os.system(splitCommand.replace('SIGSET', sample).replace('SAMPLE', sample.split(':')[-1]))
 
@@ -44,17 +45,24 @@ def getSplits(opt, year, tag):
     for sample in samples:
         treeType = samples[sample]['treeType']+':'
         if 'split' in samples[sample] and samples[sample]['split']=='AsMuchAsPossible':
+            if 'recover' in opt.option:
+                jobsForSamples = 0
+                if 'FilesPerJob' in samples[sample]: jobsForSamples = int(math.ceil(float(len(samples[sample]['name']))/samples[sample]['FilesPerJob']))
+                elif 'JobsPerSample' in samples[sample]: jobsForSamples = int(samples[sample]['JobsPerSample']) 
+                if jobsForSamples>0:
+                    if commonTools.countedSampleShapeFiles(opt.shapedir, year, tag, sample)==jobsForSamples: continue
             splits['AsMuchAsPossible'].append(treeType+sample)
         elif 'shapes' in opt.action:
             if 'recover' in opt.option and commonTools.foundSampleShapeFile(opt.shapedir, year, tag, sample): continue
-            sampleList = -1
-            for ilist in range(len(splits['Samples'])):
-                if treeType in splits['Samples'][ilist]:
-                    sampleList = ilist
-            if sampleList==-1:
-                splits['Samples'].append(treeType+sample)
-            else:
-                splits['Samples'][sampleList] += ','+sample
+            if 'split' in samples[sample] and samples[sample]['split']=='Single':
+                splits['Samples'].append(treeType+':'+sample)
+            else: 
+                sampleList = -1
+                for ilist in range(len(splits['Samples'])):
+                    if treeType in splits['Samples'][ilist] and '::' not in splits['Samples'][ilist]:
+                        sampleList = ilist
+                if sampleList==-1: splits['Samples'].append(treeType+sample)
+                else:              splits['Samples'][sampleList] += ','+sample
                 
     return splits
 
@@ -136,14 +144,23 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
 
 def mergedPlots(opt):
 
+    fileset = commonTools.setFileset(opt.fileset, opt.sigset)
+    inputNuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
+
     for tag in opt.tag.split('-'):
 
-        opt2 = copy.deepcopy(opt)
-        opt2.tag = tag           
-        opt2.nuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
-        commonTools.mergeShapes(opt2) 
+        if 'deep' in opt.option:
+            year = opt.option.split('deep')[1].split('_')[0]
+            outputNuisances = inputNuisances
+            outputDir = '/'.join([ opt.shapedir, year, tag ])
+            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, fileset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
+
+        else:
+            year = opt.year
+            outputNuisances =  inputNuisances.replace('.py', '_'.join([ opt.year, opt.tag, opt.sigset ])+'.py')
+            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, fileset, '', 'None', inputNuisances, outputNuisances, opt.verbose)
         
-        mkPlot(opt, opt.year, tag, opt2.nuisances)
+        mkPlot(opt, year, tag, outputNuisances)
         os.system('rm -f nuisances_*.py')
 
 # Tools for making plots from combine fits
@@ -210,6 +227,7 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
                         if convertShapes or not os.path.isfile(postFitShapeFile):
  
                             os.system('rm -f '+postFitShapeFile)
+                            os.system('mkdir -p '+getShapeDirName(opt.shapedir, fittedYear, tag, tagoption))
 
                             if year!='':
 

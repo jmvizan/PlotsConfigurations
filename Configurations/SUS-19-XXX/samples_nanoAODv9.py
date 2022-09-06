@@ -960,6 +960,8 @@ for sample in samples:
     samples[sample]['treeType']  = 'Backgrounds' 
     if sample in [ 'ttbar', 'DY', 'ZZTo2L2Nu', 'ZZTo4L', 'VZ' ]:
         samples[sample]['split'] = 'AsMuchAsPossible'
+    elif 'BackSF' in opt.tag and sample in [ 'WZ', 'ttZ' ]:
+        samples[sample]['split'] = 'Single'
 
 ### Data
 
