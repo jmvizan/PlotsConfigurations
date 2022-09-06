@@ -23,11 +23,11 @@ def setAnalysisDefaults(opt):
     opt.signalRegionMap['charSR'] = { 'tag' : 'CharginoSignalRegionsVetoesUL', 'signals' : [ 'TChipmSlepSnu_mC-100to1500_mX-1to750', 'TSlepSlep_mS-100to1000_mX-1to650' ] }
     opt.signalRegionMap['chwwSR'] = { 'tag' : 'TChipmWWSignalRegionsVetoesUL', 'signals' : [ 'TChipmWW_mC-100to700_mX-1to250' ] } 
 
-    signalSubsets = { 'T2tt'          : [ ],
-                      'T2bW'          : [ ],
-                      'TChipmSlepSnu' : [ ],
-                      'TChipmWW'      : [ ],
-                      'TSlepSlep'     : [ ] }
+    opt.signalSubsets = { 'T2tt'          : [ 'T2tt_mS-150to800_dm-80to175' ],
+                          'T2bW'          : [ 'T2bW_mS-200to1000_mX-1to700' ],
+                          'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-100to600_mX-1to750', 'TChipmSlepSnu_mC-625to850_mX-1to750', 'TChipmSlepSnu_mC-875to1075_mX-1to750', 'TChipmSlepSnu_mC-1100to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1500_mX-1to750' ],
+                          'TChipmWW'      : [ 'TChipmWW_mC-100to700_mX-1to250' ],
+                          'TSlepSlep'     : [ 'TSlepSlep_mS-100to425_mX-1to650', 'TSlepSlep_mS-450to1000_mX-1to650' ] }
 
     opt.backgroundsInFit = [ 'ttZ', 'ZZ', 'WZ' ]
 
@@ -55,15 +55,6 @@ def setAnalysisDefaults(opt):
     if len(tagList)>0: opt.tag = '-'.join( tagList )
 
     if 'merge' in taglower: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
-
-    if 'signal' in opt.sigset:
-        coreSigset = opt.sigset.replace(opt.sigset.split('-')[-1],'') if '-' in opt.sigset else ''
-        for sr in opt.signalRegionMap:
-            if opt.signalRegionMap[sr]['tag'] in opt.tag.replace('Merge',''):
-                signalList = []
-                if opt.sigset.split('signal')[-1]!='': signalList.append(opt.signalRegionMap[sr]['signals'][int(opt.sigset.split('signal')[-1])])
-                else: signalList = opt.signalRegionMap[sr]['signals']
-                opt.sigset = coreSigset+','.join(signalList)
 
     if opt.action=='shapes':
         for sr in opt.signalRegionMap:
@@ -121,6 +112,19 @@ def mergeFitCR(opt):
 
 ### Tools for handling signal mass points
 
+def getSignalList(sigset, tag):
+
+    inputsignal = sigset.split('-')[-1]
+    signalList = []  
+  
+    for sr in opt.signalRegionMap:
+        if tag==opt.signalRegionMap[sr]['tag']:
+            for signal in opt.signalRegionMap[sr]['signals']:
+                if inputsignal=='signal' or signal.split('_')[0] in inputsignal:
+                    signalList.extend(opt.signalSubsets[signal.split('_')[0]])
+
+    return signalList
+
 def splitSignalMassPoints(opt, massPointForSubset=300):
 
     promptMassStep = 25
@@ -140,7 +144,12 @@ def splitSignalMassPoints(opt, massPointForSubset=300):
             minPromptMass = int(signal.split('_')[1].split('-')[1].split('to')[0])
             maxPromptMass = int(signal.split('_')[1].split('to')[1])
 
-            nDivisions = int(round(float(nMassPoints)/massPointForSubset))
+            nDivisions = max(1, int(round(float(nMassPoints)/massPointForSubset)))
+
+            if nDivisions==1:
+                signalSubsets[baseSignal].append(signal)
+                continue
+
             signalMmassPointForSubset = nMassPoints/nDivisions
 
             promptMassRangeDraft = signal.split('_')[1].split('-')[0]+'-minPromptMasstomaxPromptMass'
@@ -161,7 +170,7 @@ def splitSignalMassPoints(opt, massPointForSubset=300):
                         break
 
     for signal in signalSubsets:
-        print 'signalSubsets[\''+signal+'\'] = '+repr(signalSubsets[signal])+'\n\n'               
+        print 'signalSubsets[\''+signal+'\'] = '+repr(signalSubsets[signal])+'\n'               
 
 ### Analysis specific weights, efficiencies, scale factors, etc.
 
