@@ -386,10 +386,10 @@ LSP = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#sc
 CHR = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}'
 STP = '#tilde{t}'
 
-for model in signalMassPoints:
+for model in signalMassPoints.signalMassPoints:
     if model in opt.sigset:
-        for massPoint in signalMassPoints[model]:
-            if massPointInSignalSet(massPoint, opt.sigset):
+        for massPoint in signalMassPoints.signalMassPoints[model]:
+            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset):
 
                 massPointName = massPoint.replace('_mS-', ' m_{'+STP+'}=').replace('_mC-', ' m_{'+CHR+'}=').replace('_mX-', ' m_{'+LSP+'}=')
                 massPointNameLatex = massPoint.replace('_mS-', ' \\invM{\\PSQtDo}=').replace('_mC-', ' \\invM{\\PSGcpmDo}=').replace('_mX-', ', \\invM{\\PSGczDo}=')

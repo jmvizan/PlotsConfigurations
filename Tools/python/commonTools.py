@@ -13,6 +13,15 @@ tdrStyle.setTDRStyle()
 class Object(object):
     pass
 
+def getBranch():
+
+    proc=subprocess.Popen('git branch', stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
+    out, err = proc.communicate()
+
+    for line in out.split("\n"): 
+        if '*' in line:
+            return line.replace('* ','')
+
 ### Plot utilities
 
 def bookHistogram(name, xBins, yBins=(), title='', style=''):
@@ -440,7 +449,7 @@ def getProcessIdList(opt):
 
                 if processOutput:
 
-                    processId = processOutput.split('\n')[0].split('.')[0]
+                    processId = processOutput.replace('Submitted batch job','').split('\n')[0].split('.')[0]
                     if processId not in processIdList.keys(): 
                         processIdList[processId] = { 'logprocess' : logprocess, 'year' : yearJob, 'tag' : tagJob, 'samples' : [] }
                     if sample not in processIdList[processId]['samples']: processIdList[processId]['samples'].append(sample)    
@@ -467,7 +476,6 @@ def checkJobs(opt):
     if '*' in opt.logprocess: jobInfoList.insert(0, 'logprocess') 
 
     if processOutput:
-
         for processLine in processOutput.split('\n'):
             if 'JOB' in processLine: print processLine
             else:
@@ -522,7 +530,7 @@ def printKilledJobs(opt):
 
 ### Methods for analyzing shapes 
 
-def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
+def getShapeDirName(shapeDir, year, tag, fitoption=''):
 
     shapeDirList = [ shapeDir, year, tag.split('_')[0], fitoption ]
 
@@ -530,10 +538,17 @@ def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
         tag = tag.replace('___','_')
         if '__' in tag:
             shapeDirList.append(tag.replace(tag.split('__')[0],'').replace('__','/'))
-            tag = tag.split('__')[0]
+
+    return '/'.join(shapeDirList)
+
+def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
+
+    shapeDirList = [ shapeDir, year, tag.split('_')[0], fitoption ]
+
+    if fitoption!='':
+        tag = tag.replace('___','_').split('__')[0]
             
-    os.system('mkdir -p '+'/'.join(shapeDirList))
-    return '/'.join(shapeDirList)+'/plots_'+tag+setFileset(fileset, sigset)+'.root'
+    return getShapeDirName(shapeDir, year, tag, fitoption)+'/plots_'+tag+setFileset(fileset, sigset)+'.root'
 
 def foundShapeFiles(opt, rawShapes=False):
 
@@ -549,6 +564,11 @@ def foundShapeFiles(opt, rawShapes=False):
      
     return not missingShapeFiles
 
+def countedSampleShapeFiles(shapeDir, year, tag, sample):
+
+    sampleShapeDir = '/'.join([ shapeDir, year, tag, 'AsMuchAsPossible' ])
+    return len(glob.glob(sampleShapeDir+'/plots_'+year+tag+'_ALL_'+sample+'.*.root'))
+
 def foundSampleShapeFile(shapeDir, year, tag, sample):
 
     sampleShapeDir = '/'.join([ shapeDir, year, tag, 'Samples' ])
@@ -562,9 +582,15 @@ def openShapeFile(shapeDir, year, tag, sigset, fileset):
 
     return openRootFile(getShapeFileName(shapeDir, year, tag, sigset, fileset))
 
-def mergeShapes(opt):
+def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outputdir=None, inputnuisances=None, outputnuisances=None, verbose=False):
 
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mergeShapes.py :('
+    mergeCommandList = [ '--inputDir='+opt.shapedir, '--years='+years, '--tag='+tag, '--='+fileset, '--nuisancesFile='+inputnuisances ]
+    if verbose: mergeCommandList.append('--verbose')
+
+    if strategy=='deep': mergeCommandList.extend([ '--outputDir='+outputdir, '--skipLNN' ])
+    else:                mergeCommandList.extend([ '--outputNuisFile='+outputnuisances, '--saveNuisances' ])
+
+    os.system('mergeDataTakingPeriodShapes.py '+' ',join( mergeCommandList ))
 
 def yieldsTables(opt):
 
