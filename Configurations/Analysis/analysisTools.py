@@ -66,24 +66,38 @@ def setAnalysisDefaults(opt):
 
 ### Shapes
 
-def signalShapes(opt):
+def signalShapes(opt, action='shapes'):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
             for sr in opt.signalRegionMap:
-                if tag==opt.signalRegionMap[sr]['tag']:   
-                    signalList = opt.signalRegionMap[sr]['signals'] if opt.sigset=='SM' else opt.sigset.split(',')
+                if tag==opt.signalRegionMap[sr]['tag']:
+                    if opt.sigset=='SM': signalList = opt.signalRegionMap[sr]['signals']
+                    elif 'signal' in opt.sigset: signalList = getSignalList(opt, opt.sigset, tag)
+                    else: signalList = opt.sigset.split(',')   
                     for signal in signalList:
 
                         opt2 = copy.deepcopy(opt)
                         opt2.year, opt2.tag = year, tag
-                        print year, tag, signal
-                        samples = commonTools.getSamplesInLoop(opt.configuration, year, tag, 'EOY'+signal) 
 
-                        for sample in samples:
-                            print 'submit', sample
-                            opt2.sigset = 'EOY'+sample 
-                            latinoTools.shapes(opt2)
+                        if action=='shapes':
+
+                            if 'split' in opt.option:
+                                for sample in commonTools.getSamplesInLoop(opt.configuration, year, tag, 'EOY'+signal):
+                                    opt2.sigset = 'EOY'+sample 
+                                    latinoTools.shapes(opt2)
+                         
+                            else:
+                                opt2.sigset = 'EOY'+signal
+                                latinoTools.shapes(opt2)
+
+                        else:
+                            opt2.sigset = signal
+                            latinoTools.mergeall(opt2)
+
+def mergeSignal(opt):
+
+    signalShapes(opt, action='mergeall')
 
 def mergeFitCR(opt):
 
@@ -112,7 +126,7 @@ def mergeFitCR(opt):
 
 ### Tools for handling signal mass points
 
-def getSignalList(sigset, tag):
+def getSignalList(opt, sigset, tag):
 
     inputsignal = sigset.split('-')[-1]
     signalList = []  
