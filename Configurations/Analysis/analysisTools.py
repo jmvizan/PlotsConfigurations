@@ -59,8 +59,8 @@ def setAnalysisDefaults(opt):
             for signal in signalRegionMap[sr]['signals']:
                 if signal in opt.sigset: 
                     opt.sigset = 'EOY' + opt.sigset 
- 
-    print opt.year, opt.tag, opt.sigset
+
+    if opt.verbose: print opt.year, opt.tag, opt.sigset
 
 ### Loops on analysis years and tags
 

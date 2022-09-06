@@ -31,6 +31,7 @@ if __name__ == '__main__':
     parser.add_option('--logprocess'      , dest='logprocess'      , help='Process for log inspection'     , default='mkShapes')
     parser.add_option('--dryRun'          , dest='dryRun'          , help='do not submit jobs'             , default=False, action='store_true')
     parser.add_option('--unblind'         , dest='unblind'         , help='Unblind data in limits'         , default=False, action='store_true')
+    parser.add_option('--verbose'         , dest='verbose'         , help='verbose'                        , default=False, action='store_true')
     parser.add_option('--combineLocation' , dest='combineLocation' , help='Combine CMSSW Directory'        , default='COMBINE')
     parser.add_option('--iihe-wall-time'  , dest='IiheWallTime'    , help='Requested IIHE queue Wall Time' , default='168:00:00')
     (opt, args) = parser.parse_args()
