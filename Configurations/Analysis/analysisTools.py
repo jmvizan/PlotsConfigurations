@@ -70,6 +70,8 @@ def setAnalysisDefaults(opt):
 
 def signalShapes(opt, action='shapes'):
 
+    mergeJobs = { }
+
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
             for signal in getSignalList(opt, opt.sigset, tag):
@@ -92,9 +94,19 @@ def signalShapes(opt, action='shapes'):
                     opt2.sigset = 'EOY'+signal
                     commonTools.checkJobs(opt2)
 
-                else:
+                elif action=='mergeall':
                     opt2.sigset = signal
                     latinoTools.mergeall(opt2)
+                  
+                elif action=='mergeallbatch':
+                    if year not in mergeJobs: mergeJobs[year] = {}
+                    if tag not in mergeJobs[year]: mergeJobs[year][tag] = {}
+                    mergeCommandList = [ 'cd '+os.getenv('PWD'), 'eval `scramv1 runtime -sh`' ]
+                    mergeCommandList.append('./runAnalysis.py --action=mergeSignal --year='+year+' --tag='+tag+' --sigset='+signal)
+                    mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
+
+    if len(mergeJobs.keys())>0:
+        print mergeJobs
 
 def checkSignalJobs(opt):
 
@@ -102,7 +114,8 @@ def checkSignalJobs(opt):
 
 def mergeSignal(opt):
 
-    signalShapes(opt, action='mergeall')
+    batch = 'batch' if 'batch' in opt.option else ''
+    signalShapes(opt, action='mergeall'+batch)
 
 # stuff for 2016  
 
@@ -113,6 +126,7 @@ def merge2016(opt):
     for tag in opt.tag.split('-'):
 
         outputDir = '/'.join([ opt.shapedir, '2016', tag ])
+        os.system('rm -r -f '+outputDir+'/plots_'+tag+ '_'+ opt.sigset+'.root')
         commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, opt.sigset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
 
 def merge2016SR(opt):
@@ -137,21 +151,23 @@ def merge2016SR(opt):
 
 def mergeFitCR(opt):
 
-    if 'merge2016' in option: merge2016SR(opt)
+    if 'merge2016' in opt.option: merge2016SR(opt)
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
             outputTag = tag.replace('VetoesUL', 'FitCRVetoesUL')
             outputDir = commonTools.getShapeDirName(opt.shapedir, year, outputTag)
+            os.system('mkdir -p '+outputDir)
 
             for signal in getSignalList(opt, opt.sigset, tag):
 
                 outputFile = outputDir + '/plots_' + outputTag + '_SM-' + signal + '.root'
+                os.system('rm -r -f '+outputFile)
 
                 filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,''), outputFile.replace('FitCR','').replace('SM-','') ]
                 for backcr in opt.backgroundsInFit:
-                    fitFileList.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,''))
+                    filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,''))
 
                 os.system('haddfast --compress '+outputFile+' '+' '.join(filesToMerge))
 
