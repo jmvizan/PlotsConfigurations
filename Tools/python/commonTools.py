@@ -466,7 +466,7 @@ def checkJobs(opt):
     if len(processIdList.keys())==0:
         logprocessInfo = 'logprocess='+opt.logprocess+', ' if opt.logprocess!='*' else ''
         print 'No job running for '+logprocessInfo+'year='+opt.year+', tag='+opt.tag+', sigset='+opt.sigset
-        exit()
+        return
 
     process=subprocess.Popen(checkCommand, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
     processOutput, processError = process.communicate()

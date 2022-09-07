@@ -91,9 +91,17 @@ def signalShapes(opt, action='shapes'):
                                 opt2.sigset = 'EOY'+signal
                                 latinoTools.shapes(opt2)
 
+                        elif action=='checkJobs':
+                            opt2.sigset = 'EOY'+signal
+                            commonTools.checkJobs(opt2)
+
                         else:
                             opt2.sigset = signal
-                            latinoTools.mergeall(opt2)
+                            if action=='mergeall':  latinoTools.mergeall(opt2)
+
+def checkSignalJobs(opt):
+
+    signalShapes(opt, action='checkJobs')
 
 def mergeSignal(opt):
 

@@ -35,7 +35,7 @@ def mkShapesMulti(opt, year, tag, splits, action):
             for sample in splits[split]:
                 commonTools.resetShapes(opt, split, year, tag, sample, opt.reset)
                 os.system(splitCommand.replace('SIGSET', sample).replace('SAMPLE', sample.split(':')[-1]))
-
+ 
 def getSplits(opt, year, tag, action):
 
     splits = { 'Samples' : [ ], 'AsMuchAsPossible' : [ ] }
