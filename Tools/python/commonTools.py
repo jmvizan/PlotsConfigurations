@@ -322,6 +322,7 @@ def cleanShapes(opt):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
+
             deleteDirectory('/'.join([ opt.shapedir, year, tag, 'AsMuchAsPossible' ]))
 
 def deleteShapes(opt):
@@ -584,13 +585,13 @@ def openShapeFile(shapeDir, year, tag, sigset, fileset):
 
 def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outputdir=None, inputnuisances=None, outputnuisances=None, verbose=False):
 
-    mergeCommandList = [ '--inputDir='+opt.shapedir, '--years='+years, '--tag='+tag, '--='+fileset, '--nuisancesFile='+inputnuisances ]
+    mergeCommandList = [ '--inputDir='+opt.shapedir, '--years='+years, '--tag='+tag, '--sigset='+fileset, '--nuisancesFile='+inputnuisances ]
     if verbose: mergeCommandList.append('--verbose')
 
-    if strategy=='deep': mergeCommandList.extend([ '--outputDir='+outputdir, '--skipLNN' ])
+    if strategy=='deep': mergeCommandList.extend([ '--outputShapeDir='+outputdir, '--skipLNN' ])
     else:                mergeCommandList.extend([ '--outputNuisFile='+outputnuisances, '--saveNuisances' ])
 
-    os.system('mergeDataTakingPeriodShapes.py '+' ',join( mergeCommandList ))
+    os.system('mergeDataTakingPeriodShapes.py '+' '.join( mergeCommandList ))
 
 def yieldsTables(opt):
 

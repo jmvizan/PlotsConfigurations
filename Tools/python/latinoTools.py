@@ -33,7 +33,7 @@ def mkShapesMulti(opt, year, tag, splits, action):
                 else: splitCommand += '/plots_'+tag+commonTools.setFileset('',opt.sigset)+'.root'
 
             for sample in splits[split]:
-                commonTools.resetShapes(opt, split, year, tag, sample, 'reset' in opt.option)
+                commonTools.resetShapes(opt, split, year, tag, sample, opt.reset)
                 os.system(splitCommand.replace('SIGSET', sample).replace('SAMPLE', sample.split(':')[-1]))
 
 def getSplits(opt, year, tag, action):
@@ -45,7 +45,7 @@ def getSplits(opt, year, tag, action):
     for sample in samples:
         treeType = samples[sample]['treeType']+':'
         if 'split' in samples[sample] and samples[sample]['split']=='AsMuchAsPossible':
-            if 'recover' in opt.option:
+            if opt.recover:
                 jobsForSamples = 0
                 if 'FilesPerJob' in samples[sample]: jobsForSamples = int(math.ceil(float(len(samples[sample]['name']))/samples[sample]['FilesPerJob']))
                 elif 'JobsPerSample' in samples[sample]: jobsForSamples = int(samples[sample]['JobsPerSample']) 
@@ -53,7 +53,7 @@ def getSplits(opt, year, tag, action):
                     if commonTools.countedSampleShapeFiles(opt.shapedir, year, tag, sample)==jobsForSamples: continue
             splits['AsMuchAsPossible'].append(treeType+sample)
         elif 'shapes' in action:
-            if 'recover' in opt.option and commonTools.foundSampleShapeFile(opt.shapedir, year, tag, sample): continue
+            if opt.recover and commonTools.foundSampleShapeFile(opt.shapedir, year, tag, sample): continue
             if 'split' in samples[sample] and samples[sample]['split']=='Single':
                 splits['Samples'].append(treeType+':'+sample)
             else: 
@@ -144,13 +144,13 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
 
 def mergedPlots(opt):
 
-    fileset = commonTools.setFileset(opt.fileset, opt.sigset)
+    fileset = commonTools.setFileset(opt.fileset, opt.sigset).replace('_','')
     inputNuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
 
     for tag in opt.tag.split('-'):
 
-        if 'deep' in opt.option:
-            year = opt.option.split('deep')[1].split('_')[0]
+        if opt.deepMerge!=None:
+            year = opt.deepMerge
             outputNuisances = inputNuisances
             outputDir = '/'.join([ opt.shapedir, year, tag ])
             commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, fileset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
@@ -160,7 +160,7 @@ def mergedPlots(opt):
             outputNuisances =  inputNuisances.replace('.py', '_'.join([ opt.year, opt.tag, opt.sigset ])+'.py')
             commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, fileset, '', 'None', inputNuisances, outputNuisances, opt.verbose)
         
-        mkPlot(opt, year, tag, outputNuisances)
+        mkPlot(opt, year, tag, opt.sigset, outputNuisances)
         os.system('rm -f nuisances_*.py')
 
 # Tools for making plots from combine fits
@@ -247,7 +247,7 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
 
 def postFitShapes(opt):
 
-    convertShapes = True if 'noreset' not in opt.option else False
+    convertShapes = True if not opt.recover else False
     postFitPlots(opt, convertShapes, False) 
 
 def postFitPlotsOnly(opt):

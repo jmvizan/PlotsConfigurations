@@ -147,7 +147,7 @@ def runCombine(opt):
                     opt2.combineSignalDir = commonTools.getSignalDir(opt2, year, tag, sample, 'combineOutDir')
 
                     if runCombineJob:
-                        if 'reset' in opt.option: 
+                        if opt.reset: 
                             commonTools.deleteDirectory(opt2.combineSignalDir)
                         elif os.path.isfile(commonTools.getCombineOutputFileName(opt2, sample)): 
                             continue
