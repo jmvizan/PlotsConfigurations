@@ -66,16 +66,15 @@ def setAnalysisDefaults(opt):
 
 ### Shapes
 
+# signal
+
 def signalShapes(opt, action='shapes'):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
             for sr in opt.signalRegionMap:
                 if tag==opt.signalRegionMap[sr]['tag']:
-                    if opt.sigset=='SM': signalList = opt.signalRegionMap[sr]['signals']
-                    elif 'signal' in opt.sigset: signalList = getSignalList(opt, opt.sigset, tag)
-                    else: signalList = opt.sigset.split(',')   
-                    for signal in signalList:
+                    for signal in getSignalList(opt, opt.sigset, tag):
 
                         opt2 = copy.deepcopy(opt)
                         opt2.year, opt2.tag = year, tag
@@ -99,45 +98,76 @@ def mergeSignal(opt):
 
     signalShapes(opt, action='mergeall')
 
+# stuff for 2016  
+
+def merge2016(opt):
+
+    inputNuisances = commonTools.getCfgFileName(opt, 'nuisances') 
+
+    for tag in opt.tag.split('-'):
+
+        outputDir = '/'.join([ opt.shapedir, '2016', tag ])
+        commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, opt.sigset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
+
+def merge2016SR(opt):
+
+    opt2 = copy.deepcopy(opt)
+
+    for tag in opt.tag.split('-'):
+  
+        opt2.tag = tag
+        sigsetList = [ 'SM' ] + getSignalList(opt, opt.sigset, tag)
+
+        for sigset in sigsetList:
+            opt2.sigset = sigset
+            merge2016(opt2)
+
+        opt2.sigset = 'SM'
+        for backcr in opt.backgroundsInFit:
+            opt2.tag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
+            merge2016(opt2)
+
+# merging CRs in the fit
+
 def mergeFitCR(opt):
+
+    if 'merge2016' in option: merge2016SR(opt)
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
-            if year=='2016': 
+            outputTag = tag.replace('VetoesUL', 'FitCRVetoesUL')
+            outputDir = commonTools.getShapeDirName(opt.shapedir, year, outputTag)
 
-                inputNuisances = commonTools.getCfgFileName(opt, 'nuisances')
-                outputDir = '/'.join([ opt.shapedir, year, tag ])
-               
-                commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, 'SM'       , 'deep', outputDir, inputNuisances, 'None', opt.verbose)
-                commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, opt.sigset , 'deep', outputDir, inputNuisances, 'None', opt.verbose)
+            for signal in getSignalList(opt, opt.sigset, tag):
 
-                for backcr in opt.backgroundsInFit: 
-                    fittag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
-                    commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', fittag, 'SM', 'deep', outputDir, inputNuisances, 'None', opt.verbose)                      
-            shapeDir = commonTools.getShapeDirName(opt.shapedir, year, tag)
+                outputFile = outputDir + '/plots_' + outputTag + '_SM-' + signal + '.root'
 
-            fitFileList = [ shapeDir+'/plots_'+tag.replace('VetoesUL', 'FitCRVetoesUL')+'_SM-'+opt.sigset+'.root' ]
-            fitFileList.extend([ shapeDir+'/plots_'+tag+'_SM.root', shapeDir+'/plots_'+tag+'_'+opt.sigset+'.root' ])
-            for backcr in opt.backgroundsInFit:
-                fitFileList.append(shapeDir+'/plots_'+tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')+'_SM.root')
+                filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,''), outputFile.replace('FitCR','').replace('SM-','') ]
+                for backcr in opt.backgroundsInFit:
+                    fitFileList.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,''))
 
-            os.system('haddfast --compress '+' '.join(fitFileList))
+                os.system('haddfast --compress '+outputFile+' '+' '.join(filesToMerge))
 
 ### Tools for handling signal mass points
 
 def getSignalList(opt, sigset, tag):
 
-    inputsignal = sigset.split('-')[-1]
-    signalList = []  
-  
     for sr in opt.signalRegionMap:
         if tag==opt.signalRegionMap[sr]['tag']:
-            for signal in opt.signalRegionMap[sr]['signals']:
-                if inputsignal=='signal' or signal.split('_')[0] in inputsignal:
-                    signalList.extend(opt.signalSubsets[signal.split('_')[0]])
 
-    return signalList
+            if sigset=='SM': 
+                return opt.signalRegionMap[sr]['signals']
+
+            elif 'signal' in opt.sigset:
+                signalList = []
+                for signal in opt.signalRegionMap[sr]['signals']:
+                    if sigset.split('-')[-1]=='signal' or signal.split('_')[0] in sigset:
+                        signalList.extend(opt.signalSubsets[signal.split('_')[0]])
+                return signalList
+
+            else:
+                return sigset.split('-')[-1].split(',')
 
 def splitSignalMassPoints(opt, massPointForSubset=300):
 

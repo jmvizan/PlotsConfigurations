@@ -43,7 +43,6 @@ if '2018' in opt.tag :
     lumi_uncertainty_cor = '1.020'
     lumi_uncertainty_dos = '1.002'
     trigger_uncertainty  = '1.020'
-print 'Value of lumi set to', opt.lumi
 
 recoFlag = '_UL'
 
@@ -56,6 +55,10 @@ nuis_btag_split = True
 treePrefix= 'nanoLatino_'
 
 isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit')
+isShapeOrDatacardOrPlot = hasattr(opt, 'doHadd') or isDatacardOrPlot
+
+if isShapeOrDatacardOrPlot:
+    print 'Value of lumi set to', opt.lumi
 
 ### Directories
 
