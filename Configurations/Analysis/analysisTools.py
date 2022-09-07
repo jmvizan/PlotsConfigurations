@@ -72,27 +72,25 @@ def signalShapes(opt, action='shapes'):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
-            for sr in opt.signalRegionMap:
-                if tag==opt.signalRegionMap[sr]['tag']:
-                    for signal in getSignalList(opt, opt.sigset, tag):
+            for signal in getSignalList(opt, opt.sigset, tag):
 
-                        opt2 = copy.deepcopy(opt)
-                        opt2.year, opt2.tag = year, tag
+                opt2 = copy.deepcopy(opt)
+                opt2.year, opt2.tag = year, tag
 
-                        if action=='shapes':
+                if action=='shapes':
 
-                            if 'split' in opt.option:
-                                for sample in commonTools.getSamplesInLoop(opt.configuration, year, tag, 'EOY'+signal):
-                                    opt2.sigset = 'EOY'+sample 
-                                    latinoTools.shapes(opt2)
+                    if 'split' in opt.option:
+                        for sample in commonTools.getSamplesInLoop(opt.configuration, year, tag, 'EOY'+signal):
+                            opt2.sigset = 'EOY'+sample 
+                            latinoTools.shapes(opt2)
                          
-                            else:
-                                opt2.sigset = 'EOY'+signal
-                                latinoTools.shapes(opt2)
+                    else:
+                        opt2.sigset = 'EOY'+signal
+                        latinoTools.shapes(opt2)
 
-                        else:
-                            opt2.sigset = signal
-                            latinoTools.mergeall(opt2)
+                else:
+                    opt2.sigset = signal
+                    latinoTools.mergeall(opt2)
 
 def mergeSignal(opt):
 
@@ -154,7 +152,7 @@ def mergeFitCR(opt):
 def getSignalList(opt, sigset, tag):
 
     for sr in opt.signalRegionMap:
-        if tag==opt.signalRegionMap[sr]['tag']:
+        if tag.split('_')[0].replace('Merge','')==opt.signalRegionMap[sr]['tag']:
 
             if sigset=='SM': 
                 return opt.signalRegionMap[sr]['signals']
