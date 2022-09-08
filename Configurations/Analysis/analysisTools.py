@@ -95,15 +95,17 @@ def signalShapes(opt, action='shapes'):
                     commonTools.checkJobs(opt2)
 
                 elif action=='mergeall':
-                    opt2.sigset = signal
-                    latinoTools.mergeall(opt2)
+                
+                    if 'iterative' in opt.option:
+                        opt2.sigset = signal
+                        latinoTools.mergeall(opt2)
                   
-                elif action=='mergeallbatch':
-                    if year not in mergeJobs: mergeJobs[year] = {}
-                    if tag not in mergeJobs[year]: mergeJobs[year][tag] = {}
-                    mergeCommandList = [ 'cd '+os.getenv('PWD'), 'eval `scramv1 runtime -sh`' ]
-                    mergeCommandList.append('./runAnalysis.py --action=mergeSignal --year='+year+' --tag='+tag+' --sigset='+signal)
-                    mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
+                    else:
+                        if year not in mergeJobs: mergeJobs[year] = {}
+                        if tag not in mergeJobs[year]: mergeJobs[year][tag] = {}
+                        mergeCommandList = [ 'cd '+os.getenv('PWD'), 'eval `scramv1 runtime -sh`' ]
+                        mergeCommandList.append('./runAnalysis.py --action=mergeSignal --year='+year+' --tag='+tag+' --sigset='+signal)
+                        mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
 
     if len(mergeJobs.keys())>0:
         combineTools.submitCombineJobs(opt, mergeJobs, 'mergesig')
@@ -114,8 +116,7 @@ def checkSignalJobs(opt):
 
 def mergeSignal(opt):
 
-    batch = 'batch' if 'batch' in opt.option else ''
-    signalShapes(opt, action='mergeall'+batch)
+    signalShapes(opt, action='mergeall')
 
 # stuff for 2016  
 
