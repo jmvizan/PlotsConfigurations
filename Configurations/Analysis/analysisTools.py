@@ -29,6 +29,9 @@ def setAnalysisDefaults(opt):
                           'TChipmWW'      : [ 'TChipmWW_mC-100to375_mX-1to250', 'TChipmWW_mC-400to700_mX-1to250' ],
                           'TSlepSlep'     : [ 'TSlepSlep_mS-100to275_mX-1to650', 'TSlepSlep_mS-300to400_mX-1to650', 'TSlepSlep_mS-425to600_mX-1to650', 'TSlepSlep_mS-625to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650' ] }
 
+    opt.tableSigset = { 'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200' ],
+                        'T2tt'          : [ 'T2tt_mS-300_mX-213', 'T2tt_mS-300_mX-175', 'T2tt_mS-350_mX-263', 'T2tt_mS-350_mX-225', 'T2tt_mS-400_mX-275', 'T2tt_mS-300_mX-125', 'T2tt_mS-350_mX-175', 'T2tt_mS-400_mX-225', 'T2tt_mS-400_mX-313', 'T2tt_mS-475_mX-350', 'T2tt_mS-450_mX-275', 'T2tt_mS-450_mX-325', 'T2tt_mS-475_mX-388', 'T2tt_mS-450_mX-363', 'T2tt_mS-475_mX-300' ] }
+
     opt.backgroundsInFit = [ 'ttZ', 'ZZ', 'WZ' ]
 
     tagList = []
@@ -199,7 +202,13 @@ def getSignalList(opt, sigset, tag):
             if sigset=='SM': 
                 return opt.signalRegionMap[sr]['signals']
 
-            elif 'signal' in opt.sigset:
+            elif 'tabsignal' in sigset:
+                signalList = []
+                for signal in opt.signalRegionMap[sr]['signals']:
+                    if sigset.split('-')[-1]=='tabsignal' or signal.split('_')[0] in sigset:
+                        signalList.extend(opt.tableSigset[signal.split('_')[0]])
+
+            elif 'signal' in sigset:
                 signalList = []
                 for signal in opt.signalRegionMap[sr]['signals']:
                     if sigset.split('-')[-1]=='signal' or signal.split('_')[0] in sigset:
