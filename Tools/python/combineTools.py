@@ -14,21 +14,14 @@ def submitCombineJobs(opt, combineJobs, jobName):
     for year in combineJobs:
         for tag in combineJobs[year]:
 
-            targetList = combineJobs[year][tag].keys()
+            targetList = combineJobs[year][tag]
 
-            if len(targetList)==0:
+            if len(targetList.keys())==0:
                 print 'Noting left to submit for tag', tag, 'in year', year
                 continue
 
             else:
-
-                jobs = batchJobs(jobName,year+tag,['ALL'],targetList,splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
-                jobs.nThreads = nThreads
-
-                for signal in targetList:
-                    jobs.Add('ALL', signal, combineJobs[year][tag][signal])
-
-                jobs.Sub(opt.batchQueue,opt.IiheWallTime,True)                
+                latinoTools.submitJobs(opt, jobName, year+tag, targetList, splitBatch, jobSplit, nThreads)
 
 def setupCombineCommand(opt):
 

@@ -22,6 +22,12 @@ def getBranch():
         if '*' in line:
             return line.replace('* ','')
 
+def isGoodFile(filename, minSize=1000000.):
+
+    if not os.path.isfile(filename): return False
+    fileSize = os.path.getsize(filename)
+    return fileSize>minSize
+
 ### Plot utilities
 
 def bookHistogram(name, xBins, yBins=(), title='', style=''):

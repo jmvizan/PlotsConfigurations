@@ -2,6 +2,7 @@ import os
 import copy
 import math
 import commonTools
+from LatinoAnalysis.Tools.batchTools import *
 
 ### Shapes
 
@@ -309,4 +310,16 @@ def datacards(opt, dryRun=False):
 
                     if dryRun: return datacardCommand 
                     else: os.system(datacardCommand)
+
+### Batch
+
+def submitJobs(opt, jobName, jobTag, targetList, splitBatch, jobSplit, nThreads):
+
+    jobs = batchJobs(jobName,jobTag,['ALL'],targetList.keys(),splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
+    jobs.nThreads = nThreads
+
+    for signal in targetList:
+        jobs.Add('ALL', signal, targetList[signal])
+
+    jobs.Sub(opt.batchQueue,opt.IiheWallTime,True)
 

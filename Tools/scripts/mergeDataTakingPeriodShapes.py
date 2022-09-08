@@ -89,6 +89,9 @@ if __name__ == '__main__':
 
     inFiles = [ ]
     for year in years:
+        if not os.path.isfile('/'.join([ opt.inputDir, year, tag ])+outFileName): 
+            print 'Error in mergeDataTakingPeriodShapes: input file', '/'.join([ opt.inputDir, year, tag ])+outFileName, 'not found' 
+            return
         inFiles.append([ ROOT.TFile('/'.join([ opt.inputDir, year, tag ])+outFileName, 'READ') , year ])
 
     missingSampleList = [ ]

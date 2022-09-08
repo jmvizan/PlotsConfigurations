@@ -95,7 +95,10 @@ def signalShapes(opt, action='shapes'):
                     commonTools.checkJobs(opt2)
 
                 elif action=='mergeall':
-                
+               
+                    if opt.recover:
+                        if os.path.isfile(commonTools.getShapeFileName(opt.shapedir, year, tag, signal, '')): continue
+
                     if 'iterative' in opt.option:
                         opt2.sigset = signal
                         latinoTools.mergeall(opt2)
@@ -107,8 +110,10 @@ def signalShapes(opt, action='shapes'):
                         mergeCommandList.append('./runAnalysis.py --action=mergeSignal --year='+year+' --tag='+tag+' --sigset='+signal)
                         mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
 
-    if len(mergeJobs.keys())>0:
-        combineTools.submitCombineJobs(opt, mergeJobs, 'mergesig')
+    for year in mergeJobs:
+        for tag in mergeJobs[year]:
+            if len(mergeJobs[year][tag].keys())>0:
+                latinoTools.submitJobs(opt, 'mergesig', year+tag, mergeJobs[year][tag], 'Targets', True, 1)
 
 def checkSignalJobs(opt):
 
@@ -127,7 +132,9 @@ def merge2016(opt):
     for tag in opt.tag.split('-'):
 
         outputDir = '/'.join([ opt.shapedir, '2016', tag ])
-        os.system('rm -r -f '+outputDir+'/plots_'+tag+ '_'+ opt.sigset+'.root')
+        outputFile = outputDir+'/plots_'+tag+ '_'+ opt.sigset+'.root'
+        if opt.recover and commonTools.isGoodFile(outputFile): continue
+        os.system('rm -r -f '+outputFile)
         commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, opt.sigset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
 
 def merge2016SR(opt):
@@ -137,16 +144,18 @@ def merge2016SR(opt):
     for tag in opt.tag.split('-'):
   
         opt2.tag = tag
-        sigsetList = [ 'SM' ] + getSignalList(opt, opt.sigset, tag)
+        sigsetList = getSignalList(opt, opt.sigset, tag)
+        if 'SM' in opt.sigset: sigsetList.append('SM')
 
         for sigset in sigsetList:
             opt2.sigset = sigset
             merge2016(opt2)
 
-        opt2.sigset = 'SM'
-        for backcr in opt.backgroundsInFit:
-            opt2.tag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
-            merge2016(opt2)
+        if 'SM' in opt.sigset:
+            opt2.sigset = 'SM'
+            for backcr in opt.backgroundsInFit:
+                opt2.tag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
+                merge2016(opt2)
 
 # merging CRs in the fit
 
@@ -164,13 +173,21 @@ def mergeFitCR(opt):
             for signal in getSignalList(opt, opt.sigset, tag):
 
                 outputFile = outputDir + '/plots_' + outputTag + '_SM-' + signal + '.root'
+                if opt.recover and commonTools.isGoodFile(outputFile): continue
                 os.system('rm -r -f '+outputFile)
 
                 filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,''), outputFile.replace('FitCR','').replace('SM-','') ]
                 for backcr in opt.backgroundsInFit:
                     filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,''))
 
-                os.system('haddfast --compress '+outputFile+' '+' '.join(filesToMerge))
+                foundFilesToMerge = True
+                for fileToMerge in filesToMerge:
+                    if not commonTools.isGoodFile(fileToMerge):
+                        print 'mergeFitCR error: input file', fileToMerge, 'not found or corrupted' 
+                        foundFilesToMerge = False
+
+                if foundFilesToMerge:
+                    os.system('haddfast --compress '+outputFile+' '+' '.join(filesToMerge))
 
 ### Tools for handling signal mass points
 
@@ -190,7 +207,7 @@ def getSignalList(opt, sigset, tag):
                 return signalList
 
             else:
-                return sigset.split(',')
+                return sigset.replace('SM-','').split(',')
 
 def splitSignalMassPoints(opt, massPointForSubset=150):
 
