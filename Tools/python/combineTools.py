@@ -6,7 +6,6 @@ from LatinoAnalysis.Tools.batchTools import *
 
 def submitCombineJobs(opt, combineJobs, jobName):
 
-    opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
     nThreads = 1
     splitBatch =  'Targets'
     jobSplit = True if opt.sigset!='' and opt.sigset!='SM' else False
@@ -164,6 +163,7 @@ def runCombine(opt):
                         combineJobs[year][tag][sample] = combineCommand
 
     if 'debug' not in opt.option and 'interactive' not in opt.option: 
+        opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
         submitCombineJobs(opt, combineJobs, opt.combineAction)
   
 def writeDatacards(opt):

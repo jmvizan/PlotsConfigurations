@@ -90,14 +90,15 @@ def signalShapes(opt, action='shapes'):
                         opt2.sigset = 'EOY'+signal
                         latinoTools.shapes(opt2)
 
-                elif action=='checkJobs':
-                    opt2.sigset = 'EOY'+signal
-                    commonTools.checkJobs(opt2)
+                elif action=='checkJobs' or action=='killJobs':
+                    opt2.sigset = signal if 'mergesig' in opt.logprocess else 'EOY'+signal
+                    if action=='checkJobs':  commonTools.checkJobs(opt2)
+                    elif action=='killJobs': commonTools.killJobs(opt2)
 
                 elif action=='mergeall':
                
                     if opt.recover:
-                        if os.path.isfile(commonTools.getShapeFileName(opt.shapedir, year, tag, signal, '')): continue
+                        if commonTools.isGoodFile(commonTools.getShapeFileName(opt.shapedir, year, tag, signal, '')): continue
 
                     if 'iterative' in opt.option:
                         opt2.sigset = signal
@@ -107,17 +108,23 @@ def signalShapes(opt, action='shapes'):
                         if year not in mergeJobs: mergeJobs[year] = {}
                         if tag not in mergeJobs[year]: mergeJobs[year][tag] = {}
                         mergeCommandList = [ 'cd '+os.getenv('PWD'), 'eval `scramv1 runtime -sh`' ]
-                        mergeCommandList.append('./runAnalysis.py --action=mergeSignal --year='+year+' --tag='+tag+' --sigset='+signal)
+                        mergeCommandList.append('./runAnalysis.py --option=iterative --action=mergeSignal --year='+year+' --tag='+tag+' --sigset='+signal)
                         mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
 
-    for year in mergeJobs:
-        for tag in mergeJobs[year]:
-            if len(mergeJobs[year][tag].keys())>0:
-                latinoTools.submitJobs(opt, 'mergesig', year+tag, mergeJobs[year][tag], 'Targets', True, 1)
+    if len(mergeJobs.keys())>0:
+        opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
+        for year in mergeJobs:
+            for tag in mergeJobs[year]:
+                if len(mergeJobs[year][tag].keys())>0:
+                    latinoTools.submitJobs(opt, 'mergesig', year+tag, mergeJobs[year][tag], 'Targets', True, 1)
 
 def checkSignalJobs(opt):
 
     signalShapes(opt, action='checkJobs')
+
+def killSignalJobs(opt):
+
+    signalShapes(opt, action='killJobs')
 
 def mergeSignal(opt):
 

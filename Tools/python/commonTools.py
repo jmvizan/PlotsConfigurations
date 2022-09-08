@@ -431,6 +431,8 @@ def getProcessIdList(opt):
            
             if opt.sigset=='*':
                 logDirList += getLogDir(opt, year, tag, '*').split(' ')
+            elif 'mergesig' in opt.logprocess:
+                logDirList += getLogDir(opt, year, tag, opt.sigset).split(' ')
             else:
                 for sample in getSamplesInLoop(opt.configuration, year, tag, opt.sigset):
                     logDirList += getLogDir(opt, year, tag, sample).split(' ')
