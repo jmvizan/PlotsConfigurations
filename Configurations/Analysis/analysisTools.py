@@ -4,6 +4,7 @@ import copy
 import PlotsConfigurations.Tools.commonTools as commonTools
 import PlotsConfigurations.Tools.latinoTools as latinoTools
 import PlotsConfigurations.Tools.combineTools as combineTools
+import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
 from array import array
 
 ### Analysis defaults
@@ -85,8 +86,8 @@ def signalShapes(opt, action='shapes'):
                 if action=='shapes':
 
                     if 'split' in opt.option:
-                        for sample in commonTools.getSamplesInLoop(opt.configuration, year, tag, 'EOY'+signal):
-                            opt2.sigset = 'EOY'+sample 
+                        for massPoint in getMassPointList(signal):
+                            opt2.sigset = 'EOY'+massPoint
                             latinoTools.shapes(opt2)
                          
                     else:
@@ -199,8 +200,59 @@ def mergeFitCR(opt):
                 if foundFilesToMerge:
                     os.system('haddfast --compress '+outputFile+' '+' '.join(filesToMerge))
 
+### Combine with mass points
+
+def signalCombine(opt, action):
+
+    if opt.sigset=='SM': opt.sigset = 'signal'
+
+    for tag in tag.split('-'):
+
+        opt2 = copy.deepcopy(opt)
+        opt2.year, opt2.tag = year, tag
+
+        filesetMap = {}
+        signalList = getSignalList(opt, opt.sigset, tag)      
+
+        if 'signal' in opt.sigset:
+            for fileset in signalList:
+                filesetMap[fileset] = [ fileset ]
+
+        else:
+            for signal in signalList:
+                massPoints = getMassPointList(signal)
+                for massPoint in massPoints:
+                    signalFileset = getMassPointSubset(massPoint)
+                    if signalFileset!=None:
+                        if signalFileset not in filesetMap: filesetMap[signalFileset] = []
+                        filesetMap[signalFileset].append(massPoint)
+
+        for fileset in filesetMap:
+
+            opt2.fileset = 'SM-'+fileset
+            opt2.sigset = 'SM-'+','.join(filesetMap[fileset])
+
+            if action=='limits': combineTools.limits(opt2)
+            if action=='mlfits': combineTools.mlfits(opt2)
+
+def signalLimits(opt):
+
+    signalCombine(opt, 'limits')
+
+def signalMLFits(opt):
+
+    signalCombine(opt, 'mlfits')
+
 ### Tools for handling signal mass points
 
+def getMassPointFileset(massPoint):
+
+    for subset in opt.signalSubsets[massPoint.split('_')[0]]:
+        if signalMassPoints.massPointInSignalSet(massPoint, subset):
+            return subset
+
+    return None
+          
 def getSignalList(opt, sigset, tag):
 
     for sr in opt.signalRegionMap:
@@ -238,9 +290,9 @@ def splitSignalMassPoints(opt, massPointForSubset=150):
 
             if opt.verbose: print 'Splitting mass points for', baseSignal          
 
-            samples = commonTools.getSamplesInLoop(opt.configuration, '2018', opt.signalRegionMap[sr]['tag'], signal)
+            massPoints = getMassPointList(signal)
 
-            nMassPoints = len(samples.keys()) 
+            nMassPoints = len(massPoints.keys()) 
             minPromptMass = int(signal.split('_')[1].split('-')[1].split('to')[0])
             maxPromptMass = int(signal.split('_')[1].split('to')[1])
 
@@ -261,9 +313,9 @@ def splitSignalMassPoints(opt, massPointForSubset=150):
                 for promptMass in range(minSubsetPromptMass, maxPromptMass+1, promptMassStep):
                     
                     signalSubset = signalDraft.replace('minPromptMass', str(minSubsetPromptMass)).replace('maxPromptMass', str(promptMass))
-                    subsamples = commonTools.getSamplesInLoop(opt.configuration, '2018', opt.signalRegionMap[sr]['tag'], signalSubset)
+                    massPointSubsets = getMassPointList(signalSubset)
 
-                    if len(subsamples.keys())>=signalMmassPointForSubset or promptMass==maxPromptMass:
+                    if len(massPointSubsets.keys())>=signalMmassPointForSubset or promptMass==maxPromptMass:
 
                         signalSubsets[baseSignal].append(signalSubset)
                         minSubsetPromptMass = promptMass + promptMassStep
@@ -271,6 +323,15 @@ def splitSignalMassPoints(opt, massPointForSubset=150):
 
     for signal in signalSubsets:
         print 'signalSubsets[\''+signal+'\'] = '+repr(signalSubsets[signal])+'\n'               
+
+def getMassPointList(signal):
+
+    massPointList = []
+    for massPoint in signalMassPoints.signalMassPoints[signal.split('_')[0]]:
+        if signalMassPoints.massPointInSignalSet(massPoint, signal):
+            massPointList.append(massPoint)
+
+    return massPointList
 
 ### Analysis specific weights, efficiencies, scale factors, etc.
 
