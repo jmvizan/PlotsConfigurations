@@ -22,7 +22,7 @@ def getBranch():
         if '*' in line:
             return line.replace('* ','')
 
-def isGoodFile(filename, minSize=1000000.):
+def isGoodFile(filename, minSize=100000.):
 
     if not os.path.isfile(filename): return False
     fileSize = os.path.getsize(filename)
