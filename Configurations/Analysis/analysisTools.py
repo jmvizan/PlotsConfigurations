@@ -54,7 +54,7 @@ def setAnalysisDefaults(opt):
      
     if len(tagList)>0: opt.tag = '-'.join( tagList )
 
-    if 'merge' in taglower: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
+    if 'merge' in taglower and 'Merge' not in opt.tag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
 
     if opt.action=='shapes':
         for sr in opt.signalRegionMap:
