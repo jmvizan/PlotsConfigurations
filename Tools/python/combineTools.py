@@ -4,7 +4,7 @@ import commonTools
 import latinoTools
 from LatinoAnalysis.Tools.batchTools import *
 
-def submitCombineJobs(opt, combineJobs):
+def submitCombineJobs(opt, combineJobs, jobName):
 
     opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
     nThreads = 1
@@ -22,7 +22,7 @@ def submitCombineJobs(opt, combineJobs):
 
             else:
 
-                jobs = batchJobs(opt.combineAction,year+tag,['ALL'],targetList,splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
+                jobs = batchJobs(jobName,year+tag,['ALL'],targetList,splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
                 jobs.nThreads = nThreads
 
                 for signal in targetList:
@@ -171,7 +171,7 @@ def runCombine(opt):
                         combineJobs[year][tag][sample] = combineCommand
 
     if 'debug' not in opt.option and 'interactive' not in opt.option: 
-        submitCombineJobs(opt, combineJobs)
+        submitCombineJobs(opt, combineJobs, opt.combineAction)
   
 def writeDatacards(opt):
 

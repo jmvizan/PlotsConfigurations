@@ -25,9 +25,9 @@ def setAnalysisDefaults(opt):
 
     opt.signalSubsets = { 'T2tt'          : [ 'T2tt_mS-150to800_dm-80to175' ],
                           'T2bW'          : [ 'T2bW_mS-200to1000_mX-1to700' ],
-                          'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-100to600_mX-1to750', 'TChipmSlepSnu_mC-625to850_mX-1to750', 'TChipmSlepSnu_mC-875to1075_mX-1to750', 'TChipmSlepSnu_mC-1100to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1500_mX-1to750' ],
-                          'TChipmWW'      : [ 'TChipmWW_mC-100to700_mX-1to250' ],
-                          'TSlepSlep'     : [ 'TSlepSlep_mS-100to425_mX-1to650', 'TSlepSlep_mS-450to1000_mX-1to650' ] }
+                          'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-100to475_mX-1to750', 'TChipmSlepSnu_mC-500to650_mX-1to750', 'TChipmSlepSnu_mC-675to800_mX-1to750', 'TChipmSlepSnu_mC-825to925_mX-1to750', 'TChipmSlepSnu_mC-950to1050_mX-1to750', 'TChipmSlepSnu_mC-1075to1175_mX-1to750', 'TChipmSlepSnu_mC-1200to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750' ],
+                          'TChipmWW'      : [ 'TChipmWW_mC-100to375_mX-1to250', 'TChipmWW_mC-400to700_mX-1to250' ],
+                          'TSlepSlep'     : [ 'TSlepSlep_mS-100to275_mX-1to650', 'TSlepSlep_mS-300to400_mX-1to650', 'TSlepSlep_mS-425to600_mX-1to650', 'TSlepSlep_mS-625to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650' ] }
 
     opt.backgroundsInFit = [ 'ttZ', 'ZZ', 'WZ' ]
 
@@ -106,7 +106,7 @@ def signalShapes(opt, action='shapes'):
                     mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
 
     if len(mergeJobs.keys())>0:
-        print mergeJobs
+        combineTools.submitCombineJobs(opt, mergeJobs, 'mergesig')
 
 def checkSignalJobs(opt):
 
@@ -189,9 +189,9 @@ def getSignalList(opt, sigset, tag):
                 return signalList
 
             else:
-                return sigset.split('-')[-1].split(',')
+                return sigset.split(',')
 
-def splitSignalMassPoints(opt, massPointForSubset=300):
+def splitSignalMassPoints(opt, massPointForSubset=150):
 
     promptMassStep = 25
     signalSubsets = { }
