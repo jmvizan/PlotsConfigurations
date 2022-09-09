@@ -10,6 +10,17 @@ from array import array
 ### Analysis defaults
 
 def setAnalysisDefaults(opt):
+    
+    if 'cern' in os.uname()[1] or 'lxplus' in os.uname()[1]:
+        if 'scodella' in os.getlogin():
+            opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src'
+        elif 'pmatorra' in os.getlogin():
+            opt.combineLocation = '/afs/cern.ch/work/p/pmatorra/...'
+    else:
+        if 'sluca' in os.getlogin():
+            opt.combineLocation = '/gpfs/users/sluca/CMS/SUSY/...'
+        elif 'pmatorra' in os.getlogin():
+            opt.combineLocation = '...'
 
     if opt.year.lower()=='run2split': opt.year = '2016HIPM-2016noHIPM-2017-2018'
     elif opt.year.lower()=='run2': opt.year = '2016-2017-2018'
@@ -55,6 +66,11 @@ def setAnalysisDefaults(opt):
                 for backcr in opt.backgroundsInFit:
                     if allFitCR or backcr.lower() in fitcrtag:
                         tagList.append(opt.signalRegionMap[sr]['tag'].replace('VetoesUL','FitCR'+backcr+'VetoesUL'))
+
+    elif 'fit' in taglower:
+        for sr in opt.signalRegionMap:
+            if 'fit'+sr.replace('SR','') in taglower:
+                tagList.append(opt.signalRegionMap[sr]['tag'].replace('VetoesUL','FitCRVetoesUL'))
      
     if len(tagList)>0: opt.tag = '-'.join( tagList )
 
@@ -206,15 +222,15 @@ def signalCombine(opt, action):
 
     if opt.sigset=='SM': opt.sigset = 'signal'
 
-    for tag in tag.split('-'):
+    for tag in opt.tag.split('-'):
 
         opt2 = copy.deepcopy(opt)
-        opt2.year, opt2.tag = year, tag
+        opt2.year, opt2.tag = opt.year, tag
 
         filesetMap = {}
         signalList = getSignalList(opt, opt.sigset, tag)      
 
-        if 'signal' in opt.sigset:
+        if 'signal' in opt.sigset and 'tabsignal' not in opt.sigset:
             for fileset in signalList:
                 filesetMap[fileset] = [ fileset ]
 
@@ -222,7 +238,7 @@ def signalCombine(opt, action):
             for signal in signalList:
                 massPoints = getMassPointList(signal)
                 for massPoint in massPoints:
-                    signalFileset = getMassPointSubset(massPoint)
+                    signalFileset = getMassPointSubset(opt, massPoint)
                     if signalFileset!=None:
                         if signalFileset not in filesetMap: filesetMap[signalFileset] = []
                         filesetMap[signalFileset].append(massPoint)
@@ -245,7 +261,7 @@ def signalMLFits(opt):
 
 ### Tools for handling signal mass points
 
-def getMassPointFileset(massPoint):
+def getMassPointSubset(opt, massPoint):
 
     for subset in opt.signalSubsets[massPoint.split('_')[0]]:
         if signalMassPoints.massPointInSignalSet(massPoint, subset):
@@ -256,7 +272,7 @@ def getMassPointFileset(massPoint):
 def getSignalList(opt, sigset, tag):
 
     for sr in opt.signalRegionMap:
-        if tag.split('_')[0].replace('Merge','')==opt.signalRegionMap[sr]['tag']:
+        if tag.split('_')[0].replace('Merge','').replace('FitCR','')==opt.signalRegionMap[sr]['tag']:
 
             if sigset=='SM': 
                 return opt.signalRegionMap[sr]['signals']
@@ -265,6 +281,7 @@ def getSignalList(opt, sigset, tag):
                 signalList = []
                 for signal in opt.signalRegionMap[sr]['signals']:
                     if sigset.split('-')[-1]=='tabsignal' or signal.split('_')[0] in sigset:
+                        print sigset.split('-')[-1], signal.split('_')[0]
                         signalList.extend(opt.tableSigset[signal.split('_')[0]])
 
             elif 'signal' in sigset:

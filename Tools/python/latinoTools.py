@@ -278,7 +278,9 @@ def getPerSignalSigset(inputfileset, inputsigset):
     fileset = commonTools.setFileset(inputfileset, inputsigset)
 
     if '-' in fileset:                       # This is SUSY like
-        sigset = fileset.replace(fileset.split('-')[-1], '').replace('_','')+'MASSPOINT'
+        auxfileset = fileset if fileset[0]!='_' else fileset[1:]
+        auxfileset = auxfileset.split('_')[0]
+        sigset = auxfileset.replace(auxfileset.split('-')[-1], '')+'MASSPOINT'
     elif inputsigset=='' or inputsigset=='SM': # This should work for SM searches
         sigset = inputsigset
     else:                                    # Guessing latinos' usage
@@ -298,9 +300,8 @@ def datacards(opt, dryRun=False):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
- 
             for sample in samples:
-                if samples[sample]['isSignal']:
+               if samples[sample]['isSignal']:
 
                     outputDir = commonTools.getSignalDir(opt, year, tag, sample, 'cardsdir')
 

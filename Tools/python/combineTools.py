@@ -56,7 +56,6 @@ def prepareDatacards(opt, dryRun=False):
 def combineDatacards(opt, signal, dryRun=False):
 
     combineDatacardCommandList = [ setupCombineCommand(opt) ]
-
     combineDatacardCommandList.append('cd '+opt.combineSignalDir)
 
     datacardList = [ ]
@@ -66,8 +65,7 @@ def combineDatacards(opt, signal, dryRun=False):
     for year in opt.year.split('-'):
 
         inputDatacardDir = commonTools.mergeDirPaths(opt.baseDir, commonTools.getSignalDir(opt, year, opt.tag, signal, 'cardsdir'))
-
-        samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, opt.sigset, 'variables')
+        samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, opt.sigset, 'variables', opt.combineAction)
 
         datacardNameStructure = latinoTools.getDatacardNameStructure(addYearToDatacardName, len(cuts.keys())>1, len(variables.keys())>1)
         datacardNameStructure = datacardNameStructure.replace('year', year)
@@ -116,7 +114,7 @@ def runCombine(opt):
     opt2 = copy.deepcopy(opt)
 
     opt2.baseDir = os.getenv('PWD')
-    opt2.fileset, sigset = latinoTools.getPerSignalSigset(opt.fileset, opt.sigset)
+    opt2.fileset, sigset = latinoTools.getPerSignalSigset(opt.fileset, opt.sigset) 
 
     samples = commonTools.getSamples(opt)
 
@@ -147,7 +145,6 @@ def runCombine(opt):
                     os.system('mkdir -p '+opt2.combineSignalDir)
 
                     combineCommandList = [ ]   
-
                     if makeDatacards:  combineCommandList.append(prepareDatacards(opt2, True))
                     combineCommandList.append(combineDatacards(opt2, sample, True))
                     if runCombineJob:  combineCommandList.append(' '.join(['combine', opt.combineOption, 'combinedDatacard.txt' ]))

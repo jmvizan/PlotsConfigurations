@@ -279,7 +279,7 @@ nuisances['pdf'] = {
 
 for yeartomerge in yearstaglist:
 
-    exec(open('./theoryNormalizations/theoryNormalizations'+recoFlag+'_'+yeartomerge+'.py').read())
+    exec(open('./Data/theoryNormalizations/theoryNormalizations'+recoFlag+'_'+yeartomerge+'.py').read())
 
     # LHE scale variation weights (w_var / w_nominal)
     # [0] is muR=0.50000E+00 muF=0.50000E+00

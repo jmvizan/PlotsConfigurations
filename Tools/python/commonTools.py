@@ -174,27 +174,28 @@ def getDictionaries(optOrig, lastDictionary='nuisances'):
     elif lastDictionaryIndex==2: return samples, cuts, variables
     elif lastDictionaryIndex==3: return samples, cuts, variables, nuisances
 
-def getDictionariesInLoop(configuration, year, tag, sigset, lastDictionary='nuisances'):
+def getDictionariesInLoop(configuration, year, tag, sigset, lastDictionary='nuisances', combineAction=''):
 
     opt2 = Object()
     opt2.configuration, opt2.year, opt2.tag, opt2.sigset = configuration, year, tag, sigset
+    if combineAction!='': opt2.combineAction = combineAction
     return getDictionaries(opt2, lastDictionary)
 
 def getSamples(opt):
 
     return getDictionaries(opt, 'samples')
 
-def getSamplesInLoop(configuration, year, tag, sigset):
+def getSamplesInLoop(configuration, year, tag, sigset, combineAction=''):
 
-    return getDictionariesInLoop(configuration, year, tag, sigset, 'samples')
+    return getDictionariesInLoop(configuration, year, tag, sigset, 'samples', combineAction)
 
 def setFileset(fileset, sigset):
 
     if fileset=='':
         if sigset=='': return '' # So we are prepared to switch from 'SM' to '' if required 
         else: return '_'+sigset
-    else:
-        return '_'+fileset.replace('_','')
+    elif fileset[0]=='_': return fileset
+    else: return '_'+fileset
 
 def getSignalDir(opt, year, tag, signal, directory):
 
@@ -268,7 +269,8 @@ def cleanLogs(opt):
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
-            samples = getSamplesInLoop(opt.configuration, year, tag, opt.sigset)
+            combineAction = opt.combineAction if hasattr(opt, 'combineAction') else ''
+            samples = getSamplesInLoop(opt.configuration, year, tag, opt.sigset, combineAction)
 
             for sample in samples:
                 cleanSampleLogs(opt, year, tag, sample)
@@ -556,7 +558,7 @@ def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
 
     if fitoption!='':
         tag = tag.replace('___','_').split('__')[0]
-            
+
     return getShapeDirName(shapeDir, year, tag, fitoption)+'/plots_'+tag+setFileset(fileset, sigset)+'.root'
 
 def foundShapeFiles(opt, rawShapes=False):
@@ -621,12 +623,13 @@ def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
     if year=='': year = opt.year
     if tag=='': tag = opt.tag
 
-    if hasattr(opt, combineAction):
+    if hasattr(opt, 'combineAction'):
         combineAction = opt.combineAction
 
     if combineAction=='limits':
         combineOutDir = 'limitdir'
-        outputFileName = 'higgsCombine_'+getLimitRun(opt.unblind)+'.AsymptoticLimits.mH120.root'
+        limitRun = 'Both' if opt.unblind else 'Blind'
+        outputFileName = 'higgsCombine_'+limitRun+'.AsymptoticLimits.mH120.root'
     elif combineAction=='mlfits': 
         combineOutDir = 'mlfitdir'
         outputFileName = 'fitDiagnostics.root'

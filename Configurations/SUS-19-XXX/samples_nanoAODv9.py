@@ -54,7 +54,7 @@ nuis_btag_split = True
 
 treePrefix= 'nanoLatino_'
 
-isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit')
+isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit') or hasattr(opt, 'combineAction')
 isShapeOrDatacardOrPlot = hasattr(opt, 'doHadd') or isDatacardOrPlot
 
 if isShapeOrDatacardOrPlot:
