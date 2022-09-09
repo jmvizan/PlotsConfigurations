@@ -172,17 +172,16 @@ def merge2016SR(opt):
   
         opt2.tag = tag
         sigsetList = getSignalList(opt, opt.sigset, tag)
-        if 'SM' in opt.sigset: sigsetList.append('SM')
+        sigsetList.append('SM')
 
         for sigset in sigsetList:
             opt2.sigset = sigset
             merge2016(opt2)
 
-        if 'SM' in opt.sigset:
-            opt2.sigset = 'SM'
-            for backcr in opt.backgroundsInFit:
-                opt2.tag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
-                merge2016(opt2)
+        opt2.sigset = 'SM'
+        for backcr in opt.backgroundsInFit:
+            opt2.tag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
+            merge2016(opt2)
 
 # merging CRs in the fit
 
