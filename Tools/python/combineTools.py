@@ -4,23 +4,13 @@ import commonTools
 import latinoTools
 from LatinoAnalysis.Tools.batchTools import *
 
-def submitCombineJobs(opt, combineJobs, jobName):
+def submitCombineJobs(opt, jobName, jobTag, combineJobs):
 
     nThreads = 1
     splitBatch =  'Targets'
     jobSplit = True if opt.sigset!='' and opt.sigset!='SM' else False
 
-    for year in combineJobs:
-        for tag in combineJobs[year]:
-
-            targetList = combineJobs[year][tag]
-
-            if len(targetList.keys())==0:
-                print 'Noting left to submit for tag', tag, 'in year', year
-                continue
-
-            else:
-                latinoTools.submitJobs(opt, jobName, year+tag, targetList, splitBatch, jobSplit, nThreads)
+    latinoTools.submitJobs(opt, jobName, jobTag, combineJobs, splitBatch, jobSplit, nThreads)
 
 def setupCombineCommand(opt):
 
@@ -91,6 +81,7 @@ def runCombine(opt):
 
     if 'interactive' not in opt.option and opt.action!='writeDatacards':
         commonTools.checkProxy(opt)
+        opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
 
     if not hasattr(opt, 'combineAction'):
         if 'limit' in opt.option: limits(opt)
@@ -109,8 +100,6 @@ def runCombine(opt):
         opt.option += 'interactive'
         cleanDatacards = False
 
-    combineJobs = { }
-
     opt2 = copy.deepcopy(opt)
 
     opt2.baseDir = os.getenv('PWD')
@@ -121,14 +110,10 @@ def runCombine(opt):
     yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
 
     for year in yearList:
-
-        opt2.year = year
-        combineJobs[year] = { }
-
         for tag in opt.tag.split('-'):
 
-            opt2.tag = tag
-            combineJobs[year][tag] = { }
+            opt2.year, opt2.tag = year, tag
+            combineJobs = { } 
 
             for sample in samples:
                 if samples[sample]['isSignal']:
@@ -157,12 +142,14 @@ def runCombine(opt):
                     elif 'interactive' in opt.option: os.system(combineCommand)
                     else:
                         commonTools.cleanLogs(opt2) 
-                        combineJobs[year][tag][sample] = combineCommand
+                        combineJobs[sample] = combineCommand
 
-    if 'debug' not in opt.option and 'interactive' not in opt.option: 
-        opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
-        submitCombineJobs(opt, combineJobs, opt.combineAction)
-  
+            if 'debug' not in opt.option and 'interactive' not in opt.option:
+                if len(combineJobs.keys())>0: 
+                    submitCombineJobs(opt, opt.combineAction, year+tag, combineJobs)
+                else:
+                    print 'Noting left to submit for tag', tag, 'in year', year
+
 def writeDatacards(opt):
 
     opt.combineAction = 'datacard'
