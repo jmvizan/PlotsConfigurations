@@ -280,8 +280,8 @@ def getSignalList(opt, sigset, tag):
                 signalList = []
                 for signal in opt.signalRegionMap[sr]['signals']:
                     if sigset.split('-')[-1]=='tabsignal' or signal.split('_')[0] in sigset:
-                        print sigset.split('-')[-1], signal.split('_')[0]
                         signalList.extend(opt.tableSigset[signal.split('_')[0]])
+                return signalList
 
             elif 'signal' in sigset:
                 signalList = []

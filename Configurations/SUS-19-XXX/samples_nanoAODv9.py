@@ -55,9 +55,11 @@ nuis_btag_split = True
 treePrefix= 'nanoLatino_'
 
 isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit') or hasattr(opt, 'combineAction')
-isShapeOrDatacardOrPlot = hasattr(opt, 'doHadd') or isDatacardOrPlot
+isShape = hasattr(opt, 'doHadd')
+isShapeOrPlot = isShape or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN')
+isShapeOrDatacardOrPlot = isShape or isDatacardOrPlot
 
-if isShapeOrDatacardOrPlot:
+if isShapeOrPlot:
     print 'Value of lumi set to', opt.lumi
 
 ### Directories
@@ -76,10 +78,10 @@ if  'cern' in SITE :
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     if not skipTreesCheck and 'EOY' not in opt.sigset:
-        print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
         if not hasattr(opt, 'doHadd') or opt.doHadd:
             skipTreesCheck = True
         else:
+            print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
             exit()
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
