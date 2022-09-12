@@ -30,7 +30,8 @@ def mkShapesMulti(opt, year, tag, splits, action):
                 sampleFlag = '_SIGSET' if 'worker' in commonTools.getBranch() else '' 
                 outputDir = mainDir if 'mergeall' in action else mainDir+'/Samples'
                 splitCommand += ' ; mkdir -p '+outputDir+' ; mv '+splitDir+'/plots_'+year+tag+sampleFlag+'.root '+outputDir
-                if 'mergesingle' in action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
+                if opt.fileset!='': splitCommand += '/plots_'+year+tag+'_'+opt.fileset+'.root'
+                elif 'mergesingle' in action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
                 else: splitCommand += '/plots_'+tag+commonTools.setFileset('',opt.sigset)+'.root'
 
             for sample in splits[split]:

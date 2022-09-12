@@ -120,8 +120,9 @@ def signalShapes(opt, action='shapes'):
                         if year not in mergeJobs: mergeJobs[year] = {}
                         if tag not in mergeJobs[year]: mergeJobs[year][tag] = {}
                         mergeCommandList = [ 'cd '+os.getenv('PWD'), 'eval `scramv1 runtime -sh`' ]
-                        mergeCommandList.append('./runAnalysis.py --action=mergeall --year='+year+' --tag='+tag+' --sigset='+signal)
-                        mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
+                        mergeCommandList.append('./runAnalysis.py --action=mergeall --year='+year+' --tag='+tag+' --sigset='+signal+' --fileset='+opt.fileset)
+                        jobName = signal if opt.fileset=='' else opt.fileset
+                        mergeJobs[year][tag][jobName] = '\n'.join(mergeCommandList) 
 
     if len(mergeJobs.keys())>0:
         opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
