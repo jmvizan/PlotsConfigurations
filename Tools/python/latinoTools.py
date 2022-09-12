@@ -145,7 +145,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
 
 def mergedPlots(opt):
 
-    fileset = commonTools.setFileset(opt.fileset, opt.sigset).replace('_','')
+    fileset = commonTools.setFileset(opt.fileset, opt.sigset)
     inputNuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
 
     for tag in opt.tag.split('-'):
@@ -158,7 +158,7 @@ def mergedPlots(opt):
 
         else:
             year = opt.year
-            outputNuisances =  inputNuisances.replace('.py', '_'.join([ opt.year, opt.tag, opt.sigset ])+'.py')
+            outputNuisances =  '_'.join([ 'nuisances', opt.year, opt.tag, opt.sigset+'.py' ])
             commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, fileset, '', 'None', inputNuisances, outputNuisances, opt.verbose)
         
         mkPlot(opt, year, tag, opt.sigset, outputNuisances)
@@ -169,16 +169,16 @@ def mergedPlots(opt):
 def getDatacardNameStructure(addYearToDatacardName, addCutToDatacardName, addVariableToDatacardName):
 
     datacardNameStructureList = [ ]
-    if addYearToDatacardName: datacardNameStructureList.append('year')
     if addCutToDatacardName: datacardNameStructureList.append('cut')
     if addVariableToDatacardName: datacardNameStructureList.append('variable')
+    if addYearToDatacardName: datacardNameStructureList.append('year')
     return '_'.join(datacardNameStructureList)
 
 def mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, signal, sigset, datacardNameStructure):
 
     fitkind = 'p' if fitoption=='PreFit' else fitoption[7:].lower()
     postFitPlotCommandList = [ '--kind='+fitkind, '--structureFile='+commonTools.getCfgFileName(opt, 'structure') ]
-    postFitPlotCommandList.extend([ '--tag='+tag, '--sigset='+sigset ])
+    postFitPlotCommandList.extend([ '--tag='+fittedYear+tag, '--sigset='+sigset ])
 
     postFitPlotCommandList.extend([ '--cutNameInOriginal='+cut, '--variable='+variable ])
     postFitPlotCommandList.append('--cut='+datacardNameStructure.replace('year', year).replace('cut', cut).replace('variable', variable))
@@ -228,7 +228,7 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
                         if convertShapes or not os.path.isfile(postFitShapeFile):
  
                             os.system('rm -f '+postFitShapeFile)
-                            os.system('mkdir -p '+getShapeDirName(opt.shapedir, fittedYear, tag, tagoption))
+                            os.system('mkdir -p '+commonTools.getShapeDirName(opt.shapedir, fittedYear, tag, tagoption))
 
                             if year!='':
 
@@ -260,7 +260,7 @@ def postFitPlotsOnly(opt):
 def plots(opt):
 
     if 'merge' in opt.option: mergedPlots(opt)
-    elif 'fit' in opt.option.lower(): postfitPlots(opt)
+    elif 'fit' in opt.option.lower(): postFitPlots(opt)
     else: 
 
         if not commonTools.foundShapeFiles(opt): exit()
@@ -288,29 +288,34 @@ def getPerSignalSigset(inputfileset, inputsigset):
 
     return fileset, sigset
 
-def datacards(opt, dryRun=False):
-
-    if not commonTools.foundShapeFiles(opt, True): exit()
-
-    commonTools.cleanDatacards(opt)
+def datacards(opt, signal='', dryRun=False):
 
     fileset, sigset = getPerSignalSigset(opt.fileset, opt.sigset)
 
-    samples = commonTools.getSamples(opt)
+    if signal!='': 
+        signalList = [ signal ]
+    else: 
+        signalList = []
+        samples = commonTools.getSamples(opt)
+        for sample in samples:
+            if samples[sample]['isSignal']:
+                signalList.append(sample)
+
+    datacardCommandList = []
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
-            for sample in samples:
-               if samples[sample]['isSignal']:
+            for sample in signalList:
 
-                    outputDir = commonTools.getSignalDir(opt, year, tag, sample, 'cardsdir')
+                outputDir = commonTools.getSignalDir(opt, year, tag, sample, 'cardsdir')
+                os.system('mkdir -p '+outputDir)
 
-                    os.system('mkdir -p '+outputDir)
+                datacardCommand = 'mkDatacards.py --pycfg='+opt.configuration+' --tag='+year+opt.tag+' --sigset='+sigset.replace('MASSPOINT',sample)+' --outputDirDatacard='+outputDir+' --inputFile='+commonTools.getShapeFileName(opt.shapedir, year, tag.split('_')[0], '', fileset)
 
-                    datacardCommand = 'mkDatacards.py --pycfg='+opt.configuration+' --tag='+year+opt.tag+' --sigset='+sigset.replace('MASSPOINT',sample)+' --outputDirDatacard='+outputDir+' --inputFile='+commonTools.getShapeFileName(opt.shapedir, year, tag.split('_')[0], '', fileset)
+                if dryRun: datacardCommandList.append(datacardCommand) 
+                else: os.system(datacardCommand)
 
-                    if dryRun: return datacardCommand 
-                    else: os.system(datacardCommand)
+    if dryRun: return datacardCommandList
 
 ### Batch
 

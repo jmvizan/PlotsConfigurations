@@ -402,7 +402,7 @@ for model in signalMassPoints.signalMassPoints:
                     'nameHR' : massPointName,
                     'nameLatex' : massPointNameLatex,
                     'color': signalColor,  
-                    'isSignal' : 1,
+                    'isSignal' : 3,
                     'isData'   : 0,
                     'scale'    : 1.0
                 }
@@ -410,7 +410,7 @@ for model in signalMassPoints.signalMassPoints:
                 groupPlot[massPoint]  = {
                     'nameHR' : massPointName,
                     'nameLatex' : massPointNameLatex,
-                    'isSignal' : 1,
+                    'isSignal' : 3,
                     'color': signalColor,  
                     'samples'  : [massPoint], 
                     'scale'    : 1.0

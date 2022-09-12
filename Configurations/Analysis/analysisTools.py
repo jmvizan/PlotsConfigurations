@@ -11,21 +11,13 @@ from array import array
 
 def setAnalysisDefaults(opt):
     
-    if 'cern' in os.uname()[1] or 'lxplus' in os.uname()[1]:
-        if 'scodella' in os.getlogin():
-            opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src'
-        elif 'pmatorra' in os.getlogin():
-            opt.combineLocation = '/afs/cern.ch/work/p/pmatorra/...'
-    else:
-        if 'sluca' in os.getlogin():
-            opt.combineLocation = '/gpfs/users/sluca/CMS/SUSY/...'
-        elif 'pmatorra' in os.getlogin():
-            opt.combineLocation = '...'
+    opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src'
+    opt.isExotics = True
 
     if opt.year.lower()=='run2split': opt.year = '2016HIPM-2016noHIPM-2017-2018'
     elif opt.year.lower()=='run2': opt.year = '2016-2017-2018'
 
-    taglower = opt.tag.lower()
+    inputTag = opt.tag
 
     validationRegionMap = { 'vr1'    : 'HighPtMissValidationRegionVetoesUL',
                             'wzwwvr' : 'WZtoWWValidationRegionVetoesUL' } 
@@ -49,13 +41,13 @@ def setAnalysisDefaults(opt):
     tagList = []
 
     for vr in validationRegionMap:
-        if vr.lower() in taglower or 'allvr' in taglower: tagList.append(validationRegionMap[vr])
+        if vr.lower() in inputTag or 'allvr' in inputTag: tagList.append(validationRegionMap[vr])
 
     for sr in opt.signalRegionMap:
-        if sr.lower() in taglower or 'allsr' in taglower: tagList.append(opt.signalRegionMap[sr]['tag'])
+        if sr.lower() in inputTag or 'allsr' in inputTag: tagList.append(opt.signalRegionMap[sr]['tag'])
      
-    if 'fitcr' in taglower:
-        fitcrtag = taglower.replace(taglower.split('fitcr')[0],'')
+    if 'fitcr' in inputTag:
+        fitcrtag = inputTag.replace(inputTag.split('fitcr')[0],'')
         allSR, allFitCR = True, True
         for sr in opt.signalRegionMap:
             if sr.replace('SR','') in fitcrtag: allSR = False
@@ -67,14 +59,14 @@ def setAnalysisDefaults(opt):
                     if allFitCR or backcr.lower() in fitcrtag:
                         tagList.append(opt.signalRegionMap[sr]['tag'].replace('VetoesUL','FitCR'+backcr+'VetoesUL'))
 
-    elif 'fit' in taglower:
+    elif 'fit' in inputTag:
         for sr in opt.signalRegionMap:
-            if 'fit'+sr.replace('SR','') in taglower:
+            if 'fit'+sr.replace('SR','') in inputTag:
                 tagList.append(opt.signalRegionMap[sr]['tag'].replace('VetoesUL','FitCRVetoesUL'))
      
     if len(tagList)>0: opt.tag = '-'.join( tagList )
 
-    if 'merge' in taglower and 'Merge' not in opt.tag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
+    if 'merge' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
 
     if opt.action=='shapes':
         for sr in opt.signalRegionMap:
@@ -120,7 +112,7 @@ def signalShapes(opt, action='shapes'):
                     if opt.recover:
                         if commonTools.isGoodFile(commonTools.getShapeFileName(opt.shapedir, year, tag, signal, '')): continue
 
-                    if 'iterative' in opt.option:
+                    if 'interactive' in opt.option:
                         opt2.sigset = signal
                         latinoTools.mergeall(opt2)
                   
@@ -128,7 +120,7 @@ def signalShapes(opt, action='shapes'):
                         if year not in mergeJobs: mergeJobs[year] = {}
                         if tag not in mergeJobs[year]: mergeJobs[year][tag] = {}
                         mergeCommandList = [ 'cd '+os.getenv('PWD'), 'eval `scramv1 runtime -sh`' ]
-                        mergeCommandList.append('./runAnalysis.py --option=iterative --action=mergeSignal --year='+year+' --tag='+tag+' --sigset='+signal)
+                        mergeCommandList.append('./runAnalysis.py --action=mergeall --year='+year+' --tag='+tag+' --sigset='+signal)
                         mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
 
     if len(mergeJobs.keys())>0:
@@ -258,6 +250,25 @@ def signalMLFits(opt):
 
     signalCombine(opt, 'mlfits')
 
+### Post fit analysis
+
+# Yields
+
+def yieldsSR(opt):
+
+    yearInDatacard = '-' in opt.year and 'split' not in opt.option
+
+    for tag in opt.tag.split('-'):
+        opt2 = copy.deepcopy(opt)
+        opt2.tag = tag
+        cardNameStructure = latinoTools.getDatacardNameStructure(yearInDatacard, True, 'Merge' in tag)
+        commonTools.postFitYieldsTables(opt2, cardNameStructure, ','.join(getSignalList(opt, 'tabsignal', tag)))
+
+def preFitYieldsSR(opt):
+    
+    opt.option += 'prefit'
+    yieldsSR(opt)
+
 ### Tools for handling signal mass points
 
 def getMassPointSubset(opt, massPoint):
@@ -279,10 +290,11 @@ def getSignalList(opt, sigset, tag):
             elif 'tabsignal' in sigset:
                 signalList = []
                 for signal in opt.signalRegionMap[sr]['signals']:
-                    if sigset.split('-')[-1]=='tabsignal' or signal.split('_')[0] in sigset:
+                    if sigset.split('-')[-1]=='tabsignal' or sigset.split('-')[-1]=='tabsignalset' or signal.split('_')[0] in sigset:
                         if signal.split('_')[0] in opt.tableSigset:
                             signalList.extend(opt.tableSigset[signal.split('_')[0]])
-                return signalList
+                if 'tabsignalset' in sigset: return [ ','.join(signalList) ]
+                else: return signalList
 
             elif 'signal' in sigset:
                 signalList = []

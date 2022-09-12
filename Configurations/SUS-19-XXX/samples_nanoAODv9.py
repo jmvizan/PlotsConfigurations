@@ -1115,12 +1115,13 @@ elif 'LeptonL2TRate' in opt.tag and 'Single' in opt.sigset:
                     samples[dataName]['weights'].append( '('+triggerPath+')' )
 
 ### Files per job
- 
-for sample in samples:
-    if 'FilesPerJob' not in samples[sample]:
-        ntrees = len(samples[sample]['name']) 
-        multFactor = 6 if 'JobsPerSample' not in samples[sample] else int(samples[sample]['JobsPerSample'])
-        samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/multFactor))
+
+if not skipTreesCheck:
+    for sample in samples:
+        if 'FilesPerJob' not in samples[sample]:
+            ntrees = len(samples[sample]['name']) 
+            multFactor = 6 if 'JobsPerSample' not in samples[sample] else int(samples[sample]['JobsPerSample'])
+            samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/multFactor))
 
 ### Signals
 
@@ -1155,7 +1156,7 @@ for model in signalMassPoints.signalMassPoints:
 
 ### Nasty clean up for eos
 
-if 'cern' in SITE:
+if 'cern' in SITE and not skipTreesCheck:
     for sample in samples:
         for ifile in range(len(samples[sample]['name'])):
             samples[sample]['name'][ifile] = samples[sample]['name'][ifile].replace('root://eoscms.cern.ch/', '')

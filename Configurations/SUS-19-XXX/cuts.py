@@ -574,7 +574,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
     crcuts = { } 
     cutToRemove = [ ] 
 
-    isStrictDatacardOrPlot = isDatacardOrPlot and not hasattr(opt, 'skipLNN')
+    isStrictDatacardOrPlot = 'FitCRWZ' not in opt.tag and 'FitCRttZ' not in opt.tag and 'FitCRZZ' not in opt.tag
 
     for cut in cuts:
         if 'SR' in cut or 'VR1' in cut:

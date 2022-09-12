@@ -25,6 +25,7 @@ if __name__ == '__main__':
     parser.add_option('--cardsdir'        , dest='cardsdir'        , help='Directory to store datacards'   , default='./Datacards')
     parser.add_option('--limitdir'        , dest='limitdir'        , help='Directory to store limits'      , default='./Limits')
     parser.add_option('--mlfitdir'        , dest='mlfitdir'        , help='Directory to store ML fits'     , default='./MaxLikelihoodFits')
+    parser.add_option('--tabledir'        , dest='tabledir'        , help='Directory to store tables'      , default='./Tables')
     parser.add_option('--datadir'         , dest='datadir'         , help='Directory to store input data'  , default='./Data')
     parser.add_option('--batchQueue'      , dest='batchQueue'      , help='Queue for the batch jobs'       , default='cms_high')
     parser.add_option('--logs'            , dest='logs'            , help='Directory with log files'       , default='./logs')

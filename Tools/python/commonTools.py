@@ -211,9 +211,7 @@ def getSignalDir(opt, year, tag, signal, directory):
 
 def isExotics(opt):
 
-    process=subprocess.Popen('grep "isExotics" '+opt.configuration, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
-    processOutput, processError = process.communicate()
-    return 'True' in processOutput
+    return hasattr(opt, 'isExotics')
 
 def plotAsExotics(opt):
 
@@ -595,6 +593,7 @@ def openShapeFile(shapeDir, year, tag, sigset, fileset):
 
 def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outputdir=None, inputnuisances=None, outputnuisances=None, verbose=False):
 
+    if fileset[0]=='_': fileset = fileset[1:]
     mergeCommandList = [ '--inputDir='+opt.shapedir, '--years='+years, '--tag='+tag, '--sigset='+fileset, '--nuisancesFile='+inputnuisances ]
     if verbose: mergeCommandList.append('--verbose')
 
@@ -603,14 +602,14 @@ def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outpu
 
     os.system('mergeDataTakingPeriodShapes.py '+' '.join( mergeCommandList ))
 
-def yieldsTables(opt):
+def yieldsTables(opt, masspoints=''):
 
-    if 'fit' in opt.option.lower(): postfitYieldsTables(opt)
+    if 'fit' in opt.option.lower(): postFitYieldsTables(opt, masspoints)
     else: 
         print 'please, complete me :('
-        print 'using postfitYieldsTables for the time being'
+        print 'using postFitYieldsTables for the time being'
         opt.option += 'prefit'
-        postfitYieldsTables(opt)
+        postFitYieldsTables(opt, masspoints)
 
 def systematicsTables(opt):
 
@@ -687,9 +686,26 @@ def fitMatrices(opt):
 
     print 'please, port me fromhttps://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkMatrixPlots.py :('
 
-def postfitYieldsTables(opt):
+def postFitYieldsTables(opt, cardNameStructure='cut', masspoints=''):
 
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkYieldsTables.py :('
+    yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
+
+    if 'prefit' in opt.option.lower(): fittype = 'PreFit'
+    elif 'postfitb' in opt.option.lower(): fittype = 'PostFitB'
+    else: fittype = 'PostFitS'
+
+    for year in yearList:
+        for tag in opt.tag.split('-'):
+
+            commandList = [ '--tag='+year+tag, '--year='+year, '--fit='+fittype, '--cardName='+cardNameStructure, '--masspoints='+masspoints ]
+
+            commandList.append('--inputDirMaxFit='+'/'.join([ opt.mlfitdir, year, tag ]))
+            commandList.append('--outputTableDir='+'/'.join([ opt.tabledir, year, tag ]))
+
+            if opt.unblind: commandList.append('--unblind')
+            if 'nosignal' in opt.option: commandList.append('--nosignal')
+    
+            os.system('mkPostFitYieldsTables.py '+' '.join(commandList))
 
 ### Methods for computing weights, efficiencies, scale factors, etc.
 

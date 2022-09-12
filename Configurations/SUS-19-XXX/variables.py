@@ -507,7 +507,8 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                      'range' : (   7,    0.,  140.),   #   variable range
                                      'xaxis' : mt2 + pll + gv,         #   x axis name
                                      'fold'  : overflow,               #   fold overflow
-                                     'CRbins' : [1, 4]
+                                     'CRbins' : [1, 4],
+                                     'nameLatex' : '\\mtll'
                                   }
 
         else:
@@ -522,7 +523,8 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          'range' : (mt2llMainBins,[1]), # variable range
                                          'xaxis' : mt2 + pll + gv,      #   x axis name
                                          'fold'  : overflow,            #   fold overflow
-                                         'CRbins' : [1, 4] 
+                                         'CRbins' : [1, 4],
+                                         'nameLatex' : '\\mtll' 
                                       }
 
             else: 
@@ -548,7 +550,8 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                                      'xaxis' : mt2 + pll + gv,      #   x axis name
                                                      'fold'  : overflow,            #   fold overflow
                                                      'cuts'  : cutTypes[cutType]['cuts'],
-                                                     'CRbins' : [1, 4]
+                                                     'CRbins' : [1, 4],
+                                                     'nameLatex' : '\\mtll'
                                                   }
 
         # Some other mt2ll binning for validation regions
