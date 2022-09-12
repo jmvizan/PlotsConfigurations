@@ -177,6 +177,34 @@ def merge2016SR(opt):
             opt2.tag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
             merge2016(opt2)
 
+def merge2016CR(opt):
+
+    opt2 = copy.deepcopy(opt)
+
+    for tag in opt.tag.split('-'):
+
+        opt2.tag = tag
+
+        opt2.sigset = 'SM'
+        merge2016(opt2)
+
+        for sigset in getSignalList(opt, opt.sigset, tag):
+            opt2.sigset = sigset
+            opt2.fileset = opt.sigset
+            merge2016(opt2)
+
+def mergeCRToSignal(opt):
+
+    for year in opt.year.split('-'):
+        for tag in opt.tag.split('-'):
+
+            outputDir = commonTools.getShapeDirName(opt.shapedir, year, tag)
+            outputFile = outputDir + '/plots_' + tag + '_SM-' + opt.sigset + '.root'
+            smFile     = outputDir + '/plots_' + tag + '_SM.root' 
+            signalFile = outputDir + '/plots_' + tag + '_' + opt.sigset + '.root'
+
+            os.system('haddfast --compress '+outputFile+' '+smFile+' '+signalFile) 
+
 # merging CRs in the fit
 
 def mergeFitCR(opt):
@@ -313,6 +341,8 @@ def getSignalList(opt, sigset, tag):
             if signal in sigset:
                if 'tabsignalset' in sigset: return [ ','.join(opt.tableSigset[signal]) ]
                else: return opt.tableSigset[signal]
+
+    return []
 
 def splitSignalMassPoints(opt, massPointForSubset=150):
 
