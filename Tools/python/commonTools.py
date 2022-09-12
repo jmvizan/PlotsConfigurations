@@ -591,10 +591,9 @@ def openShapeFile(shapeDir, year, tag, sigset, fileset):
 
     return openRootFile(getShapeFileName(shapeDir, year, tag, sigset, fileset))
 
-def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outputdir=None, inputnuisances=None, outputnuisances=None, verbose=False):
+def mergeDataTakingPeriodShapes(opt, years, tag, strategy='deep', outputdir=None, inputnuisances=None, outputnuisances=None, verbose=False):
 
-    if fileset[0]=='_': fileset = fileset[1:]
-    mergeCommandList = [ '--inputDir='+opt.shapedir, '--years='+years, '--tag='+tag, '--sigset='+fileset, '--nuisancesFile='+inputnuisances ]
+    mergeCommandList = [ '--inputDir='+opt.shapedir, '--years='+years, '--tag='+tag, '--sigset='+opt.sigset, '--fileset='+opt.fileset, '--nuisancesFile='+inputnuisances ]
     if verbose: mergeCommandList.append('--verbose')
 
     if strategy=='deep': mergeCommandList.extend([ '--outputShapeDir='+outputdir, '--skipLNN' ])

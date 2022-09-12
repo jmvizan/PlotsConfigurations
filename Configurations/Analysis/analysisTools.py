@@ -122,8 +122,9 @@ def signalShapes(opt, action='shapes'):
                         if year not in mergeJobs: mergeJobs[year] = {}
                         if tag not in mergeJobs[year]: mergeJobs[year][tag] = {}
                         mergeCommandList = [ 'cd '+os.getenv('PWD'), 'eval `scramv1 runtime -sh`' ]
-                        mergeCommandList.append('./runAnalysis.py --action=mergeall --year='+year+' --tag='+tag+' --sigset='+signal)
-                        mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
+                        mergeCommandList.append('./runAnalysis.py --action=mergeall --year='+year+' --tag='+tag+' --sigset='+signal+' --fileset='+opt.fileset)
+                        jobName = signal if opt.fileset=='' else opt.fileset
+                        mergeJobs[year][tag][jobName] = '\n'.join(mergeCommandList) 
 
     if len(mergeJobs.keys())>0:
         opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
@@ -156,7 +157,7 @@ def merge2016(opt):
         outputFile = outputDir+'/plots_'+tag+commonTools.setFileset(opt.fileset, opt.sigset)+'.root'
         if opt.recover and commonTools.isGoodFile(outputFile): continue
         os.system('rm -r -f '+outputFile)
-        commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, opt.sigset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
+        commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
 
 def merge2016SR(opt):
 

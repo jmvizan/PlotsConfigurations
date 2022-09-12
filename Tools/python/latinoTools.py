@@ -30,7 +30,8 @@ def mkShapesMulti(opt, year, tag, splits, action):
                 sampleFlag = '_SIGSET' if 'worker' in commonTools.getBranch() else '' 
                 outputDir = mainDir if 'mergeall' in action else mainDir+'/Samples'
                 splitCommand += ' ; mkdir -p '+outputDir+' ; mv '+splitDir+'/plots_'+year+tag+sampleFlag+'.root '+outputDir
-                if 'mergesingle' in action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
+                if opt.fileset!='': splitCommand += '/plots_'+year+tag+'_'+opt.fileset+'.root'
+                elif 'mergesingle' in action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
                 else: splitCommand += '/plots_'+tag+commonTools.setFileset('',opt.sigset)+'.root'
 
             for sample in splits[split]:
@@ -145,7 +146,6 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
 
 def mergedPlots(opt):
 
-    fileset = commonTools.setFileset(opt.fileset, opt.sigset)
     inputNuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
 
     for tag in opt.tag.split('-'):
@@ -154,12 +154,12 @@ def mergedPlots(opt):
             year = opt.deepMerge
             outputNuisances = inputNuisances
             outputDir = '/'.join([ opt.shapedir, year, tag ])
-            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, fileset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
+            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
 
         else:
             year = opt.year
             outputNuisances =  '_'.join([ 'nuisances', opt.year, opt.tag, opt.sigset+'.py' ])
-            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, fileset, '', 'None', inputNuisances, outputNuisances, opt.verbose)
+            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, '', 'None', inputNuisances, outputNuisances, opt.verbose)
         
         mkPlot(opt, year, tag, opt.sigset, outputNuisances)
         os.system('rm -f nuisances_*.py')
