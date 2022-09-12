@@ -166,14 +166,14 @@ def merge2016SR(opt):
     for tag in opt.tag.split('-'):
   
         opt2.tag = tag
-        sigsetList = getSignalList(opt, opt.sigset, tag)
-        sigsetList.append('SM')
 
-        for sigset in sigsetList:
-            opt2.sigset = sigset
+        for sigset in getSignalList(opt, opt.sigset, tag):
+            opt2.sigset, opt2.fileset = sigset, opt.fileset
             merge2016(opt2)
 
-        opt2.sigset = 'SM'
+        opt2.sigset, opt2.fileset = 'SM', ''
+        merge2016(opt2)
+
         for backcr in opt.backgroundsInFit:
             opt2.tag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
             merge2016(opt2)
@@ -186,12 +186,11 @@ def merge2016CR(opt):
 
         opt2.tag = tag
 
-        opt2.sigset = 'SM'
+        opt2.sigset, opt2.fileset = 'SM', ''
         merge2016(opt2)
 
         for sigset in getSignalList(opt, opt.sigset, tag):
-            opt2.sigset = sigset
-            opt2.fileset = opt.sigset
+            opt2.sigset, opt2.fileset = sigset, opt.fileset
             merge2016(opt2)
 
 def mergeCRToSignal(opt):
