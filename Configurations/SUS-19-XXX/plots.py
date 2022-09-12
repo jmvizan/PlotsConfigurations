@@ -93,7 +93,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'nameHR' : 'Minor bkg.',
         'isSignal' : 0,
         'color': 394, #  kYellow-6
-        'samples'  : ['ttW', 'VVV', 'Higgs', 'VZ', 'HWW']
+        'samples'  : ['ttW', 'VVV', 'Higgs', 'VZ', 'HWW', 'minor' ]
     }
 
     groupPlot['EOYOthers']  = {
@@ -322,6 +322,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'scale'    : 1.0
     }
 
+    plot['minor']  = {
+        'nameHR' : 'Minor bkg.',
+        'nameLatex' : 'Minor bkg.',
+        'color': 394, #  kYellow-6
+        'isSignal' : 0,
+        'isData'   : 0 ,
+        'scale'    : 1.0
+    }
+
     #if 'EOY' in opt.tag:
     plot['EOYZZ4L']       = plot['ZZTo4L'].copy()
     plot['EOYH']          = plot['Higgs'].copy()
@@ -391,7 +400,8 @@ for model in signalMassPoints.signalMassPoints:
         for massPoint in signalMassPoints.signalMassPoints[model]:
             if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset):
 
-                massPointName = massPoint.replace('_mS-', ' m_{'+STP+'}=').replace('_mC-', ' m_{'+CHR+'}=').replace('_mX-', ' m_{'+LSP+'}=')
+                massPointName = massPoint.replace(massPoint.split('_')[0],'')
+                massPointName = massPointName.replace('_mS-', ' m_{'+STP+'}=').replace('_mC-', ' m_{'+CHR+'}=').replace('_mX-', ' m_{'+LSP+'}=')
                 massPointNameLatex = massPoint.replace('_mS-', ' \\invM{\\PSQtDo}=').replace('_mC-', ' \\invM{\\PSGcpmDo}=').replace('_mX-', ', \\invM{\\PSGczDo}=')
                 #massPointNameLatex = massPointNameLatex.replace('TChipmSlepSnu', '\\PSGcpmDo\\PSGcpmDo, \\TChipmDecay,') 
                 #massPointNameLatex = massPointNameLatex.replace('T2tt', '\\PSQtDo\\PASQtDo, \\PSQtDo\\to\\PQt\\PSGczDo,')

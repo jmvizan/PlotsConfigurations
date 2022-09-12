@@ -65,6 +65,11 @@ def massPointPass(massPoint, sigSetItem):
     # No known model found in sigSetItem
     return False
 
+tableSignal = { 'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-200_mX-125', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ],
+                'T2tt'          : [ 'T2tt_mS-300_mX-213', 'T2tt_mS-300_mX-175', 'T2tt_mS-350_mX-263', 'T2tt_mS-350_mX-225', 'T2tt_mS-400_mX-275', 'T2tt_mS-300_mX-125', 'T2tt_mS-350_mX-175', 'T2tt_mS-400_mX-225', 'T2tt_mS-400_mX-313', 'T2tt_mS-475_mX-350', 'T2tt_mS-450_mX-275', 'T2tt_mS-450_mX-325', 'T2tt_mS-475_mX-388', 'T2tt_mS-450_mX-363', 'T2tt_mS-475_mX-300', 'T2tt_mS-200_mX-113', 'T2tt_mS-200_mX-75' ],
+                'TChipmWW'      : [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50' ],
+                'TSlepSlep'     : [ 'TSlepSlep_mS-200_mX-125', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ] }
+
 def massPointInSignalSet(massPoint, sigSet):
 
     signalSet = sigSet.replace('SM-', '')
@@ -79,6 +84,10 @@ def massPointInSignalSet(massPoint, sigSet):
         return True
 
     for sigSetItem in sigSetList:
+        if 'tab' in sigSetItem:
+            if sigSetItem.replace('tab','') in tableSignal:
+                if massPoint in tableSignal[sigSetItem.replace('tab','')]: 
+                    return True
 
         if massPointPass(massPoint, sigSetItem):
             return True
