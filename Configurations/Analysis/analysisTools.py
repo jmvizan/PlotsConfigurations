@@ -157,7 +157,7 @@ def merge2016(opt):
         outputFile = outputDir+'/plots_'+tag+ '_'+ opt.sigset+'.root'
         if opt.recover and commonTools.isGoodFile(outputFile): continue
         os.system('rm -r -f '+outputFile)
-        commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, opt.sigset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
+        commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
 
 def merge2016SR(opt):
 
