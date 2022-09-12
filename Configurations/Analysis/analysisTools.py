@@ -193,6 +193,8 @@ def merge2016CR(opt):
             opt2.sigset, opt2.fileset = sigset, opt.fileset
             merge2016(opt2)
 
+# To study signal in CRs
+
 def mergeCRToSignal(opt):
 
     for year in opt.year.split('-'):
@@ -336,11 +338,13 @@ def getSignalList(opt, sigset, tag):
             else:
                 return sigset.replace('SM-','').split(',')
 
-    if 'SignalRegion' not in tag and 'tabsignal' in sigset:
-        for signal in opt.tableSigset:
-            if signal in sigset:
-               if 'tabsignalset' in sigset: return [ ','.join(opt.tableSigset[signal]) ]
-               else: return opt.tableSigset[signal]
+    if 'SignalRegion' not in tag:
+        if 'tabsignal' in sigset:
+            for signal in opt.tableSigset:
+                if signal in sigset:
+                   if 'tabsignalset' in sigset: return [ ','.join(opt.tableSigset[signal]) ]
+                   else: return opt.tableSigset[signal]
+        else: return sigset.replace('SM-','').split(',')
 
     return []
 
