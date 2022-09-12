@@ -31,7 +31,7 @@ def mkShapesMulti(opt, year, tag, splits, action):
                 outputDir = mainDir if 'mergeall' in action else mainDir+'/Samples'
                 splitCommand += ' ; mkdir -p '+outputDir+' ; mv '+splitDir+'/plots_'+year+tag+sampleFlag+'.root '+outputDir
                 if 'mergesingle' in action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
-                else: splitCommand += '/plots_'+tag+commonTools.setFileset(opt.fileset,opt.sigset)+'.root'
+                else: splitCommand += '/plots_'+tag+commonTools.setFileset('',opt.sigset)+'.root'
 
             for sample in splits[split]:
                 commonTools.resetShapes(opt, split, year, tag, sample, opt.reset)
@@ -153,12 +153,12 @@ def mergedPlots(opt):
             year = opt.deepMerge
             outputNuisances = inputNuisances
             outputDir = '/'.join([ opt.shapedir, year, tag ])
-            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
+            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, opt.fileset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
 
         else:
             year = opt.year
             outputNuisances =  '_'.join([ 'nuisances', opt.year, opt.tag, opt.sigset+'.py' ])
-            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, '', 'None', inputNuisances, outputNuisances, opt.verbose)
+            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, opt.fileset, '', 'None', inputNuisances, outputNuisances, opt.verbose)
         
         mkPlot(opt, year, tag, opt.sigset, outputNuisances)
         os.system('rm -f nuisances_*.py')

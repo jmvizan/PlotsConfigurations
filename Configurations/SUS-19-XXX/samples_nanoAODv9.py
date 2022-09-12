@@ -637,6 +637,7 @@ if 'SignalRegions' in opt.tag or hasattr(opt, 'outputDirDatacard'):
     normBackgrounds['VVV']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
     normBackgrounds['DY']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
     normBackgrounds['ttSemilep'] = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
+    normBackgrounds['minor']     = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
 
 if 'BackSF' in opt.tag:
 
@@ -1161,5 +1162,16 @@ if 'cern' in SITE and not skipTreesCheck:
         for ifile in range(len(samples[sample]['name'])):
             samples[sample]['name'][ifile] = samples[sample]['name'][ifile].replace('root://eoscms.cern.ch/', '')
 
-
+if 'Group' in opt.tag:
+    if not isDatacardOrPlot:
+        print 'Error: should not use Group string in tag name':
+        exit()
+    samples['minor'] = {}
+    for keys in samples['Higgs']:
+        samples['minor'][key] = samples['Higgs'][key]
+    del samples['Higgs'] 
+    del samples['VVV']
+    del samples['VZ']
+    del samples['ttW']
+    del samples['ttSemilep']
 

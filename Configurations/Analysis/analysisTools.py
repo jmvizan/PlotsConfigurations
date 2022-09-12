@@ -122,9 +122,8 @@ def signalShapes(opt, action='shapes'):
                         if year not in mergeJobs: mergeJobs[year] = {}
                         if tag not in mergeJobs[year]: mergeJobs[year][tag] = {}
                         mergeCommandList = [ 'cd '+os.getenv('PWD'), 'eval `scramv1 runtime -sh`' ]
-                        mergeCommandList.append('./runAnalysis.py --action=mergeall --year='+year+' --tag='+tag+' --sigset='+signal+' --fileset='+opt.fileset)
-                        jobName = signal if opt.fileset=='' else opt.fileset
-                        mergeJobs[year][tag][jobName] = '\n'.join(mergeCommandList) 
+                        mergeCommandList.append('./runAnalysis.py --action=mergeall --year='+year+' --tag='+tag+' --sigset='+signal)
+                        mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
 
     if len(mergeJobs.keys())>0:
         opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
@@ -154,10 +153,10 @@ def merge2016(opt):
     for tag in opt.tag.split('-'):
 
         outputDir = '/'.join([ opt.shapedir, '2016', tag ])
-        outputFile = outputDir+'/plots_'+tag+commonTools.setFileset(opt.fileset, opt.sigset)+'.root'
+        outputFile = outputDir+'/plots_'+tag+'_'+opt.sigset+'.root'
         if opt.recover and commonTools.isGoodFile(outputFile): continue
         os.system('rm -r -f '+outputFile)
-        commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
+        commonTools.mergeDataTakingPeriodShapes(opt, '2016HIPM-2016noHIPM', tag, opt.sigset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
 
 def merge2016SR(opt):
 
@@ -168,10 +167,10 @@ def merge2016SR(opt):
         opt2.tag = tag
 
         for sigset in getSignalList(opt, opt.sigset, tag):
-            opt2.sigset, opt2.fileset = sigset, opt.fileset
+            opt2.sigset = sigset
             merge2016(opt2)
 
-        opt2.sigset, opt2.fileset = 'SM', ''
+        opt2.sigset = 'SM'
         merge2016(opt2)
 
         for backcr in opt.backgroundsInFit:
@@ -186,11 +185,11 @@ def merge2016CR(opt):
 
         opt2.tag = tag
 
-        opt2.sigset, opt2.fileset = 'SM', ''
+        opt2.sigset = 'SM'
         merge2016(opt2)
 
         for sigset in getSignalList(opt, opt.sigset, tag):
-            opt2.sigset, opt2.fileset = sigset, opt.fileset
+            opt2.sigset = sigset
             merge2016(opt2)
 
 def mergeCRToSignal(opt):
@@ -198,12 +197,14 @@ def mergeCRToSignal(opt):
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
-            outputDir = commonTools.getShapeDirName(opt.shapedir, year, tag)
-            outputFile = outputDir + '/plots_' + tag + '_SM-' + opt.sigset + '.root'
-            smFile     = outputDir + '/plots_' + tag + '_SM.root' 
-            signalFile = outputDir + '/plots_' + tag + '_' + opt.sigset + '.root'
+            for sigset in getSignalList(opt, opt.sigset, tag):
 
-            os.system('haddfast --compress '+outputFile+' '+smFile+' '+signalFile) 
+                outputDir = commonTools.getShapeDirName(opt.shapedir, year, tag)
+                outputFile = outputDir + '/plots_' + tag + '_SM-' + sigset + '.root'
+                smFile     = outputDir + '/plots_' + tag + '_SM.root' 
+                signalFile = outputDir + '/plots_' + tag + '_' + sigset + '.root'
+
+                os.system('haddfast --compress '+outputFile+' '+smFile+' '+signalFile) 
 
 # merging CRs in the fit
 
@@ -336,11 +337,13 @@ def getSignalList(opt, sigset, tag):
             else:
                 return sigset.replace('SM-','').split(',')
 
-    if 'SignalRegion' not in tag and 'tabsignal' in sigset:
-        for signal in opt.tableSigset:
-            if signal in sigset:
-               if 'tabsignalset' in sigset: return [ ','.join(opt.tableSigset[signal]) ]
-               else: return opt.tableSigset[signal]
+    if 'SignalRegion' not in tag:
+        if 'tabsignal' in sigset:
+            for signal in opt.tableSigset:
+                if signal in sigset:
+                   if 'tabsignalset' in sigset: return [ ','.join(opt.tableSigset[signal]) ]
+                   else: return opt.tableSigset[signal]
+        else: return sigset.replace('SM-','').split(',')
 
     return []
 
