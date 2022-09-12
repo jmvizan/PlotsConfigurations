@@ -15,7 +15,6 @@ if __name__ == '__main__':
     parser.add_option('--tag'            , dest='tag'            , help='Tag used for the shape file name'   , default=None)
     parser.add_option('--years'          , dest='years'          , help='Years'                              , default='all')
     parser.add_option('--sigset'         , dest='sigset'         , help='Signal samples [SM]'                , default='SM')
-    parser.add_option('--fileset'        , dest='fileset'        , help='Fileset name'                       , default='')
     parser.add_option('--outputShapeDir' , dest='outputShapeDir' , help='Output directory'                   , default=None)
     parser.add_option('--skipLNN'        , dest='skipLNN'        , help='Skip lnN nuisances'                 , default=False, action='store_true')
     parser.add_option('--saveNuisances'  , dest='saveNuisances'  , help='Save file with merged nuisances'    , default=False, action='store_true')
@@ -38,8 +37,6 @@ if __name__ == '__main__':
     allnuisances = {}
 
     tag = opt.tag
-
-    if opt.fileset=='': opt.fileset = opt.sigset
 
     for period in years:
 
@@ -87,7 +84,7 @@ if __name__ == '__main__':
     outDirName = opt.outputShapeDir if opt.outputShapeDir!=None else '/'.join([ opt.inputDir, opt.years, tag ])
     os.system ('mkdir -p ' + outDirName)
 
-    outFileName = '/plots_' + tag + '_' + opt.fileset + '.root'
+    outFileName = '/plots_' + tag + '_' + opt.sigset + '.root'
     outFile = ROOT.TFile.Open(outDirName+outFileName, 'recreate') 
 
     inFiles = [ ]
