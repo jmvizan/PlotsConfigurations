@@ -294,8 +294,12 @@ for yeartomerge in yearstaglist:
 
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
-            if sample not in theoryNormalizations:
-                print 'Nuisance warning:', sample, 'not in theoryNormalizations'
+            if sample=='minor':
+                nuisances['qcdScale']['samples'][sample] = []
+                nuisances['pdf']['samples'][sample] = []
+                continue
+            elif sample not in theoryNormalizations:
+                print 'Nuisance warning: sample', sample, 'not in theoryNormalizations'
                 continue
             if theoryNormalizations[sample]['qcdScaleStatus']==3:
                 qcdScaleVariations = [ ]

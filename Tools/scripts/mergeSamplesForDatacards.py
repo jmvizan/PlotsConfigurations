@@ -12,7 +12,8 @@ if __name__ == '__main__':
     parser = optparse.OptionParser(usage)
 
     parser.add_option('--inputDir'       , dest='inputDir'       , help='Input directory'                    , default='./Shapes')
-    parser.add_option('--tag'            , dest='tag'            , help='Tag used for the shape file name'   , default=None)
+    parser.add_option('--tag'            , dest='tag'            , help='Tag used for the input file name'   , default=None)
+    parser.add_option('--outputtag'      , dest='outputtag'      , help='Tag used for the output file name'  , default=None)
     parser.add_option('--year'           , dest='year'           , help='Year'                               , default='all')
     parser.add_option('--groups'         , dest='groups'         , help='Group dictionary'                   , default={})
     parser.add_option('--sigset'         , dest='sigset'         , help='Signal samples [SM]'                , default='SM')
@@ -52,26 +53,32 @@ if __name__ == '__main__':
         exec(handle)
         handle.close()
 
-    outDirName = opt.outputShapeDir if opt.outputShapeDir!=None else '/'.join([ opt.inputDir, opt.years, tag+'Group' ])
+    outDirName = opt.outputShapeDir if opt.outputShapeDir!=None else '/'.join([ opt.inputDir, opt.year, opt.outputtag ])
     os.system ('mkdir -p ' + outDirName)
 
-    outFileName = '/plots_' + tag + 'Group' + '_' + opt.sigset + '.root'
+    outFileName = '_'.join([ '/plots', opt.outputtag , opt.sigset+'.root' ])
     outFile = ROOT.TFile.Open(outDirName+outFileName, 'recreate') 
 
-    if not os.path.isfile('/'.join([ opt.inputDir, year, tag ])+outFileName.replace('Group','')): 
-        print 'Error in mergeDataTakingPeriodShapes: input file', '/'.join([ opt.inputDir, year, tag ])+outFileName, 'not found' 
+    inputFileName = '/'.join([ opt.inputDir, opt.year, tag ])+outFileName.replace(opt.outputtag, tag)
+    if not os.path.isfile(inputFileName): 
+        print 'Error in mergeDataTakingPeriodShapes: input file', inputFileName, 'not found' 
         exit()
-    infile = [ ROOT.TFile('/'.join([ opt.inputDir, year, tag ])+outFileName.replace('Group',''), 'READ') , year ]
+    inputFile = ROOT.TFile(inputFileName, 'READ')
 
     missingSampleList = [ ] 
+
+    groups = {}
+    for grp in opt.groups.split('-'):
+        group = grp.split(':')[0]
+        groups[group] = grp.split(':')[1].split(',')
  
     for sample in samples:
         sampleToGroup = False
-        for group in opt.groups:
-            if sample in opt.groups[group]:
+        for group in groups:
+            if sample in groups[group]:
                 sampleToGroup = True
         if not sampleToGroup:
-            opt.groups[sample] = [ sample ]
+            groups[sample] = [ sample ]
 
     for cutName in cuts:
 
@@ -84,9 +91,9 @@ if __name__ == '__main__':
 
                 if opt.verbose: print '################################', folderName
 
-                inDir = [ infile[0].Get(folderName), infile[1] ])
+                inDir = inputFile.Get(folderName)
 
-                for group in opt.groups:
+                for group in groups:
 
                     for nuisance in nuisances:                        
                         if 'cuts' in nuisances[nuisance] and cutName not in nuisances[nuisance]['cuts']: continue
@@ -97,62 +104,63 @@ if __name__ == '__main__':
                                 continue
                             if nuisances[nuisance]['type']=='lnN': continue
                             if nuisances[nuisance]['type']=='rateParam': continue
-                            if allnuisances[nuisance]['type']!='shape':
-                                print 'Warning: unknown nuisance type -> ', allnuisances[nuisance]['type']
+                            if nuisances[nuisance]['type']!='shape':
+                                print 'Warning: unknown nuisance type -> ', nuisances[nuisance]['type']
                                 continue
 
                         nuisanceInGroup = False 
-                        sample in opt.groups[group]:
+                        for sample in groups[group]:
                             if sample in nuisances[nuisance]['samples'] or nuisance=='stat':                        
                                 nuisanceInGroup = True
  
                         if nuisanceInGroup:
                             for var in [ 'Up', 'Down' ]:
+
                                 if nuisance=='stat' and var=='Down': continue
 
-                                    skipGroup = False
-                                    shapeGroup = 'histo_'+group if nuisance=='stat' else 'histo_'+group+'_'+nuisances[nuisance]['name']+var
+                                skipGroup = False
+                                shapeGroup = 'histo_'+group if nuisance=='stat' else 'histo_'+group+'_'+nuisances[nuisance]['name']+var
 
-                                    for isample, sample in enumatare(opt.groups[group]):
+                                for isample, sample in enumerate(groups[group]):
 
-                                        skipHisto = False
-                                        shapeName = 'histo_' + sample
-                                        shapeVar = shapeName if nuisance=='stat' else shapeName + '_' + nuisances[nuisance]['name'] + var
+                                    skipHisto = False
+                                    shapeName = 'histo_' + sample
+                                    shapeVar = shapeName if nuisance=='stat' else shapeName + '_' + nuisances[nuisance]['name'] + var
                                  
-                                        if indir[0].GetListOfKeys().Contains(shapeVar):
-                                            tmpHisto = indir[0].Get(shapeVar)
-                                            tmpHisto.SetDirectory(0)   
+                                    if inDir.GetListOfKeys().Contains(shapeVar):
+                                        tmpHisto = inDir.Get(shapeVar)
+                                        tmpHisto.SetDirectory(0)   
+
+                                    else:
+
+                                        if sample in nuisances[nuisance]['samples'] or nuisance=='stat':
+                                            print 'Warning: nuisance', nuisance, 'for sample', sample, 'not in input shape file for', cutName
+
+                                        if inDir.GetListOfKeys().Contains(shapeName):
+                                            tmpHisto = inDir.Get(shapeName)
+                                            tmpHisto.SetDirectory(0)
 
                                         else:
+                                            if sample not in missingSampleList:
+                                                print 'Warning:', sample, 'not in input shape file for', cutName, 'in', opt.year, 'year!'
+                                                missingSampleList.append(sample)
+                                            skipHisto = True
+                                            skipGroup = True
 
-                                            if sample in nuisances[nuisance]['samples'] or nuisance=='stat':
-                                                print 'Warning: nuisance', nuisance, 'for sample', sample, 'not in input shape file for', cutName
+                                    if not skipHisto:
+                                        if isample==0:
+                                            sumHisto = tmpHisto.Clone()
+                                            sumHisto.SetDirectory(0)
+                                            sumHisto.SetTitle(shapeVar)
+                                            sumHisto.SetName(shapeVar)
+                                        else:
+                                            sumHisto.Add(tmpHisto)
 
-                                            if indir[0].GetListOfKeys().Contains(shapeName):
-                                                tmpHisto = indir[0].Get(shapeName)
-                                                tmpHisto.SetDirectory(0)
-
-                                            else:
-                                                if indir[1]+'_'+sample not in missingSampleList:
-                                                    print 'Warning:', sample, 'not in input shape file for', cutName, 'in', indir[1], 'year!'
-                                                    missingSampleList.append(indir[1]+'_'+sample)
-                                                skipHisto = True
-                                                skipGroup = True
-
-                                        if not skipHisto:
-                                            if isample==0:
-                                                sumHisto = tmpHisto.Clone()
-                                                sumHisto.SetDirectory(0)
-                                                sumHisto.SetTitle(shapeVar)
-                                                sumHisto.SetName(shapeVar)
-                                            else:
-                                                sumHisto.Add(tmpHisto)
-
-                                    if not skipGroup: 
-                                        outFile.cd(folderName)
-                                        sumHisto.SetTitle(shapeGroup)
-                                        sumHisto.SetName(shapeGroup)
-                                        sumHisto.Write()                         
+                                if not skipGroup: 
+                                    outFile.cd(folderName)
+                                    sumHisto.SetTitle(shapeGroup)
+                                    sumHisto.SetName(shapeGroup)
+                                    sumHisto.Write()                         
  
  
     

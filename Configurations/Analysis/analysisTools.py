@@ -68,6 +68,7 @@ def setAnalysisDefaults(opt):
      
     if len(tagList)>0: opt.tag = '-'.join( tagList )
 
+    if 'group' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsGroup')
     if 'merge' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
 
     if opt.action=='shapes':
@@ -208,6 +209,33 @@ def mergeCRToSignal(opt):
 
                 os.system('haddfast --compress '+outputFile+' '+smFile+' '+signalFile) 
 
+# groups
+
+def mergeGroupsForDatacards(opt):
+
+    inputnuisances = commonTools.getCfgFileName(opt, 'nuisances')
+
+    groups = { 'ttbar' : [ 'ttbar', 'ttSemilep' ],
+               'minor' : [ 'Higgs', 'VVV', 'ttW', 'VZ' ] }
+
+    groupList = []
+    for group in groups:
+        groupList.append(group+':'+','.join(groups[group]))
+
+    mergeCommandList = [ '--inputDir='+opt.shapedir, '--sigset='+opt.sigset, '--nuisancesFile='+inputnuisances ]
+    mergeCommandList.append('--groups='+'-'.join(groupList))
+    if opt.verbose: mergeCommandList.append('--verbose')
+
+    for year in opt.year.split('-'):
+        for tag in opt.tag.split('-'):
+
+            loopMergeCommandList = mergeCommandList
+            loopMergeCommandList.extend([ '--year='+year, '--tag='+tag ])
+            outputtag = tag.replace('FitCR', 'GroupFitCR') if 'FitCR' in tag else tag.replace('VetoesUL', 'GroupVetoesUL')
+            loopMergeCommandList.append('--outputtag='+outputtag)
+
+            os.system('mergeSamplesForDatacards.py '+' '.join( loopMergeCommandList))
+
 # merging CRs in the fit
 
 def mergeFitCR(opt):
@@ -227,7 +255,8 @@ def mergeFitCR(opt):
                 if opt.recover and commonTools.isGoodFile(outputFile): continue
                 os.system('rm -r -f '+outputFile)
 
-                filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,''), outputFile.replace('FitCR','').replace('SM-','') ]
+                filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,'') ]
+                filesToMerge.append(outputFile.replace('FitCR','').replace('SM-','').replace('Group',''))
                 for backcr in opt.backgroundsInFit:
                     filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,''))
 
@@ -314,10 +343,12 @@ def getMassPointSubset(opt, massPoint):
           
 def getSignalList(opt, sigset, tag):
 
-    for sr in opt.signalRegionMap:
-        if tag.split('_')[0].replace('Merge','').replace('FitCR','')==opt.signalRegionMap[sr]['tag']:
+    if sigset=='SM': return []
 
-            if sigset=='SM': 
+    for sr in opt.signalRegionMap:
+        if tag.split('_')[0].replace('Merge','').replace('FitCR','').replace('Group','')==opt.signalRegionMap[sr]['tag']:
+
+            if sigset=='SM-all': 
                 return opt.signalRegionMap[sr]['signals']
 
             elif 'tabsignal' in sigset:
@@ -346,8 +377,6 @@ def getSignalList(opt, sigset, tag):
                    if 'tabsignalset' in sigset: return [ ','.join(opt.tableSigset[signal]) ]
                    else: return opt.tableSigset[signal]
         else: return sigset.replace('SM-','').split(',')
-
-    return []
 
 def splitSignalMassPoints(opt, massPointForSubset=150):
 

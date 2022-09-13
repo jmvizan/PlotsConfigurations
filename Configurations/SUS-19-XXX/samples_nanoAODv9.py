@@ -1163,11 +1163,11 @@ if 'cern' in SITE and not skipTreesCheck:
             samples[sample]['name'][ifile] = samples[sample]['name'][ifile].replace('root://eoscms.cern.ch/', '')
 
 if 'Group' in opt.tag:
-    if not isDatacardOrPlot:
-        print 'Error: should not use Group string in tag name':
+    if isShape:
+        print 'Error: should not use Group string in tag name'
         exit()
     samples['minor'] = {}
-    for keys in samples['Higgs']:
+    for key in samples['Higgs'].keys():
         samples['minor'][key] = samples['Higgs'][key]
     del samples['Higgs'] 
     del samples['VVV']
