@@ -73,6 +73,7 @@ def setAnalysisDefaults(opt):
     if 'merge' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
     if 'systwz' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WZbin')
     if 'systww' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WWshape')
+    if 'sysbww' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WWShape')
 
     if opt.action=='shapes':
         for sr in opt.signalRegionMap:
