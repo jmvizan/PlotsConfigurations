@@ -334,7 +334,7 @@ def preFitYieldsSR(opt):
     opt.option += 'prefit'
     yieldsSR(opt)
 
-# 
+# Limits 
 
 def printLimits(opt):
 
@@ -351,8 +351,8 @@ def printLimits(opt):
                 else:
                     tag = opt.tag + tagopt
                 outputDir = '/'.join([ opt.limitdir, opt.year, tag, signal ])
-                if not commonTools.isGoodFile(outputDir+'/higgsCombine_'+fittype+'.AsymptoticLimits.mH120.root', 6000.):
-                    if opt.debug: print outputDir+'/higgsCombine_'+fittype+'.AsymptoticLimits.mH120.root'
+                if not commonTools.isGoodFile(outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root', 6000.):
+                    if opt.debug: print outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root'
                     continue
                 inputFile =  commonTools.openRootFile(outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root')
 
@@ -385,6 +385,60 @@ def printLimits(opt):
                 print signalResult[evt]
             print '\n\n'
 
+def makeContours(opt):
+
+    sigset = ','.join(getSignalList(opt, opt.sigset, opt.tag))
+
+    fitOption = 'Both' if opt.unblind else 'Blind'
+
+    histogramDir = '/'.join([ opt.limitdir, opt.year, opt.tag, 'Histograms' ])
+    contourDir   = '/'.join([ opt.limitdir, opt.year, opt.tag, 'Contours' ])
+
+    histogramFileNoFillEmptyBins = histogramDir + '_'.join([ '/massScan', opt.tag, sigset, fitOption, 'noFillEmptyBins' ]) + '.root'
+    histogramFile                = histogramDir + '_'.join([ '/massScan', opt.tag, sigset, fitOption ]) + '.root'
+    contourFile                  = contourDir   + '_'.join([ '/massScan', opt.tag, sigset, fitOption ]) + '.root' 
+
+    if opt.reset: 
+        os.system('rm -f '+' '.join([ histogramFileNoFillEmptyBins, histogramFile, contourFile ]))
+ 
+    commandList = [ '--years='+opt.year, '--tag='+opt.tag, '--sigset='+sigset ]
+
+    if not os.path.isfile(histogramFileNoFillEmptyBins):
+        os.system('analyzeLimits.py '+' '.join(commandList + [ '--nofillempties' ]))
+
+    if not os.path.isfile(contourFile):
+        os.system('analyzeLimits.py '+' '.join(commandList + [ '--makecontours' ])) 
+
+def exclusionPlot(opt, plotoption='2'):
+
+    tagList = opt.tag.split('-')
+
+    if len(tagList)>2: 
+        print 'Comparison of more than two tags not supported'  
+        exit()
+
+    sigset = ','.join(getSignalList(opt, opt.sigset, opt.tag))
+ 
+    opt2 = copy.deepcopy(opt)
+
+    for tag in tagList:
+        opt2.tag = tag
+        makeContours(opt2)
+
+    plotCommandList = [ '--years='+opt.year, '--tag='+tagList[0], '--sigset='+sigset, '--plotoption='+plotoption ] 
+    if len(tagList)>1: plotCommandList.append('--compareto='+tagList[1])
+    if plotoption=='0': plotCommandList.append('--nofillempties')
+
+    os.system('analyzeLimits.py '+' '.join(plotCommandList))
+
+def plotLimits(opt):
+
+    exclusionPlot(opt, '0')
+
+def plotContours(opt):
+
+    exclusionPlot(opt, '1')
+    
 ### Tools for handling signal mass points
 
 def getMassPointSubset(opt, massPoint):
@@ -402,9 +456,13 @@ def getSignalList(opt, sigset, tag):
     for sr in opt.signalRegionMap:
         if tag.split('_')[0].replace('Merge','').replace('FitCR','').replace('Group','')==opt.signalRegionMap[sr]['tag']:
 
-            if sigset=='SM-all': 
-                return opt.signalRegionMap[sr]['signals']
-
+            if 'all' in sigset:
+                signalList = []
+                for signal in opt.signalRegionMap[sr]['signals']:
+                    if signal.split('_')[0] in sigset:
+                        signalList.append(signal)
+                if len(signalList)==0: return opt.signalRegionMap[sr]['signals']
+                else: return signalList
             elif 'tabsignal' in sigset:
                 signalList = []
                 for signal in opt.signalRegionMap[sr]['signals']:
