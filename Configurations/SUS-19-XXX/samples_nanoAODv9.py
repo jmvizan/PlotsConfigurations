@@ -66,7 +66,7 @@ if isShapeOrPlot:
 
 skipTreesCheck = False if len(yeartag.split('-'))==1 else True
 
-if not isDatacardOrPlot and skipTreesCheck:
+if isShape and skipTreesCheck:
     print 'Error: it is not allowed to fill shapes and skipping trees check!'
     exit()
  
@@ -1162,7 +1162,7 @@ if 'cern' in SITE and not skipTreesCheck:
         for ifile in range(len(samples[sample]['name'])):
             samples[sample]['name'][ifile] = samples[sample]['name'][ifile].replace('root://eoscms.cern.ch/', '')
 
-if 'Group' in opt.tag:
+if 'Group' in opt.tag and ('SM' in opt.sigset or 'Backgrounds' in opt.sigset):
     if isShape:
         print 'Error: should not use Group string in tag name'
         exit()

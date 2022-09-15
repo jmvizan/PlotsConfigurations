@@ -68,8 +68,11 @@ def setAnalysisDefaults(opt):
      
     if len(tagList)>0: opt.tag = '-'.join( tagList )
 
+    opt.tag = opt.tag.replace('StopSignalRegionsMerge','StopSignalRegions')
     if 'group' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsGroup')
     if 'merge' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
+    if 'systwz' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WZbin')
+    if 'systww' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WWshape')
 
     if opt.action=='shapes':
         for sr in opt.signalRegionMap:
@@ -115,7 +118,7 @@ def signalShapes(opt, action='shapes'):
                     if opt.recover:
                         if commonTools.isGoodFile(commonTools.getShapeFileName(opt.shapedir, year, tag, signal, '')): continue
 
-                    if 'interactive' in opt.option:
+                    if opt.interactive in opt.option:
                         opt2.sigset = signal
                         latinoTools.mergeall(opt2)
                   
@@ -324,12 +327,63 @@ def yieldsSR(opt):
         opt2 = copy.deepcopy(opt)
         opt2.tag = tag
         cardNameStructure = latinoTools.getDatacardNameStructure(yearInDatacard, True, 'Merge' in tag)
-        commonTools.postFitYieldsTables(opt2, cardNameStructure, ','.join(getSignalList(opt, 'tabsignal', tag)))
-
+        #commonTools.postFitYieldsTables(opt2, cardNameStructure, ','.join(getSignalList(opt, 'tabsignal', tag)))
+        commonTools.postFitYieldsTables(opt2, cardNameStructure, 'T2tt_mS-300_mX-125')
 def preFitYieldsSR(opt):
     
     opt.option += 'prefit'
     yieldsSR(opt)
+
+# 
+
+def printLimits(opt):
+
+    signalList = getSignalList(opt, opt.sigset, opt.tag)
+
+    for signal in signalList:
+
+        limitResult = {}
+
+        for tagopt in [ '', 'Group', 'Merge', 'MergeGroup', '_WWshape', '_WZbin' ]:
+            if 'Stop' not in opt.tag or 'Merge' not in tagopt: 
+                if '_' not in tagopt:
+                    tag = opt.tag.replace('FitCR', tagopt+'FitCR')
+                else:
+                    tag = opt.tag + tagopt
+                outputDir = '/'.join([ opt.limitdir, opt.year, tag, signal ])
+                if not commonTools.isGoodFile(outputDir+'/higgsCombine_'+fittype+'.AsymptoticLimits.mH120.root', 6000.):
+                    if opt.debug: print outputDir+'/higgsCombine_'+fittype+'.AsymptoticLimits.mH120.root'
+                    continue
+                inputFile =  commonTools.openRootFile(outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root')
+
+                if tagopt=='': limitResult['central'] = []
+                else: limitResult[tagopt] = []
+
+                for event in inputFile.limit:
+                    if tagopt=='': limitResult['central'].append(event.limit)
+                    else: limitResult[tagopt].append(event.limit)
+
+        printSignal = False
+        signalResult = []
+        if 'central' not in limitResult: continue
+        availableResultList = [ 'central' ]
+        if len(limitResult.keys())==1: printSignal = True
+        for evt in range(len(limitResult['central'])):
+            resultList = [ str(limitResult['central'][evt]) ]
+            for tagopt in [ 'Group', 'Merge', 'MergeGroup', '_WWshape', '_WZbin' ]:
+                if tagopt in limitResult:
+                    diff = abs(1. - limitResult[tagopt][evt]/limitResult['central'][evt])
+                    if diff>0.0: printSignal = True
+                    if tagopt not in availableResultList: availableResultList.append(tagopt)
+                    resultList.append(str(limitResult[tagopt][evt]/limitResult['central'][evt]))
+            signalResult.append(' '.join(resultList)) 
+        availableResult = ' '.join(availableResultList)
+        if printSignal:
+            print '####', signal
+            print '    ', availableResult
+            for evt in range(len(signalResult)):
+                print signalResult[evt]
+            print '\n\n'
 
 ### Tools for handling signal mass points
 

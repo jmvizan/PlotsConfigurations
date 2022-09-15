@@ -24,16 +24,8 @@ def prepareDatacards(opt, signal, dryRun=False):
 
     prepareDatacardCommandList = [ ]
 
-    if 'interactive' not in opt.option:
-
-        prepareDatacardCommandList.append('cd '+commonTools.mergeDirPaths(opt.baseDir, opt.combineTagDir)) 
-
-        #for cfgFile in [ 'configuration', 'samples*', 'cuts', 'variables', 'nuisances', 'structure' ]:
-        #    os.system('cp '+cfgFile+'.py '+opt.combineTagDir) 
-        #os.system(' ; '.join([ 'cd '+opt.combineSignalDir, 'ln -s -f '+opt.baseDir+'/Data', 'cd '+opt.baseDir ]))
-
-    opt.cardsdir = commonTools.mergeDirPaths(opt.baseDir, opt.cardsdir)
-    opt.shapedir = commonTools.mergeDirPaths(opt.baseDir, opt.shapedir)
+    if not opt.interactive:
+        prepareDatacardCommandList.append('cd '+opt.combineTagDir)
 
     prepareDatacardCommandList.extend(latinoTools.datacards(opt, signal, True))
 
@@ -42,7 +34,7 @@ def prepareDatacards(opt, signal, dryRun=False):
     if dryRun: return prepareDatacardCommand
     else: os.system(prepareDatacardCommand)
 
-def getDatacardList(opt):
+def getDatacardList(opt, signal):
 
     datacardList = [ ]
 
@@ -50,7 +42,7 @@ def getDatacardList(opt):
 
     for year in opt.year.split('-'):
 
-        inputDatacardDir = commonTools.mergeDirPaths(opt.baseDir, commonTools.getSignalDir(opt, year, opt.tag, 'MASSPOINT', 'cardsdir'))
+        inputDatacardDir = commonTools.mergeDirPaths(opt.baseDir, commonTools.getSignalDir(opt, year, opt.tag, signal, 'cardsdir'))
         samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, 'SM', 'variables', opt.combineAction)
 
         datacardNameStructure = latinoTools.getDatacardNameStructure(addYearToDatacardName, len(cuts.keys())>1, len(variables.keys())>1)
@@ -66,28 +58,38 @@ def getDatacardList(opt):
 
     return datacardList
 
-def combineDatacards(opt, signal, datacardList, dryRun=False):
+#def combineDatacards(opt, signal, datacardList, dryRun=False):
+def combineDatacards(opt, signal, dryRun=False):
 
     combineDatacardCommandList = [ setupCombineCommand(opt) ]
-    combineDatacardCommandList.append('cd '+opt.combineSignalDir)
 
-    signalDatacardList = [ ]
+    signalOutputDir = commonTools.getSignalDir(opt, opt.year, opt.tag, signal, 'combineOutDir')
+    combineDatacardCommandList.extend([ 'mkdir -p '+signalOutputDir, 'cd '+signalOutputDir ])
 
-    for datacard in datacardList:
-        signalDatacardList.append(datacard.replace('MASSPOINT', signal))
+    #signalDatacardList = getDatacardList(opt)
 
-    combineDatacardCommandList.append('combineCards.py '+' '.join(signalDatacardList)+' > combinedDatacard.txt')
+    #for datacard in getDatacardList(opt):
+    #    signalDatacardList.append(datacard.replace('MASSPOINT', signal))
+
+    combineDatacardCommandList.append('combineCards.py '+' '.join(getDatacardList(opt, signal))+' > combinedDatacard.txt')
 
     combineDatacardCommand = '\n'.join(combineDatacardCommandList)
 
     if dryRun: return combineDatacardCommand
     else: os.system(combineDatacardCommand)
 
+def prepareJobDirectory(opt):
+
+    os.system('mkdir -p '+opt.combineTagDir)
+    for cfgFile in [ 'configuration', 'samples*', 'cuts', 'variables', 'nuisances', 'structure' ]:
+        os.system('cp '+cfgFile+'.py '+opt.combineTagDir)
+    os.system(' ; '.join([ 'cd '+opt.combineTagDir, 'ln -s -f '+opt.baseDir+'/Data', 'cd '+opt.baseDir ]))
+
 def runCombine(opt):
 
     if not commonTools.foundShapeFiles(opt, True): exit()
 
-    if 'interactive' not in opt.option and opt.action!='writeDatacards':
+    if not opt.interactive and opt.action!='writeDatacards':
         commonTools.checkProxy(opt)
         opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
 
@@ -105,13 +107,16 @@ def runCombine(opt):
     runCombineJob  = 'onlydatacard' not in opt.option.lower() and 'onlydc' not in opt.option.lower()
 
     if not runCombineJob:
-        opt.option += 'interactive'
+        opt.interactive = True
         cleanDatacards = False
 
     opt2 = copy.deepcopy(opt)
 
     opt2.baseDir = os.getenv('PWD')
-    opt2.fileset, sigset = latinoTools.getPerSignalSigset(opt.fileset, opt.sigset) 
+    opt2.cardsdir = commonTools.mergeDirPaths(opt2.baseDir, opt2.cardsdir)
+    opt2.shapedir = commonTools.mergeDirPaths(opt2.baseDir, opt2.shapedir)
+
+    opt2.fileset, baseSigset = latinoTools.getPerSignalSigset(opt.fileset, opt.sigset) 
 
     samples = commonTools.getSamples(opt)
 
@@ -121,46 +126,53 @@ def runCombine(opt):
         for tag in opt.tag.split('-'):
 
             opt2.year, opt2.tag = year, tag
-            datacardList = getDatacardList(opt2)
+            #datacardList = getDatacardList(opt2)
             combineJobs = { } 
 
-            if 'interactive' not in opt.option:
-                opt2.combineTagDir = commonTools.getSignalDir(opt2, year, tag, '', 'combineOutDir')
-                os.system('mkdir -p '+opt2.combineTagDir)
-                for cfgFile in [ 'configuration', 'samples*', 'cuts', 'variables', 'nuisances', 'structure' ]:
-                    os.system('cp '+cfgFile+'.py '+opt2.combineTagDir)
-                os.system(' ; '.join([ 'cd '+opt2.combineTagDir, 'ln -s -f '+opt2.baseDir+'/Data', 'cd '+opt2.baseDir ]))
+            if not opt.interactive: 
+                commonTools.cleanLogs(opt2)
+                opt2.combineTagDir = commonTools.mergeDirPaths(opt2.baseDir, commonTools.getSignalDir(opt2, year, tag, '', 'combineOutDir'))
+                if makeDatacards: prepareJobDirectory(opt2)
+
+            combineCommandList = [ ]
+            if makeDatacards:  combineCommandList.append(prepareDatacards(opt2, 'MASSPOINT', True))
+            combineCommandList.append(combineDatacards(opt2, 'MASSPOINT', True))
+            if runCombineJob:  combineCommandList.append(' '.join(['combine', opt.combineOption, 'combinedDatacard.txt' ]))
+            combineCommandList.append( 'cd '+opt2.baseDir )
+            if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, tag, 'MASSPOINT', True))
+
+            combineCommand = '\n'.join(combineCommandList)
 
             for sample in samples:
                 if samples[sample]['isSignal']:
 
-                    opt2.sigset = sigset.replace('MASSPOINT', sample)
-                    opt2.combineSignalDir = commonTools.getSignalDir(opt2, year, tag, sample, 'combineOutDir')
-
+                    #opt2.sigset = baseSigset.replace('MASSPOINT', sample)
                     if runCombineJob:
+                        combineOutputFileName = commonTools.getCombineOutputFileName(opt2, sample)
                         if opt.reset: 
-                            commonTools.deleteDirectory(opt2.combineSignalDir)
-                        elif os.path.isfile(commonTools.getCombineOutputFileName(opt2, sample)): 
+                            os.system('rm -f '+combineOutputFileName)
+                        elif commonTools.isGoodFile(combineOutputFileName, 6000.):
                             continue
 
-                    os.system('mkdir -p '+opt2.combineSignalDir)
+                    #os.system('mkdir -p '+opt2.combineSignalDir)
 
-                    combineCommandList = [ ]   
-                    if makeDatacards:  combineCommandList.append(prepareDatacards(opt2, sample, True))
-                    combineCommandList.append(combineDatacards(opt2, sample, datacardList, True))
-                    if runCombineJob:  combineCommandList.append(' '.join(['combine', opt.combineOption, 'combinedDatacard.txt' ]))
-                    combineCommandList.append( 'cd '+opt2.baseDir )
-                    if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, tag, sample, True))
+                    #combineCommandList = [ ]   
+                    #if makeDatacards:  combineCommandList.append(prepareDatacards(opt2, sample, True))
+                    #combineCommandList.append(combineDatacards(opt2, sample, datacardList, True))
+                    #if runCombineJob:  combineCommandList.append(' '.join(['combine', opt.combineOption, 'combinedDatacard.txt' ]))
+                    #combineCommandList.append( 'cd '+opt2.baseDir )
+                    #if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, tag, sample, True))
 
-                    combineCommand = '\n'.join(combineCommandList) 
+                    #combineCommand = '\n'.join(combineCommandList) 
 
-                    if 'debug' in opt.option: print combineCommand
-                    elif 'interactive' in opt.option: os.system(combineCommand)
+                    signalCombineCommand = combineCommand.replace('MASSPOINT', sample)
+
+                    if opt.debug: print signalCombineCommand
+                    elif opt.interactive: os.system(signalCombineCommand)
                     else:
-                        commonTools.cleanLogs(opt2) 
-                        combineJobs[sample] = combineCommand
+                        combineJobs[sample] = signalCombineCommand
 
-            if 'debug' not in opt.option and 'interactive' not in opt.option:
+            if not opt.debug and not opt.interactive:
                 if len(combineJobs.keys())>0: 
                     submitCombineJobs(opt, opt.combineAction, year+tag, combineJobs)
                 else:

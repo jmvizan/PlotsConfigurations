@@ -31,6 +31,8 @@ if __name__ == '__main__':
     parser.add_option('--logs'            , dest='logs'            , help='Directory with log files'       , default='./logs')
     parser.add_option('--logprocess'      , dest='logprocess'      , help='Process for log inspection'     , default='mkShapes')
     parser.add_option('--dryRun'          , dest='dryRun'          , help='do not submit jobs'             , default=False, action='store_true')
+    parser.add_option('--interactive'     , dest='interactive'     , help='Run jobs in interactive'        , default=False, action='store_true')
+    parser.add_option('--debug'           , dest='debug'           , help='Print command (no execute it)'  , default=False, action='store_true')
     parser.add_option('--unblind'         , dest='unblind'         , help='Unblind data in limits'         , default=False, action='store_true')
     parser.add_option('--verbose'         , dest='verbose'         , help='Activate debug printing'        , default=False, action='store_true')
     parser.add_option('--reset'           , dest='reset'           , help='Reset existing shapes'          , default=False, action='store_true')

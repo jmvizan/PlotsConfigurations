@@ -358,10 +358,13 @@ def deletePlots(opt):
 
 def cleanSignalDatacards(opt, year, tag, signal, dryRun=False):
 
-    cleanSignalDatacardCommand = 'rm -r -f '+getSignalDir(opt, year, tag, signal, 'cardsdir')
+    cleanSignalDatacardCommandList = []
 
-    if dryRun: return cleanSignalDatacardCommand
-    else: os.system(cleanSignalDatacardCommand)
+    for singleYear in year.split('-'):
+        cleanSignalDatacardCommandList.append('rm -r -f '+getSignalDir(opt, singleYear, tag, signal, 'cardsdir'))
+
+    if dryRun: return '\n'.join(cleanSignalDatacardCommandList)
+    else: os.system('\n'.join(cleanSignalDatacardCommandList))
 
 def cleanDatacards(opt):
 
