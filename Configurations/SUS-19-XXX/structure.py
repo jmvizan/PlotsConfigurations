@@ -16,7 +16,7 @@ for sample in samples:
         structure[sample]['removeFromCuts'] = samples[sample]['removeFromCuts']
      
     if '_ScaleStat' in opt.tag:  
-        scaleStat = float(opt.tag.split('_ScaleStat')[1])                            
+        scaleStat = float(opt.tag.split('_ScaleStat')[1].split('_')[0])                            
         if samples[sample]['isSignal']:
             if scaleStat>=999.:
                 mx = float(sample.split('_')[1].replace('mC-','').replace('mS-',''))
@@ -27,4 +27,4 @@ for sample in samples:
                 else: scaleStat = 2
             if '_ScaleStat9999' in opt.tag: scaleStat *= 2
             structure[sample]['scaleStatUnc'] = scaleStat
-  
+ 

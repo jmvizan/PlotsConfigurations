@@ -420,7 +420,6 @@ def exclusionPlot(opt, plotoption='2'):
     sigset = ','.join(getSignalList(opt, opt.sigset, opt.tag))
  
     opt2 = copy.deepcopy(opt)
-
     for tag in tagList:
         opt2.tag = tag
         makeContours(opt2)

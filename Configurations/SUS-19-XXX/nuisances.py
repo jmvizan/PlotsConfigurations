@@ -223,6 +223,41 @@ if '_WWshape' in opt.tag:
             if mt2llregion in cut:
                 nuisances[nuisancekey]['cuts'].append(cut)
 
+if '_WWShape' in opt.tag:
+
+    mt2llweightUp = '(1. + 0.2*(mt2ll>=100.)*(mt2ll<160.) + 0.4*(mt2ll>=160.)*(mt2ll<240.) + 0.5*(mt2ll>=240))'
+    mt2llweightDo = '1.'
+
+    for mt2llregion in mt2llRegions:
+        if 'VR1' in mt2llregion: continue
+
+        binList = []
+        if 'Merge' not in opt.tag: binList.extend([ 'Bin6', 'Bin7', 'Bin8' , 'Bin9' ])
+        else: 
+            if 'SR1' in mt2llregion: binList.extend([ 'Bin6', 'Bin7' ])
+            elif 'SR2' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8' ])
+            elif 'SR3' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8' ])
+            elif 'SR4' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8', 'Bin9' ])
+
+        for ibin in binList:
+            nuisancekey = 'WWshape_'+ibin+'_'+mt2llregion
+            nuisances[nuisancekey]  = {
+                'name'  : nuisancekey+year.replace('noHIPM','').replace('HIPM',''),
+                'samples'  : { 'ttbar' : [ mt2llweightUp, mt2llweightDo],
+                               'STtW'  : [ mt2llweightUp, mt2llweightDo],
+                               'WW'    : [ mt2llweightUp, mt2llweightDo] },
+                'OneSided' : True,
+                'kind'  : 'weight',
+                'type'  : 'shape',
+                'cuts'  : [ ]
+            }
+
+            for cut in cuts.keys():
+                if mt2llregion in cut:
+                    nuisances[nuisancekey]['cuts'].append(cut)
+
+
+
 # mt2ll top and WW SUS-17-010 style
 #mt2llBins = [ ]
 #mt2llNuisances = False
