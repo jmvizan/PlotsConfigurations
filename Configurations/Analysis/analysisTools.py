@@ -30,13 +30,15 @@ def setAnalysisDefaults(opt):
     opt.signalSubsets = { 'T2tt'          : [ 'T2tt_mS-150to800_dm-80to175' ],
                           'T2bW'          : [ 'T2bW_mS-200to1000_mX-1to700' ],
                           'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-100to475_mX-1to750', 'TChipmSlepSnu_mC-500to650_mX-1to750', 'TChipmSlepSnu_mC-675to800_mX-1to750', 'TChipmSlepSnu_mC-825to925_mX-1to750', 'TChipmSlepSnu_mC-950to1050_mX-1to750', 'TChipmSlepSnu_mC-1075to1175_mX-1to750', 'TChipmSlepSnu_mC-1200to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750' ],
+                          'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-100to475_mX-1to750', 'TChipmSlepSnu_mC-500to650_mX-1to750', 'TChipmSlepSnu_mC-675to800_mX-1to750', 'TChipmSlepSnu_mC-825to925_mX-1to750', 'TChipmSlepSnu_mC-950to1050_mX-1to750', 'TChipmSlepSnu_mC-1075to1175_mX-1to750', 'TChipmSlepSnu_mC-1200to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750' ],
                           'TChipmWW'      : [ 'TChipmWW_mC-100to375_mX-1to250', 'TChipmWW_mC-400to700_mX-1to250' ],
                           'TSlepSlep'     : [ 'TSlepSlep_mS-100to275_mX-1to650', 'TSlepSlep_mS-300to400_mX-1to650', 'TSlepSlep_mS-425to600_mX-1to650', 'TSlepSlep_mS-625to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650' ] }
 
-    opt.tableSigset = { 'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-200_mX-125', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ],
-                        'T2tt'          : [ 'T2tt_mS-300_mX-213', 'T2tt_mS-300_mX-175', 'T2tt_mS-350_mX-263', 'T2tt_mS-350_mX-225', 'T2tt_mS-400_mX-275', 'T2tt_mS-300_mX-125', 'T2tt_mS-350_mX-175', 'T2tt_mS-400_mX-225', 'T2tt_mS-400_mX-313', 'T2tt_mS-475_mX-350', 'T2tt_mS-450_mX-275', 'T2tt_mS-450_mX-325', 'T2tt_mS-475_mX-388', 'T2tt_mS-450_mX-363', 'T2tt_mS-475_mX-300', 'T2tt_mS-200_mX-113', 'T2tt_mS-200_mX-75' ],
+    opt.tableSigset = { #'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-200_mX-125', 'TChipmSlepSnu_mC-200_mX-150', 'TChipmSlepSnu_mC-250_mX-175', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ],
+                        'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ],
+                        'T2tt'          : [ 'T2tt_mS-300_mX-213', 'T2tt_mS-300_mX-175', 'T2tt_mS-350_mX-263', 'T2tt_mS-350_mX-225', 'T2tt_mS-400_mX-275', 'T2tt_mS-300_mX-125', 'T2tt_mS-350_mX-175', 'T2tt_mS-400_mX-225', 'T2tt_mS-400_mX-313', 'T2tt_mS-475_mX-350', 'T2tt_mS-450_mX-275', 'T2tt_mS-450_mX-325', 'T2tt_mS-475_mX-388', 'T2tt_mS-450_mX-363', 'T2tt_mS-475_mX-300', 'T2tt_mS-475_mX-325', 'T2tt_mS-475_mX-375', 'T2tt_mS-500_mX-325', 'T2tt_mS-500_mX-350', 'T2tt_mS-500_mX-375', 'T2tt_mS-500_mX-400', 'T2tt_mS-500_mX-413', 'T2tt_mS-525_mX-350', 'T2tt_mS-525_mX-375', 'T2tt_mS-525_mX-400', 'T2tt_mS-525_mX-425', 'T2tt_mS-525_mX-438', 'T2tt_mS-550_mX-375', 'T2tt_mS-550_mX-400', 'T2tt_mS-550_mX-425', 'T2tt_mS-550_mX-450', 'T2tt_mS-550_mX-463' ],
                         'TChipmWW'      : [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50' ],
-                        'TSlepSlep'     : [ 'TSlepSlep_mS-200_mX-125', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ] }
+                        'TSlepSlep'     : [ 'TSlepSlep_mS-200_mX-120', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ] }
 
     opt.backgroundsInFit = [ 'ttZ', 'ZZ', 'WZ' ]
 
@@ -74,6 +76,7 @@ def setAnalysisDefaults(opt):
     if 'systwz' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WZbin')
     if 'systww' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WWshape')
     if 'sysbww' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WWShape')
+    if 'sysbwz' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WZBin')
 
     if opt.action=='shapes':
         for sr in opt.signalRegionMap:
@@ -328,8 +331,8 @@ def yieldsSR(opt):
         opt2 = copy.deepcopy(opt)
         opt2.tag = tag
         cardNameStructure = latinoTools.getDatacardNameStructure(yearInDatacard, True, 'Merge' in tag)
-        #commonTools.postFitYieldsTables(opt2, cardNameStructure, ','.join(getSignalList(opt, 'tabsignal', tag)))
-        commonTools.postFitYieldsTables(opt2, cardNameStructure, 'T2tt_mS-300_mX-125')
+        commonTools.postFitYieldsTables(opt2, cardNameStructure, ','.join(getSignalList(opt, 'tabsignal', tag)))
+
 def preFitYieldsSR(opt):
     
     opt.option += 'prefit'
@@ -345,12 +348,12 @@ def printLimits(opt):
 
         limitResult = {}
 
-        for tagopt in [ '', 'Group', 'Merge', 'MergeGroup', '_WWshape', '_WZbin' ]:
-            if 'Stop' not in opt.tag or 'Merge' not in tagopt: 
-                if '_' not in tagopt:
-                    tag = opt.tag.replace('FitCR', tagopt+'FitCR')
-                else:
-                    tag = opt.tag + tagopt
+        for tags in [ '', '_WWshape', '_WWShape', '_WZbin' ]:
+            for tagm in [ '', 'Group', 'Merge', 'MergeGroup' ]:
+                if 'Stop' in opt.tag and 'Merge' in tagm: continue
+                tagopt = tagm+tags
+                tag = opt.tag.replace('FitCR', tagm+'FitCR')
+                tag += tags
                 outputDir = '/'.join([ opt.limitdir, opt.year, tag, signal ])
                 if not commonTools.isGoodFile(outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root', 6000.):
                     if opt.debug: print outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root'
@@ -361,6 +364,7 @@ def printLimits(opt):
                 else: limitResult[tagopt] = []
 
                 for event in inputFile.limit:
+                    if opt.debug: print tagopt, event.limit
                     if tagopt=='': limitResult['central'].append(event.limit)
                     else: limitResult[tagopt].append(event.limit)
 
@@ -371,12 +375,14 @@ def printLimits(opt):
         if len(limitResult.keys())==1: printSignal = True
         for evt in range(len(limitResult['central'])):
             resultList = [ str(limitResult['central'][evt]) ]
-            for tagopt in [ 'Group', 'Merge', 'MergeGroup', '_WWshape', '_WZbin' ]:
-                if tagopt in limitResult:
-                    diff = abs(1. - limitResult[tagopt][evt]/limitResult['central'][evt])
-                    if diff>0.0: printSignal = True
-                    if tagopt not in availableResultList: availableResultList.append(tagopt)
-                    resultList.append(str(limitResult[tagopt][evt]/limitResult['central'][evt]))
+            for tags in [ '', '_WWshape', '_WWShape', '_WZbin' ]:
+                for tagm in [ '', 'Group', 'Merge', 'MergeGroup' ]:
+                    tagopt = tagm+tags
+                    if tagopt in limitResult:
+                        diff = abs(1. - limitResult[tagopt][evt]/limitResult['central'][evt])
+                        if diff>0.0: printSignal = True
+                        if tagopt not in availableResultList: availableResultList.append(tagopt)
+                        resultList.append(str(limitResult[tagopt][evt]/limitResult['central'][evt]))
             signalResult.append(' '.join(resultList)) 
         availableResult = ' '.join(availableResultList)
         if printSignal:
@@ -386,7 +392,7 @@ def printLimits(opt):
                 print signalResult[evt]
             print '\n\n'
 
-def makeContours(opt):
+def makeContours(opt, plotoption='2'):
 
     sigset = ','.join(getSignalList(opt, opt.sigset, opt.tag))
 
@@ -407,8 +413,9 @@ def makeContours(opt):
     if not os.path.isfile(histogramFileNoFillEmptyBins):
         os.system('analyzeLimits.py '+' '.join(commandList + [ '--nofillempties' ]))
 
-    if not os.path.isfile(contourFile):
-        os.system('analyzeLimits.py '+' '.join(commandList + [ '--makecontours' ])) 
+    if plotoption!='0':
+        if not os.path.isfile(contourFile):
+            os.system('analyzeLimits.py '+' '.join(commandList + [ '--makecontours' ])) 
 
 def exclusionPlot(opt, plotoption='2'):
 
@@ -418,12 +425,12 @@ def exclusionPlot(opt, plotoption='2'):
         print 'Comparison of more than two tags not supported'  
         exit()
 
-    sigset = ','.join(getSignalList(opt, opt.sigset, opt.tag))
+    sigset = ','.join(getSignalList(opt, opt.sigset, tagList[0]))
  
     opt2 = copy.deepcopy(opt)
     for tag in tagList:
         opt2.tag = tag
-        makeContours(opt2)
+        makeContours(opt2, plotoption)
 
     plotCommandList = [ '--years='+opt.year, '--tag='+tagList[0], '--sigset='+sigset, '--plotoption='+plotoption ] 
     if len(tagList)>1: plotCommandList.append('--compareto='+tagList[1])

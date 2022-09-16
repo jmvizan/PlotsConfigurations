@@ -28,7 +28,7 @@ def getSampleYields(sample, shape, nBins, SMyields):
             errorString = '%.1f' % error
         else:
             yieldsString = '%.2f' % yields
-            errorString = '%.2f' % error    
+            errorString = '%.2f' % error  
         sampleYields += ' & $' + yieldsString + '\\pm ' + errorString +'$'
 
     return sampleYields, maxYields, maxSignificance
@@ -65,8 +65,9 @@ if __name__ == '__main__':
     else:
         opt.sigset = 'SM-'+opt.masspoints
         for masspoint in opt.masspoints.split(','):
-            inputFiles[masspoint] = ROOT.TFile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ]), 'READ')
-            refmasspoint = masspoint 
+            if os.path.isfile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ])):
+                inputFiles[masspoint] = ROOT.TFile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ]), 'READ')
+                refmasspoint = masspoint 
 
     samples = { }
     cuts = { }
@@ -118,7 +119,6 @@ if __name__ == '__main__':
                         for ibin in range(nBins-1):
                             table.write(' & '+str(variableEdges[ibin])+'-'+str(variableEdges[ibin+1]))
                         table.write(' & $\\ge '+str(variableEdges[nBins-1])+'$')
-                                
 
                         table.write(' \\\\\n')
                    
@@ -142,7 +142,9 @@ if __name__ == '__main__':
 
                                 sampleName = 'data' if plot[sample]['isData'] else sample
                                 if plot[sample]['isSignal']:
-                                    shape = inputFiles[sample].Get(inDir+'/'+sample)
+                                    if sample in inputFiles:
+                                        shape = inputFiles[sample].Get(inDir+'/'+sample)
+                                    else: continue
                                 elif plot[sample]['isData']:
                                     graph = refDir.Get('data')
                                     shape = ROOT.TH1F('shape', '', graph.GetN(), 0, graph.GetN())
@@ -152,6 +154,7 @@ if __name__ == '__main__':
                                 else:
                                     if refDir.GetListOfKeys().Contains(sample):
                                         shape = refDir.Get(sample)
+                                    else: continue
 
                                 if shape:
                                     sampleName = plot[sample]['nameLatex'] if 'nameLatex' in plot[sample] else plot[sample]['nameHR']

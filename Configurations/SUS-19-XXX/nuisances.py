@@ -185,7 +185,7 @@ for cut in cuts:
 
 # mt2ll top and WW
 
-if '_WZbin' in opt.tag and 'Merge' not in opt.tag:
+if ('_WZbin' in opt.tag or '_WZBin' in opt.tag) and 'Merge' not in opt.tag:
 
     mt2llweightUp = '(1. + 3.*(mt2ll>=370))'
     mt2llweightDo = '1.'
@@ -232,7 +232,8 @@ if '_WWShape' in opt.tag:
         if 'VR1' in mt2llregion: continue
 
         binList = []
-        if 'Merge' not in opt.tag: binList.extend([ 'Bin6', 'Bin7', 'Bin8' , 'Bin9' ])
+        if 'Stop' in opt.tag: binList.extend([ 'Bin6', 'Bin7' ])
+        elif 'Merge' not in opt.tag: binList.extend([ 'Bin6', 'Bin7', 'Bin8' , 'Bin9' ])
         else: 
             if 'SR1' in mt2llregion: binList.extend([ 'Bin6', 'Bin7' ])
             elif 'SR2' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8' ])
