@@ -385,6 +385,7 @@ def printLimits(opt):
                         resultList.append(str(limitResult[tagopt][evt]/limitResult['central'][evt]))
             signalResult.append(' '.join(resultList)) 
         availableResult = ' '.join(availableResultList)
+
         if printSignal:
             print '####', signal
             print '    ', availableResult
