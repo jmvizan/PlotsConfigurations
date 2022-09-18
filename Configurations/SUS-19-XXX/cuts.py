@@ -113,7 +113,7 @@ if 'METFix' in opt.tag:
     cuts['METFixEE_high_mm_Tag']  = { 'expr' : '('+OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight1tag }
     cuts['METFixEE_high_sf_Tag']  = { 'expr' : '('+OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight1tag }
     
-if 'VetoNoiseEE' in opt.tag:
+if 'VetoNoiseEE' in opt.tag and not 'HTFCut' in opt.tag:
 
     channelCut = OC 
     if 'Zveto' in opt.tag:
@@ -156,6 +156,32 @@ if 'VetoNoiseEE' in opt.tag:
         cuts['Veto1_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
         cuts['Veto2_Veto_HTF']            = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
         cuts['Veto2_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
+
+if 'VetoNoiseEE' in opt.tag and 'HTFCut' in opt.tag:
+
+    channelCut = OC
+    if 'Zveto' in opt.tag:
+        channelCut += ' && ('+DF+' || '+SF+')'
+
+    EENoiseVeto0 = '(Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
+    EENoiseVeto1 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
+    EENoiseVeto2 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
+
+    ptm = ' ptmiss>=100. && ptmiss<140 '
+    if 'MET' in opt.tag: ptm = ptm.replace('ptmiss', 'MET_pt')
+
+    cuts['Veto0_Tag_HTFCut']             = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto0_Tag_highptmiss_HTFCut']  = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto1_Tag_HTFCut']             = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && ' + HTForward + '<60.' +')', 'weight' : btagWeight1tag }
+    cuts['Veto1_Tag_highptmiss_HTFCut']  = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto2_Tag_HTFCut']             = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto2_Tag_highptmiss_HTFcut']  = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto0_Veto_HTFCut']            = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto0_Veto_highptmiss_HTFCut'] = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto1_Veto_HTFCut']            = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto1_Veto_highptmiss_HTFCut'] = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto2_Veto_HTFCut']            = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto2_Veto_highptmiss_HTFCut'] = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
 
 if 'DYchecks' in opt.tag:
 

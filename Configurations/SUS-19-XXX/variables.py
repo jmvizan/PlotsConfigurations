@@ -115,6 +115,30 @@ elif 'DYchecks' in opt.tag:
 
 elif 'VetoNoiseEE' in opt.tag:
 
+    variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    
+
+    variables['mt2ll']         = {   'name'  : 'mt2ll',                #   variable name
+                                     'range' : (   7,    0.,  140.),   #   variable range
+                                     'xaxis' : mt2 + pll + gv,         #   x axis name
+                                     'fold'  : overflow,               #   fold overflow
+                                     'nameLatex' : '\\mtll'
+                                  }
+
+    
+
+    variables['mt2llOptim']    = {   'name'  : 'mt2ll',                #   variable name
+                                     'range' : ([0, 20, 40, 60, 80, 100, 160, 220],[1]),    #   variable range
+                                     'xaxis' : mt2 + pll + gv,         #   x axis name
+                                     'fold'  : overflow,               #   fold overflow
+                                     'CRbins' : [1, 4]
+                                  }
+
     variables['njeteenoise']          = { 'name'  : njeteenoise,                          #   variable name
                                           'range' : (  5, 0., 5.),                        #   variable range
                                           'xaxis' : 'Number of EE Noise jets',            #   x axis name
