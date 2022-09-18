@@ -611,6 +611,7 @@ if len(yearstaglist)>1:
    nuisanceToRemove = [ ]
 
    for nuisance in nuisances:
+       if 'WWshape' in nuisance or 'WZbin' in nuisance: continue
        if 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='shape':
            if year in nuisances[nuisance]['name']:
                nuisanceToRemove.append(nuisance)
