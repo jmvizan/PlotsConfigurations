@@ -243,7 +243,7 @@ def getScaleFactorFromCanvas(fileName, canvasName, dataName, signalName, binNumb
 if __name__ == '__main__':
 
     for year in years.split('-'):
-
+        print '\t\tYEAR:'+year+'\n'
         normBackgrounds = {}
 
         for background in backgroundProcess.split('-'):
@@ -274,7 +274,7 @@ if __name__ == '__main__':
                     normBackgrounds[sample][meas]['selection'] = measInfo['selection'] 
 
             for sample in bkgInfo['samples']:
-                print 'normBackgrounds[\''+sample+'\'] = '+json.dumps(normBackgrounds[sample]).replace('"','\'')
+                print '\t\tnormBackgrounds[\''+sample+'\'] = '+json.dumps(normBackgrounds[sample]).replace('"','\'')
 
 
 

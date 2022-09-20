@@ -47,7 +47,7 @@ if __name__ == '__main__':
     tags_fin = args[3]
     if len(args) ==3:
         version='ALL_DATA'
-    elif len(args[4].split('_'))==1:
+    elif len(args[4].split('_'))==1 and 'SM' not in args[4]:
         version = '_ALL_'+args[4]
     else:
         version = '_'+args[4]
@@ -66,6 +66,7 @@ if __name__ == '__main__':
     
     print "years", yearset
     print "tags_ini ", tags_ini
+    print "version ", version
     if len(tags_ini.split('-'))>1 or len(yearset)>1: confirm()
     for idx, tag_ini in enumerate(tags_ini.split('-')):
         tag_fin = tags_fin.split('-')[idx]
@@ -80,6 +81,7 @@ if __name__ == '__main__':
             fol_f  = os.getcwd()+'/Shapes/'+year+'/'+tag_fin+'/'
             file_i = 'plots_'+year+tag_ini+version+'.root'#.replace('.root','.broot')
             file_f = 'plots_'+year+tag_fin+version+'.root'#.replace('.root','.broot')
+            
             if '_ALL_' in version: 
                 fol_i  +='Samples/'
                 fol_f  +='Samples/'

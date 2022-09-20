@@ -23,8 +23,7 @@ def readsamples(sigset):
         samples=sigfile.read().splitlines()
     return samples
 
-def submit_shapes(args):
-    doDC=False
+def getVariables(args):
     
     if len(args)<4:
         print 'Please, specify year, tag and sigset values, in that order'
@@ -32,6 +31,8 @@ def submit_shapes(args):
 
     if   args[1] == '-1':
         yearset = ['2016HIPM', '2016noHIPM','2017','2018']
+    elif args[1] == '-1plot':
+        yearset = ['-1']
     elif args[1] == '0':
         yearset = ['2016']
     elif args[1] == '0b':
@@ -49,9 +50,14 @@ def submit_shapes(args):
         tags = 'ValidationRegions'
     elif args[2] == '2':
         tags = 'StopSignalRegions'
+    elif args[2] == 'backSFtags':
+        tags = 'ZZValidationRegionBackSFVetoesUL_WZValidationRegionBackSFVetoesUL_WZValidationRegionZLepsBackSFVetoesUL_ttZValidationRegionBackSFVetoesUL_WZtoWWValidationRegionBackSFVetoesUL'
     else:
         tags = args[2]
-    
+    return yearset, tags
+def submit_shapes(args):
+
+    yearset,tags = getVariables(args)    
     #    tags=sys.argv[2]                                                                         
     lastarg = len(args)-1
     yearnm  = '-'.join(yearset)
@@ -72,7 +78,7 @@ def submit_shapes(args):
     yearnm = '-'.join(yearset)
     hadd   = args[3]
     sigset = args[4]
-    
+
     multi  = 'Multi'
     
     if '_notmulti' in tags.lower() : 
@@ -104,14 +110,10 @@ def submit_shapes(args):
     smsend    = bkgsend+ ['Data']
     for signal in sigset.split('__'):
         print "sample:",signal
-    if        len(sigset.split('__'))>1 : allsend = sigset.split('__')
-    elif           '.' in sigset        : allsend = readsamples(sigset)
-    elif 'backgrounds' in split.lower() : allsend = bkgsend
-    elif          'SM' in split         : allsend = smsend
-    elif        'plot' in args[-1].lower() : 
-        allsend = ["SM"]
-        script  = './run_mkPlot.sh'
-        hadd    = '' 
+    if      len(sigset.split('__'))>1 : allsend = sigset.split('__')
+    if           '.' in sigset        : allsend = readsamples(sigset)
+    if 'backgrounds' in split.lower() : allsend = bkgsend
+    if      split    == 'SM'          : allsend = smsend
     elif         'all' in split.lower() :
         if hadd == '1' and "SM-" not in sigset and sigset not in smsend+["SM","Backgrounds"]: sigset="SM-"+sigset
         if sigset.replace('Backgrounds','') in bkgs or sigset == 'Data': 
@@ -125,6 +127,15 @@ def submit_shapes(args):
         allsend   = [sigset]
         keepsplit = True
 
+    if   'plot' in args[-1].lower(): 
+        script  = './run_mkPlot.sh'
+        hadd    = ''
+        split   = ''
+    elif 'merge' in args[-1].lower():
+        script  = './mergeShapes.py'
+    elif 'fit'   in args[-1].lower():
+        script  = 'python run_MaxLikelihoodFit.py'
+
     shapes_fol  = "./Shapes/log/"+yearnm+'/'
     allcomms    = []
     for tag in tags.split('_'):
@@ -136,6 +147,7 @@ def submit_shapes(args):
         if rmlog:
             os.system('rm '+shapes_file)
             print "REMOVING FILE:\n", shapes_file
+        print "allsend", allsend
         #logtitle(shapes_file,tag+" "+sigset+" "+split)
         for samsend in allsend:
             if skipZZ4L and "ZZ" in samsend: 
@@ -148,8 +160,18 @@ def submit_shapes(args):
                     split = 'AsMuchAsPossible'
                 else:
                     split = ''
+            i=0
             for year in yearset:
-                command = script+" "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
+                if 'mergeShapes' in script:
+                    if i>0: continue
+                    command = script+' --years=2016HIPM-2016noHIPM --tag='+tag+' --sigset='+samsend+' --outputDir=./Shapes/2016/'+tag+'/ --skipLNN'
+                    i=i+1
+                elif 'Fit.py'      in script:
+                    if len(yearset)>1 and 'HIPM' in year: year = year.replace('HIPM','')
+                    if year=='2016no': continue
+                    command = script+' --year='+year+' --tag='+tag+' --masspoint='+samsend.split('SM-')[-1]+' --fileset='+samsend
+                else:
+                    command = script+" "+ year +" "+tag+" "+hadd+" "+samsend+" "+split
                 allcomms.append(command)
     print "Commands to be ran:"
     for comm in allcomms:
