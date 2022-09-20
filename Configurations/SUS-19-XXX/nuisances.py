@@ -149,12 +149,13 @@ for sample in samples.keys():
 
 # top pt reweighting
 
-nuisances['toppt']  = {
-    'name'  : 'toppt', # assuming the mismodeling is correlated through the years 
-    'samples'  : { 'ttbar' : [ systematicTopPt+'/'+centralTopPt, '1.' ] },
-    'kind'  : 'weight',
-    'type'  : 'shape',
-}
+if 'ttbar' in samples:
+    nuisances['toppt']  = {
+        'name'  : 'toppt', # assuming the mismodeling is correlated through the years 
+        'samples'  : { 'ttbar' : [ systematicTopPt+'/'+centralTopPt, '1.' ] },
+        'kind'  : 'weight',
+        'type'  : 'shape',
+    }
 
 # isr fastsim
 
@@ -176,74 +177,149 @@ for sample in samples.keys():
 
 ### mt2ll backgrounds (special case for shape uncertainties)
 
-# mt2ll top and WW
-
-### Update to new bins: get SR from cuts and adjust mt2ll bins for high MT2
 mt2llRegions = [ ]
 for cut in cuts:
     ptmissCut = cut.split('_')[0]+'_'
-    if 'SR' in ptmissCut and ptmissCut not in mt2llRegions:
+    if ('SR' in ptmissCut or 'VR1' in ptmissCut) and ptmissCut not in mt2llRegions:
         mt2llRegions.append(ptmissCut)
 
-mt2llBins = [ ]
-mt2llNuisances = False
-if not hasattr(opt, 'outputDirDatacard') or mt2llNuisances:
-    if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
-        mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
-        mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
-        mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
-    elif 'High' in opt.tag and 'Extra' in opt.tag:
-        mt2llBins = ['Bin6', 'Bin7', 'Bin8', 'Bin9' ]
-        mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']
-        mt2llSystematics = [0.20, 0.30, 0.30, 0.30] # placeholders    
-    elif 'High' in opt.tag:
-        mt2llBins = ['Bin6', 'Bin7', 'Bin8' ]     
-        mt2llEdges = ['100.', '160.', '370.', '999999999.']
-        mt2llSystematics = [0.20, 0.30, 0.30] # placeholders     
-    else:
-        mt2llBins = ['Bin6', 'Bin7' ]
-        mt2llEdges = ['100.', '160.', '999999999.']
-        mt2llSystematics = [0.20, 0.30] # placeholders            
+# mt2ll top and WW
 
-for mt2llregion in mt2llRegions: 
-    for mt2llbin in range(len(mt2llBins)):
+if ('_WZbin' in opt.tag or '_WZBin' in opt.tag) and 'Merge' not in opt.tag:
 
-        mt2llsystname = mt2llregion + mt2llBins[mt2llbin]
-        mt2llweightUp = '(mt2ll>='+mt2llEdges[mt2llbin]+' && mt2ll<'+mt2llEdges[mt2llbin+1]+') ? '+str(1.+mt2llSystematics[mt2llbin])+' : 1.'  
-        mt2llweightDo = '(mt2ll>='+mt2llEdges[mt2llbin]+' && mt2ll<'+mt2llEdges[mt2llbin+1]+') ? '+str(1.-mt2llSystematics[mt2llbin])+' : 1.'  
-        
-        nuisances['Top_'+mt2llsystname]  = {
-            'name'  : 'Top_'+mt2llsystname+year,
-            'samples'  : { 
-                'ttbar' : [ mt2llweightUp, mt2llweightDo],
-                'STtW'  : [ mt2llweightUp, mt2llweightDo],
-                'tW'    : [ mt2llweightUp, mt2llweightDo], # backward compatibility for background names
-            },
+    mt2llweightUp = '(1. + 3.*(mt2ll>=370))'
+    mt2llweightDo = '1.'
+
+    nuisancekey = 'WZbin'
+    nuisances[nuisancekey]  = {
+        'name'  : nuisancekey+year.replace('noHIPM','').replace('HIPM',''),
+        'samples'  : { 'WZ' : [ mt2llweightUp, mt2llweightDo] },
+        'OneSided' : True,
+        'kind'  : 'weight',
+        'type'  : 'shape'
+    }
+
+if '_WWshape' in opt.tag:
+
+    mt2llweightUp = '(1. + 0.2*(mt2ll>=100.)*(mt2ll<160.) + 0.4*(mt2ll>=160.)*(mt2ll<240.) + 0.5*(mt2ll>=240))'
+    mt2llweightDo = '1.'
+
+    for mt2llregion in mt2llRegions:
+        if 'VR1' in mt2llregion: continue
+
+        nuisancekey = 'WWshape_'+mt2llregion
+        nuisances[nuisancekey]  = {
+            'name'  : nuisancekey+year.replace('noHIPM','').replace('HIPM',''),
+            'samples'  : { 'ttbar' : [ mt2llweightUp, mt2llweightDo],
+                           'STtW'  : [ mt2llweightUp, mt2llweightDo],
+                           'WW'    : [ mt2llweightUp, mt2llweightDo] },
+            'OneSided' : True,
             'kind'  : 'weight',
             'type'  : 'shape',
-            'cuts'  : [ ]           
-        }
-        
-        nuisances['WW_'+mt2llsystname]  = {
-            'name'  : 'WW_'+mt2llsystname+year,
-            'samples'  : { 
-                'WW' : [ mt2llweightUp, mt2llweightDo],
-            },
-            'kind'  : 'weight',
-            'type'  : 'shape',
-            'cuts'  : [ ]           
-        }
+            'cuts'  : [ ]
+        } 
 
         for cut in cuts.keys():
             if mt2llregion in cut:
-                nuisances['Top_'+mt2llsystname]['cuts'].append(cut)
-                nuisances['WW_' +mt2llsystname]['cuts'].append(cut)
+                nuisances[nuisancekey]['cuts'].append(cut)
+
+if '_WWShape' in opt.tag:
+
+    mt2llweightUp = '(1. + 0.2*(mt2ll>=100.)*(mt2ll<160.) + 0.4*(mt2ll>=160.)*(mt2ll<240.) + 0.5*(mt2ll>=240))'
+    mt2llweightDo = '1.'
+
+    for mt2llregion in mt2llRegions:
+        if 'VR1' in mt2llregion: continue
+
+        binList = []
+        if 'Stop' in opt.tag: binList.extend([ 'Bin6', 'Bin7' ])
+        elif 'Merge' not in opt.tag: binList.extend([ 'Bin6', 'Bin7', 'Bin8' , 'Bin9' ])
+        else: 
+            if 'SR1' in mt2llregion: binList.extend([ 'Bin6', 'Bin7' ])
+            elif 'SR2' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8' ])
+            elif 'SR3' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8' ])
+            elif 'SR4' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8', 'Bin9' ])
+
+        for ibin in binList:
+            nuisancekey = 'WWshape_'+ibin+'_'+mt2llregion
+            nuisances[nuisancekey]  = {
+                'name'  : nuisancekey+year.replace('noHIPM','').replace('HIPM',''),
+                'samples'  : { 'ttbar' : [ mt2llweightUp, mt2llweightDo],
+                               'STtW'  : [ mt2llweightUp, mt2llweightDo],
+                               'WW'    : [ mt2llweightUp, mt2llweightDo] },
+                'OneSided' : True,
+                'kind'  : 'weight',
+                'type'  : 'shape',
+                'cuts'  : [ ]
+            }
+
+            for cut in cuts.keys():
+                if mt2llregion in cut:
+                    nuisances[nuisancekey]['cuts'].append(cut)
+
+
+
+# mt2ll top and WW SUS-17-010 style
+#mt2llBins = [ ]
+#mt2llNuisances = False
+#if not isDatacardOrPlot or mt2llNuisances:
+#    if 'Optim' not in opt.tag or 'MT2' not in opt.tag:
+#        mt2llBins = ['Bin4', 'Bin5', 'Bin6', 'Bin7']
+#        mt2llEdges = ['60.', '80.', '100.', '120.', '999999999.']
+#        mt2llSystematics = [0.05, 0.10, 0.20, 0.30]
+#    elif 'High' in opt.tag and 'Extra' in opt.tag:
+#        mt2llBins = ['Bin6', 'Bin7', 'Bin8', 'Bin9' ]
+#        mt2llEdges = ['100.', '160.', '240.', '370.', '999999999.']
+#        mt2llSystematics = [0.20, 0.30, 0.30, 0.30] # placeholders    
+#    elif 'High' in opt.tag:
+#        mt2llBins = ['Bin6', 'Bin7', 'Bin8' ]     
+#        mt2llEdges = ['100.', '160.', '370.', '999999999.']
+#        mt2llSystematics = [0.20, 0.30, 0.30] # placeholders     
+#    else:
+#        mt2llBins = ['Bin6', 'Bin7' ]
+#        mt2llEdges = ['100.', '160.', '999999999.']
+#        mt2llSystematics = [0.20, 0.30] # placeholders            
+#
+#for mt2llregion in mt2llRegions: 
+#    if 'VR1' in mt2llregion: continue
+#    for mt2llbin in range(len(mt2llBins)):
+#
+#        mt2llsystname = mt2llregion + mt2llBins[mt2llbin]
+#        mt2llweightUp = '(mt2ll>='+mt2llEdges[mt2llbin]+' && mt2ll<'+mt2llEdges[mt2llbin+1]+') ? '+str(1.+mt2llSystematics[mt2llbin])+' : 1.'  
+#        mt2llweightDo = '(mt2ll>='+mt2llEdges[mt2llbin]+' && mt2ll<'+mt2llEdges[mt2llbin+1]+') ? '+str(1.-mt2llSystematics[mt2llbin])+' : 1.'  
+#        
+#        nuisances['Top_'+mt2llsystname]  = {
+#            'name'  : 'Top_'+mt2llsystname+year,
+#            'samples'  : { 
+#                'ttbar' : [ mt2llweightUp, mt2llweightDo],
+#                'STtW'  : [ mt2llweightUp, mt2llweightDo],
+#                'tW'    : [ mt2llweightUp, mt2llweightDo], # backward compatibility for background names
+#            },
+#            'kind'  : 'weight',
+#            'type'  : 'shape',
+#            'cuts'  : [ ]           
+#        }
+#        
+#        nuisances['WW_'+mt2llsystname]  = {
+#            'name'  : 'WW_'+mt2llsystname+year,
+#            'samples'  : { 
+#                'WW' : [ mt2llweightUp, mt2llweightDo],
+#            },
+#            'kind'  : 'weight',
+#            'type'  : 'shape',
+#            'cuts'  : [ ]           
+#        }
+#
+#        for cut in cuts.keys():
+#            if mt2llregion in cut:
+#                nuisances['Top_'+mt2llsystname]['cuts'].append(cut)
+#                nuisances['WW_' +mt2llsystname]['cuts'].append(cut)
 
 # mt2ll DY (from control regions)
  
 # mt2ll ZZ (from k-factors)
 
-# mt2ll signal
+# mt2ll siggnal
 if '__susyMT2reco' not in directorySig:
     nuisances['ptmissfastsim']  = {
         'name'  : 'ptmissfastsim', # mismodeling correlated through the years?
@@ -277,7 +353,7 @@ nuisances['pdf'] = {
 
 for yeartomerge in yearstaglist:
 
-    exec(open('./theoryNormalizations/theoryNormalizations'+recoFlag+'_'+yeartomerge+'.py').read())
+    exec(open('./Data/theoryNormalizations/theoryNormalizations'+recoFlag+'_'+yeartomerge+'.py').read())
 
     # LHE scale variation weights (w_var / w_nominal)
     # [0] is muR=0.50000E+00 muF=0.50000E+00
@@ -292,8 +368,12 @@ for yeartomerge in yearstaglist:
 
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
-            if sample not in theoryNormalizations:
-                print 'Nuisance warning:', sample, 'not in theoryNormalizations'
+            if sample=='minor':
+                nuisances['qcdScale']['samples'][sample] = []
+                nuisances['pdf']['samples'][sample] = []
+                continue
+            elif sample not in theoryNormalizations:
+                print 'Nuisance warning: sample', sample, 'not in theoryNormalizations'
                 continue
             if theoryNormalizations[sample]['qcdScaleStatus']==3:
                 qcdScaleVariations = [ ]
@@ -307,7 +387,7 @@ for yeartomerge in yearstaglist:
                 nuisances['pdf']['samples'][sample] = qcdScaleVariations
 
 for cut in cuts: # TODO: Why only in the signal regions? 
-    if 'SR' in cut.split('_')[0]:
+    if 'SR' in cut.split('_')[0]: #or 'SM' in opt.sigset:
         nuisances['qcdScale']['cuts'].append(cut)
         nuisances['pdf']['cuts'].append(cut)
 
@@ -437,7 +517,7 @@ if hasattr(opt, 'outputDirDatacard'):
                     nuisances[sample+rateparamname]['limits'] = rateparameters[rateparam]['limits'] 
                     
                 for cut in cuts.keys():
-                    if (mt2llregion in cut and not isControlSample) or (mt2llregion.replace('SR', 'CR') in cut and 'CR_' in rateparam and rateparam.split('_')[2]==cut.split('_')[2]):
+                    if (mt2llregion in cut and not isControlSample) or (mt2llregion.replace('SR', 'CR').replace('VR1', 'CR0') in cut and 'CR_' in rateparam and rateparam.split('_')[2]==cut.split('_')[2]):
                         for subcut in rateparameters[rateparam]['subcuts']:
                             if subcut in cut:
                                 nuisances[sample+rateparamname]['cuts'].append(cut)
@@ -505,7 +585,7 @@ nuisanceToRemove = [ ]
 
 if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag:
 
-    if ('nanoAODv6' in opt.samplesFile and 'ctrl' in regionName and 'cern' in SITE) or ('nanoAODv9' in opt.samplesFile and 'cern' in SITE): 
+    if ('nanoAODv6' in opt.samplesFile and 'ctrl' in regionName and 'cern' in SITE): 
  
         if hasattr(opt, 'batchSplit'): # Remove only when running shapes, so can make shapes in gridui and plots+datacards in lxplus
             for nuisance in nuisances:
@@ -531,6 +611,7 @@ if len(yearstaglist)>1:
    nuisanceToRemove = [ ]
 
    for nuisance in nuisances:
+       if 'WWshape' in nuisance or 'WZbin' in nuisance: continue
        if 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='shape':
            if year in nuisances[nuisance]['name']:
                nuisanceToRemove.append(nuisance)

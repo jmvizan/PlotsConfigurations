@@ -44,16 +44,17 @@ if recoFlag=='_UL' and 'TrigLatino' not in opt.tag and 'Trigger' not in opt.tag 
 
 if recoFlag=='_UL':
 
-    wpFlag = 'Tight' if 'TightLep' in opt.tag else ''
-    leptonL2TRateFile = os.getenv('PWD')+'/Data/'+yeartag+'/'+wpFlag+'LeptonL2TRate.root'
-
-    aliases['leptonL2TWeight'] = {
-            'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/leptonL2TWeightReader.cc+' ],
-            'class': 'LeptonL2TWeightReader',
-            'args': ( leptonL2TRateFile, 'mediumRelIsoTight', 'cutBasedMediumPOG'),
-            'samples': [ ]
-    }
     if 'WJetsCorr' in samples:
+
+        wpFlag = 'Tight' if 'TightLep' in opt.tag else ''
+        leptonL2TRateFile = os.getenv('PWD')+'/Data/'+yeartag+'/'+wpFlag+'LeptonL2TRate.root'
+
+        aliases['leptonL2TWeight'] = {
+                'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/leptonL2TWeightReader.cc+' ],
+                'class': 'LeptonL2TWeightReader',
+                'args': ( leptonL2TRateFile, 'mediumRelIsoTight', 'cutBasedMediumPOG'),
+                'samples': [ ]
+        }
         aliases['leptonL2TWeight']['samples'].append('WJetsCorr')
         samples['WJetsCorr']['weight'] += '*leptonL2TWeight'
  

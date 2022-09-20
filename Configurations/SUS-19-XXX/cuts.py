@@ -113,7 +113,7 @@ if 'METFix' in opt.tag:
     cuts['METFixEE_high_mm_Tag']  = { 'expr' : '('+OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight1tag }
     cuts['METFixEE_high_sf_Tag']  = { 'expr' : '('+OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight1tag }
     
-if 'VetoNoiseEE' in opt.tag:
+if 'VetoNoiseEE' in opt.tag and not 'HTFCut' in opt.tag:
 
     channelCut = OC 
     if 'Zveto' in opt.tag:
@@ -156,6 +156,32 @@ if 'VetoNoiseEE' in opt.tag:
         cuts['Veto1_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
         cuts['Veto2_Veto_HTF']            = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
         cuts['Veto2_Veto_highptmiss_HTF'] = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && '+ptm+' && ' + HTForward + '>=60.'+')', 'weight' : btagWeight0tag }
+
+if 'VetoNoiseEE' in opt.tag and 'HTFCut' in opt.tag:
+
+    channelCut = OC
+    if 'Zveto' in opt.tag:
+        channelCut += ' && ('+DF+' || '+SF+')'
+
+    EENoiseVeto0 = '(Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
+    EENoiseVeto1 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
+    EENoiseVeto2 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
+
+    ptm = ' ptmiss>=100. && ptmiss<140 '
+    if 'MET' in opt.tag: ptm = ptm.replace('ptmiss', 'MET_pt')
+
+    cuts['Veto0_Tag_HTFCut']             = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto0_Tag_highptmiss_HTFCut']  = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto1_Tag_HTFCut']             = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && ' + HTForward + '<60.' +')', 'weight' : btagWeight1tag }
+    cuts['Veto1_Tag_highptmiss_HTFCut']  = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto2_Tag_HTFCut']             = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto2_Tag_highptmiss_HTFcut']  = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight1tag }
+    cuts['Veto0_Veto_HTFCut']            = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto0_Veto_highptmiss_HTFCut'] = { 'expr' : '('+OC+' && '+EENoiseVeto0+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto1_Veto_HTFCut']            = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto1_Veto_highptmiss_HTFCut'] = { 'expr' : '('+OC+' && '+EENoiseVeto1+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto2_Veto_HTFCut']            = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
+    cuts['Veto2_Veto_highptmiss_HTFCut'] = { 'expr' : '('+OC+' && '+EENoiseVeto2+' && '+ptm+' && ' + HTForward + '<60.'+')', 'weight' : btagWeight0tag }
 
 if 'DYchecks' in opt.tag:
 
@@ -248,13 +274,16 @@ if 'DYDarkMatterControlRegion' in opt.tag:
 
 if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.tag:
 
-    cuts['VR1_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
-    cuts['VR1_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+    if not hasattr(opt, 'outputDirDatacard'):
+
+        cuts['VR1_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+        cuts['VR1_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+
+        cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
+        cuts['VR1_Veto_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
 
     cuts['VR1_Tag_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
-    cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
     cuts['VR1_Tag_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
-    cuts['VR1_Veto_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
 
     cuts['VR1_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
     cuts['VR1_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
@@ -397,9 +426,15 @@ if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
         ttZselection = sel4Lep + ' && deltaMassZ'+ctrltag+'<10. && ptmiss'+ctrltag+'>=METCUT && nCleanJet>=2 && CleanJet_pt[1]>='+jetPtCut
 
-        cuts['ttZ']            = { 'expr' : '(' + ttZselection.replace('METCUT',   '0') + ')', 'weight' : btagWeight1tag }
-        cuts['ttZ_ptmiss-140'] = { 'expr' : '(' + ttZselection.replace('METCUT', '140') + ')', 'weight' : btagWeight1tag }
-        cuts['ttZ_ptmiss-160'] = { 'expr' : '(' + ttZselection.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut10']            = { 'expr' : '(' + ttZselection.replace('METCUT',   '0') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut10_ptmiss-140'] = { 'expr' : '(' + ttZselection.replace('METCUT', '140') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut10_ptmiss-160'] = { 'expr' : '(' + ttZselection.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
+
+        ttZselectionLarge = ttZselection.replace('deltaMassZ'+ctrltag+'<10.', 'deltaMassZ'+ctrltag+'<15.')
+
+        cuts['ttZ_Zcut15']            = { 'expr' : '(' + ttZselectionLarge.replace('METCUT',   '0') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut15_ptmiss-140'] = { 'expr' : '(' + ttZselectionLarge.replace('METCUT', '140') + ')', 'weight' : btagWeight1tag }
+        cuts['ttZ_Zcut15_ptmiss-160'] = { 'expr' : '(' + ttZselectionLarge.replace('METCUT', '160') + ')', 'weight' : btagWeight1tag }
 
     elif 'ZZValidationRegion' in opt.tag:
 
@@ -565,17 +600,17 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
     crcuts = { } 
     cutToRemove = [ ] 
 
-    isStrictDatacardOrPlot = isDatacardOrPlot and not hasattr(opt, 'skipLNN')
+    isStrictDatacardOrPlot = 'FitCRWZ' not in opt.tag and 'FitCRttZ' not in opt.tag and 'FitCRZZ' not in opt.tag
 
     for cut in cuts:
-        if 'SR' in cut:
+        if 'SR' in cut or 'VR1' in cut:
 
             if not isStrictDatacardOrPlot:
                 cutToRemove.append(cut)
 
             if '_em' in cut: continue # Use only sf channel to avoid double counting
 
-            crcut = cut.replace('SR', 'CR')
+            crcut = cut.replace('SR', 'CR').replace('VR1', 'CR0')
             exprcut = cuts[cut]['expr']
             exprcut = exprcut.replace(' && '+DF, '')
             exprcut = exprcut.replace(' && '+SF, '')
@@ -594,7 +629,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
 
             if '_Tag_' not in cut and ('FitCRWZ' in opt.tag or isStrictDatacardOrPlot):
              
-                exprCR = exprcut.replace(OC, nLooseLepton+'==3 && ' + nTightLepton + '==3 && deltaMassZ_WZ<10. && ptmiss_WZ>=0.')
+                exprCR = exprcut.replace(OC, nLooseLepton+'==3 && ' + nTightLepton + '==3 && deltaMassZ_WZ<999. && ptmiss_WZ>=0.')
                 exprCR = exprCR.replace('ptmiss>', 'ptmiss_WZ>')
                 exprCR = exprCR.replace('ptmiss<', 'ptmiss_WZ<')
                 exprCR = exprCR.replace('ptmiss_phi', 'ptmiss_phi_WZ')
@@ -654,14 +689,14 @@ if hasattr(opt, 'postFit'):
 
 # For structure and plot cfg files
 
-if 'SignalRegion' in opt.tag:
+if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag:
 
     for sample in samples:
 
         cutToRemove = [ ]
 
         for cut in cuts:
-            if ('SR' in cut and 'isControlSample' in samples[sample] and samples[sample]['isControlSample']==1) or ('CR' in cut and samples[sample]['isSignal']==1):
+            if (('SR' in cut or 'VR1' in cut) and 'isControlSample' in samples[sample] and samples[sample]['isControlSample']==1) or ('CR' in cut and samples[sample]['isSignal']==1):
                 cutToRemove.append(cut)
 
         if len(cutToRemove)>0:
@@ -710,54 +745,56 @@ if normBackgrounds is not None:
                     normBackgroundNuisances[background][region]['cuts'] = cutList
                     normBackgroundNuisances[background][region]['scalefactorFromData'] = False if (region=='all' and scaleFactor=='1.00') else True
 
-            if not exclusiveSelection and hasattr(opt, 'doHadd') and not opt.doHadd:
-                # Tricky because we can't define a weight for one sample and one cut!
-                # We need to run only on the background to which the SF apply. For other samples, L673 saves us!
-                for othersample in samples:
-                    if othersample!=background:
-                        print 'Error: scale factors for', background, 'do not have exclusive selection: please run on this sample separately!'
-                        exit()
+            if len(normBackgroundNuisances[background].keys())>0:
 
-            for region in normBackgrounds[background]:    
-                if region in normBackgroundNuisances[background]:
+                if not exclusiveSelection and hasattr(opt, 'doHadd') and not opt.doHadd:
+                    # Tricky because we can't define a weight for one sample and one cut!
+                    # We need to run only on the background to which the SF apply. For other samples, L673 saves us!
+                    for othersample in samples:
+                        if othersample!=background:
+                            print 'Error: scale factors for', background, 'do not have exclusive selection: please run on this sample separately!'
+                            exit()
 
-                    scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]  
-                    scaleFactorError = normBackgrounds[background][region]['scalefactor'][scaleFactor]
-                    scaleFactorRelativeError = float(scaleFactorError)/float(scaleFactor)                    
+                for region in normBackgrounds[background]:    
+                    if region in normBackgroundNuisances[background]:
 
-                    regionCut = normBackgrounds[background][region]['selection']
-                    regionWeight = scaleFactor if regionCut=='1.' else '((!'+regionCut+')+('+regionCut+')*'+scaleFactor+')'
+                        scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]  
+                        scaleFactorError = normBackgrounds[background][region]['scalefactor'][scaleFactor]
+                        scaleFactorRelativeError = float(scaleFactorError)/float(scaleFactor)                    
 
-                    nuisanceType = 'lnN'
-                    for cut in normBackgroundNuisances[background][region]['cuts']:
-                        for otherregion in normBackgroundNuisances[background]:
-                            if otherregion!=region and cut in normBackgroundNuisances[background][otherregion]['cuts']:
-                                nuisanceType = 'shape'
+                        regionCut = normBackgrounds[background][region]['selection']
+                        regionWeight = scaleFactor if regionCut=='1.' else '((!'+regionCut+')+('+regionCut+')*'+scaleFactor+')'
 
-                    if normBackgroundNuisances[background][region]['scalefactorFromData']:
-                        if exclusiveSelection:
-                            samples[background]['weight'] += '*'+regionWeight
+                        nuisanceType = 'lnN'
+                        for cut in normBackgroundNuisances[background][region]['cuts']:
+                            for otherregion in normBackgroundNuisances[background]:
+                                if otherregion!=region and cut in normBackgroundNuisances[background][otherregion]['cuts']:
+                                    nuisanceType = 'shape'
+
+                        if normBackgroundNuisances[background][region]['scalefactorFromData']:
+                            if exclusiveSelection:
+                                samples[background]['weight'] += '*'+regionWeight
+                            else:
+                                for cut in cuts:                       
+                                    if cut in normBackgroundNuisances[background][region]['cuts']:
+                                        if 'weight' in cuts[cut]:
+                                            cuts[cut]['weight'] += '*'+regionWeight           
+                                        else:
+                                            cuts[cut]['weight'] = regionWeight
+
+                        normBackgroundNuisances[background][region]['type'] = nuisanceType
+   
+                        if nuisanceType=='lnN':
+
+                            normBackgroundNuisances[background][region]['samples'] = { background : str(1.+scaleFactorRelativeError) }
+                         
                         else:
-                            for cut in cuts:                       
-                                if cut in normBackgroundNuisances[background][region]['cuts']:
-                                    if 'weight' in cuts[cut]:
-                                        cuts[cut]['weight'] += '*'+regionWeight           
-                                    else:
-                                        cuts[cut]['weight'] = regionWeight
+ 
+                            regionWeightUp   = '((!'+regionCut+')+('+regionCut+')*'+str(1.+scaleFactorRelativeError)+')'
+                            regionWeightDown = '((!'+regionCut+')+('+regionCut+')*'+str(1.-scaleFactorRelativeError)+')' 
 
-                    normBackgroundNuisances[background][region]['type'] = nuisanceType
-
-                    if nuisanceType=='lnN':
-
-                        normBackgroundNuisances[background][region]['samples'] = { background : str(1.+scaleFactorRelativeError) }
-                      
-                    else:
-
-                        regionWeightUp   = '((!'+regionCut+')+('+regionCut+')*'+str(1.+scaleFactorRelativeError)+')'
-                        regionWeightDown = '((!'+regionCut+')+('+regionCut+')*'+str(1.-scaleFactorRelativeError)+')' 
-
-                        normBackgroundNuisances[background][region]['kind'] = 'weight'
-                        normBackgroundNuisances[background][region]['samples'] = { background : [ regionWeightUp, regionWeightDown ] }
-
+                            normBackgroundNuisances[background][region]['kind'] = 'weight'
+                            normBackgroundNuisances[background][region]['samples'] = { background : [ regionWeightUp, regionWeightDown ] }
+   
 
 

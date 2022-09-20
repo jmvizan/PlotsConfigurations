@@ -35,6 +35,8 @@ else:
     fileset=sigset
 if 'SM-' not in fileset:
     fileset = 'SM-' + fileset
+datatype = 'SM-'
+if 'PseudoData' in fileset: datatype += 'PseudoData-'
 
 exec(open('./signalMassPoints.py').read())
 
@@ -48,4 +50,4 @@ for year in years:
         if model in sigset:
             for massPoint in signalMassPoints[model]:
                 if massPointInSignalSet(massPoint, sigset):
-                    os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset=SM-'+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+tag+'/'+massPoint+' --inputFile=./Shapes/'+year+'/'+inputtag+'/plots_'+inputtag+'_'+fileset+'.root') 
+                    os.system('mkDatacards.py --pycfg=configuration.py --tag='+year+tag+' --sigset='+datatype+massPoint+' --outputDirDatacard=./Datacards/'+year+'/'+tag+'/'+massPoint+' --inputFile=./Shapes/'+year+'/'+inputtag+'/plots_'+inputtag+'_'+fileset+'.root') 

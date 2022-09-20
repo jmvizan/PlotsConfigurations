@@ -43,7 +43,6 @@ if '2018' in opt.tag :
     lumi_uncertainty_cor = '1.020'
     lumi_uncertainty_dos = '1.002'
     trigger_uncertainty  = '1.020'
-print 'Value of lumi set to', opt.lumi
 
 recoFlag = '_UL'
 
@@ -55,13 +54,19 @@ nuis_btag_split = True
 
 treePrefix= 'nanoLatino_'
 
-isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN')
+isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit') or hasattr(opt, 'combineAction')
+isShape = hasattr(opt, 'doHadd')
+isShapeOrPlot = isShape or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN')
+isShapeOrDatacardOrPlot = isShape or isDatacardOrPlot
+
+if isShapeOrPlot:
+    print 'Value of lumi set to', opt.lumi
 
 ### Directories
 
 skipTreesCheck = False if len(yeartag.split('-'))==1 else True
 
-if not isDatacardOrPlot and skipTreesCheck:
+if isShape and skipTreesCheck:
     print 'Error: it is not allowed to fill shapes and skipping trees check!'
     #exit()
  
@@ -72,11 +77,11 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
-    if not skipTreesCheck:
-        print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
+    if not skipTreesCheck and 'EOY' not in opt.sigset:
         if not hasattr(opt, 'doHadd') or opt.doHadd:
             skipTreesCheck = True
         else:
+            print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
             exit()
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
@@ -507,7 +512,7 @@ if 'WZtoWW' in opt.tag or 'WZVal' in opt.tag or 'ZZVal' in opt.tag or 'ttZ' in o
 
 # generation weights
 
-XSWeight       = 'baseW*genWeight'
+XSWeight       = 'baseW*genWeight*((ptmiss'+ctrltag+'-MET_pt)<10000.)'
 
 # lepton weights
 
@@ -537,6 +542,22 @@ for lep_i in ['Lep']:
         lepW_i = LepWeight[lep_i][weight_i]
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
         else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
+        if weight_i=='Extra':
+            if '2016HIPM' in yeartag or '2016noHIPM' in yeartag:
+                if lep_i=='Lep' or lep_i=='Ele':
+                    extraElectronSF    = ElectronSF+'_ExtraSF[lepIDX]'
+                    extraElectronSFvar = ElectronSF+'_ExtraSF_VAR[lepIDX]' 
+                    extraSFcorrection  = '(('+extraElectronSFvar+'*(abs('+extraElectronSF+'-'+extraElectronSFvar+')<0.4))+(FIXERR*'+extraElectronSF+'*(abs('+extraElectronSF+'-'+extraElectronSFvar+')>=0.4)))'
+                    extraElectronSF0up = extraSFcorrection.replace('lepIDX', '0').replace('VAR', 'Up').replace('FIXERR', '1.1')
+                    extraElectronSF1up = extraSFcorrection.replace('lepIDX', '1').replace('VAR', 'Up').replace('FIXERR', '1.1')
+                    extraElectronSF0do = extraSFcorrection.replace('lepIDX', '0').replace('VAR', 'Down').replace('FIXERR', '0.9')
+                    extraElectronSF1do = extraSFcorrection.replace('lepIDX', '1').replace('VAR', 'Down').replace('FIXERR', '0.9')
+                    leptonSFExtraUp = leptonSF[lep_i.lower()+weight_i]['weight'][0].replace(ElectronSF+'_ExtraSF_Up[0]',   extraElectronSF0up).replace(ElectronSF+'_ExtraSF_Up[1]',   extraElectronSF1up)
+                    leptonSF[lep_i.lower()+weight_i]['weight'][0] = leptonSFExtraUp 
+                    leptonSFExtraDo = leptonSF[lep_i.lower()+weight_i]['weight'][1].replace(ElectronSF+'_ExtraSF_Down[0]', extraElectronSF0do).replace(ElectronSF+'_ExtraSF_Down[1]', extraElectronSF1do)
+                    leptonSF[lep_i.lower()+weight_i]['weight'][1] = leptonSFExtraDo
+
+
 
 # nonprompt lepton rate:
 
@@ -582,14 +603,15 @@ SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeight['Lep']['
 normBackgrounds = {}
 
 if 'WWSF' in opt.tag and "PseudoData" not in opt.tag: # not updated to UL with no EOY mix
+
     if '2016HIPM' in opt.tag:
-        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.142' : '0.191' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+        normBackgrounds['WW'] = {'nojet': {'exclusiveSelection': 1, 'selection': '(Alt$(CleanJet_pt[0],0)<'+jetPtCut+')', 'scalefactor': {'1.42017077692': '0.376702188335'}, 'cuts': ['VR1']}}
     elif '2016noHIPM' in opt.tag:
-        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.416' : '0.189' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+        normBackgrounds['WW'] = {'nojet': {'exclusiveSelection': 1, 'selection': '(Alt$(CleanJet_pt[0],0)<'+jetPtCut+')', 'scalefactor': {'1.15470503329': '0.254156405539'}, 'cuts': ['VR1']}}
     elif '2017' in opt.tag:
-        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.333' : '0.140' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+        normBackgrounds['WW'] = {'nojet': {'exclusiveSelection': 1, 'selection': '(Alt$(CleanJet_pt[0],0)<'+jetPtCut+')', 'scalefactor': {'1.33185796241': '0.243856942973'}, 'cuts': ['VR1']}}
     elif '2018' in opt.tag:
-        normBackgrounds['WW']      = { 'nojet'   : { 'scalefactor' : { '1.395' : '0.167' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' } }
+        normBackgrounds['WW'] = {'nojet': {'exclusiveSelection': 1, 'selection': '(Alt$(CleanJet_pt[0],0)<'+jetPtCut+')', 'scalefactor': {'1.35580318702': '0.221281786431'}, 'cuts': ['VR1']}}
 
 if 'WJetsCorr' in opt.sigset: # not updated to UL with no EOY mix
 
@@ -606,7 +628,7 @@ if 'WJetsCorr' in opt.sigset: # not updated to UL with no EOY mix
         normBackgrounds['WJetsCorr']      = { 'nojet'   : { 'scalefactor' : { '1.34' : '0.' }, 'cuts' : [ '_NoJet', '_Veto' ], 'selection' : '(nCleanJet==0)' },
                                               'notag'   : { 'scalefactor' : { '1.25' : '0.' }, 'cuts' : [ '_NoTag', '_Veto' ], 'selection' : '(nCleanJet>=1)' } }
 
-if 'SignalRegions' in opt.tag:
+if 'SignalRegions' in opt.tag or hasattr(opt, 'outputDirDatacard'):
 
     normBackgrounds['STtW']      = { 'all'   : { 'scalefactor' : { '1.00' : '0.10' }, 'selection' : '1.' } }
     normBackgrounds['ttW']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
@@ -615,6 +637,7 @@ if 'SignalRegions' in opt.tag:
     normBackgrounds['VVV']       = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } } 
     normBackgrounds['DY']        = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
     normBackgrounds['ttSemilep'] = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
+    normBackgrounds['minor']     = { 'all'   : { 'scalefactor' : { '1.00' : '0.50' }, 'selection' : '1.' } }
 
 if 'BackSF' in opt.tag:
 
@@ -622,7 +645,7 @@ if 'BackSF' in opt.tag:
 
             normBackgrounds['ZZTo2L2Nu'] = {"zz4": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.642748635788": "0.82989918649"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"1.09540359418": "0.639116792926"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.20787166102": "0.49472557433"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.04123176537": "0.280836244411"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
             normBackgrounds['ZZTo4L'] = {"zz4": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.642748635788": "0.82989918649"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"1.09540359418": "0.639116792926"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.20787166102": "0.49472557433"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"1.04123176537": "0.280836244411"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
-            normBackgrounds['ttZ'] = {"tz1": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.408873874828": "0.713813423581"}, "cuts": ["ttZ"]}, "tz3": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"2.14353899042": "2.54558982305"}, "cuts": ["ttZ"]}, "tz2": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.18656410358": "1.48495154662"}, "cuts": ["ttZ"]}, "tz4": {"exclusiveSelection": 1, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"-0.439607147131": "3.50561191569"}, "cuts": ["ttZ"]}}
+            normBackgrounds['ttZ'] = {'tz45': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'-0.412675623801': '3.28037068854'}, 'cuts': ['ttZ_Zcut15']}, 'tz40': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'-0.439607147131': '3.50561191569'}, 'cuts': ['ttZ_Zcut10']}, 'tz25': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.11106561112': '1.41299952493'}, 'cuts': ['ttZ_Zcut15']}, 'tz35': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'2.03458207419': '2.43072900216'}, 'cuts': ['ttZ_Zcut15']}, 'tz20': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.18656410358': '1.48495154662'}, 'cuts': ['ttZ_Zcut10']}, 'tz30': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'2.14353899042': '2.54558982305'}, 'cuts': ['ttZ_Zcut10']}, 'tz15': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'0.377903697577': '0.673556931903'}, 'cuts': ['ttZ_Zcut15']}, 'tz10': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'0.408873874828': '0.713813423581'}, 'cuts': ['ttZ_Zcut10']}}
             if 'WZtoWW' in opt.tag:
                 normBackgrounds['WZ'] = {"ww10": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.86579968952": "0.14903266946"}, "cuts": ["WZtoWW_Zcut10"]}, "ww15": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.853836719288": "0.150293895881"}, "cuts": ["WZtoWW_Zcut15"]}, "ww40": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.933791591544": "0.340907729422"}, "cuts": ["WZtoWW_Zcut10"]}, "ww45": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"0.882427474833": "0.32387640479"}, "cuts": ["WZtoWW_Zcut15"]}, "ww20": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.11913854591": "0.234083467711"}, "cuts": ["WZtoWW_Zcut10"]}, "ww30": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.939328409057": "0.26792447745"}, "cuts": ["WZtoWW_Zcut10"]}, "ww25": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"1.11929501829": "0.233454133201"}, "cuts": ["WZtoWW_Zcut15"]}, "ww35": {"exclusiveSelection": 0, "selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.916180000371": "0.260232333732"}, "cuts": ["WZtoWW_Zcut15"]}}
             elif 'ZLeps' in opt.tag:
@@ -633,8 +656,7 @@ if 'BackSF' in opt.tag:
     elif '2017' in yeartag:
         normBackgrounds['ZZTo2L2Nu'] = {'zz4': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'0.248007809152': '0.589761505932'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}, 'zz3': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'0.643118648465': '0.465005872912'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}, 'zz2': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.22752793759': '0.427161120149'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}, 'zz1': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'1.02877263464': '0.229947378119'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}}
         normBackgrounds['ZZTo4L'] = {'zz4': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'0.248007809152': '0.589761505932'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}, 'zz3': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'0.643118648465': '0.465005872912'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}, 'zz2': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.22752793759': '0.427161120149'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}, 'zz1': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'1.02877263464': '0.229947378119'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}}
-
-        normBackgrounds['ttZ'] = {'tz1': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'2.06936282752': '0.99981236776'}, 'cuts': ['ttZ']}, 'tz3': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'3.45013411751': '2.43919481175'}, 'cuts': ['ttZ']}, 'tz2': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.01109357226': '1.31867043189'}, 'cuts': ['ttZ']}, 'tz4': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'-0.656876764451': '3.29220677094'}, 'cuts': ['ttZ']}}
+        normBackgrounds['ttZ'] = {'tz45': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'-0.645892522943': '3.22267810342'}, 'cuts': ['ttZ_Zcut15']}, 'tz40': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'-0.656062067797': '3.2923657397'}, 'cuts': ['ttZ_Zcut10']}, 'tz25': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.53909841721': '1.41164370836'}, 'cuts': ['ttZ_Zcut15']}, 'tz35': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'3.31568600691': '2.34600794231'}, 'cuts': ['ttZ_Zcut15']}, 'tz20': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.01119593002': '1.31879786226'}, 'cuts': ['ttZ_Zcut10']}, 'tz30': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'3.45083335269': '2.43937611565'}, 'cuts': ['ttZ_Zcut10']}, 'tz15': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'1.95769434389': '0.958586708359'}, 'cuts': ['ttZ_Zcut15']}, 'tz10': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'2.06956647561': '0.99990546014'}, 'cuts': ['ttZ_Zcut10']}} 
         if 'WZtoWW' in opt.tag:
             normBackgrounds['WZ'] = {'ww10': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'1.17690004895': '0.14537978304'}, 'cuts': ['WZtoWW_Zcut10']}, 'ww15': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'1.1675866243': '0.14460455135'}, 'cuts': ['WZtoWW_Zcut15']}, 'ww40': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'0.800542118995': '0.27241140959'}, 'cuts': ['WZtoWW_Zcut10']}, 'ww45': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'0.79840719637': '0.265900274356'}, 'cuts': ['WZtoWW_Zcut15']}, 'ww20': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.00607496615': '0.185183533197'}, 'cuts': ['WZtoWW_Zcut10']}, 'ww30': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'0.99315061994': '0.216951732983'}, 'cuts': ['WZtoWW_Zcut10']}, 'ww25': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'0.963933885678': '0.179130910294'}, 'cuts': ['WZtoWW_Zcut15']}, 'ww35': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'0.982138899004': '0.212427943972'}, 'cuts': ['WZtoWW_Zcut15']}}
 
@@ -650,6 +672,9 @@ if 'BackSF' in opt.tag:
         normBackgrounds['ZZTo4L'] = {'zz4': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'1.10844678741': '0.685951015408'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}, 'zz3': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'0.74889885311': '0.395056981858'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}, 'zz2': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'0.708573946655': '0.280518903975'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}, 'zz1': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'0.938738860471': '0.183091667585'}, 'cuts': ['_NoJet', '_Veto', '_NoTag', '_Tag', 'ZZ']}}
         normBackgrounds['ttZ'] = {'tz1': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'0.783056223534': '0.603517905136'}, 'cuts': ['ttZ']}, 'tz3': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'1.20146825329': '1.52032391843'}, 'cuts': ['ttZ']}, 'tz2': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.02860595864': '1.00821891795'}, 'cuts': ['ttZ']}, 'tz4': {'exclusiveSelection': 1, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'-0.634153905734': '2.23065249957'}, 'cuts': ['ttZ']}}
 
+        normBackgrounds['ZZTo2L2Nu'] = {"zz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"1.11252027454": "0.685953714115"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.753620561097": "0.395047856574"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.712418368326": "0.280521588409"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.943111858876": "0.18310080517"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
+        normBackgrounds['ZZTo4L'] = {"zz4": {"selection": "(ptmiss"+ctrltag+">=380)", "scalefactor": {"1.11252027454": "0.685953714115"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz3": {"selection": "(ptmiss"+ctrltag+">=280 && ptmiss"+ctrltag+"<380)", "scalefactor": {"0.753620561097": "0.395047856574"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz2": {"selection": "(ptmiss"+ctrltag+">=220 && ptmiss"+ctrltag+"<280)", "scalefactor": {"0.712418368326": "0.280521588409"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}, "zz1": {"selection": "(ptmiss"+ctrltag+">=160 && ptmiss"+ctrltag+"<220)", "scalefactor": {"0.943111858876": "0.18310080517"}, "cuts": ["_NoJet", "_Veto", "_NoTag", "_Tag", "ZZ"]}}
+        normBackgrounds['ttZ'] = {'tz45': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'-0.611131112516': '2.12302088534'}, 'cuts': ['ttZ_Zcut15']}, 'tz40': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'-0.634153905734': '2.23065249957'}, 'cuts': ['ttZ_Zcut10']}, 'tz25': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'0.970034600705': '0.955679500264'}, 'cuts': ['ttZ_Zcut15']}, 'tz35': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'1.15317427075': '1.4623087126'}, 'cuts': ['ttZ_Zcut15']}, 'tz20': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'1.02860595864': '1.00821876631'}, 'cuts': ['ttZ_Zcut10']}, 'tz30': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'1.20146825329': '1.52032388997'}, 'cuts': ['ttZ_Zcut10']}, 'tz15': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'1.14666392501': '0.658540753848'}, 'cuts': ['ttZ_Zcut15']}, 'tz10': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'0.783056223534': '0.603517726262'}, 'cuts': ['ttZ_Zcut10']}} 
         if 'WZtoWW' in opt.tag:
             normBackgrounds['WZ'] = {'ww10': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'1.03805545918': '0.123572589853'}, 'cuts': ['WZtoWW_Zcut10']}, 'ww15': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=160 && ptmiss'+ctrltag+'<220)', 'scalefactor': {'1.04982528726': '0.124882884595'}, 'cuts': ['WZtoWW_Zcut15']}, 'ww40': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'0.54368403857': '0.204764883769'}, 'cuts': ['WZtoWW_Zcut10']}, 'ww45': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=380)', 'scalefactor': {'0.601772045017': '0.209305536497'}, 'cuts': ['WZtoWW_Zcut15']}, 'ww20': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'0.722912407741': '0.138432782057'}, 'cuts': ['WZtoWW_Zcut10']}, 'ww30': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'0.766527926749': '0.168236736031'}, 'cuts': ['WZtoWW_Zcut10']}, 'ww25': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=220 && ptmiss'+ctrltag+'<280)', 'scalefactor': {'0.716792262416': '0.136490646408'}, 'cuts': ['WZtoWW_Zcut15']}, 'ww35': {'exclusiveSelection': 0, 'selection': '(ptmiss'+ctrltag+'>=280 && ptmiss'+ctrltag+'<380)', 'scalefactor': {'0.812708612869': '0.170208534936'}, 'cuts': ['WZtoWW_Zcut15']}}
 
@@ -861,7 +886,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
                                 'weight' : XSWeight+'*'+SFweight ,
                                 }
 
-        if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot) or 'TheoryNormalizations' in opt.tag:
+        if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWW' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot) or 'TheoryNormalizations' in opt.tag:
         
             samples['ZZTo4L']   = {    'name'  :    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'              , False,treePrefix,skipTreesCheck) +
                                                     getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2m'            , False,treePrefix,skipTreesCheck) +
@@ -922,16 +947,18 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
 if 'Backgrounds' in opt.sigset and opt.sigset not in 'Backgrounds' and 'Backgrounds-' not in opt.sigset:
 
+    shortset = opt.sigset.split('-')[0]
+
     sampleToRemove = [ ] 
 
     for sample in samples:
-        if 'Veto' in opt.sigset:
-            if sample in opt.sigset:
+        if 'Veto' in shortset:
+            if sample in shortset:
                 sampleToRemove.append(sample)
-        elif 'BackgroundsWJets' in opt.sigset:
+        elif 'BackgroundsWJets' in opt.sigset or 'Backgrounds:WJets' in opt.sigset:
             if sample!=nameWJets and sample!='WJetsPrompt' and sample!='WJetsFake':
                 sampleToRemove.append(sample)
-        elif 'Backgrounds'+sample!= opt.sigset:
+        elif sample not in shortset: # Be sure this sample's name is not substring of other samples' names ####'Backgrounds'+sample!= opt.sigset:
             sampleToRemove.append(sample)
 
     for sample in sampleToRemove:
@@ -944,19 +971,28 @@ for sample in samples:
     samples[sample]['suppressNegative'] = ['all']
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
+    samples[sample]['treeType']  = 'Backgrounds' 
+    if sample in [ 'ttbar', 'DY', 'ZZTo2L2Nu', 'ZZTo4L', 'VZ' ]:
+        samples[sample]['split'] = 'AsMuchAsPossible'
+    elif 'BackSF' in opt.tag and sample in [ 'WZ', 'ttZ' ]:
+        samples[sample]['split'] = 'Single'
 
 ### Data
 
 if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
-    samples['DATA']  = {   'name': [ ] ,    
-                           'weight' : METFilters_Data+'*'+VetoHEMdata+'*'+VetoEENoise, 
-                           'weights' : [ ],
-                           'isData': ['all'],
-                           'isSignal'  : 0,
-                           'isDATA'    : 1, 
-                           'isFastsim' : 0
-                         }
+    dataSampleName = 'DATA' if 'Pseudo' not in opt.sigset else 'PseudoDATA'
+
+    samples[dataSampleName]  = { 'name': [ ] ,    
+                                 'weight' : METFilters_Data+'*'+VetoHEMdata+'*'+VetoEENoise, 
+                                 'weights' : [ ],
+                                 'isData': ['all'],
+                                 'isSignal'  : 0,
+                                 'isDATA'    : 1, 
+                                 'isFastsim' : 0,
+                                 'treeType'  : 'Data',
+                                 'split' : 'AsMuchAsPossible'
+                                }
 
     for Run in DataRun :
         for DataSet in DataSets :
@@ -969,8 +1005,8 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
             FileTarget = getSampleFiles(directoryData,datasetName,True,treePrefix,skipTreesCheck)
             for iFile in FileTarget:
-                samples['DATA']['name'].append(iFile)
-                samples['DATA']['weights'].append(DataTrig[DataSet])
+                samples[dataSampleName]['name'].append(iFile)
+                samples[dataSampleName]['weights'].append(DataTrig[DataSet])
 
 elif 'MET' in opt.sigset:
 
@@ -1088,41 +1124,62 @@ elif 'LeptonL2TRate' in opt.tag and 'Single' in opt.sigset:
                     samples[dataName]['weights'].append( '('+triggerPath+')' )
 
 ### Files per job
- 
-for sample in samples:
-    if 'FilesPerJob' not in samples[sample]:
-        ntrees = len(samples[sample]['name']) 
-        multFactor = 6 if 'JobsPerSample' not in samples[sample] else int(samples[sample]['JobsPerSample'])
-        samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/multFactor))
+
+if not skipTreesCheck:
+    for sample in samples:
+        if 'FilesPerJob' not in samples[sample]:
+            ntrees = len(samples[sample]['name']) 
+            multFactor = 6 if 'JobsPerSample' not in samples[sample] else int(samples[sample]['JobsPerSample'])
+            samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/multFactor))
 
 ### Signals
 
-exec(open('./signalMassPoints.py').read())
+#exec(open('./signalMassPoints.py').read())
+import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
 
-for model in signalMassPoints:
-    if model in opt.sigset.replace('EOY', ''):
+for model in signalMassPoints.signalMassPoints:
+    if model in opt.sigset.replace('EOY:', '').replace('EOY', ''):
 
         isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
 
-        for massPoint in signalMassPoints[model]:
-            if massPointInSignalSet(massPoint, opt.sigset.replace('EOY', '')):
+        for massPoint in signalMassPoints.signalMassPoints[model]:
+            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset.replace('EOY:', '').replace('EOY', '')):
 
-                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
+                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
                                        'FilesPerJob' : 2 ,
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
                                        'suppressZeroTreeNuisances' : ['all'],
+                                       'treeType' : 'EOY',
                                        'isrObservable' : isrObservable,
                                        'isSignal'  : 1,
                                        'isDATA'    : 0,
                                      }
                   
                 if fastsimSignal:
-                    samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
                     samples[massPoint]['isFastsim'] = 1
                 else:
-                    samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
                     samples[massPoint]['isFastsim'] = 0
 
-            
+### Nasty clean up for eos
+
+if 'cern' in SITE and not skipTreesCheck:
+    for sample in samples:
+        for ifile in range(len(samples[sample]['name'])):
+            samples[sample]['name'][ifile] = samples[sample]['name'][ifile].replace('root://eoscms.cern.ch/', '')
+
+if 'Group' in opt.tag and ('SM' in opt.sigset or 'Backgrounds' in opt.sigset):
+    if isShape:
+        print 'Error: should not use Group string in tag name'
+        exit()
+    samples['minor'] = {}
+    for key in samples['Higgs'].keys():
+        samples['minor'][key] = samples['Higgs'][key]
+    del samples['Higgs'] 
+    del samples['VVV']
+    del samples['VZ']
+    del samples['ttW']
+    del samples['ttSemilep']
 
