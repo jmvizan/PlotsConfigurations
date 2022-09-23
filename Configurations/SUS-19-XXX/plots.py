@@ -222,7 +222,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'isData'   : 0,
         'scale'    : 1.0                  
     }
-    
+
     plot['STtW'] = {
         'nameHR' : 'tW',
         'nameLatex' : '\\tW',
