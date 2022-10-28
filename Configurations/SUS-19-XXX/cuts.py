@@ -366,7 +366,7 @@ if 'WWValidationRegion' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
         cuts['VR1_Veto_ee_mt2']    = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.)'
         cuts['VR1_Veto_0jet']      = '(' + OC+' && ('+SF+' || '+DF+')  && ptmiss>=100 && ptmiss<140 && '+NoJets+')'
 
-if 'SameSignValidationRegion' in opt.tag:
+if 'SameSignValidationRegion' in opt.tag or 'SameSignInclusiveValidationRegion' in opt.tag:
 
     cuts['SS_ptmiss']            = { 'expr' : '('+SSM+' && ptmiss'+ctrltag+'>=0  )', 'weight' : btagWeight1tag }
     cuts['SS_ptmiss_100to140']   = { 'expr' : '('+SS +' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : btagWeight1tag }
