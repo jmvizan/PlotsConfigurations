@@ -41,7 +41,7 @@ if __name__ == '__main__':
     for period in years:
 
         opt.tag = period + tag
-
+        print "samples file", opt.samplesFile
         samples = {}
         if os.path.exists(opt.samplesFile) :
             handle = open(opt.samplesFile,'r')

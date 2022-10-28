@@ -136,11 +136,12 @@ def bookPad(name, xlow, ylow, xup, yup, title=''):
 ### Utilities for reading and setting cfg parameters
 
 def getCfgFileName(opt, cfgName):
-
+    print "opem", ('grep '+cfgName+' '+opt.configuration)
     process=subprocess.Popen('grep '+cfgName+'"File" '+opt.configuration, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
     processOutput, processError = process.communicate()
 
-    if not processOutput: 
+    if not processOutput:
+        print 'heyhey', cfgName
         print 'getCfgFileName error: '+cfgName+' File line not found in '+opt.configuration
         exit() 
 
@@ -601,8 +602,8 @@ def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outpu
 
     if strategy=='deep': mergeCommandList.extend([ '--outputShapeDir='+outputdir, '--skipLNN' ])
     else:                mergeCommandList.extend([ '--outputNuisFile='+outputnuisances, '--saveNuisances' ])
-
-    os.system('mergeDataTakingPeriodShapes.py '+' '.join( mergeCommandList ))
+    print os.getcwd()
+    os.system('../../Tools/scripts/mergeDataTakingPeriodShapes.py '+' '.join( mergeCommandList ))
 
 def yieldsTables(opt, masspoints=''):
 
