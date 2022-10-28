@@ -150,8 +150,7 @@ def mergedPlots(opt):
     for tag in opt.tag.split('-'):
 
         if opt.deepMerge!=None:
-            year = opt.deepMerge
-            
+            year = opt.deepMerge            
             outputNuisances = inputNuisances
             outputDir = '/'.join([ opt.shapedir, year, tag ])
             commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, opt.fileset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
@@ -160,7 +159,7 @@ def mergedPlots(opt):
             year = opt.year
             outputNuisances =  '_'.join([ 'nuisances', opt.year, opt.tag, opt.sigset+'.py' ])
             commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, opt.fileset, '', 'None', inputNuisances, outputNuisances, opt.verbose)
-
+        
         mkPlot(opt, year, tag, opt.sigset, outputNuisances)
         os.system('rm -f nuisances_*.py')
 
