@@ -46,7 +46,6 @@ if __name__ == '__main__':
 
     for tool in [ commonTools, latinoTools, combineTools, analysisTools ]:
         if hasattr(tool, opt.action):
-            print tool, opt.action
             module = getattr(tool, opt.action)
             module(opt)
 
