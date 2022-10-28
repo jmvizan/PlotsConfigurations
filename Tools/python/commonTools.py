@@ -136,10 +136,11 @@ def bookPad(name, xlow, ylow, xup, yup, title=''):
 ### Utilities for reading and setting cfg parameters
 
 def getCfgFileName(opt, cfgName):
+
     process=subprocess.Popen('grep '+cfgName+'"File" '+opt.configuration, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
     processOutput, processError = process.communicate()
 
-    if not processOutput:
+    if not processOutput: 
         print 'getCfgFileName error: '+cfgName+' File line not found in '+opt.configuration
         exit() 
 
