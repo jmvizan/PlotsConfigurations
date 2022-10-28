@@ -600,7 +600,7 @@ def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outpu
 
     if strategy=='deep': mergeCommandList.extend([ '--outputShapeDir='+outputdir, '--skipLNN' ])
     else:                mergeCommandList.extend([ '--outputNuisFile='+outputnuisances, '--saveNuisances' ])
-    
+
     os.system('mergeDataTakingPeriodShapes.py '+' '.join( mergeCommandList ))
 
 def yieldsTables(opt, masspoints=''):
