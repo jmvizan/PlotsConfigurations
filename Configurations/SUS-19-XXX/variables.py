@@ -614,14 +614,16 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                                 'fold'  : overflow                 #   fold overflow
                                              }
 
-                variables['nbjets']        = {  'name'  : nbjets,                    #   variable name    
+                nbjetsSS = nbjets
+                if 'SameSignVeto' in opt.tag: nbjetsSS = '0.5'
+                variables['nbjets']        = {  'name'  : nbjetsSS,                  #   variable name    
                                                 'range' : (  3,    0.,     3.),      #   variable range
                                                 'xaxis' : 'number of b-tagged jets', #   x axis name
                                                 'fold'  : overflow                   #   fold overflow
                                              }
 
-                variables['jetpt']         = {   'name'  : 'CleanJet_pt',          #   variable name    
-                                                 'range' : (  40,    0.,  200.),   #   variable range
+                variables['jetpt']         = {   'name'  : 'CleanJet_pt[0]',       #   variable name    
+                                                 'range' : (  10,    0.,  200.),   #   variable range
                                                  'xaxis' : 'jet ' + pt + gv,       #   x axis name
                                                  'fold'  : overflow                #   fold overflow
                                              }
