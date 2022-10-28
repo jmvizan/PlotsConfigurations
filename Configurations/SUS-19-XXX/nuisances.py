@@ -185,9 +185,11 @@ for cut in cuts:
 
 # mt2ll top and WW
 
-if ('_WZbin' in opt.tag or '_WZBin' in opt.tag) and 'Merge' not in opt.tag:
+doMT2Shapes = True
 
-    mt2llweightUp = '(1. + 3.*(mt2ll>=370))'
+if addMT2Shapes:
+
+    mt2llweightUp = '(1. - 0.75*(mt2ll>=370))'
     mt2llweightDo = '1.'
 
     nuisancekey = 'WZbin'
@@ -198,8 +200,6 @@ if ('_WZbin' in opt.tag or '_WZBin' in opt.tag) and 'Merge' not in opt.tag:
         'kind'  : 'weight',
         'type'  : 'shape'
     }
-
-if '_WWshape' in opt.tag:
 
     mt2llweightUp = '(1. + 0.2*(mt2ll>=100.)*(mt2ll<160.) + 0.4*(mt2ll>=160.)*(mt2ll<240.) + 0.5*(mt2ll>=240))'
     mt2llweightDo = '1.'
@@ -222,14 +222,6 @@ if '_WWshape' in opt.tag:
         for cut in cuts.keys():
             if mt2llregion in cut:
                 nuisances[nuisancekey]['cuts'].append(cut)
-
-if '_WWShape' in opt.tag:
-
-    mt2llweightUp = '(1. + 0.2*(mt2ll>=100.)*(mt2ll<160.) + 0.4*(mt2ll>=160.)*(mt2ll<240.) + 0.5*(mt2ll>=240))'
-    mt2llweightDo = '1.'
-
-    for mt2llregion in mt2llRegions:
-        if 'VR1' in mt2llregion: continue
 
         binList = []
         if 'Stop' in opt.tag: binList.extend([ 'Bin6', 'Bin7' ])
