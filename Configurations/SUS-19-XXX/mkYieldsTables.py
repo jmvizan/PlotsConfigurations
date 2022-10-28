@@ -69,7 +69,7 @@ if __name__ == '__main__':
     massPointOutput = opt.masspoints
 
     if opt.masspoints=='referenceMassPoints':
-        opt.masspoints = 'TChipmSlepSnu_mC-300_mX-1'#,TChipmSlepSnu_mC-300_mX-175,TChipmSlepSnu_mC-400_mX-225,TChipmSlepSnu_mC-500_mX-50,TChipmSlepSnu_mC-500_mX-300,TChipmSlepSnu_mC-650_mX-350,TChipmSlepSnu_mC-650_mX-125,TChipmSlepSnu_mC-800_mX-425,TChipmSlepSnu_mC-800_mX-200,TChipmSlepSnu_mC-950_mX-400,TChipmSlepSnu_mC-950_mX-200,TChipmSlepSnu_mC-1050_mX-375,TChipmSlepSnu_mC-1050_mX-150,TChipmSlepSnu_mC-1100_mX-50,TChipmSlepSnu_mC-1150_mX-1'
+        opt.masspoints = 'TChipmSlepSnu_mC-300_mX-1,TChipmSlepSnu_mC-300_mX-175,TChipmSlepSnu_mC-400_mX-225,TChipmSlepSnu_mC-500_mX-50,TChipmSlepSnu_mC-500_mX-300,TChipmSlepSnu_mC-650_mX-350,TChipmSlepSnu_mC-650_mX-125,TChipmSlepSnu_mC-800_mX-425,TChipmSlepSnu_mC-800_mX-200,TChipmSlepSnu_mC-950_mX-400,TChipmSlepSnu_mC-950_mX-200,TChipmSlepSnu_mC-1050_mX-375,TChipmSlepSnu_mC-1050_mX-150,TChipmSlepSnu_mC-1100_mX-50,TChipmSlepSnu_mC-1150_mX-1'
     elif opt.masspoints=='referenceStopMassPoints':
         opt.masspoints = ''
         for mS in [ 300, 350, 400, 450, 475, 500, 525, 550 ]:
