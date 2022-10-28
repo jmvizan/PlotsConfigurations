@@ -606,6 +606,38 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                                        'fold'  : overflow,                     #   fold overflow
                                                        'CRbins' : [1, 4]
                                                     }
+            if 'SameSign' in opt.tag:
+                #HERE
+                variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name
+                                                'range' : (  6,    0.,     6.),    #   variable range
+                                                'xaxis' : 'number of jets',        #   x axis name
+                                                'fold'  : overflow                 #   fold overflow
+                                             }
+
+                variables['nbjets']        = {  'name'  : nbjets,                    #   variable name    
+                                                'range' : (  3,    0.,     3.),      #   variable range
+                                                'xaxis' : 'number of b-tagged jets', #   x axis name
+                                                'fold'  : overflow                   #   fold overflow
+                                             }
+
+                variables['jetpt']         = {   'name'  : 'CleanJet_pt',          #   variable name    
+                                                 'range' : (  40,    0.,  200.),   #   variable range
+                                                 'xaxis' : 'jet ' + pt + gv,       #   x axis name
+                                                 'fold'  : overflow                #   fold overflow
+                                             }
+
+                variables['leppt']          = { 'name'  : 'Lepton_pt[0]',          #   variable name
+                                                'range' : ([20, 25, 30, 40, 50, 70, 100, 150, 200],[1]),  #   variable range
+                                                'xaxis' : 'lepton ' + pt + gv,     #   x axis name
+                                                'fold'  : overflow                 #   fold overflow
+                                              }
+
+                variables['ptmissSR']     = {  'name'  : 'ptmiss'+ctrltag,        #   variable name  
+                                               'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]), #   variable range
+                                               'xaxis' : met + gv,                #   x axis name
+                                               'fold'  : overflow                 #   fold overflow
+                                             }
+
 
     ### Extra variables 
     # Optimization ...

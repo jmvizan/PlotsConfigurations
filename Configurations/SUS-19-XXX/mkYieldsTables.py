@@ -115,7 +115,7 @@ if __name__ == '__main__':
                 
                     tableName = outputDir+fittype+'_'+cut+'_'+year+'.tex'
                     table = open(tableName , 'w')
-
+                    print "tableName", tableName
                     # Here we are assuming one variable for cut!
                     for variable in variables:
                         if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
@@ -203,19 +203,25 @@ if __name__ == '__main__':
                     #table.write('\\hline\n')
 
                     #table.write('\\end{tabular}\n')
-                    ##table.write('\\end{center}\n') 
+                    #table.write('\\end{center}\n') 
 
-                    eoyTableName = '/afs/cern.ch/user/s/scodella/Documents/notes/AN-19-256/EOY/tables/07/PROC'+year+'/'+fittype+'_'+cut+'_'+year+'.tex'
+                    #eoyTableName = '/afs/cern.ch/user/s/scodella/Documents/notes/AN-19-256/EOY/tables/07/PROC'+year+'/'+fittype+'_'+cut+'_'+year+'.tex'
+                    if "pmatorra" in  os.getenv('USER'): base = '/gpfs/users/pmatorra/Documents/notes'
+                    else: base ='/afs/cern.ch/user/s/scodella/Documents/notes'
+                    
+                    eoyTableName = base+'/AN-19-256/EOY/tables/07/PROC'+year+'/'+fittype+'_'+cut+'_'+year+'.tex'
                     if 'Chargino' in tag: eoyTableName = eoyTableName.replace('PROC','TChipm')
                     if 'Stop' in tag: eoyTableName = eoyTableName.replace('PROC','T2')
                     with open(eoyTableName) as f:
       	                 lines = f.readlines()
                          doPrint = False
                          for line in lines:
-    	                     if "SM" in line and "Processes" in line:
+                            if "SM" in line and "Processes" in line:
                                  line = line.replace("Processes", "Processes (EOY)")
                                  doPrint = True
-                             if doPrint: table.write(line)
+                            #print "line", line, doPrint
+                            if doPrint: table.write(line)
                  
                              
-
+                    
+    print "end of the document"

@@ -189,6 +189,7 @@ for model in signalMassPoints:
         #if massPoint not in sigset: continue
         #print 'Mass Point:', massPoint 
 
+print "is makefit false?", makeFit
 #Print missing MP/DC
 if makeFit is False:
     print 'Total datacards missing', len(missDC)
@@ -277,6 +278,7 @@ for ijob,job in enumerate(jobs):
     argsigset = ','.join(job)
     arguments = year+' '+tag+' '+argsigset+ ' ' +PWD+' '+fileset+' '+str(doDC)+' '+limrun
     flist.write(argsigset+'\n')
+    print "this are the arguments", arguments
     #    submit='condor_submit '+subfilename+' >>'+logfile
     
     if gridui is True:
@@ -287,7 +289,7 @@ for ijob,job in enumerate(jobs):
         f2.write('\npython run_AnalysisMP.py '+arguments)
         f2.close()
         os.system(gridcomm)
-        #print gridcomm
+        print gridcomm
         print 'sending job',str(ijob)+':', argsigset# arguments  
 flist.close()
 

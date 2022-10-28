@@ -150,7 +150,7 @@ def mergedPlots(opt):
     for tag in opt.tag.split('-'):
 
         if opt.deepMerge!=None:
-            year = opt.deepMerge
+            year = opt.deepMerge            
             outputNuisances = inputNuisances
             outputDir = '/'.join([ opt.shapedir, year, tag ])
             commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, opt.fileset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
