@@ -493,7 +493,6 @@ elif 'ttZNormalization' in opt.tag:
                              'fold'  : overflow                 #   fold overflow
                            }
 
-
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     ### Set the mt2ll variable

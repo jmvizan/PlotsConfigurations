@@ -82,7 +82,7 @@ for scalefactor in leptonSF:
 
 btagWeight1tagSyst = btagWeight1tag if 'TrigBTag' not in opt.tag else btagWeight1tag.replace('*triggerWeightBTag', '') # Bleah!!!
 bSelections = { '1b' : { 'weight' : btagWeight1tagSyst+'_syst/'+btagWeight1tagSyst,
-                         'cuts'   : [ '_Tag', 'SS_'  , 'Fake', 'ttZ', '1tag', '2tag' ] },
+                         'cuts'   : [ '_Tag', 'SS_', 'Fake', 'ttZ', '1tag', '2tag' ] },
                 '0b' : { 'weight' : '(1.-'+btagWeight1tagSyst+'_syst)/(1.-'+btagWeight1tagSyst+')',
                          'cuts'   : [ '_Veto', 'SSV_', '_NoTag', 'WZ_', 'WZtoWW_', 'ZZ', 'Zpeak' ] },
                }

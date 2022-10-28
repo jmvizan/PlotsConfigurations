@@ -80,7 +80,6 @@ def submit_shapes(args):
     sigset = args[4]
 
     multi  = 'Multi'
-    
     if '_notmulti' in tags.lower() : 
         multi = ''
         tags   = tags.split('_notmulti')[0]

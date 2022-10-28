@@ -158,10 +158,9 @@ def mergedPlots(opt):
 
         else:
             year = opt.year
-            print "year", year
             outputNuisances =  '_'.join([ 'nuisances', opt.year, opt.tag, opt.sigset+'.py' ])
             commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, opt.fileset, '', 'None', inputNuisances, outputNuisances, opt.verbose)
-            exit()
+
         mkPlot(opt, year, tag, opt.sigset, outputNuisances)
         os.system('rm -f nuisances_*.py')
 

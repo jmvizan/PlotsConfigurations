@@ -81,7 +81,6 @@ if __name__ == '__main__':
             fol_f  = os.getcwd()+'/Shapes/'+year+'/'+tag_fin+'/'
             file_i = 'plots_'+year+tag_ini+version+'.root'#.replace('.root','.broot')
             file_f = 'plots_'+year+tag_fin+version+'.root'#.replace('.root','.broot')
-            
             if '_ALL_' in version: 
                 fol_i  +='Samples/'
                 fol_f  +='Samples/'

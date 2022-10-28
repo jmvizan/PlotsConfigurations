@@ -224,4 +224,4 @@ if __name__ == '__main__':
                  
                              
                     
-    print "end of the documenbt"
+    print "end of the document"
