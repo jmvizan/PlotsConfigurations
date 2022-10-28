@@ -185,7 +185,7 @@ for cut in cuts:
 
 # mt2ll top and WW
 
-doMT2Shapes = True
+addMT2Shapes = True
 
 if addMT2Shapes:
 
