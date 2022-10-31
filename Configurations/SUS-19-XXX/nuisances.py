@@ -207,7 +207,7 @@ if addMT2Shapes:
     for mt2llregion in mt2llRegions:
         if 'VR1' in mt2llregion: continue
 
-        if isShape or '_WWShapeCorr' not in opt.tag:
+        if isShape or hasattr(opt, 'groups') or hasattr(opt,'skipLNN') or '_WWShapeCorr' not in opt.tag:
 
             nuisancekey = 'WWshape_'+mt2llregion
             nuisances[nuisancekey]  = {
@@ -225,7 +225,7 @@ if addMT2Shapes:
                 if mt2llregion in cut:
                     nuisances[nuisancekey]['cuts'].append(cut)
 
-        if isShape or '_WWShapeCorr' in opt.tag:
+        if isShape or hasattr(opt, 'groups') or hasattr(opt,'skipLNN') or '_WWShapeCorr' in opt.tag:
 
             binList = []
             if 'Stop' in opt.tag: binList.extend([ 'Bin6', 'Bin7' ])

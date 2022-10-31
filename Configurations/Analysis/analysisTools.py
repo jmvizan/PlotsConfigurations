@@ -212,7 +212,7 @@ def mergeCRToSignal(opt):
                 outputDir = commonTools.getShapeDirName(opt.shapedir, year, tag)
                 outputFile = outputDir + '/plots_' + tag + '_SM-' + sigset + '.root'
                 smFile     = outputDir + '/plots_' + tag + '_SM.root' 
-                signalFile = outputDir + '/plots_' + tag + '_' + sigset + '.root'
+                signalFile = outputDir.replace('Group','') + '/plots_' + tag.replace('Group','') + '_' + sigset + '.root'
 
                 os.system('haddfast --compress '+outputFile+' '+smFile+' '+signalFile) 
 
@@ -298,7 +298,8 @@ def signalCombine(opt, action):
             for signal in signalList:
                 massPoints = getMassPointList(signal)
                 for massPoint in massPoints:
-                    signalFileset = getMassPointSubset(opt, massPoint)
+                    if opt.fileset!='': signalFileset = opt.fileset
+                    else: signalFileset = getMassPointSubset(opt, massPoint)
                     if signalFileset!=None:
                         if signalFileset not in filesetMap: filesetMap[signalFileset] = []
                         filesetMap[signalFileset].append(massPoint)
