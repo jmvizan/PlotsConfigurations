@@ -189,7 +189,7 @@ addMT2Shapes = 'SignalRegions' in opt.tag
 
 if addMT2Shapes:
 
-    mt2llweightUp = '(1. - 0.75*(mt2ll>=370))'
+    mt2llweightUp = '(1. - 0.75*(mt2ll'+ctrltag+'>=370))'
     mt2llweightDo = '1.'
 
     nuisancekey = 'WZbin'
