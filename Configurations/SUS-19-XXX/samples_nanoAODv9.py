@@ -87,7 +87,7 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
-Spring21UL16FS_106X_nAODv9_Full2016v8/susyGen__susyW__FSSusy2016v8__FSSusyCorr2016v8noHIPM__FSSusyJERUp2016v8noHIPM
+
 if '2016' in yeartag :
     hipmFlag = yeartag.replace('2016', '')
     ProductionMC   = 'Summer20UL16_106X_nAODv9_'+hipmFlag+'_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8'+hipmFlag+'__MCSusyNomin2016v8'
@@ -1127,7 +1127,6 @@ if not skipTreesCheck:
 
 ### Signals
 
-#exec(open('./signalMassPoints.py').read())
 import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
 
 for model in signalMassPoints.signalMassPoints:

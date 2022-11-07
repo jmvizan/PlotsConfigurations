@@ -1126,8 +1126,8 @@ if not skipTreesCheck:
 
 ### Signals
 
-#exec(open('./signalMassPoints.py').read())
-import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
+#exec(open('./signalMassPointsEOY.py').read())
+import PlotsConfigurations.Tools.signalMassPointsEOY as signalMassPoints
 
 for model in signalMassPoints.signalMassPoints:
     if model in opt.sigset.replace('EOY:', '').replace('EOY', ''):

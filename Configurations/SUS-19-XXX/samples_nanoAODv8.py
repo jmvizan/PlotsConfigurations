@@ -869,7 +869,7 @@ for sample in samples:
 
 ### Signals
 
-exec(open('./signalMassPoints.py').read())
+exec(open('./signalMassPointsEOY.py').read())
 
 for model in signalMassPoints:
     if model in opt.sigset.replace('EOY', ''):
