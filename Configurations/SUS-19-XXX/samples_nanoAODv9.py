@@ -1130,30 +1130,29 @@ if not skipTreesCheck:
 import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
 
 for model in signalMassPoints.signalMassPoints:
-    if model in opt.sigset.replace('EOY:', '').replace('EOY', ''):
 
-        isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
+    isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
 
-        for massPoint in signalMassPoints.signalMassPoints[model]:
-            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset.replace('EOY:', '').replace('EOY', '')):
+    for massPoint in signalMassPoints.signalMassPoints[model]:
+        if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset):
 
-                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
-                                       'FilesPerJob' : 2 ,
-                                       'suppressNegative':['all'],
-                                       'suppressNegativeNuisances' :['all'],
-                                       'suppressZeroTreeNuisances' : ['all'],
-                                       'treeType' : 'EOY',
-                                       'isrObservable' : isrObservable,
-                                       'isSignal'  : 1,
-                                       'isDATA'    : 0,
-                                     }
+            samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
+                                   'FilesPerJob' : 2 ,
+                                   'suppressNegative':['all'],
+                                   'suppressNegativeNuisances' :['all'],
+                                   'suppressZeroTreeNuisances' : ['all'],
+                                   'treeType' : 'UL',
+                                   'isrObservable' : isrObservable,
+                                   'isSignal'  : 1,
+                                   'isDATA'    : 0,
+                                 }
                   
-                if fastsimSignal:
-                    samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
-                    samples[massPoint]['isFastsim'] = 1
-                else:
-                    samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
-                    samples[massPoint]['isFastsim'] = 0
+            if fastsimSignal:
+                samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                samples[massPoint]['isFastsim'] = 1
+            else:
+                samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                samples[massPoint]['isFastsim'] = 0
 
 ### Nasty clean up for eos
 
