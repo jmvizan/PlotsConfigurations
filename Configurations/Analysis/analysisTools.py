@@ -311,6 +311,7 @@ def signalCombine(opt, action):
 
             if action=='limits': combineTools.limits(opt2)
             if action=='mlfits': combineTools.mlfits(opt2)
+            if action=='impactsPlots': combineTools.impactsPlots(opt2)
 
 def signalLimits(opt):
 
@@ -319,6 +320,10 @@ def signalLimits(opt):
 def signalMLFits(opt):
 
     signalCombine(opt, 'mlfits')
+
+def signalImpactsPlots(opt):
+
+    signalCombine(opt, 'impactsPlots')
 
 ### Post fit analysis
 

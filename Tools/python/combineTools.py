@@ -96,7 +96,8 @@ def runCombine(opt):
     if not hasattr(opt, 'combineAction'):
         if 'limit' in opt.option: limits(opt)
         elif 'fit' in opt.option: mlfits(opt)
-        else: print 'Please, speficy if you want to compute limits or make ML fits'
+        elif 'impact' in opt.option: impactsPlots(opt)
+        else: print 'Please, speficy if you want to compute limits, make ML fits, or produce impacts plots'
         exit()
 
     opt.logprocess = opt.combineAction
@@ -137,7 +138,7 @@ def runCombine(opt):
             combineCommandList = [ ]
             if makeDatacards:  combineCommandList.append(prepareDatacards(opt2, 'MASSPOINT', True))
             combineCommandList.append(combineDatacards(opt2, 'MASSPOINT', True))
-            if runCombineJob:  combineCommandList.append(' '.join(['combine', opt.combineOption, 'combinedDatacard.txt' ]))
+            if runCombineJob:  combineCommandList.append(opt.combineCommand)
             combineCommandList.append( 'cd '+opt2.baseDir )
             if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, tag, 'MASSPOINT', True))
 
@@ -149,6 +150,7 @@ def runCombine(opt):
                     #opt2.sigset = baseSigset.replace('MASSPOINT', sample)
                     if runCombineJob:
                         combineOutputFileName = commonTools.getCombineOutputFileName(opt2, sample)
+
                         if opt.reset: 
                             os.system('rm -f '+combineOutputFileName)
                         elif commonTools.isGoodFile(combineOutputFileName, 6000.):
@@ -181,9 +183,9 @@ def runCombine(opt):
 def writeDatacards(opt):
 
     opt.combineAction = 'datacard'
-    opt.option        += 'onlydatacards'
-    opt.combineOption  = 'dummy'
-    opt.combineOutDir  = opt.cardsdir
+    opt.option += 'onlydatacards'
+    opt.combineCommand = 'dummy'
+    opt.combineOutDir = opt.cardsdir
 
     runCombine(opt)
 
@@ -191,7 +193,7 @@ def limits(opt):
 
     opt.combineAction = 'limits'
     limitRun = getLimitRun(opt.unblind)
-    opt.combineOption = ' '.join([ '-M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun ])
+    opt.combineCommand = ' '.join([ 'combine -M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun, 'combinedDatacard.txt' ])
     opt.combineOutDir = opt.limitdir
 
     runCombine(opt)
@@ -200,8 +202,35 @@ def mlfits(opt):
 
     opt.combineAction = 'mlfits'
     skipBOnlyFit = '--skipBOnlyFit' if 'skipbonly' in opt.option.lower() else ''
-    opt.combineOption = ' '.join(['-M FitDiagnostics', '--saveShapes', '--saveWithUncertainties', skipBOnlyFit, '--saveOverallShapes' ])
+    asimovOption = ''
+    if 'asimovb' in opt.option.lower(): asimovOption = '-t -1 --expectSignal 0  -n _asimovB'
+    if 'asimovs' in opt.option.lower(): asimovOption = '-t -1 --expectSignal 1  -n _asimovS'
+    if 'asimovi' in opt.option.lower(): asimovOption = '-t -1 --expectSignal 15 -n _asimovI'
+    opt.combineCommand = ' '.join(['combine -M FitDiagnostics', '--saveShapes', '--saveWithUncertainties', skipBOnlyFit, '--saveOverallShapes', asimovOption, 'combinedDatacard.txt' ])
     opt.combineOutDir = opt.mlfitdir
 
     runCombine(opt)
+
+def impactsPlots(opt):
+
+    opt.combineAction = 'impacts'
+    asimovOption = ''
+    if 'asimovb' in opt.option.lower(): asimovOption = ' -t -1 --expectSignal 0  -n _asimovB'
+    if 'asimovs' in opt.option.lower(): asimovOption = ' -t -1 --expectSignal 1  -n _asimovS'
+    if 'asimovi' in opt.option.lower(): asimovOption = ' -t -1 --expectSignal 15 -n _asimovI'
+    autoOption = ''
+    if '_autob'  in opt.tag.lower(): autoOption += ' --autoBoundsPOIs="*"'
+    if '_autom'  in opt.tag.lower(): autoOption += ' --autoMaxPOIs="*"'   
+    stepList = [ 'text2workspace.py combinedDatacard.txt']
+    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 --doInitialFit --robustFit 1'+autoOption+asimovOption)
+    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 --robustFit 1 --doFits --parallel 50'+autoOption+asimovOption)
+    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 -o impacts.json '+autoOption+asimovOption)
+    stepList.append('plotImpacts.py -i impacts.json -o impacts')
+    opt.combineCommand = ' ; '.join(stepList)
+    opt.combineOutDir = opt.impactdir
+
+    runCombine(opt)
+
+
+
 

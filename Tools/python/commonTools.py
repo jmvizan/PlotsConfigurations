@@ -634,8 +634,11 @@ def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
     elif combineAction=='mlfits': 
         combineOutDir = 'mlfitdir'
         outputFileName = 'fitDiagnostics.root'
+    elif combineAction=='impacts':
+        combineOutDir = 'impactdir'
+        outputFileName = 'impacts.pdf'
     else:
-        'Error in getCombineOutputFileName: please speficy if you want the output from a limit or a ML fit'
+        print 'Error in getCombineOutputFileName: please speficy if you want the output from a limit or a ML fit'
         exit()
 
     return getSignalDir(opt, year, tag, signal, combineOutDir)+'/'+outputFileName
