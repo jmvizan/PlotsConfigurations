@@ -7,7 +7,7 @@ def massPointPass(massPoint, sigSetItem):
             return True
 
     for model in signalMassPoints:
-        if model in sigSetItem:
+        if model in sigSetItem and model in massPoint:
 
             massPointTerms = massPoint.split('_')
             
@@ -89,7 +89,7 @@ def massPointInSignalSet(massPoint, sigSet):
                 if massPoint in tableSignal[sigSetItem.replace('tab','')]: 
                     return True
 
-        if massPointPass(massPoint, sigSetItem):
+        elif massPointPass(massPoint, sigSetItem):
             return True
 
     return False
@@ -216,7 +216,8 @@ signalMassPoints['TSlepSlepRH'] = {}
 signalMassPoints['TSeleSeleRH'] = {}
 signalMassPoints['TSmuoSmuoRH'] = {}
 
-for mSlep in range( 100, 1001, 25):
+#for mSlep in range( 100, 1001, 25):
+for mSlep in range( 100, 475, 25): # TODO: update when trees available
 
     datasetName = 'TSlepSlep_mSlep-'
     if mSlep<=475: datasetName += '100to475'
