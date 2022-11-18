@@ -7,7 +7,7 @@ def massPointPass(massPoint, sigSetItem):
             return True
 
     for model in signalMassPoints:
-        if model in sigSetItem and model in massPoint:
+        if model in sigSetItem:
 
             massPointTerms = massPoint.split('_')
             
@@ -89,7 +89,7 @@ def massPointInSignalSet(massPoint, sigSet):
                 if massPoint in tableSignal[sigSetItem.replace('tab','')]: 
                     return True
 
-        elif massPointPass(massPoint, sigSetItem):
+        if massPointPass(massPoint, sigSetItem):
             return True
 
     return False
@@ -110,20 +110,28 @@ signalMassPoints['SChipmSlepSnu'] = {
 
 signalMassPoints['T2tt'] = {}
 
-for mStop in range( 150,  826, 25):
-
-    datasetName = 'T2tt_mStop-'
-    if mStop<=250: datasetName += '150to250'
-    elif mStop<=325: datasetName += '250to350'
-    elif mStop<=400: datasetName += '350to400'
-    elif mStop<=825: datasetName += '400to825'
-    else: print 'Squark top mass', mStop, 'not available'
-
-    for massSplit in [ 87, 100, 125, 150, 175 ]:
+for mStop in range( 150,  2001, 25):
+    datasetName = 'T2tt__mStop-'
+    if mStop<=250:
+        datasetName += '150to250'
+    elif mStop<350:
+        datasetName += '250to350'
+    elif mStop<=400:
+        datasetName += '350to400'
+    elif mStop<=1200:
+        datasetName += '400to1200'
+    elif mStop<=2000:
+        datasetName += '1200to2000'
+    else :
+        print 'Squark top mass', mStop, 'not available'
+    for mNeutralino in range( 0,  min(mStop-74, 1151), 25):
             
-        mLSP = mStop - massSplit
-        if mLSP<0. or mLSP>650.: continue
+        if (mStop-mNeutralino>300 and (mStop%50!=0 or mNeutralino%50!=0)):
+            continue
+            
+        mLSP = mNeutralino
         if mLSP==0: mLSP = 1
+        if mStop-mLSP==75: mLSP = mStop - 87 
             
         massPointName = 'T2tt' + '_mS-' + str(mStop) + '_mX-' + str(mLSP)
         massPointCut = '(susyMstop>=' + str(mStop) + '-4 && susyMstop<=' + str(mStop) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2)'
@@ -136,10 +144,8 @@ for mStop in range( 150,  826, 25):
 
 signalMassPoints['T2bW'] = {}
 
-for mStop in range( 200,  1001, 25):
-
-    datasetName = 'T2bW_mStop-200to1000'
-
+for mStop in range( 200,  1501, 25):
+    datasetName = 'T2bW'
     for mNeutralino in range( 0,  min(mStop-174, 651), 25):
             
         if (mStop%50!=0 or mNeutralino%50!=0):
@@ -168,12 +174,10 @@ for mStop in range( 200,  1001, 25):
 signalMassPoints['TChipmSlepSnu'] = {}
 
 for mChipm in range( 100,  1501, 25):
-
-    datasetName = 'TChipmSlepSnu_mC1-'
-    if mChipm<=800: datasetName += '100to800'
-    elif mChipm<=1500: datasetName += '825to1500'
-
-    for mNeutralino in range( 0, min(mChipm-49, 751), 25):
+    datasetName = 'TChipmSlepSnu'
+    if mChipm>800:
+        datasetName += '_mC1_825_1500'
+    for mNeutralino in range( 0,  min(mChipm-49, 901), 25):
             
         mLSP = mNeutralino
         if mLSP==0: mLSP = 1
@@ -189,9 +193,9 @@ for mChipm in range( 100,  1501, 25):
 
 signalMassPoints['TChipmWW'] = {}
 
-for mChipm in range( 100,  701, 25):
-    datasetName = 'TChipmWW_WWTo2LNu_mC1-100to700'
-    for mNeutralino in range( 0,  min(mChipm-9, 251), 5):
+for mChipm in range( 100,  851, 25):
+    datasetName = 'TChipmWW'
+    for mNeutralino in range( 0,  min(mChipm-9, 601), 5):
             
         if ((mChipm-mNeutralino<=100 and (mChipm-mNeutralino)%10==0) or 
             (mChipm-mNeutralino> 100 and mNeutralino%25==0)):
@@ -216,35 +220,83 @@ signalMassPoints['TSlepSlepRH'] = {}
 signalMassPoints['TSeleSeleRH'] = {}
 signalMassPoints['TSmuoSmuoRH'] = {}
 
-#for mSlep in range( 100, 1001, 25):
-for mSlep in range( 100, 475, 25): # TODO: update when trees available
+import math
+from LatinoAnalysis.NanoGardener.framework.samples.susyCrossSections import SUSYCrossSections
+def getTSlepSlepCrossSection(susyModel, susyMass):
 
-    datasetName = 'TSlepSlep_mSlep-'
-    if mSlep<=475: datasetName += '100to475'
-    elif mSlep<=1000: datasetName += '500to1000'
+    susyProcess = susyModel.replace('TSelectronSelectron', 'Slepton').replace('TSmuonSmuon', 'Slepton')
 
-    for mNeutralino in range( 0,  min(mChipm-19, 651), 5):
+    isusyMass = int(susyMass)
 
-        if ((mSlep-mNeutralino<=40 and (mSlep-mNeutralino)%10==0) or
-            (mSlep-mNeutralino> 40 and mNeutralino%25==0)):
+    if str(isusyMass) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
 
-            mLSP = mNeutralino
-            if mLSP==0: mLSP = 1
+        return float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['value'])
+
+    else: # Try to extrapolate
+
+        if isusyMass<=400: step = 20
+        elif isusyMass<=440: step = 40
+        elif isusyMass<=500: step = 60
+        elif isusyMass<=1000: step = 100
+        else: step = -1
+
+        isusyMass1 = step*(isusyMass/step)
+        isusyMass2 = step*(isusyMass/step+1)
+
+        if step==60:
+            isusyMass1 =  440
+            isusyMass2 =  500
+        elif isusyMass>1000:
+            isusyMass1 =  900
+            isusyMass2 = 1000
+
+        if str(isusyMass1) in SUSYCrossSections[susyProcess]['massPoints'].keys() and str(isusyMass2) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
+
+            susyXsec1 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass1)]['value'])
+            susyXsec2 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass2)]['value'])
+
+            slope = -math.log(susyXsec2/susyXsec1)/(isusyMass2-isusyMass1)
+            return susyXsec1*math.exp(-slope*(isusyMass-isusyMass1))
+
+    print 'getCrossSection ERROR: cross section not available for', susyProcess, 'at mass =', susyMass, ', exiting'
+    exit()
+
+for mSlep in range( 100, 1301, 25):
+    datasetName = 'TSlepSlep'
+    lspStep = 10
+    if mSlep>450:
+        if mSlep%50!=0:
+            continue
+        datasetName = 'TSlepSlep_mSlep-500to1300'
+        lspStep = 25
+    mNeutralinoList = [ ] 
+    mNeutralinoList.extend(range( 0,  min(mSlep-40+1, 651), lspStep))
+    for dm in [1,5,10,20,30,40]:
+        if mSlep-dm<=650 and (dm<40 or mSlep>=500):
+            mNeutralinoList.append(mSlep-dm)
+    for mNeutralino in mNeutralinoList:
+
+        mLSP = mNeutralino
+        if mLSP==0: mLSP = 1
             
-            massPointName = '_mS-' + str(mSlep) + '_mX-' + str(mLSP)
-            massPointCut = 'susyMSlepton>=' + str(mSlep) + '-4 && susyMSlepton<=' + str(mSlep) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2'
+        massPointName = '_mS-' + str(mSlep) + '_mX-' + str(mLSP)
+        massPointCut = 'susyMSlepton>=' + str(mSlep) + '-4 && susyMSlepton<=' + str(mSlep) + '+4 && susyMLSP>=' + str(mLSP) + '-2 && susyMLSP<=' + str(mLSP) + '+2'
 
-            for sleptonModel in [ 'TSlepSlep', 'TSlepSlepLH', 'TSeleSeleLH', 'TSmuoSmuoLH', 'TSlepSlepRH', 'TSeleSeleRH', 'TSmuoSmuoRH' ]:
-                signalMassPoints[sleptonModel][sleptonModel+massPointName] = { }
-                signalMassPoints[sleptonModel][sleptonModel+massPointName]['massPointDataset'] = datasetName
-                signalMassPoints[sleptonModel][sleptonModel+massPointName]['massPointCut'] = '(' + massPointCut
+        xSecSlepLH = str(getTSlepSlepCrossSection('TSelectronSelectronLH', str(mSlep)))
+        xSecSlepRH = str(getTSlepSlepCrossSection('TSelectronSelectronRH', str(mSlep)))
+        xSecCorrection = '(('+xSecSlepLH+'*(susyIDprompt<=1000016)+'+xSecSlepRH+'*(susyIDprompt>=2000000))/Xsec)'
+
+        for sleptonModel in [ 'TSlepSlep', 'TSlepSlepLH', 'TSeleSeleLH', 'TSmuoSmuoLH', 'TSlepSlepRH', 'TSeleSeleRH', 'TSmuoSmuoRH' ]:
+            signalMassPoints[sleptonModel][sleptonModel+massPointName] = { }
+            signalMassPoints[sleptonModel][sleptonModel+massPointName]['massPointDataset'] = datasetName
+            signalMassPoints[sleptonModel][sleptonModel+massPointName]['massPointCut'] = xSecCorrection+'*(' + massPointCut
                 
-            signalMassPoints['TSlepSlep']  ['TSlepSlep'+massPointName]  ['massPointCut'] += ')'
-            signalMassPoints['TSlepSlepLH']['TSlepSlepLH'+massPointName]['massPointCut'] += ' && susyIDprompt<=1000016)'
-            signalMassPoints['TSeleSeleLH']['TSeleSeleLH'+massPointName]['massPointCut'] += ' && susyIDprompt==1000011)'
-            signalMassPoints['TSmuoSmuoLH']['TSmuoSmuoLH'+massPointName]['massPointCut'] += ' && susyIDprompt==1000013)'
-            signalMassPoints['TSlepSlepRH']['TSlepSlepRH'+massPointName]['massPointCut'] += ' && susyIDprompt>=2000000)'
-            signalMassPoints['TSeleSeleRH']['TSeleSeleRH'+massPointName]['massPointCut'] += ' && susyIDprompt==2000011)'
-            signalMassPoints['TSmuoSmuoRH']['TSmuoSmuoRH'+massPointName]['massPointCut'] += ' && susyIDprompt==2000013)'
+        signalMassPoints['TSlepSlep']  ['TSlepSlep'+massPointName]  ['massPointCut'] += ')'
+        signalMassPoints['TSlepSlepLH']['TSlepSlepLH'+massPointName]['massPointCut'] += ' && susyIDprompt<=1000016)'
+        signalMassPoints['TSeleSeleLH']['TSeleSeleLH'+massPointName]['massPointCut'] += ' && susyIDprompt==1000011)'
+        signalMassPoints['TSmuoSmuoLH']['TSmuoSmuoLH'+massPointName]['massPointCut'] += ' && susyIDprompt==1000013)'
+        signalMassPoints['TSlepSlepRH']['TSlepSlepRH'+massPointName]['massPointCut'] += ' && susyIDprompt>=2000000)'
+        signalMassPoints['TSeleSeleRH']['TSeleSeleRH'+massPointName]['massPointCut'] += ' && susyIDprompt==2000011)'
+        signalMassPoints['TSmuoSmuoRH']['TSmuoSmuoRH'+massPointName]['massPointCut'] += ' && susyIDprompt==2000013)'
 
 

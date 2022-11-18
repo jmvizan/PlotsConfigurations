@@ -89,16 +89,17 @@ elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
 
 if '2016' in yeartag :
-    ProductionMC   = 'Summer20UL16_106X_nAODv9_'+yeartag.replace('2016', '')+'_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8'+yeartag.replace('2016', '')+'__MCSusyNomin2016v8'
-    ProductionSig  = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
-    ProductionData = 'Run2016_106X_nAODv9_'+yeartag.replace('2016', '')+'_Full2016v8/DATASusy2016v8__hadd'
+    hipmFlag = yeartag.replace('2016', '')
+    ProductionMC   = 'Summer20UL16_106X_nAODv9_'+hipmFlag+'_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8'+hipmFlag+'__MCSusyNomin2016v8'
+    ProductionSig  = 'Spring21UL16FS_106X_nAODv9_Full2016v8/susyGen__susyW__FSSusy2016v8__FSSusyCorr2016v8'+hipmFlag+'__FSSusyNomin2016v8'+hipmFlag
+    ProductionData = 'Run2016_106X_nAODv9_'+hipmFlag+'_Full2016v8/DATASusy2016v8__hadd'
 elif '2017' in yeartag :
     ProductionMC   = 'Summer20UL17_106X_nAODv9_Full2017v8/MCSusy2017v8__MCSusyCorr2017v8__MCSusyNomin2017v8'
-    ProductionSig  = 'Fall2017FS_102X_nAODv6_Full2017v6loose/hadd__susyGen__susyW__FSSusy2017v6loose__FSSusyCorr2017v6loose__FSSusyNomin2017v6loose'
+    ProductionSig  = 'Spring21UL17FS_106X_nAODv9_Full2017v8/susyGen__susyW__FSSusy2017v8__FSSusyCorr2017v8__FSSusyNomin2017v8'
     ProductionData = 'Run2017_106X_nAODv9_Full2017v8/DATASusy2017v8__hadd'
 elif '2018' in yeartag :
     ProductionMC   = 'Summer20UL18_106X_nAODv9_Full2018v8/MCSusy2018v8__MCSusyCorr2018v8__MCSusyNomin2018v8'
-    ProductionSig  = 'Autumn18FS_102X_nAODv6_Full2018v6loose/hadd__susyGen__susyW__FSSusy2018v6loose__FSSusyCorr2018v6loose__FSSusyNomin2018v6loose'
+    ProductionSig  = 'Spring21UL18FS_106X_nAODv9_Full2018v8/susyGen__susyW__FSSusy2018v8__FSSusyCorr2018v8__FSSusyNomin2018v8'
     ProductionData = 'Run2018_106X_nAODv9_Full2018v8/DATASusy2018v8__hadd'
 
 fastsimSignal = False if ('S2tt' in opt.sigset or 'SChipm' in opt.sigset) else True
@@ -1126,34 +1127,32 @@ if not skipTreesCheck:
 
 ### Signals
 
-#exec(open('./signalMassPoints.py').read())
 import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
 
 for model in signalMassPoints.signalMassPoints:
-    if model in opt.sigset.replace('EOY:', '').replace('EOY', ''):
 
-        isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
+    isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
 
-        for massPoint in signalMassPoints.signalMassPoints[model]:
-            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset.replace('EOY:', '').replace('EOY', '')):
+    for massPoint in signalMassPoints.signalMassPoints[model]:
+        if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset):
 
-                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
-                                       'FilesPerJob' : 2 ,
-                                       'suppressNegative':['all'],
-                                       'suppressNegativeNuisances' :['all'],
-                                       'suppressZeroTreeNuisances' : ['all'],
-                                       'treeType' : 'EOY',
-                                       'isrObservable' : isrObservable,
-                                       'isSignal'  : 1,
-                                       'isDATA'    : 0,
-                                     }
+            samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
+                                   'FilesPerJob' : 2 ,
+                                   'suppressNegative':['all'],
+                                   'suppressNegativeNuisances' :['all'],
+                                   'suppressZeroTreeNuisances' : ['all'],
+                                   'treeType' : 'UL',
+                                   'isrObservable' : isrObservable,
+                                   'isSignal'  : 1,
+                                   'isDATA'    : 0,
+                                 }
                   
-                if fastsimSignal:
-                    samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
-                    samples[massPoint]['isFastsim'] = 1
-                else:
-                    samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
-                    samples[massPoint]['isFastsim'] = 0
+            if fastsimSignal:
+                samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                samples[massPoint]['isFastsim'] = 1
+            else:
+                samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                samples[massPoint]['isFastsim'] = 0
 
 ### Nasty clean up for eos
 

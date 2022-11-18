@@ -70,9 +70,9 @@ def setAnalysisDefaults(opt):
      
     if len(tagList)>0: opt.tag = '-'.join( tagList )
 
-    opt.tag = opt.tag.replace('StopSignalRegionsMerge','StopSignalRegions')
     if 'group' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsGroup')
     if 'merge' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
+    opt.tag = opt.tag.replace('StopSignalRegionsMerge','StopSignalRegions')
     if 'systwz' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WZbin')
     if 'systww' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WWshape')
     if 'sysbww' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WWShape')
@@ -105,15 +105,16 @@ def signalShapes(opt, action='shapes'):
 
                     if 'split' in opt.option:
                         for massPoint in getMassPointList(signal):
-                            opt2.sigset = 'EOY'+massPoint
+                            opt2.sigset = massPoint
                             latinoTools.shapes(opt2)
                          
                     else:
-                        opt2.sigset = 'EOY'+signal
+                        opt2.sigset = signal
+                        samples = commonTools.getSamples(opt2)
                         latinoTools.shapes(opt2)
 
                 elif action=='checkJobs' or action=='killJobs':
-                    opt2.sigset = signal if 'mergesig' in opt.logprocess else 'EOY'+signal
+                    opt2.sigset = signal if 'mergesig' in opt.logprocess else signal
                     if action=='checkJobs':  commonTools.checkJobs(opt2)
                     elif action=='killJobs': commonTools.killJobs(opt2)
 
