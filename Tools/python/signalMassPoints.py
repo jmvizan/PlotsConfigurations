@@ -173,7 +173,7 @@ for mChipm in range( 100,  1501, 25):
     if mChipm<=800: datasetName += '100to800'
     elif mChipm<=1500: datasetName += '825to1500'
 
-    for mNeutralino in range( 0, min(mChipm-49, 751), 25):
+    for mNeutralino in range( 0, min(mChipm-24, 751), 25):
             
         mLSP = mNeutralino
         if mLSP==0: mLSP = 1
@@ -223,7 +223,7 @@ for mSlep in range( 100, 475, 25): # TODO: update when trees available
     if mSlep<=475: datasetName += '100to475'
     elif mSlep<=1000: datasetName += '500to1000'
 
-    for mNeutralino in range( 0,  min(mChipm-19, 651), 5):
+    for mNeutralino in range( 0,  min(mSlep-19, 651), 5):
 
         if ((mSlep-mNeutralino<=40 and (mSlep-mNeutralino)%10==0) or
             (mSlep-mNeutralino> 40 and mNeutralino%25==0)):
