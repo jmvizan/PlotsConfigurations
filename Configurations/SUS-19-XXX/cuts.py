@@ -649,6 +649,25 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
     for cut in crcuts:
         cuts[cut] = crcuts[cut]
 
+# For FastSim pTmiss
+if isFillShape and 'Fast' in opt.tag:
+
+    cutList = cuts.keys()
+
+    for cut in cutList:
+        if 'SR' in cut:
+            if 'FastReco' in opt.tag:
+                for key in cuts[cut]:
+                    cuts[cut][key] = cuts[cut][key].replace('ptmiss','ptmiss_reco').replace('ptmiss_reco_phi','ptmiss_phi_reco')
+      
+            else:
+                cuts[cut+'_reco'] = { }
+                cuts[cut+'_gen'] = { }
+                for key in cuts[cut]:
+                    cuts[cut+'_reco'][key] = cuts[cut][key].replace('ptmiss','ptmiss_reco').replace('ptmiss_reco_phi','ptmiss_phi_reco')
+                    cuts[cut+'_gen'][key]  = cuts[cut][key].replace('ptmiss','ptmiss_gen').replace('ptmiss_gen_phi','ptmiss_phi_gen')
+                del cuts[cut]
+
 # To keep track of mkShapes without Multi
 
 if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):

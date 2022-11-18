@@ -313,19 +313,21 @@ if addMT2Shapes:
  
 # mt2ll ZZ (from k-factors)
 
-# mt2ll siggnal
-if '__susyMT2reco' not in directorySig:
-    nuisances['ptmissfastsim']  = {
-        'name'  : 'ptmissfastsim', # mismodeling correlated through the years?
-        'samples'  : { },
-        'kind'  : 'tree',
-        'type'  : 'shape',
-        'folderUp':   directorySig.replace('__susyMT2fast', '__susyMT2reco'),
-        'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm').replace('Smear', 'Nomin'),
-    }
-    for sample in samples.keys():
-        if samples[sample]['isFastsim']:
-            nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
+# mt2ll signal
+if signalReco=='fast' and fastsimMetType!='reco': 
+    if fastsimMetType=='average' or not isFillShape:
+        nuisances['ptmissfastsim']  = {
+            'name'  : 'ptmissfastsim', # mismodeling correlated through the years?
+            'samples'  : { },
+            'kind'  : 'tree',
+            'type'  : 'shape',
+            'folderUp':   directorySig.replace('__susyMT2fast', '__susyMT2reco'),
+            'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm').replace('Smear', 'Nomin'),
+        }
+        if fastsimMetType=='acceptance': nuisances['ptmissfastsim']['extremes'] = [ '_reco', '_gen' ]
+        for sample in samples.keys():
+            if samples[sample]['isFastsim']:
+                nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
 ### QCD scale and PDFs
 
@@ -347,7 +349,8 @@ nuisances['pdf'] = {
 
 for yeartomerge in yearstaglist:
 
-    exec(open('./Data/theoryNormalizations/theoryNormalizations'+recoFlag+'_'+yeartomerge+'.py').read())
+    theoryRecoFlag = recoFlag+'SigV6' if 'SigV6' in opt.tag else recoFlag
+    exec(open('./Data/theoryNormalizations/theoryNormalizations'+theoryRecoFlag+'_'+yeartomerge+'.py').read())
 
     # LHE scale variation weights (w_var / w_nominal)
     # [0] is muR=0.50000E+00 muF=0.50000E+00
