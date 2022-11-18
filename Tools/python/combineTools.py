@@ -218,12 +218,10 @@ def impactsPlots(opt):
     if 'asimovb' in opt.option.lower(): asimovOption = ' -t -1 --expectSignal 0  -n _asimovB'
     if 'asimovs' in opt.option.lower(): asimovOption = ' -t -1 --expectSignal 1  -n _asimovS'
     if 'asimovi' in opt.option.lower(): asimovOption = ' -t -1 --expectSignal 15 -n _asimovI'
-    autoOption = ''
-    if '_autob'  in opt.tag.lower(): autoOption += ' --autoBoundsPOIs="*"'
-    if '_autom'  in opt.tag.lower(): autoOption += ' --autoMaxPOIs="*"'   
+    autoOption = ' --autoBoundsPOIs="*"' if 'autob'  in opt.option.lower() else ''
     stepList = [ 'text2workspace.py combinedDatacard.txt']
     stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 --doInitialFit --robustFit 1'+autoOption+asimovOption)
-    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 --robustFit 1 --doFits --parallel 50'+autoOption+asimovOption)
+    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 --robustFit 1 --doFits --parallel 100'+autoOption+asimovOption)
     stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 -o impacts.json '+autoOption+asimovOption)
     stepList.append('plotImpacts.py -i impacts.json -o impacts')
     opt.combineCommand = ' ; '.join(stepList)
