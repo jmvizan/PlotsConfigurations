@@ -3,6 +3,7 @@ import timeit
 import optparse
 import json
 import LatinoAnalysis.Gardener.hwwtools as hwwtools
+import glob 
 
 # functions used in everyday life ...
 from LatinoAnalysis.Tools.commonTools import *
@@ -194,7 +195,15 @@ if __name__ == '__main__':
             for iqcd in range(expectedScaleWeights):
 		qcdWeights.append(0.)
 
-            for treeName in sam_v['name']:
+            baseTreeName = sam_v['name'][0]
+            if 'rootd' not in baseTreeName:
+                baseTreeName = baseTreeName.replace('###', '')
+            baseTreeName = baseTreeName.replace('root://eoscms.cern.ch/', '')
+            baseTreeName = baseTreeName.split('susyGen')[0]+'susyGen/'
+            baseTreeName += sam_v['name'][0].split('/')[-1].replace('.root','').split('_part')[0]+'*.root'
+            treeList = glob.glob(baseTreeName)
+
+            for treeName in treeList: #sam_v['name']:
 
 		chain = ROOT.TChain('Runs')
                 if 'rootd' not in treeName:
