@@ -54,8 +54,9 @@ nuis_btag_split = True
 
 treePrefix= 'nanoLatino_'
 
-isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit') or hasattr(opt, 'combineAction')
+isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit') or hasattr(opt, 'combineAction') or hasattr(opt, 'groups')
 isShape = hasattr(opt, 'doHadd')
+isFillShape = isShape and not opt.doHadd
 isShapeOrPlot = isShape or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN')
 isShapeOrDatacardOrPlot = isShape or isDatacardOrPlot
 
@@ -91,21 +92,24 @@ elif 'ifca' in SITE or 'cloud' in SITE:
 if '2016' in yeartag :
     hipmFlag = yeartag.replace('2016', '')
     ProductionMC   = 'Summer20UL16_106X_nAODv9_'+hipmFlag+'_Full2016v8/MCSusy2016v8__MCSusyCorr2016v8'+hipmFlag+'__MCSusyNomin2016v8'
-    ProductionSig  = 'Spring21UL16FS_106X_nAODv9_Full2016v8/susyGen__susyW__FSSusy2016v8__FSSusyCorr2016v8'+hipmFlag+'__FSSusyNomin2016v8'+hipmFlag
+    ProductionSig  = 'Spring21UL16FS_106X_nAODv9_Full2016v8/susyGen__susyW__FSSusy2016v8__FSSusyCorr2016v8'+hipmFlag+'__hadd__FSSusyNomin2016v8'+hipmFlag
     ProductionData = 'Run2016_106X_nAODv9_'+hipmFlag+'_Full2016v8/DATASusy2016v8__hadd'
 elif '2017' in yeartag :
     ProductionMC   = 'Summer20UL17_106X_nAODv9_Full2017v8/MCSusy2017v8__MCSusyCorr2017v8__MCSusyNomin2017v8'
-    ProductionSig  = 'Spring21UL17FS_106X_nAODv9_Full2017v8/susyGen__susyW__FSSusy2017v8__FSSusyCorr2017v8__FSSusyNomin2017v8'
+    ProductionSig  = 'Spring21UL17FS_106X_nAODv9_Full2017v8/susyGen__susyW__FSSusy2017v8__FSSusyCorr2017v8__hadd__FSSusyNomin2017v8'
     ProductionData = 'Run2017_106X_nAODv9_Full2017v8/DATASusy2017v8__hadd'
 elif '2018' in yeartag :
     ProductionMC   = 'Summer20UL18_106X_nAODv9_Full2018v8/MCSusy2018v8__MCSusyCorr2018v8__MCSusyNomin2018v8'
-    ProductionSig  = 'Spring21UL18FS_106X_nAODv9_Full2018v8/susyGen__susyW__FSSusy2018v8__FSSusyCorr2018v8__FSSusyNomin2018v8'
+    ProductionSig  = 'Spring21UL18FS_106X_nAODv9_Full2018v8/susyGen__susyW__FSSusy2018v8__FSSusyCorr2018v8__hadd__FSSusyNomin2018v8'
     ProductionData = 'Run2018_106X_nAODv9_Full2018v8/DATASusy2018v8__hadd'
 
 fastsimSignal = False if ('S2tt' in opt.sigset or 'SChipm' in opt.sigset) else True
 signalReco = 'fast' if fastsimSignal else 'reco'
 if not fastsimSignal:
     ProductionSig = ProductionMC.replace('/MCSusy', '/susyGen__susyW__MCSusy')
+fastsimMetType = 'average'
+if 'Fast' in opt.tag:
+    fastsimMetType = 'reco' if 'FastReco' in opt.tag else 'acceptance'
 
 metnom, metsmr = 'Smear', 'Nomin'
 if 'Nomin' in opt.tag:
@@ -1130,29 +1134,33 @@ if not skipTreesCheck:
 import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
 
 for model in signalMassPoints.signalMassPoints:
+    if model in opt.sigset:
 
-    isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
+        isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
+        XSWeightModel = XSWeight+'*0.10497000068426132' if 'T2' in model else XSWeight
 
-    for massPoint in signalMassPoints.signalMassPoints[model]:
-        if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset):
+        for massPoint in signalMassPoints.signalMassPoints[model]:
+            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset.split(':')[-1]):
 
-            samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
-                                   'FilesPerJob' : 2 ,
-                                   'suppressNegative':['all'],
-                                   'suppressNegativeNuisances' :['all'],
-                                   'suppressZeroTreeNuisances' : ['all'],
-                                   'treeType' : 'UL',
-                                   'isrObservable' : isrObservable,
-                                   'isSignal'  : 1,
-                                   'isDATA'    : 0,
-                                 }
+                if isFillShape and '2016' in yeartag: opt.lumi = 36.33
+
+                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
+                                       'FilesPerJob' : 2 ,
+                                       'suppressNegative':['all'],
+                                       'suppressNegativeNuisances' :['all'],
+                                       'suppressZeroTreeNuisances' : ['all'],
+                                       'treeType' : 'ULFS',
+                                       'isrObservable' : isrObservable,
+                                       'isSignal'  : 1,
+                                       'isDATA'    : 0,
+                                     }
                   
-            if fastsimSignal:
-                samples[massPoint]['weight']    = XSWeight+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
-                samples[massPoint]['isFastsim'] = 1
-            else:
-                samples[massPoint]['weight']    = XSWeight+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
-                samples[massPoint]['isFastsim'] = 0
+                if fastsimSignal:
+                    samples[massPoint]['weight']    = XSWeightModel+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPoint]['isFastsim'] = 1
+                else:
+                    samples[massPoint]['weight']    = XSWeightModel+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPoint]['isFastsim'] = 0
 
 ### Nasty clean up for eos
 
