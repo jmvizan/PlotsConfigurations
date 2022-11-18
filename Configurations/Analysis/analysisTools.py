@@ -22,23 +22,28 @@ def setAnalysisDefaults(opt):
     validationRegionMap = { 'vr1'    : 'HighPtMissValidationRegionVetoesUL',
                             'wzwwvr' : 'WZtoWWValidationRegionVetoesUL' } 
 
-    opt.signalRegionMap = { }
+    opt.signalRegionMap, opt.signalSubsets, opt.tableSigset = { }, { }, { }
+
     opt.signalRegionMap['stopSR'] = { 'tag' : 'StopSignalRegionsVetoesUL',     'signals' : [ 'T2tt_mS-150to800_dm-80to175' ] } #, 'T2bW_mS-200to1000_mX-1to700' ] }
     opt.signalRegionMap['charSR'] = { 'tag' : 'CharginoSignalRegionsVetoesUL', 'signals' : [ 'TChipmSlepSnu_mC-100to1500_mX-1to750', 'TSlepSlep_mS-100to1000_mX-1to650' ] }
-    opt.signalRegionMap['chwwSR'] = { 'tag' : 'TChipmWWSignalRegionsVetoesUL', 'signals' : [ 'TChipmWW_mC-100to700_mX-1to250' ] } 
+    opt.signalRegionMap['chwwSR'] = { 'tag' : 'TChipmWWSignalRegionsVetoesUL', 'signals' : [ 'TChipmWW_mC-100to700_mX-1to250' ] }
 
-    opt.signalSubsets = { 'T2tt'          : [ 'T2tt_mS-150to800_dm-80to175' ],
-                          'T2bW'          : [ 'T2bW_mS-200to1000_mX-1to700' ],
-                          'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-100to475_mX-1to750', 'TChipmSlepSnu_mC-500to650_mX-1to750', 'TChipmSlepSnu_mC-675to800_mX-1to750', 'TChipmSlepSnu_mC-825to925_mX-1to750', 'TChipmSlepSnu_mC-950to1050_mX-1to750', 'TChipmSlepSnu_mC-1075to1175_mX-1to750', 'TChipmSlepSnu_mC-1200to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750' ],
-                          'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-100to475_mX-1to750', 'TChipmSlepSnu_mC-500to650_mX-1to750', 'TChipmSlepSnu_mC-675to800_mX-1to750', 'TChipmSlepSnu_mC-825to925_mX-1to750', 'TChipmSlepSnu_mC-950to1050_mX-1to750', 'TChipmSlepSnu_mC-1075to1175_mX-1to750', 'TChipmSlepSnu_mC-1200to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750' ],
-                          'TChipmWW'      : [ 'TChipmWW_mC-100to375_mX-1to250', 'TChipmWW_mC-400to700_mX-1to250' ],
-                          'TSlepSlep'     : [ 'TSlepSlep_mS-100to275_mX-1to650', 'TSlepSlep_mS-300to400_mX-1to650', 'TSlepSlep_mS-425to600_mX-1to650', 'TSlepSlep_mS-625to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650' ] }
+    #opt.tableSigset['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-200_mX-125', 'TChipmSlepSnu_mC-200_mX-150', 'TChipmSlepSnu_mC-250_mX-175', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ]
+    opt.tableSigset['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ]
+    opt.tableSigset['T2tt']          = [ 'T2tt_mS-300_mX-213', 'T2tt_mS-300_mX-175', 'T2tt_mS-350_mX-263', 'T2tt_mS-350_mX-225', 'T2tt_mS-400_mX-275', 'T2tt_mS-300_mX-125', 'T2tt_mS-350_mX-175', 'T2tt_mS-400_mX-225', 'T2tt_mS-400_mX-313', 'T2tt_mS-475_mX-350', 'T2tt_mS-450_mX-275', 'T2tt_mS-450_mX-325', 'T2tt_mS-475_mX-388', 'T2tt_mS-450_mX-363', 'T2tt_mS-475_mX-300', 'T2tt_mS-475_mX-325', 'T2tt_mS-475_mX-375', 'T2tt_mS-500_mX-325', 'T2tt_mS-500_mX-350', 'T2tt_mS-500_mX-375', 'T2tt_mS-500_mX-400', 'T2tt_mS-500_mX-413', 'T2tt_mS-525_mX-350', 'T2tt_mS-525_mX-375', 'T2tt_mS-525_mX-400', 'T2tt_mS-525_mX-425', 'T2tt_mS-525_mX-438', 'T2tt_mS-550_mX-375', 'T2tt_mS-550_mX-400', 'T2tt_mS-550_mX-425', 'T2tt_mS-550_mX-450', 'T2tt_mS-550_mX-463' ]
+    opt.tableSigset['TChipmWW']      = [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50' ]    
 
-    opt.tableSigset = { #'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-200_mX-125', 'TChipmSlepSnu_mC-200_mX-150', 'TChipmSlepSnu_mC-250_mX-175', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ],
-                        'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ],
-                        'T2tt'          : [ 'T2tt_mS-300_mX-213', 'T2tt_mS-300_mX-175', 'T2tt_mS-350_mX-263', 'T2tt_mS-350_mX-225', 'T2tt_mS-400_mX-275', 'T2tt_mS-300_mX-125', 'T2tt_mS-350_mX-175', 'T2tt_mS-400_mX-225', 'T2tt_mS-400_mX-313', 'T2tt_mS-475_mX-350', 'T2tt_mS-450_mX-275', 'T2tt_mS-450_mX-325', 'T2tt_mS-475_mX-388', 'T2tt_mS-450_mX-363', 'T2tt_mS-475_mX-300', 'T2tt_mS-475_mX-325', 'T2tt_mS-475_mX-375', 'T2tt_mS-500_mX-325', 'T2tt_mS-500_mX-350', 'T2tt_mS-500_mX-375', 'T2tt_mS-500_mX-400', 'T2tt_mS-500_mX-413', 'T2tt_mS-525_mX-350', 'T2tt_mS-525_mX-375', 'T2tt_mS-525_mX-400', 'T2tt_mS-525_mX-425', 'T2tt_mS-525_mX-438', 'T2tt_mS-550_mX-375', 'T2tt_mS-550_mX-400', 'T2tt_mS-550_mX-425', 'T2tt_mS-550_mX-450', 'T2tt_mS-550_mX-463' ],
-                        'TChipmWW'      : [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50' ],
-                        'TSlepSlep'     : [ 'TSlepSlep_mS-200_mX-120', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ] }
+    opt.signalSubsets['T2tt']          = [ 'T2tt_mS-150to800_dm-80to175' ]
+    opt.signalSubsets['T2bW']          = [ 'T2bW_mS-200to1000_mX-1to700' ]
+    opt.signalSubsets['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-100to475_mX-1to750', 'TChipmSlepSnu_mC-500to650_mX-1to750', 'TChipmSlepSnu_mC-675to800_mX-1to750', 'TChipmSlepSnu_mC-825to925_mX-1to750', 'TChipmSlepSnu_mC-950to1050_mX-1to750', 'TChipmSlepSnu_mC-1075to1175_mX-1to750', 'TChipmSlepSnu_mC-1200to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750' ]
+    opt.signalSubsets['TChipmWW']      = [ 'TChipmWW_mC-100to375_mX-1to250', 'TChipmWW_mC-400to700_mX-1to250' ]
+
+    if 'SigV6' in inputTag or 'sigv6' in inputTag:
+        opt.tableSigset['TSlepSlep'] = [ 'TSlepSlep_mS-200_mX-120', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ]
+        opt.signalSubsets['TSlepSlep'] = [ 'TSlepSlep_mS-100to275_mX-1to650', 'TSlepSlep_mS-300to400_mX-1to650', 'TSlepSlep_mS-425to600_mX-1to650', 'TSlepSlep_mS-625to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650' ]
+    else:
+        opt.tableSigset['TSlepSlep'] = [ 'TSlepSlep_mS-200_mX-125', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ]
+        opt.signalSubsets['TSlepSlep'] = [ 'TSlepSlep_mS-100to400_mX-1to650', 'TSlepSlep_mS-425to575_mX-1to650', 'TSlepSlep_mS-600to725_mX-1to650', 'TSlepSlep_mS-750to875_mX-1to650', 'TSlepSlep_mS-900to1000_mX-1to650' ]
 
     opt.backgroundsInFit = [ 'ttZ', 'ZZ', 'WZ' ]
 
@@ -73,6 +78,8 @@ def setAnalysisDefaults(opt):
     if 'group' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsGroup')
     if 'merge' in inputTag: opt.tag = opt.tag.replace('SignalRegions','SignalRegionsMerge') 
     opt.tag = opt.tag.replace('StopSignalRegionsMerge','StopSignalRegions')
+    if 'fast' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesULFast')
+    if 'reco' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesULFastReco')
     if 'systwz' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WZbin')
     if 'systww' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WWshape')
     if 'sysbww' in inputTag: opt.tag = opt.tag.replace('VetoesUL','VetoesUL_WWShape')
@@ -99,7 +106,7 @@ def signalShapes(opt, action='shapes'):
             for signal in getSignalList(opt, opt.sigset, tag):
 
                 opt2 = copy.deepcopy(opt)
-                opt2.year, opt2.tag = year, tag
+                opt2.year, opt2.tag, opt2.action = year, tag, action
 
                 if action=='shapes':
 
@@ -110,7 +117,6 @@ def signalShapes(opt, action='shapes'):
                          
                     else:
                         opt2.sigset = signal
-                        samples = commonTools.getSamples(opt2)
                         latinoTools.shapes(opt2)
 
                 elif action=='checkJobs' or action=='killJobs':
@@ -123,7 +129,7 @@ def signalShapes(opt, action='shapes'):
                     if opt.recover:
                         if commonTools.isGoodFile(commonTools.getShapeFileName(opt.shapedir, year, tag, signal, '')): continue
 
-                    if opt.interactive in opt.option:
+                    if opt.interactive:
                         opt2.sigset = signal
                         latinoTools.mergeall(opt2)
                   
@@ -469,7 +475,7 @@ def getSignalList(opt, sigset, tag):
     if sigset=='SM': return []
 
     for sr in opt.signalRegionMap:
-        if tag.split('_')[0].replace('Merge','').replace('FitCR','').replace('Group','')==opt.signalRegionMap[sr]['tag']:
+        if tag.split('_')[0].replace('Merge','').replace('FitCR','').replace('Group','').replace('Fast','').replace('FastReco','')==opt.signalRegionMap[sr]['tag']:
 
             if 'all' in sigset:
                 signalList = []
@@ -520,7 +526,7 @@ def splitSignalMassPoints(opt, massPointForSubset=150):
 
             massPoints = getMassPointList(signal)
 
-            nMassPoints = len(massPoints.keys()) 
+            nMassPoints = len(massPoints) 
             minPromptMass = int(signal.split('_')[1].split('-')[1].split('to')[0])
             maxPromptMass = int(signal.split('_')[1].split('to')[1])
 
@@ -543,7 +549,7 @@ def splitSignalMassPoints(opt, massPointForSubset=150):
                     signalSubset = signalDraft.replace('minPromptMass', str(minSubsetPromptMass)).replace('maxPromptMass', str(promptMass))
                     massPointSubsets = getMassPointList(signalSubset)
 
-                    if len(massPointSubsets.keys())>=signalMmassPointForSubset or promptMass==maxPromptMass:
+                    if len(massPointSubsets)>=signalMmassPointForSubset or promptMass==maxPromptMass:
 
                         signalSubsets[baseSignal].append(signalSubset)
                         minSubsetPromptMass = promptMass + promptMassStep
