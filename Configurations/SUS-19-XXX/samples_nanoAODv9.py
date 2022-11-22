@@ -78,11 +78,11 @@ if  'cern' in SITE :
     treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
-    if not skipTreesCheck and 'EOY' not in opt.sigset:
-        if not hasattr(opt, 'doHadd') or opt.doHadd:
+    if not skipTreesCheck and ('SM' in opt.sigset or 'Data' in opt.sigset or 'Backgrounds' in opt.sigset or 'MET' in opt.sigset):
+        if not isFillShape:
             skipTreesCheck = True
         else:
-            print 'nanoAODv9 trees for', yeartag, 'not available yet on cern'
+            print 'nanoAODv9 trees for', yeartag, 'available on cern only for the signal'
             exit()
 elif 'ifca' in SITE or 'cloud' in SITE:
     treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
