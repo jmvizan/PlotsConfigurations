@@ -650,7 +650,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
         cuts[cut] = crcuts[cut]
 
 # For FastSim pTmiss
-if isFillShape and 'Fast' in opt.tag:
+if isShape and 'Fast' in opt.tag:
 
     cutList = cuts.keys()
 

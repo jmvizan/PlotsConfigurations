@@ -498,7 +498,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
     ### Set the mt2ll variable
     mt2ll = 'mt2ll' + ctrltag
 
-    if isFillShape and 'Fast' in opt.tag: mt2ll = 'mt2ll_reco'
+    if isShape and 'Fast' in opt.tag: mt2ll = 'mt2ll_reco'
 
     if 'WZValidationRegionZLeps' in opt.tag:
         mt2ll = '(mt2llfake0+mt2llfake1+mt2llfake2-mt2ll_WZ)'
@@ -564,6 +564,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                         cutTypes[cutType] = { }
                         cutTypes[cutType]['cuts'] = [ ]
                         for cut2 in cuts:
+                            if '_gen' in cut2: continue
                             if cutType in cut2 or cutType.replace('SR','CR') in cut2:
                                 cutTypes[cutType]['cuts'].append(cut2)
                         if 'SR1' in cutType: cutTypes[cutType]['mt2llbins'] = mt2llOptimBin
@@ -582,7 +583,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                                   }
 
         # For FastSim pTmiss 
-        if isFillShape and 'Fast' in opt.tag and 'FastReco' not in opt.tag:
+        if isShape and 'Fast' in opt.tag and 'FastReco' not in opt.tag:
 
             variableList = variables.keys()
             for variable in variableList:
