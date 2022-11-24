@@ -1173,12 +1173,14 @@ if 'Group' in opt.tag and ('SM' in opt.sigset or 'Backgrounds' in opt.sigset):
     if isShape:
         print 'Error: should not use Group string in tag name'
         exit()
-    samples['minor'] = {}
-    for key in samples['Higgs'].keys():
-        samples['minor'][key] = samples['Higgs'][key]
-    del samples['Higgs'] 
-    del samples['VVV']
-    del samples['VZ']
-    del samples['ttW']
-    del samples['ttSemilep']
+    minorBkgList = []
+    for minorBkg in [ 'Higgs', 'VVV', 'VZ', 'ttW', 'ttSemilep' ]:
+        if minorBkg in samples:
+            minorBkgList.append(minorBkg)
+    if len(minorBkgList)>=1:
+        samples['minor'] = {}
+        for key in samples[minorBkgList[0]].keys():
+            samples['minor'][key] = samples[minorBkgList[0]][key]
+        for minorBkg in minorBkgList:
+            del samples[minorBkg]
 

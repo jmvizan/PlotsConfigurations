@@ -100,7 +100,7 @@ def mergeall(opt):
 
 ### Plots
 
-def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
+def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraOutDirFlag=''):
 
     plotAsExotics = commonTools.plotAsExotics(opt)
 
@@ -116,7 +116,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
         plotsDirList.extend([ fitoption+tag.split('___')[0].replace('__','/'), yearInFit ])
         if fitoption=='PostFitS': plotAsExotics = False
 
-    if sigset!='SM': plotsDirList.append(sigset)
+    if sigset!='SM': plotsDirList.append(sigset.split(':')[-1]+extraOutDirFlag)
     plotsDir = '/'.join(plotsDirList)
 
     shapeFileName = commonTools.getShapeFileName(opt.shapedir, year, tag, sigset, fileset, fitoption+yearInFit) 
@@ -133,6 +133,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
     if 'saveC'        in opt.option: plotCommand += ' --fileFormats=\'png,root,C\''
     if 'plotsmearvar' in opt.option: plotCommand += ' --plotSmearVariation=1'    # This is not yet re-implemented in latino's mkPlot.py
     if 'fit' in opt.option.lower() : plotCommand += ' --postFit=p'
+    if 'nostat' in opt.option.lower() : plotCommand += ' --removeMCStat'
 
     os.system(plotCommand)
 
@@ -140,6 +141,65 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit=''):
         plotToDelete = 'c_' if 'SM' in opt.sigset else 'cratio_'
         for plot2delete in [ plotToDelete, 'log_'+plotToDelete, 'cdifference_', 'log_cdifference_' ]:
             os.system('rm '+plotsDir+'/'+plot2delete+'*')
+
+# Plot shape nuisances
+
+def plotNuisances(opt):
+
+   opt.fileset = commonTools.setFileset(opt.fileset, opt.sigset)
+   opt.samplesFile = commonTools.getCfgFileName(opt, 'samples')
+
+   for year in opt.year.split('-'):
+       for tag in opt.tag.split('-'):
+
+           opt2 = copy.deepcopy(opt)
+           opt2.year, opt2.tag = year, tag
+           samples, cuts, variables, nuisances = commonTools.getDictionaries(opt2)
+     
+           singleNuisances = {}
+
+           for nuisance in nuisances:
+               if nuisance=='stat' or ('type' in nuisances[nuisance] and nuisances[nuisance]['type']=='shape'):
+                   singleNuisanceName = 'statistics' if nuisance=='stat' else nuisances[nuisance]['name']
+                   if 'nuisances:' not in opt.option or singleNuisanceName in opt.option:
+                       nuisanceName = 'statistics' if nuisance=='stat' else nuisance
+                       if singleNuisanceName not in singleNuisances:
+                           singleNuisances[singleNuisanceName] = { }
+                       singleNuisances[singleNuisanceName][nuisanceName] = nuisances[nuisance]
+
+           for singleNuisance in singleNuisances:
+
+               opt2.option = opt.option if singleNuisance=='statistics' else opt.option+'nostat'
+
+               backgroundList, sampleList = [], []
+
+               for sample in samples:
+                   useThisSample = singleNuisance=='statistics'
+                   if not useThisSample:
+                       for nuisanceName in singleNuisances[singleNuisance]:
+                           if sample in nuisances[nuisanceName]['samples']:
+                               useThisSample = True
+                               break
+                   if useThisSample:
+                       if samples[sample]['isSignal']: sampleList.append(sample)
+                       elif sample not in backgroundList: 
+                           backgroundTreeType = samples[sample]['treeType']
+                           backgroundList.append(sample)
+
+               if len(backgroundList)>=1:
+                   sampleList.append(backgroundTreeType)
+                   if len(backgroundList)<=3: 
+                       sampleList.append(backgroundTreeType+':'+','.join(backgroundList))                        
+ 
+               singleNuisanceFile = './nuisance_'+singleNuisance+'_'+opt.year+opt.tag+'.py'
+               with open(singleNuisanceFile, 'w') as file:
+                   file.write('nuisances = '+str(singleNuisances[singleNuisance]))                   
+
+               for samplesToPlot in sampleList:
+                   opt2.sigset = samplesToPlot
+                   mkPlot(opt2, year, tag, opt2.sigset, singleNuisanceFile, extraOutDirFlag='_'+singleNuisance)
+
+               os.system('rm '+singleNuisanceFile)
 
 # Plots merging different data taking periods (years) without combine (e.g. control regions)
 
