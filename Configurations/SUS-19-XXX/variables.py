@@ -493,6 +493,20 @@ elif 'ttZNormalization' in opt.tag:
                              'fold'  : overflow                 #   fold overflow
                            }
 
+elif 'SearchRegion' in opt.tag:
+
+    mt2ll = 'mt2ll' + ctrltag
+
+    searchBins = [0, 20, 40, 60, 80, 100, 160, 220]
+    if 'Chargino' in opt.tag: searchBins = [0, 20, 40, 60, 80, 100, 160, 240, 370, 500]
+
+    variables['mt2ll'] = {   'name'  : mt2ll,            # variable name
+                             'range' : (searchBins,[1]), # variable range
+                             'xaxis' : mt2 + pll + gv,   # x axis name
+                             'fold'  : overflow,         # fold overflow
+                             'nameLatex' : '\\mtll'
+                          }
+
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     ### Set the mt2ll variable

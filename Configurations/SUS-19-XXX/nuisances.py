@@ -580,7 +580,7 @@ for nuisance in nuisanceToRemove:
 
 nuisanceToRemove = [ ]  
 
-if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag:
+if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag or 'SearchRegion' in opt.tag:
 
     if ('nanoAODv6' in opt.samplesFile and 'ctrl' in regionName and 'cern' in SITE): 
  
