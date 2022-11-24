@@ -134,6 +134,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     if 'plotsmearvar' in opt.option: plotCommand += ' --plotSmearVariation=1'    # This is not yet re-implemented in latino's mkPlot.py
     if 'fit' in opt.option.lower() : plotCommand += ' --postFit=p'
     if 'nostat' in opt.option.lower() : plotCommand += ' --removeMCStat'
+    if 'nuisanceVariations' in opt.option: plotCommand += ' --nuisanceVariations'
 
     os.system(plotCommand)
 
@@ -148,6 +149,7 @@ def plotNuisances(opt):
 
    opt.fileset = commonTools.setFileset(opt.fileset, opt.sigset)
    opt.samplesFile = commonTools.getCfgFileName(opt, 'samples')
+   opt.option += 'nuisanceVariations'
 
    for year in opt.year.split('-'):
        for tag in opt.tag.split('-'):
