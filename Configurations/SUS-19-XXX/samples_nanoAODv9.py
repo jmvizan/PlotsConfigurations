@@ -245,7 +245,7 @@ for treeNuisance in treeNuisances:
     treeNuisances[treeNuisance]['BkgToSig'] = True if not fastsimSignal else True # ???
 
 treeNuisanceDirs = { }
-treeNuisanceSuffix = '__hadd' if 'cern' in SITE else ''
+treeNuisanceSuffix = '__hadd' if ('cern' in SITE and 'EOY' in opt.sigset) else ''
 for treeNuisance in treeNuisances:
     treeNuisanceDirs[treeNuisance] = { 'Bkg' : { }, 'Sig' : { }, }
     if treeNuisance=='nosmear' or treeNuisance=='smaer':
