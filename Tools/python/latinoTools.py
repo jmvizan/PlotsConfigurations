@@ -149,7 +149,6 @@ def plotNuisances(opt):
 
    opt.fileset = commonTools.setFileset(opt.fileset, opt.sigset)
    opt.samplesFile = commonTools.getCfgFileName(opt, 'samples')
-   opt.option += 'nuisanceVariations'
 
    for year in opt.year.split('-'):
        for tag in opt.tag.split('-'):
@@ -171,7 +170,7 @@ def plotNuisances(opt):
 
            for singleNuisance in singleNuisances:
 
-               opt2.option = opt.option if singleNuisance=='statistics' else opt.option+'nostat'
+               opt2.option = opt.option if singleNuisance=='statistics' else opt.option+'nostat-nuisanceVariations'
 
                backgroundList, sampleList = [], []
 

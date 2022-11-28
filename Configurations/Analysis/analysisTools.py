@@ -525,13 +525,13 @@ def splitSignalMassPoints(opt, massPointForSubset=150):
             if opt.verbose: print 'Splitting mass points for', baseSignal          
 
             massPoints = getMassPointList(signal)
-
+            print len(massPoints)
             nMassPoints = len(massPoints) 
             minPromptMass = int(signal.split('_')[1].split('-')[1].split('to')[0])
             maxPromptMass = int(signal.split('_')[1].split('to')[1])
-
+            
             nDivisions = max(1, int(round(float(nMassPoints)/massPointForSubset)))
-
+            print nDivisions
             if nDivisions==1:
                 signalSubsets[baseSignal].append(signal)
                 continue
