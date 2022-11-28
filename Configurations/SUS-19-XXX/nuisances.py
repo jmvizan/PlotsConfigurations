@@ -349,7 +349,7 @@ nuisances['pdf'] = {
 
 for yeartomerge in yearstaglist:
 
-    theoryRecoFlag = recoFlag+'SigV6' if 'SigV6' in opt.tag else recoFlag
+    theoryRecoFlag = recoFlag+'SigV6' if ('SigV6' in opt.tag or 'EOY' in opt.sigset) else recoFlag
     exec(open('./Data/theoryNormalizations/theoryNormalizations'+theoryRecoFlag+'_'+yeartomerge+'.py').read())
 
     # LHE scale variation weights (w_var / w_nominal)

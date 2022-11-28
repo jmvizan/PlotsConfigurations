@@ -103,6 +103,11 @@ elif '2018' in yeartag :
     ProductionSig  = 'Spring21UL18FS_106X_nAODv9_Full2018v8/susyGen__susyW__FSSusy2018v8__FSSusyCorr2018v8__hadd__FSSusyNomin2018v8'
     ProductionData = 'Run2018_106X_nAODv9_Full2018v8/DATASusy2018v8__hadd'
 
+if 'EOY' in opt.sigset:
+    if '2016' in yeartag :   ProductionSig = 'Summer16FS_102X_nAODv6_Full2016v6loose/hadd__susyGen__susyW__FSSusy2016v6loose__FSSusyCorr2016v6loose__FSSusyNomin2016v6loose'
+    elif '2017' in yeartag : ProductionSig ='Fall2017FS_102X_nAODv6_Full2017v6loose/hadd__susyGen__susyW__FSSusy2017v6loose__FSSusyCorr2017v6loose__FSSusyNomin2017v6loose'
+    elif '2018' in yeartag : ProductionSig ='Autumn18FS_102X_nAODv6_Full2018v6loose/hadd__susyGen__susyW__FSSusy2018v6loose__FSSusyCorr2018v6loose__FSSusyNomin2018v6loose'
+
 fastsimSignal = False if ('S2tt' in opt.sigset or 'SChipm' in opt.sigset) else True
 signalReco = 'fast' if fastsimSignal else 'reco'
 if not fastsimSignal:
@@ -1131,25 +1136,30 @@ if not skipTreesCheck:
 
 ### Signals
 
-import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
+if 'EOY' in opt.sigset:
+    SigVer, treeType = 'EOY', 'EOY'
+    import PlotsConfigurations.Tools.signalMassPointsEOY as signalMassPoints
+else:
+    SigVer, treeType = '', 'ULFS'
+    import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
 
 for model in signalMassPoints.signalMassPoints:
     if model in opt.sigset:
 
         isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
-        XSWeightModel = XSWeight+'*0.10497000068426132' if 'T2' in model else XSWeight
+        XSWeightModel = XSWeight+'*0.10497000068426132' if ('T2' in model and 'EOY' not in opt.sigset) else XSWeight
 
         for massPoint in signalMassPoints.signalMassPoints[model]:
-            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset.split(':')[-1]):
+            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset):
 
-                if isFillShape and '2016' in yeartag: opt.lumi = 36.33
+                if isFillShape and '2016' in yeartag and 'EOY' not in opt.sigset: opt.lumi = 36.33
 
-                samples[massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
+                samples[SigVer, massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
                                        'FilesPerJob' : 2 ,
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
                                        'suppressZeroTreeNuisances' : ['all'],
-                                       'treeType' : 'ULFS',
+                                       'treeType' : treeType,
                                        'isrObservable' : isrObservable,
                                        'isSignal'  : 1,
                                        'isDATA'    : 0,
