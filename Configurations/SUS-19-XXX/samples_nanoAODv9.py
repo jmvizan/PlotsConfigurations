@@ -1154,7 +1154,7 @@ for model in signalMassPoints.signalMassPoints:
 
                 if isFillShape and '2016' in yeartag and 'EOY' not in opt.sigset: opt.lumi = 36.33
 
-                samples[SigVer, massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
+                samples[SigVer+massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
                                        'FilesPerJob' : 2 ,
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
