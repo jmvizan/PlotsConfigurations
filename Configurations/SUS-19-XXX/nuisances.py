@@ -75,7 +75,7 @@ for scalefactor in leptonSF:
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                if ('nanoAODv6' in opt.samplesFile and 'EOY' not in sample and (not samples[sample]['isFastsim'] or 'SigV6' not in opt.tag )) or 'Extra' not in scalefactor:
+                if ('nanoAODv6' not in opt.samplesFile and 'EOY' not in sample and (not samples[sample]['isFastsim'] or 'SigV6' not in opt.tag )) or 'Extra' not in scalefactor:
                     nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]['weight']
 
 # b-tagging scale factors
