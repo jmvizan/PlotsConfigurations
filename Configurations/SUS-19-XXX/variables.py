@@ -507,6 +507,92 @@ elif 'SearchRegion' in opt.tag:
                              'nameLatex' : '\\mtll'
                           }
 
+elif 'SignalStudies' in opt.tag:
+
+    variables['ptmissreco']   = {   'name'  : 'ptmiss_reco',           #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissgen']     = {  'name'  : 'GenMET_pt',             #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : 'Gen ' + met + gv,       #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissraw']     = {  'name'  : 'RawMET_pt',             #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : 'Raw ' + met + gv,          #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissdiff']   = {   'name'  : 'ptmiss_reco-GenMET_pt', #   variable name
+                                    'range' : (  80, -400.,  400.),    #   variable range
+                                    'xaxis' : 'Reco-Gen' + met + gv,   #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissdiffrg']  = {  'name'  : 'RawMET_pt-GenMET_pt',   #   variable name
+                                    'range' : (  80, -400.,  400.),    #   variable range
+                                    'xaxis' : 'Raw-Gen' + met + gv,    #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissdiffrr']  = {  'name'  : 'ptmiss_reco-RawMET_pt', #   variable name
+                                    'range' : (  80, -400.,  400.),    #   variable range
+                                    'xaxis' : 'Reco-Raw' + met + gv,   #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['njets']         = {  'name'  : njetscut,              #   variable name
+                                    'range' : (  6,    0.,     6.),    #   variable range
+                                    'xaxis' : 'number of jets ('+pt+'>'+jetPtCut+gv+')',        #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['nbjets']        = {  'name'  : nbjets,                    #   variable name
+                                    'range' : (  3,    0.,     3.),      #   variable range
+                                    'xaxis' : 'number of b-tagged jets', #   x axis name
+                                    'fold'  : overflow                   #   fold overflow
+                                }
+
+    variables['mt2ll_reco']    = {   'name'  : 'mt2ll_reco',           #   variable name
+                                     'range' : (  20,    0.,  200.),   #   variable range
+                                     'xaxis' : mt2 + pll + gv,         #   x axis name
+                                     'fold'  : overflow                #   fold overflow
+                                 }
+
+    variables['mt2ll_gen']    = {    'name'  : 'mt2ll_gen',            #   variable name
+                                     'range' : (  20,    0.,  200.),   #   variable range
+                                     'xaxis' : 'Gen ' + mt2 + pll + gv,#   x axis name
+                                     'fold'  : overflow                #   fold overflow
+                                 }
+
+    variables['mt2ll_diff']    = {   'name'  : 'mt2ll_reco-mt2ll_gen', #   variable name
+                                     'range' : (  40, -200.,  200.),   #   variable range
+                                     'xaxis' : 'Reco-Gen ' + mt2 + pll + gv, #   x axis name
+                                     'fold'  : overflow                #   fold overflow
+                                 }
+
+    variables['jetpt']         = {   'name'  : 'CleanJet_pt',          #   variable name
+                                     'range' : (  40,    0.,  200.),   #   variable range
+                                     'xaxis' : 'jet ' + pt + gv,       #   x axis name
+                                     'fold'  : overflow                #   fold overflow
+                                 }
+
+    variables['Lep1pt']        = {   'name'  : 'Lepton_pt['+lep0idx+']',     #   variable name
+                                     'range' : (  40,    0.,  200.),         #   variable range
+                                     'xaxis' : 'leading lepton ' + pt + gv,  #   x axis name
+                                     'fold'  : overflow                      #   fold overflow
+                                 }
+
+    variables['Lep2pt']        = {   'name'  : 'Lepton_pt['+lep1idx+']',     #   variable name
+                                     'range' : (  40,    0.,  200.),         #   variable range
+                                     'xaxis' : 'trailing lepton ' + pt + gv, #   x axis name
+                                     'fold'  : overflow                      #   fold overflow
+                                 } 
+
 elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
     ### Set the mt2ll variable

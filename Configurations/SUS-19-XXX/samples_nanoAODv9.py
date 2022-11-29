@@ -1154,7 +1154,8 @@ for model in signalMassPoints.signalMassPoints:
 
                 if isFillShape and '2016' in yeartag and 'EOY' not in opt.sigset: opt.lumi = 36.33
 
-                samples[SigVer+massPoint] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
+                massPointName = SigVer+massPoint
+                samples[massPointName] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
                                        'FilesPerJob' : 2 ,
                                        'suppressNegative':['all'],
                                        'suppressNegativeNuisances' :['all'],
@@ -1166,11 +1167,11 @@ for model in signalMassPoints.signalMassPoints:
                                      }
                   
                 if fastsimSignal:
-                    samples[massPoint]['weight']    = XSWeightModel+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
-                    samples[massPoint]['isFastsim'] = 1
+                    samples[massPointName]['weight']    = XSWeightModel+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPointName]['isFastsim'] = 1
                 else:
-                    samples[massPoint]['weight']    = XSWeightModel+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
-                    samples[massPoint]['isFastsim'] = 0
+                    samples[massPointName]['weight']    = XSWeightModel+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                    samples[massPointName]['isFastsim'] = 0
 
 ### Nasty clean up for eos
 

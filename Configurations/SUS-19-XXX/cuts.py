@@ -91,6 +91,12 @@ if 'Preselection' in opt.tag:
     cuts['TwoLep_ee_Tag']  = { 'expr' : '('+OC+' && '+EE+' && '+vetoZ+')', 'weight' : btagWeight1tag }
     cuts['TwoLep_mm_Tag']  = { 'expr' : '('+OC+' && '+MM+' && '+vetoZ+')', 'weight' : btagWeight1tag }
 
+if 'SignalStudies' in opt.tag:
+
+    cuts['TwoLep']    = OC
+    cuts['TwoLep_em'] = OC+' && '+DF
+    cuts['TwoLep_sf'] = OC+' && '+SF
+
 if 'METFix' in opt.tag:
     
     cuts['METFixEE_low_em_Veto'] = { 'expr' : '('+OC+' && '+DF             +')', 'weight' : btagWeight0tag }
