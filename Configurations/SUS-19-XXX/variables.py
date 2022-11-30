@@ -585,12 +585,13 @@ elif 'SignalStudies' in opt.tag:
                                      'range' : (  30, -150.,  150.),   #   variable range
                                      'xaxis' : 'Reco-Gen ' + mt2 + pll + gv, #   x axis name
                                      'fold'  : overflow                #   fold overflow
+                                   }
 
     variables['jetpt']         = {   'name'  : 'CleanJet_pt',          #   variable name
                                      'range' : (  40,    0.,  200.),   #   variable range
                                      'xaxis' : 'jet ' + pt + gv,       #   x axis name
-                                 }   'fold'  : overflow                #   fold overflow
-                                 }
+                                     'fold'  : overflow                #   fold overflow
+                                   }
 
     variables['Lep1pt']        = {   'name'  : 'Lepton_pt['+lep0idx+']',     #   variable name
                                      'range' : (  40,    0.,  200.),         #   variable range
