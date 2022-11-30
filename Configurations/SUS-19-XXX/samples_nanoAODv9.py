@@ -1137,20 +1137,35 @@ if not skipTreesCheck:
 ### Signals
 
 if 'EOY' in opt.sigset:
-    SigVer, treeType = 'EOY', 'EOY'
     import PlotsConfigurations.Tools.signalMassPointsEOY as signalMassPoints
 else:
-    SigVer, treeType = '', 'ULFS'
     import PlotsConfigurations.Tools.signalMassPoints as signalMassPoints
 
-for model in signalMassPoints.signalMassPoints:
-    if model in opt.sigset:
+signalSet = opt.sigset.replace('SM-', '')
+signalSet = signalSet.replace('Backgrounds-', '')
+signalSet = signalSet.replace('PseudoData-', '')
+signalSet = signalSet.replace('Data-', '')
+signalSet = signalSet.replace('WJets-', '')
+signalSet = signalSet.split(':')[-1]
+
+sigSetList = signalSet.split(',')
+
+for sigSetItem in sigSetList:
+
+    if 'EOY' in sigSetItem:
+        SigVer, treeType = 'EOY', 'EOY'
+    else:
+        SigVer, treeType = '', 'ULFS'
+
+    for model in signalMassPoints.signalMassPoints:
+
+        if model not in sigSetItem: continue
 
         isrObservable = 'ptISR' if ('T2' not in model and 'S2' not in model and '2016' in opt.tag) else 'njetISR'
-        XSWeightModel = XSWeight+'*0.10497000068426132' if ('T2' in model and 'EOY' not in opt.sigset) else XSWeight
+        XSWeightModel = XSWeight+'*0.10497000068426132' if (isFillShape and 'T2' in model and 'EOY' not in opt.sigset) else XSWeight
 
         for massPoint in signalMassPoints.signalMassPoints[model]:
-            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset):
+            if signalMassPoints.massPointInSignalSet(massPoint, sigSetItem):
 
                 if isFillShape and '2016' in yeartag and 'EOY' not in opt.sigset: opt.lumi = 36.33
 

@@ -127,8 +127,8 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+year+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
 
     if 'normalizedCR' in opt.option: plotCommand += ' --plotNormalizedCRratio=1' # This is not yet re-implemented in latino's mkPlot.py
-    elif 'normalized' in opt.option: plotCommand += ' --plotNormalizedDistributions=1'
-    elif plotAsExotics:              plotCommand += ' --showDataVsBkgOnly'       # This is not yet re-implemented in latino's mkPlot.py
+    elif 'normalized' in opt.option: plotCommand += ' --plotNormalizedDistributions'
+    if plotAsExotics:                plotCommand += ' --showDataVsBkgOnly'       # This is not yet re-implemented in latino's mkPlot.py
     if 'noyields' not in opt.option: plotCommand += ' --showIntegralLegend=1'
     if 'saveC'        in opt.option: plotCommand += ' --fileFormats=\'png,root,C\''
     if 'plotsmearvar' in opt.option: plotCommand += ' --plotSmearVariation=1'    # This is not yet re-implemented in latino's mkPlot.py

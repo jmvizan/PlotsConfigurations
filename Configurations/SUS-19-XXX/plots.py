@@ -389,44 +389,45 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
 # Signal  
 
+signalType = 3 if ('SM' in opt.sigset or 'Backgrounds' in opt.sigset) else 0
+
 signalColor = 1 if (hasattr(opt, 'postFit') and opt.postFit=='n') else 880 # kViolet
 
 LSP = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}'
 CHR = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}'
 STP = '#tilde{t}'
 
-for model in signalMassPoints.signalMassPoints:
-    if model in opt.sigset:
-        for massPoint in signalMassPoints.signalMassPoints[model]:
-            if signalMassPoints.massPointInSignalSet(massPoint, opt.sigset):
+for massPoint in samples:
+    if samples[massPoint]['isSignal']:
 
-                massPointName = massPoint.replace(massPoint.split('_')[0],'')
-                massPointName = massPointName.replace('_mS-', ' m_{'+STP+'}=').replace('_mC-', ' m_{'+CHR+'}=').replace('_mX-', ' m_{'+LSP+'}=')
-                massPointNameLatex = massPoint.replace('_mS-', ' \\invM{\\PSQtDo}=').replace('_mC-', ' \\invM{\\PSGcpmDo}=').replace('_mX-', ', \\invM{\\PSGczDo}=')
-                #massPointNameLatex = massPointNameLatex.replace('TChipmSlepSnu', '\\PSGcpmDo\\PSGcpmDo, \\TChipmDecay,') 
-                #massPointNameLatex = massPointNameLatex.replace('T2tt', '\\PSQtDo\\PASQtDo, \\PSQtDo\\to\\PQt\\PSGczDo,')
-                massPointNameLatex = massPointNameLatex.replace('TChipmSlepSnu', '').replace('T2tt', '')
-                massPointNameLatex = '\\ensuremath{'+massPointNameLatex+'}'              
+        massPointName = massPoint.replace(massPoint.replace('EOY','').split('_')[0],'')
+        massPointName = massPointName.replace('_mS-', ' m_{'+STP+'}=').replace('_mC-', ' m_{'+CHR+'}=').replace('_mX-', ' m_{'+LSP+'}=')
+        massPointNameLatex = massPoint.replace('_mS-', ' \\invM{\\PSQtDo}=').replace('_mC-', ' \\invM{\\PSGcpmDo}=').replace('_mX-', ', \\invM{\\PSGczDo}=')
+        #massPointNameLatex = massPointNameLatex.replace('TChipmSlepSnu', '\\PSGcpmDo\\PSGcpmDo, \\TChipmDecay,') 
+        #massPointNameLatex = massPointNameLatex.replace('T2tt', '\\PSQtDo\\PASQtDo, \\PSQtDo\\to\\PQt\\PSGczDo,')
+        massPointNameLatex = massPointNameLatex.replace('TChipmSlepSnu', '').replace('T2tt', '')
+        massPointNameLatex = '\\ensuremath{'+massPointNameLatex+'}'              
 
-                plot[massPoint]  = { 
+        plot[massPoint]  = { 
                     'nameHR' : massPointName,
                     'nameLatex' : massPointNameLatex,
                     'color': signalColor,  
-                    'isSignal' : 3,
+                    'isSignal' : signalType,
                     'isData'   : 0,
                     'scale'    : 1.0
-                }
+        }
 
-                groupPlot[massPoint]  = {
+        groupPlot[massPoint]  = {
                     'nameHR' : massPointName,
                     'nameLatex' : massPointNameLatex,
-                    'isSignal' : 3,
+                    'isSignal' : signalType,
                     'color': signalColor,  
                     'samples'  : [massPoint], 
                     'scale'    : 1.0
-                }
+        }
                 
-                signalColor += 1
+        signalType = 3
+        signalColor += 1
 
 for group in groupPlot:
     cutToRemoveFromGroup = [ ]
