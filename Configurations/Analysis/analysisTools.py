@@ -32,18 +32,21 @@ def setAnalysisDefaults(opt):
     opt.tableSigset['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ]
     opt.tableSigset['T2tt']          = [ 'T2tt_mS-300_mX-213', 'T2tt_mS-300_mX-175', 'T2tt_mS-350_mX-263', 'T2tt_mS-350_mX-225', 'T2tt_mS-400_mX-275', 'T2tt_mS-300_mX-125', 'T2tt_mS-350_mX-175', 'T2tt_mS-400_mX-225', 'T2tt_mS-400_mX-313', 'T2tt_mS-475_mX-350', 'T2tt_mS-450_mX-275', 'T2tt_mS-450_mX-325', 'T2tt_mS-475_mX-388', 'T2tt_mS-450_mX-363', 'T2tt_mS-475_mX-300', 'T2tt_mS-475_mX-325', 'T2tt_mS-475_mX-375', 'T2tt_mS-500_mX-325', 'T2tt_mS-500_mX-350', 'T2tt_mS-500_mX-375', 'T2tt_mS-500_mX-400', 'T2tt_mS-500_mX-413', 'T2tt_mS-525_mX-350', 'T2tt_mS-525_mX-375', 'T2tt_mS-525_mX-400', 'T2tt_mS-525_mX-425', 'T2tt_mS-525_mX-438', 'T2tt_mS-550_mX-375', 'T2tt_mS-550_mX-400', 'T2tt_mS-550_mX-425', 'T2tt_mS-550_mX-450', 'T2tt_mS-550_mX-463' ]
     opt.tableSigset['TChipmWW']      = [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50' ]    
+    opt.tableSigset['Studies']      = [ 'T2tt_mS-525_mX-350','T2tt_mS-525_mX-438','TChipmSlepSnu_mC-1150_mX-1','TChipmSlepSnu_mC-900_mX-475','EOYT2tt_mS-525_mX-350','EOYT2tt_mS-525_mX-438','EOYTChipmSlepSnu_mC-1150_mX-1','EOYTChipmSlepSnu_mC-900_mX-475' ]
 
     opt.signalSubsets['T2tt']          = [ 'T2tt_mS-150to800_dm-80to175' ]
     opt.signalSubsets['T2bW']          = [ 'T2bW_mS-200to1000_mX-1to700' ]
-    opt.signalSubsets['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-100to475_mX-1to750', 'TChipmSlepSnu_mC-500to650_mX-1to750', 'TChipmSlepSnu_mC-675to800_mX-1to750', 'TChipmSlepSnu_mC-825to925_mX-1to750', 'TChipmSlepSnu_mC-950to1050_mX-1to750', 'TChipmSlepSnu_mC-1075to1175_mX-1to750', 'TChipmSlepSnu_mC-1200to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750' ]
-    opt.signalSubsets['TChipmWW']      = [ 'TChipmWW_mC-100to375_mX-1to250', 'TChipmWW_mC-400to700_mX-1to250' ]
 
     if 'SigV6' in inputTag or 'sigv6' in inputTag:
         opt.tableSigset['TSlepSlep'] = [ 'TSlepSlep_mS-200_mX-120', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ]
+        opt.signalSubsets['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-100to475_mX-1to750', 'TChipmSlepSnu_mC-500to650_mX-1to750', 'TChipmSlepSnu_mC-675to800_mX-1to750', 'TChipmSlepSnu_mC-825to925_mX-1to750', 'TChipmSlepSnu_mC-950to1050_mX-1to750', 'TChipmSlepSnu_mC-1075to1175_mX-1to750', 'TChipmSlepSnu_mC-1200to1300_mX-1to750', 'TChipmSlepSnu_mC-1325to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750' ]
+        opt.signalSubsets['TChipmWW']      = [ 'TChipmWW_mC-100to375_mX-1to250', 'TChipmWW_mC-400to700_mX-1to250' ]
         opt.signalSubsets['TSlepSlep'] = [ 'TSlepSlep_mS-100to275_mX-1to650', 'TSlepSlep_mS-300to400_mX-1to650', 'TSlepSlep_mS-425to600_mX-1to650', 'TSlepSlep_mS-625to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650' ]
     else:
         opt.tableSigset['TSlepSlep'] = [ 'TSlepSlep_mS-200_mX-125', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ]
-        opt.signalSubsets['TSlepSlep'] = [ 'TSlepSlep_mS-100to400_mX-1to650', 'TSlepSlep_mS-425to575_mX-1to650', 'TSlepSlep_mS-600to725_mX-1to650', 'TSlepSlep_mS-750to875_mX-1to650', 'TSlepSlep_mS-900to1000_mX-1to650' ]
+        opt.signalSubsets['TChipmSlepSnu'] = ['TChipmSlepSnu_mC-100to350_mX-1to750', 'TChipmSlepSnu_mC-375to500_mX-1to750', 'TChipmSlepSnu_mC-525to625_mX-1to750', 'TChipmSlepSnu_mC-650to725_mX-1to750', 'TChipmSlepSnu_mC-750to825_mX-1to750', 'TChipmSlepSnu_mC-850to925_mX-1to750', 'TChipmSlepSnu_mC-950to1025_mX-1to750', 'TChipmSlepSnu_mC-1050to1125_mX-1to750', 'TChipmSlepSnu_mC-1150to1225_mX-1to750', 'TChipmSlepSnu_mC-1250to1325_mX-1to750', 'TChipmSlepSnu_mC-1350to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750']
+        opt.signalSubsets['TChipmWW'] = ['TChipmWW_mC-100to275_mX-1to250', 'TChipmWW_mC-300to500_mX-1to250', 'TChipmWW_mC-525to700_mX-1to250']
+        opt.signalSubsets['TSlepSlep'] = ['TSlepSlep_mS-100to325_mX-1to650', 'TSlepSlep_mS-350to475_mX-1to650' ]#, 'TSlepSlep_mS-500to600_mX-1to650', 'TSlepSlep_mS-625to700_mX-1to650', 'TSlepSlep_mS-725to800_mX-1to650', 'TSlepSlep_mS-825to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650']
 
     opt.backgroundsInFit = [ 'ttZ', 'ZZ', 'WZ' ]
 
@@ -185,12 +188,14 @@ def merge2016SR(opt):
             opt2.sigset = sigset
             merge2016(opt2)
 
-        opt2.sigset = 'SM'
-        merge2016(opt2)
-
-        for backcr in opt.backgroundsInFit:
-            opt2.tag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
+        if 'SM' in opt.sigset:
+ 
+            opt2.sigset = 'SM'
             merge2016(opt2)
+
+            for backcr in opt.backgroundsInFit:
+                opt2.tag = tag.replace('VetoesUL', 'FitCR'+backcr+'VetoesUL')
+                merge2016(opt2)
 
 def merge2016CR(opt):
 
@@ -475,7 +480,7 @@ def getSignalList(opt, sigset, tag):
     if sigset=='SM': return []
 
     for sr in opt.signalRegionMap:
-        if tag.split('_')[0].replace('Merge','').replace('FitCR','').replace('Group','').replace('Fast','').replace('FastReco','')==opt.signalRegionMap[sr]['tag']:
+        if tag.split('_')[0].replace('Merge','').replace('FitCR','').replace('Group','').replace('FastReco','').replace('Fast','')==opt.signalRegionMap[sr]['tag']:
 
             if 'all' in sigset:
                 signalList = []
@@ -511,7 +516,7 @@ def getSignalList(opt, sigset, tag):
                    else: return opt.tableSigset[signal]
         else: return sigset.replace('SM-','').split(',')
 
-def splitSignalMassPoints(opt, massPointForSubset=150):
+def splitSignalMassPoints(opt, massPointForSubset=100):
 
     promptMassStep = 25
     signalSubsets = { }

@@ -97,9 +97,9 @@ if 'SignalStudies' in opt.tag:
     cuts['TwoLep_em'] = OC+' && '+DF
     cuts['TwoLep_sf'] = OC+' && '+SF
 
-    cuts['TwoLep_sr']    = OC+' && ptmiss>=160.'
-    cuts['TwoLep_em_sr'] = OC+' && '+DF+' && ptmiss>=160.'
-    cuts['TwoLep_sf_sr'] = OC+' && '+SF+' && ptmiss>=160.'
+    cuts['TwoLep_sr']    = OC+' && ptmiss_reco>=160.'
+    cuts['TwoLep_em_sr'] = OC+' && '+DF+' && ptmiss_reco>=160.'
+    cuts['TwoLep_sf_sr'] = OC+' && '+SF+' && ptmiss_reco>=160.'
 
 if 'METFix' in opt.tag:
     
