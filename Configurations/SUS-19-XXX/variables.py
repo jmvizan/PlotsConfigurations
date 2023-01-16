@@ -1314,6 +1314,27 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                                        'fold'  : overflow,                     #   fold overflow
                                                        'CRbins' : [1, 4]
                                                     }
+
+                if 'WZtoWWValidationRegion' in opt.tag:
+
+                    variables['mt2llUni20'] = {   'name'  : mt2ll,          #   variable name
+                                                  'range' : (25, 0., 500.), #   variable range
+                                                  'xaxis' : mt2 + pll + gv, #   x axis name
+                                                  'fold'  : overflow        #   fold overflow
+                                               }
+
+                    variables['mt2llUni40'] = {   'name'  : mt2ll,          #   variable name
+                                                  'range' : (13, 0., 520.), #   variable range
+                                                  'xaxis' : mt2 + pll + gv, #   x axis name
+                                                  'fold'  : overflow        #   fold overflow
+                                               }
+
+                    variables['mt2llUni50'] = {   'name'  : mt2ll,          #   variable name
+                                                  'range' : (10, 0., 500.), #   variable range
+                                                  'xaxis' : mt2 + pll + gv, #   x axis name
+                                                  'fold'  : overflow        #   fold overflow
+                                               }
+
             if 'SameSign' in opt.tag:
                 #HERE
                 variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name
