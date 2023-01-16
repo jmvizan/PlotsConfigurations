@@ -595,14 +595,31 @@ if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalizati
                 nuisanceToRemove.append(nuisance)
 
     if 'JetUncertainties' in opt.tag:
+
+        nuisanceToDuplicate = []
         for nuisance in nuisances:
             if nuisance!='stat' and 'jesTotal' not in nuisance and 'unclustEn' not in nuisance and 'jer' not in nuisance:
                 nuisanceToRemove.append(nuisance)
             elif nuisance!='stat':
+                nuisanceToDuplicate.append(nuisance)
                 nuisances[nuisance]['cuts'] = []
                 for cut in cuts:
                     if 'jesTotal' not in cut and 'unclustEn' not in cut and 'jer' not in cut:
                         nuisances[nuisance]['cuts'].append(cut)
+        if not isShape:
+            for nuisance in nuisanceToDuplicate:
+                nuisances[nuisance+'MET'] = {}
+                for key in nuisances[nuisance]:
+                    nuisances[nuisance+'MET'][key] = nuisances[nuisance][key]
+                nuisances[nuisance+'MET']['name'] = nuisances[nuisance+'MET']['name'].replace(year,'MET'+year)
+                    
+elif 'unEn' in opt.tag or 'TwoLeptons' in opt.tag:
+
+    for nuisance in nuisances:
+        if nuisance!='stat' and 'jes' not in nuisance and 'jer' not in nuisance and 'unclustEn' not in nuisance:
+            nuisanceToRemove.append(nuisance)
+        elif nuisance!='stat' and 'unEn' in opt.tag:
+            nuisances[nuisance]['cuts'] = [ 'TwoLep' ] 
 
 else:
 

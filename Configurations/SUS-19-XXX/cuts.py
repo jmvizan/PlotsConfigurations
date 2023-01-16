@@ -63,6 +63,8 @@ if 'Trigger' in opt.tag:
 if 'TwoLeptons' in opt.tag:
 
     cuts['TwoLep'] = OC
+    cuts['TwoLep_df'] = OC+' && '+LL
+    cuts['TwoLep_sf'] = OC+' && '+SF
     cuts['TwoLep_em'] = OC+' && '+DF
     cuts['TwoLep_ee'] = OC+' && '+EE 
     cuts['TwoLep_mm'] = OC+' && '+MM
@@ -101,15 +103,32 @@ if 'Preselection' in opt.tag:
     cuts['TwoLep_ee_Tag']  = { 'expr' : '('+OC+' && '+EE+' && '+vetoZ+')', 'weight' : btagWeight1tag }
     cuts['TwoLep_mm_Tag']  = { 'expr' : '('+OC+' && '+MM+' && '+vetoZ+')', 'weight' : btagWeight1tag }
 
+if 'unEn' in opt.tag:
+
+    cuts['TwoLep'] = OC
+    cuts['TwoLepNoSyst'] = OC
+    cuts['TwoLepNoSystLow'] = OC
+    cuts['TwoLepNoSystMedium'] = OC
+    cuts['TwoLepNoSystHigh'] = OC
+
 if 'SignalStudies' in opt.tag:
 
     cuts['TwoLep']    = OC
-    cuts['TwoLep_em'] = OC+' && '+DF
-    cuts['TwoLep_sf'] = OC+' && '+SF
+    #cuts['TwoLep_em'] = OC+' && '+DF
+    #cuts['TwoLep_sf'] = OC+' && '+SF
 
-    cuts['TwoLep_sr']    = OC+' && ptmiss_reco>=160.'
-    cuts['TwoLep_em_sr'] = OC+' && '+DF+' && ptmiss_reco>=160.'
-    cuts['TwoLep_sf_sr'] = OC+' && '+SF+' && ptmiss_reco>=160.'
+    ptmissReco = 'ptmiss_reco' if fastsimSignal else 'ptmiss' 
+    #cuts['TwoLep_sr']    = OC+' && '+ptmissReco+'>=160.'
+    #cuts['TwoLep_em_sr'] = OC+' && '+DF+' && '+ptmissReco+'>=160.'
+    #cuts['TwoLep_sf_sr'] = OC+' && '+SF+' && '+ptmissReco+'>=160.'
+
+    if 'XXXChipmSlepSnu' in opt.sigset:
+        isSlep = 'Sum$((abs(GenPart_pdgId[abs(GenPart_genPartIdxMother)])==1000024) && (abs(GenPart_pdgId)==1000011 || abs(GenPart_pdgId)==1000013 || abs(GenPart_pdgId)==1000015 || abs(GenPart_pdgId)==2000011 || abs(GenPart_pdgId)==2000013 || abs(GenPart_pdgId)==2000015))==2'
+        isSnu = 'Sum$((abs(GenPart_pdgId[abs(GenPart_genPartIdxMother)])==1000024) && abs(GenPart_pdgId)==1000012 || abs(GenPart_pdgId)==1000014 || abs(GenPart_pdgId)==1000016)==2'
+        cuts['TwoLep_slep']    = OC + ' && ' + isSlep 
+        cuts['TwoLep_snu']     = OC + ' && ' + isSnu
+        cuts['TwoLep_slep_sr'] = OC + ' && ' + isSlep + ' && '+ptmissReco+'>=160.'
+        cuts['TwoLep_snu_sr']  = OC + ' && ' + isSnu  + ' && '+ptmissReco+'>=160.'
 
 if 'METFix' in opt.tag:
     
@@ -694,11 +713,14 @@ if 'SignalRegion' in opt.tag and 'JetUncertainties' in opt.tag:
 
     cutList = cuts.keys()
 
+    jetuncList = [ 'MET_T1Smear_pt' ]
+    if isShape: jetuncList.exptend([ 'MET_T1Smear_pt_jesTotalUp', 'MET_T1Smear_pt_jesTotalDown', 'MET_T1Smear_pt_jerUp', 'MET_T1Smear_pt_jerDown', 'MET_T1Smear_pt_unclustEnUp', 'MET_T1Smear_pt_unclustEnDown' ])
+
     for cut in cutList:
-        for jetunc in [ 'MET_T1Smear_pt', 'MET_T1Smear_pt_jesTotalUp', 'MET_T1Smear_pt_jesTotalDown', 'MET_T1Smear_pt_jerUp', 'MET_T1Smear_pt_jerDown', 'MET_T1Smear_pt_unclustEnUp', 'MET_T1Smear_pt_unclustEnDown' ]:
+        for jetunc in jetuncList:
             cuts[cut+'_'+jetunc] = {}
             for key in cuts[cut]:
-                cuts[cut+'_'+jetunc][key] = cuts[cut][key].replace('ptmiss_phi', jetunc.replace('_pt','_phi')).replace('ptmiss', jetunc)  
+                cuts[cut+'_'+jetunc] = cuts[cut][key].replace('ptmiss_phi', jetunc.replace('_pt','_phi')).replace('ptmiss', jetunc)
 
         del cuts[cut]
 

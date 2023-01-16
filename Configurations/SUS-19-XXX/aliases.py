@@ -39,7 +39,23 @@ if recoFlag=='_UL' and 'TrigLatino' not in opt.tag and 'Trigger' not in opt.tag 
                 aliases['triggerWeightBTag']['samples'].append(sample)
                 aliases['triggerWeightVeto']['samples'].append(sample)
             samples[sample]['weight'] = samples[sample]['weight'].replace(TriggerEff, trW)
-    
+
+## Signal anlges
+
+signalSamples = []
+for sample in samples:
+    if samples[sample]['isSignal']:
+        signalSamples.append(sample)
+
+if 'SignalStudies' in opt.tag and len(signalSamples)>0:
+ 
+    aliases['decayAngleCME'] = {
+            'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/decayAngleCME.cc+' ],
+            'class': 'DecayAngleCME',
+            'args': ( ),
+            'samples': signalSamples
+    }
+
 ## Lepton LooseToTight Rates
 
 if recoFlag=='_UL':

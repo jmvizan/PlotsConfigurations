@@ -92,7 +92,7 @@ def setAnalysisDefaults(opt):
         for sr in opt.signalRegionMap:
             for signal in opt.signalRegionMap[sr]['signals']:
                 if signal.split('_')[0] in opt.sigset:
-                    opt.sigset = 'EOY' + opt.sigset
+                    opt.sigset = opt.sigset
  
     if opt.verbose: print opt.year, opt.tag, opt.sigset
 
@@ -366,13 +366,15 @@ def printLimits(opt):
 
         limitResult = {}
 
-        for tags in [ '', '_WWshape', '_WWShape', '_WZbin' ]:
-            for tagm in [ '', 'Group', 'Merge', 'MergeGroup' ]:
-                if 'Stop' in opt.tag and 'Merge' in tagm: continue
-                tagopt = tagm+tags
+        for tags in [ '', '_WWSimm', '_WWCorr' ]:
+            for tagm in [ '' ]:
+                #if 'Stop' in opt.tag and 'Merge' in tagm: continue
+                #if 'Stop' not in opt.tag and 'Merge' not in tagm: continue
+                tagopt = tags #tagm+tags
                 tag = opt.tag.replace('FitCR', tagm+'FitCR')
                 tag += tags
                 outputDir = '/'.join([ opt.limitdir, opt.year, tag, signal ])
+
                 if not commonTools.isGoodFile(outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root', 6000.):
                     if opt.debug: print outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root'
                     continue
@@ -386,21 +388,23 @@ def printLimits(opt):
                     if tagopt=='': limitResult['central'].append(event.limit)
                     else: limitResult[tagopt].append(event.limit)
 
-        printSignal = False
+        printSignal = True
         signalResult = []
         if 'central' not in limitResult: continue
         availableResultList = [ 'central' ]
         if len(limitResult.keys())==1: printSignal = True
         for evt in range(len(limitResult['central'])):
             resultList = [ str(limitResult['central'][evt]) ]
-            for tags in [ '', '_WWshape', '_WWShape', '_WZbin' ]:
-                for tagm in [ '', 'Group', 'Merge', 'MergeGroup' ]:
+            for tags in [ '', '_WWSimm', '_WWCorr' ]:
+                for tagm in [ '' ]:
                     tagopt = tagm+tags
-                    if tagopt in limitResult:
+                    if tagopt!='' and tagopt in limitResult:
                         diff = abs(1. - limitResult[tagopt][evt]/limitResult['central'][evt])
                         if diff>0.0: printSignal = True
                         if tagopt not in availableResultList: availableResultList.append(tagopt)
-                        resultList.append(str(limitResult[tagopt][evt]/limitResult['central'][evt]))
+                        #resultList.append(str(limitResult[tagopt][evt]/limitResult['central'][evt]))
+                        resultList.append(str(limitResult[tagopt][evt]))
+                        
             signalResult.append(' '.join(resultList)) 
         availableResult = ' '.join(availableResultList)
 
