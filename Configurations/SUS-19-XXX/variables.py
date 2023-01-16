@@ -326,14 +326,99 @@ elif 'LeptonL2TRate' in opt.tag:
                                     'fold'  : overflow                 #   fold overflow
                                 }
 
-elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag or 'More' in opt.tag:
+elif 'InclusiveJetUncertainties' in opt.tag:
 
-    variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name    
+    variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name
                                     'range' : (  40,    0.,  400.),    #   variable range
                                     'xaxis' : met + gv,                #   x axis name
                                     'fold'  : overflow                 #   fold overflow
                                 }
-    
+
+    variables['ptmissJESUp']        = {  'name'  : 'MET_T1Smear_pt_jesTotalUp',                #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissJESDown']        = {  'name'  : 'MET_T1Smear_pt_jesTotalDown',                #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissJERUp']        = {  'name'  : 'MET_T1Smear_pt_jerUp',                #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissJERDown']        = {  'name'  : 'MET_T1Smear_pt_jerDown',                #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissunclustEnUp']        = {  'name'  : 'MET_T1Smear_pt_unclustEnUp',       #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissunclustEnDown']        = {  'name'  : 'MET_T1Smear_pt_unclustEnDown',   #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissSR']        = {  'name'  : 'ptmiss',                #   variable name
+                                    'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissSRJESUp']        = {  'name'  : 'MET_T1Smear_pt_jesTotalUp',                #   variable name
+                                    'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissSRJESDown']        = {  'name'  : 'MET_T1Smear_pt_jesTotalDown',                #   variable name
+                                    'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissSRJERUp']        = {  'name'  : 'MET_T1Smear_pt_jerUp',                #   variable name
+                                    'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissSRJERDown']        = {  'name'  : 'MET_T1Smear_pt_jerDown',                #   variable name
+                                    'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissSRunclustEnUp']        = {  'name'  : 'MET_T1Smear_pt_unclustEnUp',       #   variable name
+                                    'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    variables['ptmissSRunclustEnDown']        = {  'name'  : 'MET_T1Smear_pt_unclustEnDown',   #   variable name
+                                    'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in opt.tag or 'TwoLeptons' in opt.tag or 'More' in opt.tag:
+
+    variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
     variables['njets']         = {  'name'  : njetscut,              #   variable name    
                                     'range' : (  6,    0.,     6.),    #   variable range
                                     'xaxis' : 'number of jets ('+pt+'>'+jetPtCut+gv+')',        #   x axis name

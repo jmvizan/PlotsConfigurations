@@ -62,8 +62,18 @@ if 'Trigger' in opt.tag:
 
 if 'TwoLeptons' in opt.tag:
 
+    cuts['TwoLep'] = OC
     cuts['TwoLep_em'] = OC+' && '+DF
     cuts['TwoLep_ee'] = OC+' && '+EE 
+    cuts['TwoLep_mm'] = OC+' && '+MM
+
+if 'InclusiveJetUncertainties' in opt.tag:
+
+    cuts['TwoLep'] = OC
+    cuts['TwoLep_df'] = OC+' && '+LL
+    cuts['TwoLep_sf'] = OC+' && '+SF
+    cuts['TwoLep_em'] = OC+' && '+DF
+    cuts['TwoLep_ee'] = OC+' && '+EE
     cuts['TwoLep_mm'] = OC+' && '+MM
     
 if 'PV35' in opt.tag:
@@ -677,6 +687,20 @@ if isShape and 'Fast' in opt.tag:
                     cuts[cut+'_reco'][key] = cuts[cut][key].replace('ptmiss','ptmiss_reco').replace('ptmiss_reco_phi','ptmiss_phi_reco')
                     cuts[cut+'_gen'][key]  = cuts[cut][key].replace('ptmiss','ptmiss_gen').replace('ptmiss_gen_phi','ptmiss_phi_gen')
                 del cuts[cut]
+
+# For jet uncertainties on pTmiss and mT2ll
+
+if 'SignalRegion' in opt.tag and 'JetUncertainties' in opt.tag:
+
+    cutList = cuts.keys()
+
+    for cut in cutList:
+        for jetunc in [ 'MET_T1Smear_pt', 'MET_T1Smear_pt_jesTotalUp', 'MET_T1Smear_pt_jesTotalDown', 'MET_T1Smear_pt_jerUp', 'MET_T1Smear_pt_jerDown', 'MET_T1Smear_pt_unclustEnUp', 'MET_T1Smear_pt_unclustEnDown' ]:
+            cuts[cut+'_'+jetunc] = {}
+            for key in cuts[cut]:
+                cuts[cut+'_'+jetunc][key] = cuts[cut][key].replace('ptmiss_phi', jetunc.replace('_pt','_phi')).replace('ptmiss', jetunc)  
+
+        del cuts[cut]
 
 # To keep track of mkShapes without Multi
 

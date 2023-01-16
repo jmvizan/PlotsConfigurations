@@ -594,6 +594,16 @@ if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalizati
             if nuisance!='stat' and 'norm' in nuisances[nuisance]['name']:
                 nuisanceToRemove.append(nuisance)
 
+    if 'JetUncertainties' in opt.tag:
+        for nuisance in nuisances:
+            if nuisance!='stat' and 'jesTotal' not in nuisance and 'unclustEn' not in nuisance and 'jer' not in nuisance:
+                nuisanceToRemove.append(nuisance)
+            elif nuisance!='stat':
+                nuisances[nuisance]['cuts'] = []
+                for cut in cuts:
+                    if 'jesTotal' not in cut and 'unclustEn' not in cut and 'jer' not in cut:
+                        nuisances[nuisance]['cuts'].append(cut)
+
 else:
 
     for nuisance in nuisances:
