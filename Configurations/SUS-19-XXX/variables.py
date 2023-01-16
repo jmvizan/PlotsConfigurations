@@ -333,7 +333,14 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                     'xaxis' : met + gv,                #   x axis name
                                     'fold'  : overflow                 #   fold overflow
                                 }
-    
+
+    variables['ptmissSR']        = {  'name'  : 'ptmiss',                #   variable name
+                                    'range' : ([0, 20, 40, 60, 80, 100, 120, 160, 220, 280, 380, 480],[1]),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+    """ 
     variables['njets']         = {  'name'  : njetscut,              #   variable name    
                                     'range' : (  6,    0.,     6.),    #   variable range
                                     'xaxis' : 'number of jets ('+pt+'>'+jetPtCut+gv+')',        #   x axis name
@@ -457,6 +464,7 @@ elif 'Preselection' in opt.tag or 'ControlRegion' in opt.tag or 'Baseline' in op
                                        'xaxis' : mt2 + pll + gv,         #   x axis name
                                        'fold'  : overflow                #   fold overflow
                                    }
+    """
 
 elif 'ttZNormalization' in opt.tag:
 
@@ -507,9 +515,490 @@ elif 'SearchRegion' in opt.tag:
                              'nameLatex' : '\\mtll'
                           }
 
+elif 'unEn' in opt.tag:
+
+    variables['ptmiss']   = {   'name'  : 'ptmiss',              #   variable name
+                                'range' : (  60,    0.,  600.),    #   variable range
+                                'xaxis' : met + gv,                #   x axis name
+                                'cuts'  : [ 'TwoLep' ],
+                                'fold'  : overflow                 #   fold overflow
+                             }
+
+    variables['ptmissSR']   = {   'name'  : 'ptmissSR',              #   variable name
+                                'range' : (  60,    0.,  600.),    #   variable range
+                                'xaxis' : met + gv,                #   x axis name
+                                'cuts'  : [ 'TwoLep' ],
+                                'fold'  : overflow                 #   fold overflow
+                             }
+
+    for enunc in []:# 'unclustEn', 'jesTotal', 'jer' ]:
+
+      ptmissVarCuts = [ 'TwoLepNoSyst', 'TwoLepNoSystLow', 'TwoLepNoSystMedium', 'TwoLepNoSystHigh' ]
+
+      uncenname = enunc.replace('unclustEn','unEn').replace('jesTotal','JES').replace('jer','JER')
+
+      variables[uncenname+'Var']   = {   'name'  : 'MET_T1Smear_pt_unclustEnUp-MET_T1Smear_pt_unclustEnDown>',              #   variable name
+                                  'range' : (  200, -100., 100.),    #   variable range
+                                  'xaxis' : met + gv,                #   x axis name
+                                  'cuts'  : ptmissVarCuts,
+                                  'fold'  : overflow                 #   fold overflow
+                               }
+
+      for var in [ 'Up', 'Down' ]:
+
+        variables[enunc+var]   = {   'name'  : 'MET_T1Smear_pt_unclustEnUp-MET_T1Smear_pt_unclustEnDown>',              #   variable name
+                                  'range' : (  200, -100., 100.),    #   variable range
+                                  'xaxis' : met + gv,                #   x axis name
+                                  'cuts'  : ptmissVarCuts,
+                                  'fold'  : overflow                 #   fold overflow
+                               }
+
 elif 'SignalStudies' in opt.tag:
 
-    variables['ptmissreco']   = {   'name'  : 'ptmiss_reco',           #   variable name
+    ptmissReco = 'ptmiss_reco' if fastsimSignal else 'ptmiss'
+    mt2llReco = 'mt2ll_reco' if fastsimSignal else 'mt2ll' 
+
+    if 'EOY' in opt.sigset:
+        MuoCheck0  =  '(2.*(Lepton_muonIdx[0]>=0)*(Muon_genPartIdx[abs(Lepton_muonIdx[0])]>=0)-1.)*(abs(Lepton_pdgId[0])==13)'
+        MuoPtGen0  = 'GenPart_pt[abs(Muon_genPartIdx[abs(Lepton_muonIdx[0])])]*'+MuoCheck0
+        MuoEtaGen0 = 'GenPart_eta[abs(Muon_genPartIdx[abs(Lepton_muonIdx[0])])]*'+MuoCheck0
+        MuoCheck1  =  '(2.*(Lepton_muonIdx[1]>=0)*(Muon_genPartIdx[abs(Lepton_muonIdx[1])]>=0)-1.)*(abs(Lepton_pdgId[1])==13)'
+        MuoPtGen1  = 'GenPart_pt[abs(Muon_genPartIdx[abs(Lepton_muonIdx[1])])]*'+MuoCheck1
+        MuoEtaGen1 = 'GenPart_eta[abs(Muon_genPartIdx[abs(Lepton_muonIdx[1])])]*'+MuoCheck1
+        EleCheck0  =  '(2.*(Lepton_electronIdx[0]>=0)*(Electron_genPartIdx[abs(Lepton_electronIdx[0])]>=0)-1.)*(abs(Lepton_pdgId[0])==11)'
+        ElePtGen0  = 'GenPart_pt[abs(Electron_genPartIdx[abs(Lepton_electronIdx[0])])]*'+EleCheck0
+        EleEtaGen0 = 'GenPart_eta[abs(Electron_genPartIdx[abs(Lepton_electronIdx[0])])]*'+EleCheck0
+        EleCheck1  =  '(2.*(Lepton_electronIdx[1]>=0)*(Electron_genPartIdx[abs(Lepton_electronIdx[1])]>=0)-1.)*(abs(Lepton_pdgId[1])==11)'
+        ElePtGen1  = 'GenPart_pt[abs(Electron_genPartIdx[abs(Lepton_electronIdx[1])])]*'+EleCheck1
+        EleEtaGen1 = 'GenPart_eta[abs(Electron_genPartIdx[abs(Lepton_electronIdx[1])])]*'+EleCheck1
+        LepPtGen0  = '('+MuoPtGen0 +'+'+ElePtGen0 +')'
+        LepPtGen1  = '('+MuoPtGen1 +'+'+ElePtGen1 +')'
+        LepEtaGen0 = '('+MuoEtaGen0+'+'+EleEtaGen0+')'
+        LepEtaGen1 = '('+MuoEtaGen1+'+'+EleEtaGen1+')'
+    else:
+        LepPtGen0  = 'LeptonGen_pt[abs(Lepton_genIdx[0])]*(Lepton_genIdx[0]+0.5)/abs(Lepton_genIdx[0]+0.5)'
+        LepPtGen1  = 'LeptonGen_pt[abs(Lepton_genIdx[1])]*(Lepton_genIdx[1]+0.5)/abs(Lepton_genIdx[1]+0.5)'
+        LepEtaGen0 = 'LeptonGen_eta[abs(Lepton_genIdx[0])]*(Lepton_genIdx[0]+0.5)/abs(Lepton_genIdx[0]+0.5)'
+        LepEtaGen1 = 'LeptonGen_eta[abs(Lepton_genIdx[1])]*(Lepton_genIdx[1]+0.5)/abs(Lepton_genIdx[1]+0.5)'    
+
+    promptPlus     = '(GenPart_pdgId>= 1000000)*(abs(GenPart_pdgId)<=2001000)*(abs(GenPart_pdgId[abs(GenPart_genPartIdxMother)])<1000000)'
+    promptMinus    = '(GenPart_pdgId<=-1000000)*(abs(GenPart_pdgId)<=2001000)*(abs(GenPart_pdgId[abs(GenPart_genPartIdxMother)])<1000000)'
+    promptPlusPt   = 'Sum$(GenPart_pt*' +promptPlus +')'
+    promptMinusPt  = 'Sum$(GenPart_pt*' +promptMinus+')'
+    promptPlusEta  = 'Sum$(GenPart_eta*'+promptPlus +')'
+    promptMinusEta = 'Sum$(GenPart_eta*'+promptMinus+')'
+
+    #Events->Scan("GenPar:qt_pt:GenPart_pdgId[abs(GenPart_genPartIdxMother)]", "(abs(GenPart_pdgId)==11 || abs(GenPart_pdgId)==13) && GenPart_genPartIdxMother>-1 && ((abs(GenPart_pdgId[abs(GenPart_genPartIdxMother)])>=1000000 && abs(GenPart_pdgId[abs(GenPart_genPartIdxMother)])<=2001000) || (abs(GenPart_pdgId[abs(GenPart_genPartIdxMother)])==24))")
+    #Events->Scan("(Lepton_pt-GenPart_pt[abs(Muon_genPartIdx[abs(Lepton_muonIdx)])])/GenPart_pt[abs(Muon_genPartIdx[abs(Lepton_muonIdx)])]", "Lepton_muonIdx>=0 && Muon_genPartIdx[abs(Lepton_muonIdx)]>=0")
+
+    nLepPtBins, maxLepPt = 40, 200.
+    nDauMassBins, minDauMass, maxDauMass = 800, 0., 800.
+    nLSPMassBins, minLSPMass, maxLSPMass = 800, 0., 800.
+    if 'Slep' in opt.sigset:
+        nLepPtBins, maxLepPt = 50, 500.
+    if opt.sigset.count('_')==2:
+       prmM = int(opt.sigset.split('_')[1].split('-')[1])
+       lspM = int(opt.sigset.split('_')[2].split('-')[1])
+       minLSPMass, maxLSPMass = lspM-50, lspM+50
+       if 'ChipmSlepSnu' in opt.sigset:
+           minDauMass, maxDauMass = lspM, prmM
+       else:
+           minDauMass, maxDauMass = lspM-50, lspM+50
+       nDauMassBins = maxDauMass - minDauMass
+       nLSPMassBins = maxLSPMass - minLSPMass
+  
+    variables['PromptPlusPt']    = {    'name'  : promptPlusPt,     #   variable name
+                                        'range' : (  100,    0.,  1000.),         #   variable range
+                                        'xaxis' : 'prompt susy plus ' + pt + gv,  #   x axis name
+                                        'fold'  : overflow                      #   fold overflow
+                                     }
+
+    variables['PromptMinusPt']   = {    'name'  : promptMinusPt,     #   variable name
+                                        'range' : (  100,    0.,  1000.),         #   variable range
+                                        'xaxis' : 'prompt susy minus ' + pt + gv,  #   x axis name
+                                        'fold'  : overflow                      #   fold overflow
+                                     }
+
+    variables['PromptPlusEta']   = {    'name'  : promptPlusEta,     #   variable name
+                                        'range' : (  36,    -3.6,  3.6),         #   variable range
+                                        'xaxis' : 'prompt susy plus |#eta|',  #   x axis name
+                                     }
+
+    variables['PromptMinusEta']  = {    'name'  : promptMinusEta,     #   variable name
+                                        'range' : (  36,    -3.6,  3.6),         #   variable range
+                                        'xaxis' : 'prompt susy minus |#eta|',  #   x axis name
+                                     }
+
+    variables['decayAnglePlusSusy']  = { 'name'  : 'abs(decayAngleCME[0])', #   variable name
+                                         'range' : (  96,    0.,  3.2),         #   variable range
+                                         'xaxis' : '#Delta#phi(prompt,daughter)' #   x axis name
+                                        }
+
+    variables['decayAnglePlusSM']    = { 'name'  : 'abs(decayAngleCME[1])', #   variable name
+                                         'range' : (  96,    0.,  3.2),         #   variable range
+                                         'xaxis' : '#Delta#phi(prompt,daughter)' #   x axis name
+                                        }
+
+    variables['decayAngleMinusSusy'] = { 'name'  : 'abs(decayAngleCME[2])', #   variable name
+                                         'range' : (  96,    0.,  3.2),         #   variable range
+                                         'xaxis' : '#Delta#phi(prompt,daughter)' #   x axis name
+                                        }
+
+    variables['decayAngleMinusSM']   = { 'name'  : 'abs(decayAngleCME[3])', #   variable name
+                                         'range' : (  96,    0.,  3.2),         #   variable range
+                                         'xaxis' : '#Delta#phi(prompt,daughter)' #   x axis name
+                                        }
+
+    variables['boostedDecayAnglePlusSusy']  = { 'name'  : 'abs(decayAngleCME[4])', #   variable name
+                                         'range' : (  96,    0.,  3.2),         #   variable range
+                                         'xaxis' : '#Delta#phi(prompt,daughter)' #   x axis name
+                                        }
+
+    variables['boostedDecayAnglePlusSM']    = { 'name'  : 'abs(decayAngleCME[5])', #   variable name
+                                         'range' : (  96,    0.,  3.2),         #   variable range
+                                         'xaxis' : '#Delta#phi(prompt,daughter)' #   x axis name
+                                        }
+
+    variables['boostedDecayAngleMinusSusy'] = { 'name'  : 'abs(decayAngleCME[6])', #   variable name
+                                         'range' : (  96,    0.,  3.2),         #   variable range
+                                         'xaxis' : '#Delta#phi(prompt,daughter)' #   x axis name
+                                        }
+
+    variables['boostedDecayAngleMinusSM']   = { 'name'  : 'abs(decayAngleCME[7])', #   variable name
+                                         'range' : (  96,    0.,  3.2),         #   variable range
+                                         'xaxis' : '#Delta#phi(prompt,daughter)' #   x axis name
+                                        }
+ 
+    variables['promptPlusPt']        = {   'name'  : 'decayAngleCME[8]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'promptPlusPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['promptPlusEta']       = {   'name'  : 'decayAngleCME[9]',    #   variable name
+                                           'range' : (24, -2.4, 2.4),           #   variable range
+                                           'xaxis' : 'promptPlusEta'         #   x axis name
+                                         } 
+
+    variables['promptPlusPhi']       = {   'name'  : 'decayAngleCME[10]',    #   variable name
+                                           'range' : (64, -3.2, 3.2),           #   variable range
+                                           'xaxis' : 'promptPlusPhi'         #   x axis name
+                                         }
+
+    variables['promptPlusMass']       = {   'name'  : 'decayAngleCME[11]',    #   variable name
+                                           'range' : (1500, 0., 1500.),           #   variable range
+                                           'xaxis' : 'promptPlusMass'         #   x axis name
+                                         }
+
+    variables['promptMinusPt']        = {   'name'  : 'decayAngleCME[12]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'promptMinusPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['promptMinusEta']       = {   'name'  : 'decayAngleCME[13]',    #   variable name
+                                           'range' : (24, -2.4, 2.4),           #   variable range
+                                           'xaxis' : 'promptMinusEta'         #   x axis name
+                                         }
+
+    variables['promptMinusPhi']       = {   'name'  : 'decayAngleCME[14]',    #   variable name
+                                           'range' : (64, -3.2, 3.2),           #   variable range
+                                           'xaxis' : 'promptMinusPhi'         #   x axis name
+                                         }
+
+    variables['promptMinusMass']       = {   'name'  : 'decayAngleCME[15]',    #   variable name
+                                           'range' : (1500, 0., 1500.),           #   variable range
+                                           'xaxis' : 'promptMinusMass'         #   x axis name
+                                         }
+
+    variables['lastPromptPlusPt']        = {   'name'  : 'decayAngleCME[16]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'lastPromptPlusPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['lastPromptPlusEta']       = {   'name'  : 'decayAngleCME[17]',    #   variable name
+                                           'range' : (24, -2.4, 2.4),           #   variable range
+                                           'xaxis' : 'lastPromptPlusEta'         #   x axis name
+                                         }
+
+    variables['lastPromptPlusPhi']       = {   'name'  : 'decayAngleCME[18]',    #   variable name
+                                           'range' : (64, -3.2, 3.2),           #   variable range
+                                           'xaxis' : 'lastPromptPlusPhi'         #   x axis name
+                                         }
+
+    variables['lastPromptPlusMass']       = {   'name'  : 'decayAngleCME[19]',    #   variable name
+                                           'range' : (1500, 0., 1500.),           #   variable range
+                                           'xaxis' : 'lastPromptPlusMass'         #   x axis name
+                                         }
+
+    variables['lastPromptMinusPt']        = {   'name'  : 'decayAngleCME[20]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'lastPromptMinusPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['lastPromptMinusEta']       = {   'name'  : 'decayAngleCME[21]',    #   variable name
+                                           'range' : (24, -2.4, 2.4),           #   variable range
+                                           'xaxis' : 'lastPromptMinusEta'         #   x axis name
+                                         }
+
+    variables['lastPromptMinusPhi']       = {   'name'  : 'decayAngleCME[22]',    #   variable name
+                                           'range' : (64, -3.2, 3.2),           #   variable range
+                                           'xaxis' : 'lastPromptMinusPhi'         #   x axis name
+                                         }
+
+    variables['lastPromptMinusMass']       = {   'name'  : 'decayAngleCME[23]',    #   variable name
+                                           'range' : (1500, 0., 1500.),           #   variable range
+                                           'xaxis' : 'lastPromptMinusMass'         #   x axis name
+                                         }
+
+    variables['plusSusyPt']        = {   'name'  : 'decayAngleCME[24]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'plusSusyPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['plusSMPt']         = {   'name'  : 'decayAngleCME[25]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'plusSMPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['minusSusyPt']        = {   'name'  : 'decayAngleCME[26]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'minusSusyPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['minusSMPt']         = {   'name'  : 'decayAngleCME[27]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'minusSMPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['plusSusyMass']        = {   'name'  : 'decayAngleCME[28]',     #   variable name
+                                           'range' : (nDauMassBins, minDauMass, maxDauMass),         #   variable range
+                                           'xaxis' : 'plusSusyMass',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['plusSMMass']         = {   'name'  : 'decayAngleCME[29]',     #   variable name
+                                           'range' : (  6,0.,6.),         #   variable range
+                                           'xaxis' : 'plusSMMass',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['minusSusyMass']        = {   'name'  : 'decayAngleCME[30]',     #   variable name
+                                           'range' : (nDauMassBins, minDauMass, maxDauMass),         #   variable range
+                                           'xaxis' : 'minusSusyMass',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['minusSMMass']         = {   'name'  : 'decayAngleCME[31]',     #   variable name
+                                           'range' : (  6,0.,6.),         #   variable range
+                                           'xaxis' : 'minusSMMass',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmePlusSusyPt']        = {   'name'  : 'decayAngleCME[32]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'cmePlusSusyPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmePlusSMPt']         = {   'name'  : 'decayAngleCME[33]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'cmePlusSMPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmeMinusSusyPt']        = {   'name'  : 'decayAngleCME[34]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'cmeMinusSusyPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmeMinusSMPt']         = {   'name'  : 'decayAngleCME[35]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'cmeMinusSMPt',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmePlusSusyMass']        = {   'name'  : 'decayAngleCME[36]',     #   variable name
+                                           'range' : (nDauMassBins, minDauMass, maxDauMass),         #   variable range
+                                           'xaxis' : 'cmePlusSusyMass',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmePlusSMMass']         = {   'name'  : 'decayAngleCME[37]',     #   variable name
+                                           'range' : (  6,0.,6.),         #   variable range
+                                           'xaxis' : 'cmePlusSMMass',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmeMinusSusyMass']        = {   'name'  : 'decayAngleCME[38]',     #   variable name
+                                           'range' : (nDauMassBins, minDauMass, maxDauMass),         #   variable range
+                                           'xaxis' : 'cmeMinusSusyMass',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmeMinusSMMass']         = {   'name'  : 'decayAngleCME[39]',     #   variable name
+                                           'range' : (  6,0.,6.),         #   variable range
+                                           'xaxis' : 'cmeMinusSMMass',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmePlusSusyP']        = {   'name'  : 'decayAngleCME[40]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'cmePlusSusyP',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmePlusSMP']         = {   'name'  : 'decayAngleCME[41]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'cmePlusSMP',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmeMinusSusyP']        = {   'name'  : 'decayAngleCME[42]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'cmeMinusSusyP',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['cmeMinusSMP']         = {   'name'  : 'decayAngleCME[43]',     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : 'cmeMinusSMP',  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                         }
+
+    variables['plusResidualP']        = {   'name'  : 'decayAngleCME[44]',     #   variable name
+                                             'range' : (  100,  -100.,  100.),         #   variable range
+                                             'xaxis' : 'plusResidualP',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+
+    variables['plusResidualE']        = {   'name'  : 'decayAngleCME[45]',     #   variable name
+                                             'range' : (  100,   -100.,  100.),         #   variable range
+                                             'xaxis' : 'plusResidualE',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+
+    variables['minusResidualP']        = {   'name'  : 'decayAngleCME[46]',     #   variable name
+                                             'range' : (  100,  -100.,  100.),         #   variable range
+                                             'xaxis' : 'minusResidualP',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+
+    variables['minusResidualE']        = {   'name'  : 'decayAngleCME[47]',     #   variable name
+                                             'range' : (  100,  -100.,  100.),         #   variable range
+                                             'xaxis' : 'minusResidualE',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+
+    variables['cmePlusResidualP']        = {   'name'  : 'decayAngleCME[48]',     #   variable name
+                                             'range' : (  100,  -100.,  100.),         #   variable range
+                                             'xaxis' : 'cmePlusResidualP',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+
+    variables['cmePlusResidualE']        = {   'name'  : 'decayAngleCME[49]',     #   variable name
+                                             'range' : (  100,  -100.,  100.),         #   variable range
+                                             'xaxis' : 'cmePlusResidualE',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+
+    variables['cmeMinusResidualP']        = {   'name'  : 'decayAngleCME[50]',     #   variable name
+                                             'range' : (  100,  -100.,  100.),         #   variable range
+                                             'xaxis' : 'cmeMinusResidualP',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+
+    variables['cmeMinusResidualE']        = {   'name'  : 'decayAngleCME[51]',     #   variable name
+                                             'range' : (  100,  -100.,  100.),         #   variable range
+                                             'xaxis' : 'cmeMinusResidualE',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+
+    if 'ChipmSlepSnu' in opt.sigset:
+
+        variables['deltaSusyMass']        = {  'name'  : 'decayAngleCME[36]-decayAngleCME[38]',     #   variable name
+                                                  'range' : (400, -200., 200.),         #   variable range
+                                                  'xaxis' : 'deltaSusyMass',  #   x axis name
+                                                  'fold'  : overflow                      #   fold overflow
+                                                 }
+
+        variables['lspPlusMass']        = {   'name'  : 'decayAngleCME[52]',     #   variable name
+                                             'range' : (nLSPMassBins, minLSPMass, maxLSPMass),         #   variable range
+                                             'xaxis' : 'lspPlusMass',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+
+        variables['lspMinusMass']        = {   'name'  : 'decayAngleCME[53]',     #   variable name
+                                             'range' : (nLSPMassBins, minLSPMass, maxLSPMass),         #   variable range
+                                             'xaxis' : 'lspMinusMass',  #   x axis name
+                                             'fold'  : overflow                      #   fold overflow
+                                           }
+    
+    if 'Slep' in opt.sigset:
+ 
+        slepId       = '(abs(GenPart_pdgId)==1000011 || abs(GenPart_pdgId)==1000013 || abs(GenPart_pdgId)==1000015 || abs(GenPart_pdgId)==2000011 || abs(GenPart_pdgId)==2000013 || abs(GenPart_pdgId)==2000015)'
+        snuId        = '(abs(GenPart_pdgId)==1000012 || abs(GenPart_pdgId)==1000014 || abs(GenPart_pdgId)==1000016)'
+        lepId        = '(abs(GenPart_pdgId)==11 || abs(GenPart_pdgId)==13 || abs(GenPart_pdgId)==15)'
+        nuId         = '(abs(GenPart_pdgId)==12 || abs(GenPart_pdgId)==14 || abs(GenPart_pdgId)==16)'
+        neuId        = '(abs(GenPart_pdgId)==1000022)'
+        chipmDau   = {}
+        chipmDau['lepPlus']    = 'Sum$(genVar*'+lepId +'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]== susyIDprompt))'
+        chipmDau['lepMinus']   = 'Sum$(genVar*'+lepId +'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]==-susyIDprompt))'
+        if 'ChipmSlepSnu' in opt.sigset:
+            chipmDau['slepPlus']   = 'Sum$(genVar*'+slepId+'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]== susyIDprompt))'
+            chipmDau['slepMinus']  = 'Sum$(genVar*'+slepId+'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]==-susyIDprompt))'
+            chipmDau['snuPlus']    = 'Sum$(genVar*'+snuId +'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]== susyIDprompt))'
+            chipmDau['snuMinus']   = 'Sum$(genVar*'+snuId +'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]==-susyIDprompt))'
+            chipmDau['nuPlus']     = 'Sum$(genVar*'+nuId  +'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]== susyIDprompt))'
+            chipmDau['nuMinus']    = 'Sum$(genVar*'+nuId  +'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]==-susyIDprompt))'
+        elif 'SlepSlep' in opt.sigset:
+            chipmDau['neuPlus']    = 'Sum$(genVar*'+neuId +'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]== susyIDprompt))'
+            chipmDau['neuMinus']   = 'Sum$(genVar*'+neuId +'*(GenPart_pdgId[abs(GenPart_genPartIdxMother)]==-susyIDprompt))'        
+
+        for chipmdau in chipmDau:
+
+            variables[chipmdau+'Pt']   = { 'name'  : chipmDau[chipmdau].replace('genVar','GenPart_pt'),     #   variable name
+                                           'range' : (  100,    0.,  1000.),         #   variable range
+                                           'xaxis' : chipmdau + ' ' + pt + gv,  #   x axis name
+                                           'fold'  : overflow                      #   fold overflow
+                                          }
+        
+            variables[chipmdau+'DPhi'] = { 'name'  : chipmDau[chipmdau].replace('genVar','acos(cos(GenPart_phi-GenPart_phi[abs(GenPart_genPartIdxMother)]))'), #   variable name
+                                           'range' : (  96,    0.000001,  3.2),         #   variable range
+                                           'xaxis' : '#Delta#phi(prompt,daughter)' #   x axis name
+                                          }
+
+
+    variables['LepGen1pt']        = {   'name'  : LepPtGen0,     #   variable name    
+                                        'range' : (  nLepPtBins,    0.,  maxLepPt),         #   variable range
+                                        'xaxis' : 'leading lepton gen ' + pt + gv,  #   x axis name
+                                        'fold'  : overflow                      #   fold overflow
+                                     }
+
+    variables['LepGen2pt']        = {   'name'  : LepPtGen1,     #   variable name
+                                        'range' : (  nLepPtBins,    0.,  maxLepPt),         #   variable range
+                                        'xaxis' : 'trailing lepton gen ' + pt + gv,  #   x axis name
+                                        'fold'  : overflow                      #   fold overflow
+                                     }
+
+    variables['LepGen1eta']       = { 'name'  : LepEtaGen0,    #   variable name
+                                      'range' : (24, -2.4, 2.4),           #   variable range
+                                      'xaxis' : 'leading lepton gen |#eta|'         #   x axis name
+                                     }
+
+    variables['LepGen2eta']       = { 'name'  : LepEtaGen1,    #   variable name
+                                      'range' : (24, -2.4, 2.4),           #   variable range
+                                      'xaxis' : 'trailing lepton gen |#eta|'         #   x axis name
+                                     }
+
+    variables['ptmissreco']   = {   'name'  : ptmissReco,              #   variable name
                                     'range' : (  60,    0.,  600.),    #   variable range
                                     'xaxis' : met + gv,                #   x axis name
                                     'fold'  : overflow                 #   fold overflow
@@ -527,9 +1016,9 @@ elif 'SignalStudies' in opt.tag:
                                     'fold'  : overflow                 #   fold overflow
                                 }
 
-    variables['ptmissdiff']   = {   'name'  : 'ptmiss_reco-GenMET_pt', #   variable name
+    variables['ptmissdiff']   = {   'name'  : ptmissReco+'-GenMET_pt', #   variable name
                                     'range' : (  60, -300.,  300.),    #   variable range
-                                    'xaxis' : 'Reco-Gen ' + met + gv,   #   x axis name
+                                    'xaxis' : 'Reco-Gen ' + met + gv,  #   x axis name
                                     'fold'  : overflow                 #   fold overflow
                                 }
 
@@ -539,7 +1028,7 @@ elif 'SignalStudies' in opt.tag:
                                     'fold'  : overflow                 #   fold overflow
                                 }
 
-    variables['ptmissdiffrr']  = {  'name'  : 'ptmiss_reco-RawMET_pt', #   variable name
+    variables['ptmissdiffrr']  = {  'name'  : ptmissReco+'-RawMET_pt', #   variable name
                                     'range' : (  60, -300.,  300.),    #   variable range
                                     'xaxis' : 'Reco-Raw ' + met + gv,   #   x axis name
                                     'fold'  : overflow                 #   fold overflow
@@ -557,35 +1046,37 @@ elif 'SignalStudies' in opt.tag:
                                     'fold'  : overflow                   #   fold overflow
                                 }
 
-    variables['mt2ll_reco']    = {   'name'  : 'mt2ll_reco',           #   variable name
+    variables['mt2ll_reco']    = {   'name'  : mt2llReco,              #   variable name
                                      'range' : (  20,    0.,  200.),   #   variable range
                                      'xaxis' : mt2 + pll + gv,         #   x axis name
                                      'fold'  : overflow                #   fold overflow
-                                 }
+                                  }
 
-    variables['mt2ll_gen']    = {    'name'  : 'mt2ll_gen',            #   variable name
-                                     'range' : (  20,    0.,  200.),   #   variable range
-                                     'xaxis' : 'Gen ' + mt2 + pll + gv,#   x axis name
-                                     'fold'  : overflow                #   fold overflow
-                                 }
-
-    variables['mt2llTail_reco'] = {  'name'  : 'mt2ll_reco',           #   variable name
+    variables['mt2llTail_reco'] = {  'name'  : mt2llReco,              #   variable name
                                      'range' : (  38,    0.,  380.),   #   variable range
                                      'xaxis' : mt2 + pll + gv,         #   x axis name
-                                     'fold'  : overflow                #   fold overflow
-                                 }
-
-    variables['mt2llTail_gen']  = {  'name'  : 'mt2ll_gen',            #   variable name
-                                     'range' : (  38,    0.,  380.),   #   variable range
-                                     'xaxis' : 'Gen ' + mt2 + pll + gv,#   x axis name
-                                     'fold'  : overflow                #   fold overflow
-                                 }
-
-    variables['mt2ll_diff']     = {  'name'  : 'mt2ll_reco-mt2ll_gen', #   variable name
-                                     'range' : (  30, -150.,  150.),   #   variable range
-                                     'xaxis' : 'Reco-Gen ' + mt2 + pll + gv, #   x axis name
                                      'fold'  : overflow                #   fold overflow
                                    }
+
+    if fastsimSignal:
+
+        variables['mt2ll_gen']    = {    'name'  : 'mt2ll_gen',            #   variable name
+                                         'range' : (  20,    0.,  200.),   #   variable range
+                                         'xaxis' : 'Gen ' + mt2 + pll + gv,#   x axis name
+                                         'fold'  : overflow                #   fold overflow
+                                     }
+
+        variables['mt2llTail_gen']  = {  'name'  : 'mt2ll_gen',            #   variable name
+                                         'range' : (  38,    0.,  380.),   #   variable range
+                                         'xaxis' : 'Gen ' + mt2 + pll + gv,#   x axis name
+                                         'fold'  : overflow                #   fold overflow
+                                     }
+
+        variables['mt2ll_diff']     = {  'name'  : 'mt2ll_reco-mt2ll_gen', #   variable name
+                                         'range' : (  30, -150.,  150.),   #   variable range
+                                         'xaxis' : 'Reco-Gen ' + mt2 + pll + gv, #   x axis name
+                                         'fold'  : overflow                #   fold overflow
+                                       }
 
     variables['jetpt']         = {   'name'  : 'CleanJet_pt',          #   variable name
                                      'range' : (  40,    0.,  200.),   #   variable range
@@ -594,13 +1085,13 @@ elif 'SignalStudies' in opt.tag:
                                    }
 
     variables['Lep1pt']        = {   'name'  : 'Lepton_pt['+lep0idx+']',     #   variable name
-                                     'range' : (  40,    0.,  200.),         #   variable range
+                                     'range' : (  nLepPtBins,    0.,  maxLepPt),         #   variable range
                                      'xaxis' : 'leading lepton ' + pt + gv,  #   x axis name
                                      'fold'  : overflow                      #   fold overflow
                                  }
 
     variables['Lep2pt']        = {   'name'  : 'Lepton_pt['+lep1idx+']',     #   variable name
-                                     'range' : (  40,    0.,  200.),         #   variable range
+                                     'range' : (  nLepPtBins,    0.,  maxLepPt),         #   variable range
                                      'xaxis' : 'trailing lepton ' + pt + gv, #   x axis name
                                      'fold'  : overflow                      #   fold overflow
                                  } 
@@ -782,33 +1273,6 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          'range' : ( 120,    0., 3000.),   #   variable range
                                          'xaxis' : 'visht' + gv,           #   x axis name
                                          'fold'  : overflow               #   fold overflow
-                                     }
-        
-        variables['ht']            = {   'name'  : 'Sum$(CleanJet_pt)',    #   variable name    
-                                         'range' : ( 120,    0., 3000.),   #   variable range
-                                         'xaxis' : 'ht' + gv,              #   x axis name
-                                         'fold'  : overflow                #   fold overflow
-                                     }
-        
-        variables['sumLepPt']      = {   'name'  : sumLeptonPt,            #   variable name    
-                                         'range' : ( 120,    0., 3000.),   #   variable range
-                                         'xaxis' : 'sumleppt' + gv,        #   x axis name
-                                         'fold'  : overflow                #   fold overflow
-                                     }
-    
-        variables['njets']         = {  'name'  : 'nCleanJet',             #   variable name    
-                                        'range' : (  6,    0.,     6.),    #   variable range
-                                        'xaxis' : 'number of jets',        #   x axis name
-                                        'fold'  : overflow                 #   fold overflow
-                                    }
-
-    # ... and validation regions
-    if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag: 
-
-        variables['ptmiss']        = {  'name'  : 'ptmiss'+ctrltag,        #   variable name    
-                                        'range' : (  20,    0.,  400.),    #   variable range                             
-                                        'xaxis' : met + gv,                #   x axis name
-                                        'fold'  : overflow                 #   fold overflow
                                      }
 
         variables['ptmissSR']     = {  'name'  : 'ptmiss'+ctrltag,        #   variable name  

@@ -67,7 +67,9 @@ if isShapeOrPlot:
 
 skipTreesCheck = False if len(yeartag.split('-'))==1 else True
 
-if isShape and skipTreesCheck:
+if 'SignalStudies' in opt.tag and not isFillShape: 
+    skipTreesCheck = True
+elif isShape and skipTreesCheck:
     print 'Error: it is not allowed to fill shapes and skipping trees check!'
     exit()
  
@@ -1167,7 +1169,7 @@ for sigSetItem in sigSetList:
         for massPoint in signalMassPoints.signalMassPoints[model]:
             if signalMassPoints.massPointInSignalSet(massPoint, sigSetItem):
 
-                if isFillShape and '2016' in yeartag and 'EOY' not in opt.sigset: opt.lumi = 36.33
+                if isFillShape and '2016' in yeartag and 'EOY' not in opt.sigset and fastsimSignal: opt.lumi = 36.33
 
                 massPointName = SigVer+massPoint
                 samples[massPointName] = { 'name'   : getSampleFiles(directorySig,signalMassPoints.signalMassPoints[model][massPoint]['massPointDataset'],False,treePrefix,skipTreesCheck),
@@ -1182,11 +1184,13 @@ for sigSetItem in sigSetList:
                                      }
                   
                 if fastsimSignal:
-                    samples[massPointName]['weight']    = XSWeightModel+'*'+SFweightFS+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                    signalWeight = SFweightFS
                     samples[massPointName]['isFastsim'] = 1
                 else:
-                    samples[massPointName]['weight']    = XSWeightModel+'*'+SFweight+'*isrW*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
+                    signalWeight = SFweight+'*isrW'
                     samples[massPointName]['isFastsim'] = 0
+                if 'NoSFs' in opt.tag: signalWeight = '1.'
+                samples[massPointName]['weight']    = XSWeightModel+'*'+signalWeight+'*'+signalMassPoints.signalMassPoints[model][massPoint]['massPointCut']
 
 ### Nasty clean up for eos
 
