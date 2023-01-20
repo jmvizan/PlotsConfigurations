@@ -72,24 +72,39 @@ if 'SignalStudies' in opt.tag and not isFillShape:
 elif isShape and skipTreesCheck:
     print 'Error: it is not allowed to fill shapes and skipping trees check!'
     exit()
+
+metnom, metsmr = 'Smear', 'Nomin'
+if 'Nomin' in opt.tag:
+    metnom, metsmr = 'Nomin', 'Smear'
+
+regionName = '__susyMT2reco'+metnom+'/'
+ctrltag = ''
+
+CRs = ['SameSign', 'Fake', 'WZVal', 'WZtoWW', 'ttZ', 'ZZVal', 'FitCRWZ', 'FitCRZZ', 'Trigger3Lep']
+for CR_i in CRs:
+    if CR_i in opt.tag:
+        regionName = regionName.replace('reco', 'ctrl')
+        ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','').replace('Trigger3Lep','WZ')
  
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
-if  'cern' in SITE :
-    treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
-    treeBaseDirMC   = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
-    treeBaseDirData = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
-    if not skipTreesCheck and ('SM' in opt.sigset or 'Data' in opt.sigset or 'Backgrounds' in opt.sigset or 'MET' in opt.sigset):
-        if not isFillShape:
-            skipTreesCheck = True
-        else:
-            print 'nanoAODv9 trees for', yeartag, 'available on cern only for the signal'
-            exit()
+if 'cern' in SITE:
+    treeBaseDirSig  = '/eos/cms/store/group/phys_susy/Chargino/Nano/' 
+    treeBaseDirData = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+    if ctrltag=='':
+      if '2018' in yeartag: treeBaseDirMC = '/eos/cms/store/caf/user/scodella/BTV/Nano/'
+      else: treeBaseDirMC = '/eos/cms/store/group/phys_susy/Chargino/Nano/'
+      treeBaseDirMCSyst = '/eos/user/s/scodella/SUSY/Nano/'
+    else:
+      if '2018' in yeartag: treeBaseDirMC = '/eos/cms/store/user/scodella/SUSY/Nano/'
+      else: treeBaseDirMC = '/eos/user/s/scodella/SUSY/Nano/'
+      treeBaseDirMCSyst = treeBaseDirMC 
 elif 'ifca' in SITE or 'cloud' in SITE:
-    treeBaseDirSig  = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
-    treeBaseDirMC   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
-    treeBaseDirData = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirSig    = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirMC     = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirData   = '/gpfs/projects/tier3data/LatinosSkims/RunII/Nano/'
+    treeBaseDirMCSyst = treeBaseDirMC
 
 if '2016' in yeartag :
     hipmFlag = yeartag.replace('2016', '')
@@ -117,19 +132,6 @@ if not fastsimSignal:
 fastsimMetType = 'average'
 if 'Fast' in opt.tag:
     fastsimMetType = 'reco' if 'FastReco' in opt.tag else 'acceptance'
-
-metnom, metsmr = 'Smear', 'Nomin'
-if 'Nomin' in opt.tag:
-    metnom, metsmr = 'Nomin', 'Smear'
-
-regionName = '__susyMT2reco'+metnom+'/'
-ctrltag = ''
-
-CRs = ['SameSign', 'Fake', 'WZVal', 'WZtoWW', 'ttZ', 'ZZVal', 'FitCRWZ', 'FitCRZZ', 'Trigger3Lep']
-for CR_i in CRs:
-    if CR_i in opt.tag:
-        regionName = regionName.replace('reco', 'ctrl') 
-        ctrltag = '_'+CR_i.replace('FitCR','').replace('Val','').replace('Trigger3Lep','WZ')
 
 directoryBkg  = treeBaseDirMC   + ProductionMC   + regionName
 directorySig  = treeBaseDirSig  + ProductionSig  + regionName.replace('reco',  signalReco)
@@ -256,7 +258,11 @@ for treeNuisance in treeNuisances:
         treeNuisanceDirs[treeNuisance]['Sig']['Up']   = directorySig.replace(metnom+'/', metsmr+'/') 
         treeNuisanceDirs[treeNuisance]['Sig']['Down'] = directorySig
     else:
-        directoryBkgTemp = directoryBkg.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
+        directoryBkgTemp = directoryBkg.replace(treeBaseDirMC, treeBaseDirMCSyst)
+        if 'cern' in SITE and ctrltag=='':
+            if ('2017' in yeartag and treeNuisance=='jesTotal') or ('2018' in yeartag and treeNuisance!='jesTotal'):
+                directoryBkgTemp = directoryBkgTemp.replace(treeBaseDirMCSyst, '/eos/cms/store/user/scodella/SUSY/Nano/')
+        directoryBkgTemp = directoryBkgTemp.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
         directorySigTemp = directorySig.replace(metnom+'/', treeNuisances[treeNuisance]['name']+'variation'+treeNuisanceSuffix+'/') 
         if 'jetname' in treeNuisances[treeNuisance]:
             directoryBkgTemp = directoryBkgTemp.replace('SusyNomin', 'Susy'+treeNuisances[treeNuisance]['jetname']+'variation')
