@@ -46,7 +46,7 @@ def setAnalysisDefaults(opt):
         opt.tableSigset['TSlepSlep'] = [ 'TSlepSlep_mS-200_mX-125', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ]
         opt.signalSubsets['TChipmSlepSnu'] = ['TChipmSlepSnu_mC-100to350_mX-1to750', 'TChipmSlepSnu_mC-375to500_mX-1to750', 'TChipmSlepSnu_mC-525to625_mX-1to750', 'TChipmSlepSnu_mC-650to725_mX-1to750', 'TChipmSlepSnu_mC-750to825_mX-1to750', 'TChipmSlepSnu_mC-850to925_mX-1to750', 'TChipmSlepSnu_mC-950to1025_mX-1to750', 'TChipmSlepSnu_mC-1050to1125_mX-1to750', 'TChipmSlepSnu_mC-1150to1225_mX-1to750', 'TChipmSlepSnu_mC-1250to1325_mX-1to750', 'TChipmSlepSnu_mC-1350to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750']
         opt.signalSubsets['TChipmWW'] = ['TChipmWW_mC-100to275_mX-1to250', 'TChipmWW_mC-300to500_mX-1to250', 'TChipmWW_mC-525to700_mX-1to250']
-        opt.signalSubsets['TSlepSlep'] = ['TSlepSlep_mS-100to325_mX-1to650', 'TSlepSlep_mS-350to475_mX-1to650' ]#, 'TSlepSlep_mS-500to600_mX-1to650', 'TSlepSlep_mS-625to700_mX-1to650', 'TSlepSlep_mS-725to800_mX-1to650', 'TSlepSlep_mS-825to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650']
+        opt.signalSubsets['TSlepSlep'] = ['TSlepSlep_mS-100to325_mX-1to650', 'TSlepSlep_mS-350to475_mX-1to650', 'TSlepSlep_mS-500to600_mX-1to650', 'TSlepSlep_mS-625to700_mX-1to650', 'TSlepSlep_mS-725to800_mX-1to650', 'TSlepSlep_mS-825to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650']
 
     opt.backgroundsInFit = [ 'ttZ', 'ZZ', 'WZ' ]
 
