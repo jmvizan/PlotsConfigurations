@@ -197,6 +197,18 @@ def setFileset(fileset, sigset):
     elif fileset[0]=='_': return fileset
     else: return '_'+fileset
 
+def getTagForDatacards(tag, sigset):
+
+    flagsToAppend = []
+    for fl in range(len(sigset.split('_')[0].split('-'))-1):
+        if sigset.split('-')[fl]!='SM' and sigset.split('-')[fl] not in tag: flagsToAppend.append(sigset.split('-')[fl])
+
+    if len(flagsToAppend)!=0:
+        rawtag = tag.split('_')[0]
+        tag = tag.replace(rawtag, rawtag+'_'+'_'.join([ x for x in flagsToAppend ]))
+
+    return tag
+
 def getSignalDir(opt, year, tag, signal, directory):
 
     signalDirList = [ getattr(opt, directory), year ]
@@ -616,6 +628,16 @@ def yieldsTables(opt, masspoints=''):
 def systematicsTables(opt):
 
     print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkSystematicsTables.py :('
+
+def mkPseudoData(opt, reftag=None, refsigset=None):
+  
+    optionCommand = ''
+    if opt.verbose: optionCommand += ' --verbose'
+    if reftag!=None: optionCommand += ' --reftag='+reftag
+    if refsigset!=None: optionCommand += ' --refsigset='+refsigset
+
+    for year in opt.year.split('-'):
+        os.system('mkPseudoData.py --year='+year+' --tag='+opt.tag+' --sigset='+opt.sigset+optionCommand)
 
 ### Modules for analyzing results from combine
 

@@ -207,37 +207,11 @@ if addMT2Shapes:
     for mt2llregion in mt2llRegions:
         if 'VR1' in mt2llregion: continue
 
-        if isShape or hasattr(opt, 'groups') or hasattr(opt,'skipLNN') or '_WWShapeCorr' not in opt.tag:
+        if 'WWTails' not in opt.tag.split('_')[0] and 'WWHighs' not in opt.tag.split('_')[0]:
 
-            nuisancekey = 'WWshape_'+mt2llregion
-            nuisances[nuisancekey]  = {
-                'name'  : nuisancekey+year.replace('noHIPM','').replace('HIPM',''),
-                'samples'  : { 'ttbar' : [ mt2llweightUp, mt2llweightDo],
-                               'STtW'  : [ mt2llweightUp, mt2llweightDo],
-                               'WW'    : [ mt2llweightUp, mt2llweightDo] },
-                'OneSided' : True,
-                'kind'  : 'weight',
-                'type'  : 'shape',
-                'cuts'  : [ ]
-            } 
+            if isShape or hasattr(opt, 'groups') or hasattr(opt,'skipLNN') or '_WWShapeCorr' not in opt.tag:
 
-            for cut in cuts.keys():
-                if mt2llregion in cut:
-                    nuisances[nuisancekey]['cuts'].append(cut)
-
-        if isShape or hasattr(opt, 'groups') or hasattr(opt,'skipLNN') or '_WWShapeCorr' in opt.tag:
-
-            binList = []
-            if 'Stop' in opt.tag: binList.extend([ 'Bin6', 'Bin7' ])
-            elif 'Merge' not in opt.tag: binList.extend([ 'Bin6', 'Bin7', 'Bin8' , 'Bin9' ])
-            else: 
-                if 'SR1' in mt2llregion: binList.extend([ 'Bin6', 'Bin7' ])
-                elif 'SR2' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8' ])
-                elif 'SR3' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8' ])
-                elif 'SR4' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8', 'Bin9' ])
-
-            for ibin in binList:
-                nuisancekey = 'WWshape_'+ibin+'_'+mt2llregion
+                nuisancekey = 'WWshape_'+mt2llregion
                 nuisances[nuisancekey]  = {
                     'name'  : nuisancekey+year.replace('noHIPM','').replace('HIPM',''),
                     'samples'  : { 'ttbar' : [ mt2llweightUp, mt2llweightDo],
@@ -247,11 +221,57 @@ if addMT2Shapes:
                     'kind'  : 'weight',
                     'type'  : 'shape',
                     'cuts'  : [ ]
-                }
+                } 
 
                 for cut in cuts.keys():
                     if mt2llregion in cut:
                         nuisances[nuisancekey]['cuts'].append(cut)
+
+            if isShape or hasattr(opt, 'groups') or hasattr(opt,'skipLNN') or '_WWShapeCorr' in opt.tag:
+
+                binList = []
+                if 'Stop' in opt.tag: binList.extend([ 'Bin6', 'Bin7' ])
+                elif 'Merge' not in opt.tag: binList.extend([ 'Bin6', 'Bin7', 'Bin8' , 'Bin9' ])
+                else: 
+                    if 'SR1' in mt2llregion: binList.extend([ 'Bin6', 'Bin7' ])
+                    elif 'SR2' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8' ])
+                    elif 'SR3' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8' ])
+                    elif 'SR4' in mt2llregion: binList.extend([ 'Bin6', 'Bin7', 'Bin8', 'Bin9' ])
+
+                for ibin in binList:
+                    nuisancekey = 'WWshape_'+ibin+'_'+mt2llregion
+                    nuisances[nuisancekey]  = {
+                        'name'  : nuisancekey+year.replace('noHIPM','').replace('HIPM',''),
+                        'samples'  : { 'ttbar' : [ mt2llweightUp, mt2llweightDo],
+                                       'STtW'  : [ mt2llweightUp, mt2llweightDo],
+                                       'WW'    : [ mt2llweightUp, mt2llweightDo] },
+                        'OneSided' : True,
+                        'kind'  : 'weight',
+                        'type'  : 'shape',
+                        'cuts'  : [ ]
+                    }
+
+                    for cut in cuts.keys():
+                        if mt2llregion in cut:
+                            nuisances[nuisancekey]['cuts'].append(cut)
+
+        else:
+
+            nuisancekey = 'WWtails_'+mt2llregion
+            nuisances[nuisancekey]  = {
+                    'name'  : nuisancekey+year.replace('noHIPM','').replace('HIPM',''),
+                    'samples'  : { 'ttbar' : [ WWtailsUp+'/'+WWtails, WWtailsDown+'/'+WWtails ],
+                                   'STtW'  : [ WWtailsUp+'/'+WWtails, WWtailsDown+'/'+WWtails ],
+                                   'WW'    : [ WWtailsUp+'/'+WWtails, WWtailsDown+'/'+WWtails ] },
+                    'kind'  : 'weight',
+                    'type'  : 'shape',
+                    'cuts'  : [ ]
+            }
+
+            for cut in cuts.keys():
+                if mt2llregion in cut:
+                    nuisances[nuisancekey]['cuts'].append(cut)
+
 
 # mt2ll top and WW SUS-17-010 style
 #mt2llBins = [ ]
@@ -635,7 +655,7 @@ if len(yearstaglist)>1:
    nuisanceToRemove = [ ]
 
    for nuisance in nuisances:
-       if 'WWshape' in nuisance or 'WZbin' in nuisance: continue
+       if 'WWshape' in nuisance or 'WZbin' in nuisance or 'WWtails' in nuisance: continue
        if 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='shape':
            if year in nuisances[nuisance]['name']:
                nuisanceToRemove.append(nuisance)

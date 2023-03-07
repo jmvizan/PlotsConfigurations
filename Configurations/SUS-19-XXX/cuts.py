@@ -436,6 +436,14 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
 
     WZselection = nLooseLepton+'==3 && ' + nTightLepton + '==3 && deltaMassZ'+ctrltag+'<ZCUT && ptmiss'+ctrltag+'>=METCUT'
 
+    if 'TL0' in opt.tag: WZselection = WZselection.replace(nTightLepton + '==3', nTightLepton + '>=0')
+    if 'TL1' in opt.tag: WZselection = WZselection.replace(nTightLepton + '==3', nTightLepton + '>=1')
+    if 'TL2' in opt.tag: WZselection = WZselection.replace(nTightLepton + '==3', nTightLepton + '>=2')
+    if 'TLM' in opt.tag: WZselection = WZselection.replace(nTightLepton + '==3', nTightMT2Lepton + '==2')  
+    if 'T3V' in opt.tag: WZselection = WZselection.replace(nTightLepton + '==3', nTightLepton + '==2')
+    if 'TMZ' in opt.tag: WZselection = WZselection.replace(nTightLepton + '==3', nTightMT2Lepton + '==2 && '+Zcut.replace('<ZCUT','>15.'))
+    if 'TTZ' in opt.tag: WZselection = WZselection.replace(nTightLepton + '==3', nTightLepton + '==3 && '+Zcut.replace('<ZCUT','>15.'))    
+
     if 'WZValidationRegion' in opt.tag:
 
         if 'WZValidationRegionZLeps' in opt.tag:
@@ -451,13 +459,19 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
     elif 'WZtoWWValidationRegion' in opt.tag:
 
         cuts['WZtoWW_Zcut10']            = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag }
-        cuts['WZtoWW_Zcut15']            = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag }
+        cuts['WZtoWW_Zcut15']            = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag } 
         cuts['WZtoWW_Zcut10_ptmiss-100'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','100')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut15_ptmiss-100'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','100')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut10_ptmiss-140'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','140')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut15_ptmiss-140'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','140')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut10_ptmiss-160'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','160')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut15_ptmiss-160'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','160')+')', 'weight' : btagWeight0tag }
+
+        #if 'TL' not in opt.tag and 'T3' not in opt.tag and 'TM' not in opt.tag:
+        #    cuts['WZtoWW_ZcutNo']            = { 'expr' : '('+WZselection.replace('ZCUT','999.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag }
+        #    cuts['WZtoWW_ZcutNo_ptmiss-100'] = { 'expr' : '('+WZselection.replace('ZCUT','999.').replace('METCUT','100')+')', 'weight' : btagWeight0tag }
+        #    cuts['WZtoWW_ZcutNo_ptmiss-140'] = { 'expr' : '('+WZselection.replace('ZCUT','999.').replace('METCUT','140')+')', 'weight' : btagWeight0tag }
+        #    cuts['WZtoWW_ZcutNo_ptmiss-160'] = { 'expr' : '('+WZselection.replace('ZCUT','999.').replace('METCUT','160')+')', 'weight' : btagWeight0tag }
 
 if 'ttZValidationRegion' in opt.tag or 'ZZValidationRegion' in opt.tag:
 
@@ -593,6 +607,10 @@ if 'SignalRegion' in opt.tag:
     for sr in SRlist:
         if '_no'+sr in opt.tag:
             del ptmiss_cuts[sr]
+    if '_SR' in opt.tag:
+        for sr in SRlist:
+            if '_'+sr not in opt.tag:
+                del ptmiss_cuts[sr]
 
     isrRegions = [ ]
     if 'StopSignalRegions' in opt.tag: 
@@ -716,13 +734,13 @@ if 'SignalRegion' in opt.tag and 'JetUncertainties' in opt.tag:
     cutList = cuts.keys()
 
     jetuncList = [ 'MET_T1Smear_pt' ]
-    if isShape: jetuncList.exptend([ 'MET_T1Smear_pt_jesTotalUp', 'MET_T1Smear_pt_jesTotalDown', 'MET_T1Smear_pt_jerUp', 'MET_T1Smear_pt_jerDown', 'MET_T1Smear_pt_unclustEnUp', 'MET_T1Smear_pt_unclustEnDown' ])
+    if isShape: jetuncList.extend([ 'MET_T1Smear_pt_jesTotalUp', 'MET_T1Smear_pt_jesTotalDown', 'MET_T1Smear_pt_jerUp', 'MET_T1Smear_pt_jerDown', 'MET_T1Smear_pt_unclustEnUp', 'MET_T1Smear_pt_unclustEnDown' ])
 
     for cut in cutList:
         for jetunc in jetuncList:
             cuts[cut+'_'+jetunc] = {}
             for key in cuts[cut]:
-                cuts[cut+'_'+jetunc] = cuts[cut][key].replace('ptmiss_phi', jetunc.replace('_pt','_phi')).replace('ptmiss', jetunc)
+                cuts[cut+'_'+jetunc][key] = cuts[cut][key].replace('ptmiss_phi', jetunc.replace('_pt','_phi')).replace('ptmiss', jetunc)
 
         del cuts[cut]
 

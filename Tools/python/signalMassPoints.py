@@ -75,14 +75,16 @@ tableSignal = { #'TChipmSlepSnu' : [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu
  
 def massPointInSignalSet(massPoint, sigSet):
 
-    signalSet = sigSet.replace('SM-', '')
-    signalSet = signalSet.replace('Backgrounds-', '')
-    signalSet = signalSet.replace('PseudoData-', '')
-    signalSet = signalSet.replace('Data-', '')
-    signalSet = signalSet.replace('WJets-', '')
-    signalSet = signalSet.split(':')[-1]
+    #signalSet = sigSet.replace('SM-', '')
+    #signalSet = signalSet.replace('Backgrounds-', '')
+    #signalSet = signalSet.replace('PseudoData-', '')
+    #signalSet = signalSet.replace('Data-', '')
+    #signalSet = signalSet.replace('WJets-', '')    
+    setToRemove = sigSet.split('_')[0].split('-')
+    for st in range(len(setToRemove)-1): sigSet = sigSet.replace(setToRemove[st]+'-', '')
+    sigSet = sigSet.split(':')[-1]
 
-    sigSetList = signalSet.split(',')
+    sigSetList = sigSet.split(',')
 
     if massPoint in sigSetList:
         return True

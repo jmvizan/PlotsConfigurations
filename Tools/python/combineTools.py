@@ -126,13 +126,14 @@ def runCombine(opt):
     for year in yearList:
         for tag in opt.tag.split('-'):
 
-            opt2.year, opt2.tag = year, tag
+            outtag = commonTools.getTagForDatacards(tag, opt.sigset)
+            opt2.year, opt2.tag = year, outtag
             #datacardList = getDatacardList(opt2)
             combineJobs = { } 
 
             if not opt.interactive: 
                 commonTools.cleanLogs(opt2)
-                opt2.combineTagDir = commonTools.mergeDirPaths(opt2.baseDir, commonTools.getSignalDir(opt2, year, tag, '', 'combineOutDir'))
+                opt2.combineTagDir = commonTools.mergeDirPaths(opt2.baseDir, commonTools.getSignalDir(opt2, year, outtag, '', 'combineOutDir'))
                 if makeDatacards: prepareJobDirectory(opt2)
 
             combineCommandList = [ ]
@@ -140,7 +141,7 @@ def runCombine(opt):
             combineCommandList.append(combineDatacards(opt2, 'MASSPOINT', True))
             if runCombineJob:  combineCommandList.append(opt.combineCommand)
             combineCommandList.append( 'cd '+opt2.baseDir )
-            if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, tag, 'MASSPOINT', True))
+            if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, outtag, 'MASSPOINT', True))
 
             combineCommand = '\n'.join(combineCommandList)
 
@@ -163,7 +164,7 @@ def runCombine(opt):
                     #combineCommandList.append(combineDatacards(opt2, sample, datacardList, True))
                     #if runCombineJob:  combineCommandList.append(' '.join(['combine', opt.combineOption, 'combinedDatacard.txt' ]))
                     #combineCommandList.append( 'cd '+opt2.baseDir )
-                    #if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, tag, sample, True))
+                    #if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, outtag, sample, True))
 
                     #combineCommand = '\n'.join(combineCommandList) 
 
@@ -176,9 +177,9 @@ def runCombine(opt):
 
             if not opt.debug and not opt.interactive:
                 if len(combineJobs.keys())>0: 
-                    submitCombineJobs(opt, opt.combineAction, year+tag, combineJobs)
+                    submitCombineJobs(opt, opt.combineAction, year+outtag, combineJobs)
                 else:
-                    print 'Noting left to submit for tag', tag, 'in year', year
+                    print 'Nothing left to submit for tag', outtag, 'in year', year
 
 def writeDatacards(opt):
 
@@ -193,7 +194,8 @@ def limits(opt):
 
     opt.combineAction = 'limits'
     limitRun = getLimitRun(opt.unblind)
-    opt.combineCommand = ' '.join([ 'combine -M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun, 'combinedDatacard.txt' ])
+    limitMethod = '-M BayesianToyMC' if 'Toy' in opt.option else ' '.join([ '-M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun ])
+    opt.combineCommand = ' '.join([ 'combine', limitMethod, 'combinedDatacard.txt' ])
     opt.combineOutDir = opt.limitdir
 
     runCombine(opt)

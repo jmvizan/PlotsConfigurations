@@ -31,7 +31,7 @@ def setAnalysisDefaults(opt):
     #opt.tableSigset['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-200_mX-125', 'TChipmSlepSnu_mC-200_mX-150', 'TChipmSlepSnu_mC-250_mX-175', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ]
     opt.tableSigset['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ]
     opt.tableSigset['T2tt']          = [ 'T2tt_mS-300_mX-213', 'T2tt_mS-300_mX-175', 'T2tt_mS-350_mX-263', 'T2tt_mS-350_mX-225', 'T2tt_mS-400_mX-275', 'T2tt_mS-300_mX-125', 'T2tt_mS-350_mX-175', 'T2tt_mS-400_mX-225', 'T2tt_mS-400_mX-313', 'T2tt_mS-475_mX-350', 'T2tt_mS-450_mX-275', 'T2tt_mS-450_mX-325', 'T2tt_mS-475_mX-388', 'T2tt_mS-450_mX-363', 'T2tt_mS-475_mX-300', 'T2tt_mS-475_mX-325', 'T2tt_mS-475_mX-375', 'T2tt_mS-500_mX-325', 'T2tt_mS-500_mX-350', 'T2tt_mS-500_mX-375', 'T2tt_mS-500_mX-400', 'T2tt_mS-500_mX-413', 'T2tt_mS-525_mX-350', 'T2tt_mS-525_mX-375', 'T2tt_mS-525_mX-400', 'T2tt_mS-525_mX-425', 'T2tt_mS-525_mX-438', 'T2tt_mS-550_mX-375', 'T2tt_mS-550_mX-400', 'T2tt_mS-550_mX-425', 'T2tt_mS-550_mX-450', 'T2tt_mS-550_mX-463' ]
-    opt.tableSigset['TChipmWW']      = [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50' ]    
+    opt.tableSigset['TChipmWW']      = [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-150_mX-1', 'TChipmWW_mC-200_mX-1', 'TChipmWW_mC-200_mX-25', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50' ]    
     opt.tableSigset['Studies']      = [ 'T2tt_mS-525_mX-350','T2tt_mS-525_mX-438','TChipmSlepSnu_mC-1150_mX-1','TChipmSlepSnu_mC-900_mX-475','EOYT2tt_mS-525_mX-350','EOYT2tt_mS-525_mX-438','EOYTChipmSlepSnu_mC-1150_mX-1','EOYTChipmSlepSnu_mC-900_mX-475' ]
 
     opt.signalSubsets['T2tt']          = [ 'T2tt_mS-150to800_dm-80to175' ]
@@ -43,7 +43,7 @@ def setAnalysisDefaults(opt):
         opt.signalSubsets['TChipmWW']      = [ 'TChipmWW_mC-100to375_mX-1to250', 'TChipmWW_mC-400to700_mX-1to250' ]
         opt.signalSubsets['TSlepSlep'] = [ 'TSlepSlep_mS-100to275_mX-1to650', 'TSlepSlep_mS-300to400_mX-1to650', 'TSlepSlep_mS-425to600_mX-1to650', 'TSlepSlep_mS-625to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650' ]
     else:
-        opt.tableSigset['TSlepSlep'] = [ 'TSlepSlep_mS-200_mX-125', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ]
+        opt.tableSigset['TSlepSlep'] = [ 'TSlepSlep_mS-200_mX-125', 'TSlepSlep_mS-200_mX-150', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-275', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ]
         opt.signalSubsets['TChipmSlepSnu'] = ['TChipmSlepSnu_mC-100to350_mX-1to750', 'TChipmSlepSnu_mC-375to500_mX-1to750', 'TChipmSlepSnu_mC-525to625_mX-1to750', 'TChipmSlepSnu_mC-650to725_mX-1to750', 'TChipmSlepSnu_mC-750to825_mX-1to750', 'TChipmSlepSnu_mC-850to925_mX-1to750', 'TChipmSlepSnu_mC-950to1025_mX-1to750', 'TChipmSlepSnu_mC-1050to1125_mX-1to750', 'TChipmSlepSnu_mC-1150to1225_mX-1to750', 'TChipmSlepSnu_mC-1250to1325_mX-1to750', 'TChipmSlepSnu_mC-1350to1425_mX-1to750', 'TChipmSlepSnu_mC-1450to1500_mX-1to750']
         opt.signalSubsets['TChipmWW'] = ['TChipmWW_mC-100to275_mX-1to250', 'TChipmWW_mC-300to500_mX-1to250', 'TChipmWW_mC-525to700_mX-1to250']
         opt.signalSubsets['TSlepSlep'] = ['TSlepSlep_mS-100to325_mX-1to650', 'TSlepSlep_mS-350to475_mX-1to650', 'TSlepSlep_mS-500to600_mX-1to650', 'TSlepSlep_mS-625to700_mX-1to650', 'TSlepSlep_mS-725to800_mX-1to650', 'TSlepSlep_mS-825to900_mX-1to650', 'TSlepSlep_mS-925to1000_mX-1to650']
@@ -274,10 +274,10 @@ def mergeFitCR(opt):
                 if opt.recover and commonTools.isGoodFile(outputFile): continue
                 os.system('rm -r -f '+outputFile)
 
-                filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,'').replace('FastReco','').replace('Fast','') ]
-                filesToMerge.append(outputFile.replace('FitCR','').replace('SM-','').replace('Group',''))
+                filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','') ]
+                filesToMerge.append(outputFile.replace('FitCR','').replace('SM-','').replace('Group','').replace('WWTails','').replace('WWHighs','').replace('SmtEU',''))
                 for backcr in opt.backgroundsInFit:
-                    filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,'').replace('FastReco','').replace('Fast',''))
+                    filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','').replace('WWTails','').replace('WWHighs','').replace('SmtEU',''))
 
                 foundFilesToMerge = True
                 for fileToMerge in filesToMerge:
@@ -294,6 +294,9 @@ def signalCombine(opt, action):
 
     if opt.sigset=='SM': opt.sigset = 'signal'
 
+    smset = opt.sigset.split('_')[0]
+    smset = smset.replace(smset.split('-')[-1],'')
+
     for tag in opt.tag.split('-'):
 
         opt2 = copy.deepcopy(opt)
@@ -304,22 +307,22 @@ def signalCombine(opt, action):
 
         if 'signal' in opt.sigset and 'tabsignal' not in opt.sigset:
             for fileset in signalList:
-                filesetMap[fileset] = [ fileset ]
+                filesetMap[smset+fileset] = [ fileset ]
 
         else:
             for signal in signalList:
                 massPoints = getMassPointList(signal)
                 for massPoint in massPoints:
                     if opt.fileset!='': signalFileset = opt.fileset
-                    else: signalFileset = getMassPointSubset(opt, massPoint)
+                    else: signalFileset = smset+getMassPointSubset(opt, massPoint)
                     if signalFileset!=None:
                         if signalFileset not in filesetMap: filesetMap[signalFileset] = []
                         filesetMap[signalFileset].append(massPoint)
 
         for fileset in filesetMap:
 
-            opt2.fileset = 'SM-'+fileset
-            opt2.sigset = 'SM-'+','.join(filesetMap[fileset])
+            opt2.fileset = fileset
+            opt2.sigset = smset+','.join(filesetMap[fileset])
 
             if action=='limits': combineTools.limits(opt2)
             if action=='mlfits': combineTools.mlfits(opt2)
@@ -362,19 +365,19 @@ def printLimits(opt):
 
     signalList = getSignalList(opt, opt.sigset, opt.tag)
 
-    for signal in signalList:
+    for signal in sorted(signalList):
 
         limitResult = {}
 
-        for tags in [ '', '_WWSimm', '_WWCorr' ]:
-            for tagm in [ '' ]:
+        for tags in [ '', '_WWSimm' ]:
+            for tagm in [ '', 'WWTails', 'WWHighs' ]:
+                if (tags=='' and tagm=='') or (tags!='' and tagm!=''): continue
                 #if 'Stop' in opt.tag and 'Merge' in tagm: continue
                 #if 'Stop' not in opt.tag and 'Merge' not in tagm: continue
-                tagopt = tags #tagm+tags
-                tag = opt.tag.replace('FitCR', tagm+'FitCR')
+                tagopt = (tagm+tags).replace('_WWSimm','')
+                tag = opt.tag.replace('Group', tagm+'Group')
                 tag += tags
                 outputDir = '/'.join([ opt.limitdir, opt.year, tag, signal ])
-
                 if not commonTools.isGoodFile(outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root', 6000.):
                     if opt.debug: print outputDir+'/higgsCombine_Blind.AsymptoticLimits.mH120.root'
                     continue
@@ -395,7 +398,7 @@ def printLimits(opt):
         if len(limitResult.keys())==1: printSignal = True
         for evt in range(len(limitResult['central'])):
             resultList = [ str(limitResult['central'][evt]) ]
-            for tags in [ '', '_WWSimm', '_WWCorr' ]:
+            for tags in [ '', 'WWTails', 'WWHighs' ]:
                 for tagm in [ '' ]:
                     tagopt = tagm+tags
                     if tagopt!='' and tagopt in limitResult:
@@ -413,13 +416,54 @@ def printLimits(opt):
             print '    ', availableResult
             for evt in range(len(signalResult)):
                 print signalResult[evt]
+            if len(signalResult)==6:
+                ccc = []
+                obs = signalResult[5].split(' ')
+                cen = signalResult[2].split(' ')
+                pus = signalResult[3].split(' ')
+                pds = signalResult[4].split(' ')
+                mus = signalResult[1].split(' ')
+                mds = signalResult[0].split(' ')
+                for rr in range(len(obs)):
+                    if float(obs[rr])<float(cen[rr]) and float(obs[rr])>float(mus[rr]):
+                        ccc.append((float(obs[rr])-float(cen[rr]))/(float(cen[rr])-float(mus[rr])))
+                    elif float(obs[rr])<float(mus[rr]) and float(obs[rr])>float(mds[rr]):
+                        ccc.append(-1.+(float(obs[rr])-float(mus[rr]))/(float(mus[rr])-float(mds[rr])))
+                    elif float(obs[rr])<float(mds[rr]):
+                        ccc.append(-2.5)
+                    elif float(obs[rr])>float(cen[rr]) and float(obs[rr])<float(pus[rr]):
+                        ccc.append((float(obs[rr])-float(cen[rr]))/(float(pus[rr])-float(cen[rr])))
+                    elif float(obs[rr])>float(pus[rr]) and float(obs[rr])<float(pds[rr]):
+                        ccc.append(1.+(float(obs[rr])-float(pus[rr]))/(float(pds[rr])-float(pus[rr])))
+                    elif float(obs[rr])>float(pds[rr]):
+                        ccc.append(+2.5)
+                print ccc
             print '\n\n'
 
-def makeContours(opt, plotoption='2'):
+def makePseudoDataShapes(opt):
+
+    for year in opt.year.split('-'):
+        
+        signalList = getSignalList(opt, opt.sigset, opt.tag)
+        for signal in signalList:
+            for pseudodata in [ '', 'WWHighs' ]:
+
+                opt2 = copy.deepcopy(opt)
+                opt2.year = year
+                
+                if pseudodata=='' or pseudodata not in opt.tag:
+                    opt2.sigset = 'SM-PseudoDATA'+pseudodata+'-'+signal
+                    reftag = opt.tag.replace('Group', pseudodata+'Group')
+
+                else:
+                    opt2.sigset = 'SM-PseudoDATANo'+pseudodata+'-'+signal
+                    reftag = opt.tag.replace(pseudodata, '')
+              
+                commonTools.mkPseudoData(opt2, reftag)
+
+def makeContours(opt, plotoption='2', fitOption='Blind'):
 
     sigset = ','.join(getSignalList(opt, opt.sigset, opt.tag))
-
-    fitOption = 'Both' if opt.unblind else 'Blind'
 
     histogramDir = '/'.join([ opt.limitdir, opt.year, opt.tag, 'Histograms' ])
     contourDir   = '/'.join([ opt.limitdir, opt.year, opt.tag, 'Contours' ])
@@ -431,7 +475,7 @@ def makeContours(opt, plotoption='2'):
     if opt.reset: 
         os.system('rm -f '+' '.join([ histogramFileNoFillEmptyBins, histogramFile, contourFile ]))
  
-    commandList = [ '--years='+opt.year, '--tag='+opt.tag, '--sigset='+sigset ]
+    commandList = [ '--years='+opt.year, '--tag='+opt.tag, '--sigset='+sigset, '--limitoption='+fitOption ]
 
     if not os.path.isfile(histogramFileNoFillEmptyBins):
         os.system('analyzeLimits.py '+' '.join(commandList + [ '--nofillempties' ]))
@@ -448,14 +492,16 @@ def exclusionPlot(opt, plotoption='2'):
         print 'Comparison of more than two tags not supported'  
         exit()
 
+    fitOption = 'Both' if opt.unblind else 'Blind'
+
     sigset = ','.join(getSignalList(opt, opt.sigset, tagList[0]))
  
     opt2 = copy.deepcopy(opt)
     for tag in tagList:
         opt2.tag = tag
-        makeContours(opt2, plotoption)
+        makeContours(opt2, plotoption, fitOption)
 
-    plotCommandList = [ '--years='+opt.year, '--tag='+tagList[0], '--sigset='+sigset, '--plotoption='+plotoption ] 
+    plotCommandList = [ '--years='+opt.year, '--tag='+tagList[0], '--sigset='+sigset, '--limitoption='+fitOption, '--plotoption='+plotoption ]
     if len(tagList)>1: plotCommandList.append('--compareto='+tagList[1])
     if plotoption=='0': plotCommandList.append('--nofillempties')
 
@@ -484,8 +530,8 @@ def getSignalList(opt, sigset, tag):
     if sigset=='SM': return []
 
     for sr in opt.signalRegionMap:
-        if tag.split('_')[0].replace('Merge','').replace('FitCR','').replace('Group','').replace('FastReco','').replace('Fast','')==opt.signalRegionMap[sr]['tag']:
-
+        #if tag.split('_')[0].replace('Merge','').replace('FitCR','').replace('Group','').replace('FastReco','').replace('Fast','').replace('SigV6','').replace('WWTails','').replace('SmtEU','')==opt.signalRegionMap[sr]['tag']:
+       if opt.signalRegionMap[sr]['tag'].replace('VetoesUL','') in tag:
             if 'all' in sigset:
                 signalList = []
                 for signal in opt.signalRegionMap[sr]['signals']:
@@ -510,7 +556,9 @@ def getSignalList(opt, sigset, tag):
                 return signalList
 
             else:
-                return sigset.replace('SM-','').split(',')
+                setToRemove = sigset.split('_')[0].split('-')
+                for st in range(len(setToRemove)-1): sigset = sigset.replace(setToRemove[st]+'-', '')
+                return sigset.split(',')
 
     if 'SignalRegion' not in tag:
         if 'tabsignal' in sigset:
@@ -518,7 +566,10 @@ def getSignalList(opt, sigset, tag):
                 if signal in sigset:
                    if 'tabsignalset' in sigset: return [ ','.join(opt.tableSigset[signal]) ]
                    else: return opt.tableSigset[signal]
-        else: return sigset.replace('SM-','').split(',')
+        else:
+            setToRemove = sigset.split('_')[0].split('-')
+            for st in range(len(setToRemove)-1): sigset = sigset.replace(setToRemove[st]+'-', '')
+            return sigset.split(',')
 
 def splitSignalMassPoints(opt, massPointForSubset=100):
 

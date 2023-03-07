@@ -368,11 +368,14 @@ def datacards(opt, signal='', dryRun=False):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
+
+            outtag = commonTools.getTagForDatacards(tag, opt.sigset)
+
             for sample in signalList:
 
-                outputDir = commonTools.getSignalDir(opt, year, tag, sample, 'cardsdir')
+                outputDir = commonTools.getSignalDir(opt, year, outtag, sample, 'cardsdir')
 
-                datacardCommand = 'mkdir -p '+outputDir+' \n mkDatacards.py --pycfg='+opt.configuration+' --tag='+year+opt.tag+' --sigset='+sigset.replace('MASSPOINT',sample)+' --outputDirDatacard='+outputDir+' --inputFile='+commonTools.getShapeFileName(opt.shapedir, year, tag.split('_')[0], '', fileset)+blindData
+                datacardCommand = 'mkdir -p '+outputDir+' \n mkDatacards.py --pycfg='+opt.configuration+' --tag='+year+tag+' --sigset='+sigset.replace('MASSPOINT',sample)+' --outputDirDatacard='+outputDir+' --inputFile='+commonTools.getShapeFileName(opt.shapedir, year, tag.split('_')[0], '', fileset)+blindData
 
                 if dryRun: datacardCommandList.append(datacardCommand) 
                 else: os.system(datacardCommand)
