@@ -299,7 +299,7 @@ if nuis_btag_split and 'EOY' not in opt.sigset:
     bTagNuisances['btagunc'] = { 'name' : 'btag_yeartag',     'var' : 'b_VAR_uncorrelated' }
     bTagNuisances['btagcor'] = { 'name' : 'btag',              'var' : 'b_VAR_correlated' }
 else:
-    bTagNuisances['btag']    = { 'name' : 'btag_y:qeartag',     'var' : 'b_VAR' }
+    bTagNuisances['btag']    = { 'name' : 'btag_yeartag',     'var' : 'b_VAR' }
 
 # Complex cut variables
 
