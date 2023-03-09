@@ -207,7 +207,7 @@ if addMT2Shapes:
     for mt2llregion in mt2llRegions:
         if 'VR1' in mt2llregion: continue
 
-        if 'WWTails' not in opt.tag.split('_')[0] and 'WWHighs' not in opt.tag.split('_')[0]:
+        if 'WWTails' not in opt.tag.split('_')[0] and 'WWHighs' not in opt.tag.split('_')[0] and 'WWPol1a' not in opt.tag.split('_')[0]:
 
             if isShape or hasattr(opt, 'groups') or hasattr(opt,'skipLNN') or '_WWShapeCorr' not in opt.tag:
 

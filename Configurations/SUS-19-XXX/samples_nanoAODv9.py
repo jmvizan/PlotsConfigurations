@@ -724,6 +724,10 @@ elif 'WWHighs' in opt.tag:
     WWtailFunction = '((8.77778e-01)+(2.48749e-03)*mt2ll'+ctrltag+'+(-1.41234e-06)*mt2ll'+ctrltag+'*mt2ll'+ctrltag+')'
     WWtailOnly = '((mt2ll<100.)+(mt2ll>=100.)*'+WWtailFunction+')'
     WWtails, WWtailsUp, WWtailsDown = WWtailOnly, '(2.*'+WWtailOnly+'-1.)', '1.'
+elif 'WWPol1a' in opt.tag:
+    WWtails     = '((mt2ll'+ctrltag+'<50.)+(mt2ll'+ctrltag+'>=50.)*(0.913922462096+0.00188236208333*mt2ll' +ctrltag+'))'
+    WWtailsUp   = '((mt2ll'+ctrltag+'<50.)+(mt2ll'+ctrltag+'>=50.)*(0.844001775876+0.0034114026645*mt2ll'  +ctrltag+'))'
+    WWtailsDown = '((mt2ll'+ctrltag+'<50.)+(mt2ll'+ctrltag+'>=50.)*(0.983843148317+0.000353321502166*mt2ll'+ctrltag+'))'
 else:
     WWtails, WWtailsUp, WWtailsDown = '1.', '1.', '1.'
 

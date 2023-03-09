@@ -401,11 +401,29 @@ if __name__ == '__main__':
             mt2llHisto.Draw()
             mt2llHisto.SetXTitle('#font[50]{m}_{T2}(#font[12]{ll}) [GeV]')
             mt2llHisto.SetYTitle('(Data-Back.)/WZ')
-            mt2llFun = ROOT.TF1('mt2llFun', '[0]+[1]*x+[2]*x*x', mt2llHisto.GetBinLowEdge(1),  mt2llHisto.GetBinLowEdge(mt2llHisto.GetNbinsX()+1))
+            minMT2Fit = 0.
+            drawErrors = False
+            #mt2llFun = ROOT.TF1('mt2llFun', '[0]+[1]*x+[2]*x*x', mt2llHisto.GetBinLowEdge(1),  mt2llHisto.GetBinLowEdge(mt2llHisto.GetNbinsX()+1))
+            mt2llFun = ROOT.TF1('mt2llFun', '[0]+[1]*x', mt2llHisto.GetBinLowEdge(1),  mt2llHisto.GetBinLowEdge(mt2llHisto.GetNbinsX()+1)); minMT2Fit = 40.; drawErrors = True
             #mt2llFun = ROOT.TF1('mt2llFun', '[0]+[1]*log(x+[3])*log(x+[3])*(3-[2]*log(x+[3]))', mt2llHisto.GetBinLowEdge(1),  mt2llHisto.GetBinLowEdge(mt2llHisto.GetNbinsX()+1))
             #mt2llFun = ROOT.TF1('mt2llFun', '[0]*(1.+[1]*x)/(1.+[2]*x)', mt2llHisto.GetBinLowEdge(1),  mt2llHisto.GetBinLowEdge(mt2llHisto.GetNbinsX()+1)); mt2llFun.SetParameters(9.06333e-01, 7.05381e-03, 3.33219e-03)
             #mt2llFun = ROOT.TF1('mt2llFun', '[0]*(1.+[1]*x+[3]*x*x)/(1.+[2]*x+[4]*x*x)', mt2llHisto.GetBinLowEdge(1),  mt2llHisto.GetBinLowEdge(mt2llHisto.GetNbinsX()+1)); mt2llFun.SetParameters(4.83969e-01, 1.08049e+00, 5.47807e-01, 1.76432e-03, 0.)
-            mt2llGraph.Fit(mt2llFun, '', '', 0., 600.)
+            fitReults = mt2llGraph.Fit(mt2llFun, 'S', '', minMT2Fit, 600.)
             mt2llGraph.Draw('P0')
+            if drawErrors:
+                corMatrix = fitReults.GetCorrelationMatrix()
+                #corMatrix.Print()
+                x1 = (1.-mt2llFun.GetParameter(0))/mt2llFun.GetParameter(1)
+                slopeUp  = mt2llFun.GetParameter(1)+mt2llFun.GetParError(1)
+                #offsetUp = mt2llFun.GetParameter(0)-mt2llFun.GetParError(0)
+                offsetUp = 1. - slopeUp*x1
+                slopeDo  = mt2llFun.GetParameter(1)-mt2llFun.GetParError(1)
+                #offsetDo = mt2llFun.GetParameter(0)+mt2llFun.GetParError(0)
+                offsetDo = 1. - slopeDo*x1
+                print x1, mt2llFun.GetParameter(0), mt2llFun.GetParameter(1), offsetUp, slopeUp, offsetDo, slopeDo
+                fitUp = ROOT.TLine(minMT2Fit, offsetUp+minMT2Fit*slopeUp, 500., offsetUp+500.*slopeUp)
+                fitDo = ROOT.TLine(minMT2Fit, offsetDo+minMT2Fit*slopeDo, 500., offsetDo+500.*slopeDo)
+                fitUp.SetLineColor(2); fitUp.SetLineStyle(2); fitUp.Draw()
+                fitDo.SetLineColor(2); fitDo.SetLineStyle(2); fitDo.Draw()
             plotCanvas.Print('./Plots/'+year+'/'+backgroundInfo[backgroundProcess]['validationRegion']+commonFlag+'/fit_'+backgroundProcess.replace('WWmt2bin','')+'.png')
             

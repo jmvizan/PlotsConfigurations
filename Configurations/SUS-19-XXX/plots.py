@@ -211,7 +211,7 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
         'color': 798,    # kOrange-2
         'isSignal' : 0,
         'isData'   : 0,
-        'scale'    : 1.0                  
+        'scale'    : 1.0 #1.0052546#1.1133904#1.0176622                 
     }
     
     plot['WW']  = {  

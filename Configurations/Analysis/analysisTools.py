@@ -275,9 +275,9 @@ def mergeFitCR(opt):
                 os.system('rm -r -f '+outputFile)
 
                 filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','') ]
-                filesToMerge.append(outputFile.replace('FitCR','').replace('SM-','').replace('Group','').replace('WWTails','').replace('WWHighs','').replace('SmtEU',''))
+                filesToMerge.append(outputFile.replace('FitCR','').replace('SM-','').replace('Group','').replace('WWTails','').replace('WWHighs','').replace('WWPol1a','').replace('SmtEU',''))
                 for backcr in opt.backgroundsInFit:
-                    filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','').replace('WWTails','').replace('WWHighs','').replace('SmtEU',''))
+                    filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','').replace('WWTails','').replace('WWHighs','').replace('WWPol1a','').replace('SmtEU',''))
 
                 foundFilesToMerge = True
                 for fileToMerge in filesToMerge:
@@ -296,6 +296,7 @@ def signalCombine(opt, action):
 
     smset = opt.sigset.split('_')[0]
     smset = smset.replace(smset.split('-')[-1],'')
+    if smset=='': smset = 'SM-'
 
     for tag in opt.tag.split('-'):
 
@@ -364,13 +365,18 @@ def preFitYieldsSR(opt):
 def printLimits(opt):
 
     signalList = getSignalList(opt, opt.sigset, opt.tag)
+    if 'tab' not in opt.sigset: 
+        massPointList = []
+        for signal in sorted(signalList):
+            massPointList.extend(getMassPointList(signal))
+        signalList = massPointList
 
     for signal in sorted(signalList):
 
         limitResult = {}
 
         for tags in [ '', '_WWSimm' ]:
-            for tagm in [ '', 'WWTails', 'WWHighs' ]:
+            for tagm in [ '', 'WWTails', 'WWHighs', 'WWPol1a' ]:
                 if (tags=='' and tagm=='') or (tags!='' and tagm!=''): continue
                 #if 'Stop' in opt.tag and 'Merge' in tagm: continue
                 #if 'Stop' not in opt.tag and 'Merge' not in tagm: continue
@@ -398,7 +404,7 @@ def printLimits(opt):
         if len(limitResult.keys())==1: printSignal = True
         for evt in range(len(limitResult['central'])):
             resultList = [ str(limitResult['central'][evt]) ]
-            for tags in [ '', 'WWTails', 'WWHighs' ]:
+            for tags in [ '', 'WWTails', 'WWHighs', 'WWPol1a' ]:
                 for tagm in [ '' ]:
                     tagopt = tagm+tags
                     if tagopt!='' and tagopt in limitResult:
