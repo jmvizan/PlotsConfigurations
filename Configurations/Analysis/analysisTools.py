@@ -288,6 +288,29 @@ def mergeFitCR(opt):
                 if foundFilesToMerge:
                     os.system('haddfast --compress '+outputFile+' '+' '.join(filesToMerge))
 
+# make pseudo-data out of MC shapes
+
+def makePseudoDataShapes(opt):
+
+    for year in opt.year.split('-'):
+
+        signalList = getSignalList(opt, opt.sigset, opt.tag)
+        for signal in signalList:
+            for pseudodata in [ '', 'WWHighs' ]:
+
+                opt2 = copy.deepcopy(opt)
+                opt2.year = year
+
+                if pseudodata=='' or pseudodata not in opt.tag:
+                    opt2.sigset = 'SM-PseudoDATA'+pseudodata+'-'+signal
+                    reftag = opt.tag.replace('Group', pseudodata+'Group')
+
+                else:
+                    opt2.sigset = 'SM-PseudoDATANo'+pseudodata+'-'+signal
+                    reftag = opt.tag.replace(pseudodata, '')
+
+                commonTools.mkPseudoData(opt2, reftag)
+
 ### Combine with mass points
 
 def signalCombine(opt, action):
@@ -380,7 +403,8 @@ def printLimits(opt):
                 if (tags=='' and tagm=='') or (tags!='' and tagm!=''): continue
                 #if 'Stop' in opt.tag and 'Merge' in tagm: continue
                 #if 'Stop' not in opt.tag and 'Merge' not in tagm: continue
-                tagopt = (tagm+tags).replace('_WWSimm','')
+                #tagopt = (tagm+tags).replace('_WWSimm','')
+                tagopt = (tagm+tags).replace('WWPol1a','')
                 tag = opt.tag.replace('Group', tagm+'Group')
                 tag += tags
                 outputDir = '/'.join([ opt.limitdir, opt.year, tag, signal ])
@@ -445,27 +469,6 @@ def printLimits(opt):
                         ccc.append(+2.5)
                 print ccc
             print '\n\n'
-
-def makePseudoDataShapes(opt):
-
-    for year in opt.year.split('-'):
-        
-        signalList = getSignalList(opt, opt.sigset, opt.tag)
-        for signal in signalList:
-            for pseudodata in [ '', 'WWHighs' ]:
-
-                opt2 = copy.deepcopy(opt)
-                opt2.year = year
-                
-                if pseudodata=='' or pseudodata not in opt.tag:
-                    opt2.sigset = 'SM-PseudoDATA'+pseudodata+'-'+signal
-                    reftag = opt.tag.replace('Group', pseudodata+'Group')
-
-                else:
-                    opt2.sigset = 'SM-PseudoDATANo'+pseudodata+'-'+signal
-                    reftag = opt.tag.replace(pseudodata, '')
-              
-                commonTools.mkPseudoData(opt2, reftag)
 
 def makeContours(opt, plotoption='2', fitOption='Blind'):
 
@@ -634,5 +637,18 @@ def getMassPointList(signal):
     return massPointList
 
 ### Analysis specific weights, efficiencies, scale factors, etc.
+
+def makeFastSimLeptonEfficiencies(opt):
+
+    opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
+    
+    for year in opt.year.split('-'): 
+        mergeJobs = { 'fastsim' : './mkFastSimDYEfficiencies.py '+year+' fastsim -1', 
+                      'fullsim' : './mkFastSimDYEfficiencies.py '+year+' fullsim -1' } 
+        latinoTools.submitJobs(opt, 'fastsimlep', year+'Efficiency', mergeJobs, 'Targets', True, 1) 
+
+def plotFastSimLeptonEfficiencies(opt):
+    pass
+
 
 
