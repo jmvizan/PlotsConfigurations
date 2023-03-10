@@ -74,7 +74,7 @@ def shapes(opt):
         print '                 Please use \'_\' only to set datacard options.'
         exit()
 
-    if not opt.interactive: opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
+    if not opt.interactive: opt.batchQueue = commonTools.batchQueue(opt, opt.batchQueue)
 
     commonTools.cleanLogs(opt)
 
@@ -385,6 +385,8 @@ def datacards(opt, signal='', dryRun=False):
 ### Batch
 
 def submitJobs(opt, jobName, jobTag, targetList, splitBatch, jobSplit, nThreads):
+
+    opt.batchQueue = commonTools.batchQueue(opt, opt.batchQueue)
 
     jobs = batchJobs(jobName,jobTag,['ALL'],targetList.keys(),splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
     jobs.nThreads = nThreads

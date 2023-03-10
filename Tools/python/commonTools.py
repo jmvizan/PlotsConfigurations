@@ -400,15 +400,15 @@ def purgeDatacards(opt):
 
 # jobs
 
-def batchQueue(batchQueue):
+def batchQueue(opt, batchQueue):
 
     if 'ifca' in os.uname()[1] or 'cloud' in os.uname()[1]:
         if batchQueue not in [ 'cms_main', 'cms_med', 'cms_high' ]: 
-            print 'Batch queue', batchQueue, 'not available in gridui. Setting it to cms_high'
+            if opt.verbose: print 'Batch queue', batchQueue, 'not available in gridui. Setting it to cms_high'
             return 'cms_high'
     else: # cern
         if batchQueue not in ['espresso', 'microcentury', 'longlunch', 'workday', 'tomorrow', 'testmatch', 'nextweek' ]:
-            print 'Batch queue', batchQueue, 'not available in lxplus. Setting it to workday'
+            if opt.verbose: print 'Batch queue'tchQueue, batchQueue, 'not available in lxplus. Setting it to workday'
             return 'workday'
 
     return batchQueue

@@ -144,7 +144,6 @@ def signalShapes(opt, action='shapes'):
                         mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
 
     if len(mergeJobs.keys())>0:
-        opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
         for year in mergeJobs:
             for tag in mergeJobs[year]:
                 if len(mergeJobs[year][tag].keys())>0:
@@ -640,11 +639,11 @@ def getMassPointList(signal):
 
 def makeFastSimLeptonEfficiencies(opt):
 
-    opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
-    
+    cdWorkDir = 'cd '+os.getenv('PWD')+'; eval `scramv1 runtime -sh`; '   
+ 
     for year in opt.year.split('-'): 
-        mergeJobs = { 'fastsim' : './mkFastSimDYEfficiencies.py '+year+' fastsim -1', 
-                      'fullsim' : './mkFastSimDYEfficiencies.py '+year+' fullsim -1' } 
+        mergeJobs = { 'fastsim' : cdWorkDir+'./mkFastSimDYEfficiencies.py '+year+' fastsim -1', 
+                      'fullsim' : cdWorkDir+'./mkFastSimDYEfficiencies.py '+year+' fullsim -1' } 
         latinoTools.submitJobs(opt, 'fastsimlep', year+'Efficiency', mergeJobs, 'Targets', True, 1) 
 
 def plotFastSimLeptonEfficiencies(opt):

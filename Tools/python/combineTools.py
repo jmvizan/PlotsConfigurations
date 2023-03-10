@@ -91,7 +91,7 @@ def runCombine(opt):
 
     if not opt.interactive and opt.action!='writeDatacards':
         commonTools.checkProxy(opt)
-        opt.batchQueue = commonTools.batchQueue(opt.batchQueue)
+        #opt.batchQueue = commonTools.batchQueue(opt, opt.batchQueue)
 
     if not hasattr(opt, 'combineAction'):
         if 'limit' in opt.option: limits(opt)
