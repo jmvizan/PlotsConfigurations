@@ -21,7 +21,7 @@ Zmass = 91.1876
 
 yearset=sys.argv[1]
 prodset=sys.argv[2]
-maxentries=sys.argv[3]
+maxentries=int(sys.argv[3])
 
 campaign = 'UL'
 #treeLevel = 'DY'
@@ -113,8 +113,8 @@ if __name__ == '__main__':
                     histos[sim][lepton][level] = ROOT.TH2F(lepton+'_'+level+'_'+sim, '', len(binsx[lepton])-1, array('d',binsx[lepton]), len(binsy[lepton])-1, array('d',binsy[lepton]))                                                                                            
             nentries = events.GetEntries()            
             print maxentries, nentries
-            if maxentries>0. and int(maxentries)<nentries:
-                nentries = int(maxentries)
+            if maxentries>0. and maxentries<nentries:
+                nentries = maxentries
 
             print year, sim, nentries 
             for entry in range(nentries):
