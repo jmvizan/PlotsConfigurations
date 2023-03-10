@@ -408,7 +408,7 @@ def batchQueue(opt, batchQueue):
             return 'cms_high'
     else: # cern
         if batchQueue not in ['espresso', 'microcentury', 'longlunch', 'workday', 'tomorrow', 'testmatch', 'nextweek' ]:
-            if opt.verbose: print 'Batch queue'tchQueue, batchQueue, 'not available in lxplus. Setting it to workday'
+            if opt.verbose: print 'Batch queue', batchQueue, 'not available in lxplus. Setting it to workday'
             return 'workday'
 
     return batchQueue
