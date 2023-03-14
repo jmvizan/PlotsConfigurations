@@ -229,8 +229,8 @@ if __name__ == '__main__':
             for binjet in [ 'NoJet', 'NoTag', 'Veto', 'Tag' ]:
                 if opt.binjet!='all' and binjet!=opt.binjet: continue
                 if 'Stop' in tag and 'No' in binjet: continue
-                if 'Chargino' in tag and 'No' in binjet and binmet in ['SR3', 'SR4']: continue
-                if 'Chargino' in tag and binjet=='Veto' and binmet in ['SR1', 'SR2']: continue
+                if ('Chargino' in tag or 'TChipmWW' in tag) and 'No' in binjet and binmet in ['SR3', 'SR4']: continue
+                if ('Chargino' in tag or 'TChipmWW' in tag) and binjet=='Veto' and binmet in ['SR1', 'SR2']: continue
 
                 for source in [ 'jesTotal', 'jer', 'unclustEn' ]:
                     if opt.source!='all' and source!=opt.source: continue
@@ -253,8 +253,8 @@ if __name__ == '__main__':
                     for metbin in [ 'SR1', 'SR2', 'SR3', 'SR4' ]:
                         for jetbin in [ 'NoJet', 'NoTag', 'Veto', 'Tag' ]: 
                             if 'Stop' in tag and 'No' in jetbin: continue
-                            if 'Chargino' in tag and 'No' in jetbin and metbin in ['SR3', 'SR4']: continue
-                            if 'Chargino' in tag and jetbin=='Veto' and metbin in ['SR1', 'SR2']: continue
+                            if ('Chargino' in tag or 'TChipmWW' in tag) and 'No' in jetbin and metbin in ['SR3', 'SR4']: continue
+                            if ('Chargino' in tag or 'TChipmWW' in tag) and jetbin=='Veto' and metbin in ['SR1', 'SR2']: continue
                             for channel in [ 'em', 'sf' ]:
 
                                 for nshp in range(5):
