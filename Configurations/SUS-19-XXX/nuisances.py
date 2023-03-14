@@ -189,14 +189,14 @@ addMT2Shapes = 'SignalRegions' in opt.tag
 
 if addMT2Shapes:
 
-    mt2llweightUp = '(1. - 0.75*(mt2ll'+ctrltag+'>=370))'
-    mt2llweightDo = '1.'
+    mt2llweightUp = '(1. + 0.75*(mt2ll'+ctrltag+'>=370))'
+    mt2llweightDo = '(1. - 0.75*(mt2ll'+ctrltag+'>=370))'
 
     nuisancekey = 'WZbin'
     nuisances[nuisancekey]  = {
         'name'  : nuisancekey+year.replace('noHIPM','').replace('HIPM',''),
         'samples'  : { 'WZ' : [ mt2llweightUp, mt2llweightDo] },
-        'OneSided' : True,
+        'OneSided' : False,
         'kind'  : 'weight',
         'type'  : 'shape'
     }
