@@ -15,6 +15,7 @@ def setAnalysisDefaults(opt):
     opt.isExotics = True
 
     if opt.year.lower()=='run2split': opt.year = '2016HIPM-2016noHIPM-2017-2018'
+    elif opt.year.lower()=='2016split': opt.year = '2016HIPM-2016noHIPM'
     elif opt.year.lower()=='run2': opt.year = '2016-2017-2018'
 
     inputTag = opt.tag
@@ -253,6 +254,14 @@ def mergeGroupsForDatacards(opt):
             loopMergeCommandList.append('--outputtag='+outputtag)
 
             os.system('mergeSamplesForDatacards.py '+' '.join( loopMergeCommandList))
+
+# Smoothing JES/JER/UnclusteredEnergy uncertainties
+
+def smoothEnergyUncertainties(opt):
+    
+    for year in opt.year.split('-'):
+        for tag in opt.tag.split('-'):
+            os.system('./jetUncertaintiesSmoother.py --year='+year+' --tag='+tag)
 
 # merging CRs in the fit
 
@@ -639,15 +648,20 @@ def getMassPointList(signal):
 
 def makeFastSimLeptonEfficiencies(opt):
 
-    cdWorkDir = 'cd '+os.getenv('PWD')+'; eval `scramv1 runtime -sh`; '   
+    cdWorkDir = 'cd '+os.getenv('PWD')+'; eval `scramv1 runtime -sh`;'   
  
     for year in opt.year.split('-'): 
-        mergeJobs = { 'fastsim' : cdWorkDir+'./mkFastSimDYEfficiencies.py '+year+' fastsim -1', 
-                      'fullsim' : cdWorkDir+'./mkFastSimDYEfficiencies.py '+year+' fullsim -1' } 
-        latinoTools.submitJobs(opt, 'fastsimlep', year+'Efficiency', mergeJobs, 'Targets', True, 1) 
+        mergeJobs = {}
+        for sample in [ 'fullsim', 'fastsim' ]:
+            if opt.sigset=='SM' or sample in opt.sigset:
+                mergeJobs[sample] = ' '.join([ cdWorkDir, './mkFastSimDYEfficiencies.py', year, sample, '-1' ])
+        if len(mergeJobs.keys())>0:
+            latinoTools.submitJobs(opt, 'fastsimlep', year+'Efficiency', mergeJobs, 'Targets', True, 1) 
 
 def plotFastSimLeptonEfficiencies(opt):
-    pass
+
+    for year in opt.year.split('-'):
+        os.system('./mkFastSimDYMorePlots.py '+year)
 
 
 

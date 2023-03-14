@@ -7,16 +7,6 @@ import optparse
 from array import *
 from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
 
-def getLeptonMass(pdgId) :
-    
-        if abs(pdgId)==11 :
-            return 0.000511
-        elif abs(pdgId)==13 :
-            return 0.105658
-        else :
-            print 'mt2llProducer: WARNING: unsupported lepton pdgId'
-            return -1
-
 Zmass = 91.1876
 
 yearset=sys.argv[1]
@@ -26,6 +16,26 @@ maxentries=int(sys.argv[3])
 campaign = 'UL'
 #treeLevel = 'DY'
 treeLevel = ''
+
+def getLeptonMass(pdgId) :
+
+    if abs(pdgId)==11 :
+        return 0.000511
+    elif abs(pdgId)==13 :
+        return 0.105658
+    else:
+        print 'mt2llProducer: WARNING: unsupported lepton pdgId'
+        return -1
+
+def isTightMuon(muon):
+    if muon.mediumId==1 and abs(muon.sip3d)<4. and abs(muon.dxy)<0.05 and abs(muon.dz)<0.10 and muon.pfRelIso04_all<0.15:
+        return True
+    return False
+
+def isTightElectron(electron): 
+    if electron.cutBased>=3 and abs(electron.sip3d)<4. and abs(electron.dxy)<0.05 and abs(electron.dz)<0.10 and electron.lostHits==0:
+        return True    
+    return False
 
 if __name__ == '__main__':
 
@@ -78,9 +88,10 @@ if __name__ == '__main__':
     #matchedMuon = '((GenPart_statusFlags[abs(Muon_genPartIdx)] & 1))'    
     #matchedParton = '((GenPart_statusFlags & 1))'
 
-    leptons = { 'Ele' : 'isTightElectron_cutBasedMediumPOG',
-                'Muo' : 'isTightMuon_mediumRelIsoTight'
-              }
+    #leptons = { 'Ele' : 'isTightElectron_cutBasedMediumPOG',
+    #            #'Ele' : '(Lepton_electronIdx)' 
+    #            'Muo' : 'isTightMuon_mediumRelIsoTight'
+    #          }
 
     binsx = { 'Muo' : [ 10., 20., 35., 50., 100., 200., 500. ],
               'Ele' : [ -2.400, -1.444, -0.800,  0.000, 0.800, 1.444, 2.400 ] }
@@ -106,7 +117,7 @@ if __name__ == '__main__':
             events.Add(years[year][sim]+treeName)
 
             histos[sim] = { }
-            for lepton in leptons:
+            for lepton in [ 'Ele', 'Muo' ]:
   
                 histos[sim][lepton] = { }
                 for level in levels: 
@@ -121,7 +132,7 @@ if __name__ == '__main__':
 
                 events.GetEntry(entry)
 
-                recoleptons = Collection(events, 'Lepton')      
+                #recoleptons = Collection(events, 'Lepton')      
                 #if 'DY' not in treeLevel: 
                 #    genleptons = Collection(events, 'LeptonGen') 
                 electrons = Collection(events, 'Electron')
@@ -134,7 +145,7 @@ if __name__ == '__main__':
                     genLep = [ ]
                     genLepPdgId = [ ]
                     genLepReco = [ ]
-                    genLepTight = [ ] 
+                    #genLepTight = [ ] 
                     genVec = ROOT.vector('TLorentzVector')()
                     #for glep in range(events.nLeptonGen):
                     #    if genleptons[glep].isPrompt and genleptons[glep].pt>10. and abs(genleptons[glep].eta)<2.4 and (abs(genleptons[glep].pdgId)==11 or abs(genleptons[glep].pdgId)==13):
@@ -154,32 +165,33 @@ if __name__ == '__main__':
                             genlepton.SetPtEtaPhiM(genparticles[glep].pt, genparticles[glep].eta, genparticles[glep].phi, getLeptonMass(genparticles[glep].pdgId))
                             genVec.push_back(genlepton)
 
-                            tidx, ridx = -1, -1
-
-                            #for tlep in range(events.nLepton):
-                            #    if recoleptons[tlep].genIdx==glep: 
-                            #        tidx = tlep
+                            #tidx, ridx = -1, -1
+                            ridx = -1
+                          
+                            ##for tlep in range(events.nLepton):
+                            ##    if recoleptons[tlep].genIdx==glep: 
+                            ##        tidx = tlep
 
                             if abs(genLepId)==11:
                                 for rlep in range(events.nElectron):
                                     if electrons[rlep].genPartIdx>=0.:
                                         if abs(genparticles[electrons[rlep].genPartIdx].phi-genlepton.Phi())<0.01 and abs(genparticles[electrons[rlep].genPartIdx].eta-genlepton.Eta())<0.01:
                                             ridx = rlep
-                                            for tlep in range(events.nLepton):
-                                                if recoleptons[tlep].electronIdx==rlep:
-                                                    tidx = tlep 
+                                            #for tlep in range(events.nLepton):
+                                            #    if recoleptons[tlep].electronIdx==rlep:
+                                            #        tidx = tlep 
   
                             elif abs(genLepId)==13:
                                 for rlep in range(events.nMuon):
                                     if muons[rlep].genPartIdx>=0.:
                                         if abs(genparticles[muons[rlep].genPartIdx].phi-genlepton.Phi())<0.01 and abs(genparticles[muons[rlep].genPartIdx].eta-genlepton.Eta())<0.01:          
                                             ridx = rlep
-                                            for tlep in range(events.nLepton):
-                                                if recoleptons[tlep].muonIdx==rlep:
-                                                    tidx = tlep
+                                            #for tlep in range(events.nLepton):
+                                            #    if recoleptons[tlep].muonIdx==rlep:
+                                            #        tidx = tlep
 
                             genLepReco.append(ridx)
-                            genLepTight.append(tidx)
+                            #genLepTight.append(tidx)
 
                     if len(genLep)==2:
                         #if abs(genleptons[genLep[0]].pdgId)==abs(genleptons[genLep[1]].pdgId):
@@ -190,30 +202,39 @@ if __name__ == '__main__':
                
                                     #lepton = 'Ele' if abs(genleptons[genLep[0]].pdgId)==11 else 'Muo'
                                     lepton = 'Ele' if abs(genLepPdgId[0])==11 else 'Muo'
+                                    isLeptonTight = []
+                                    for glep in range(len(genLep)):
+                                        if genLepReco[glep]>=0:
+                                            if lepton=='Ele': isLeptonTight.append(isTightElectron(electrons[genLepReco[glep]]))
+                                            if lepton=='Muo': isLeptonTight.append(isTightMuon(muons[genLepReco[glep]]))
+                                        else: isLeptonTight.append(False)
 
                                     for glep in range(len(genLep)):
-                                        if genLepTight[1-glep]>=0:
-                                            if (getattr(recoleptons[genLepTight[1-glep]], leptons[lepton]))==1:
+                                        #if genLepTight[1-glep]>=0:
+                                        #if (lepton=='Ele' and isTightElectron(electrons[])) or (lepton=='Muo' and ):
+                                        if isLeptonTight[1-glep]:
 
-                                                if lepton=='Ele':
-                                                    obsx = genVec[glep].Eta()
-                                                    obsy = genVec[glep].Pt()
-                                                else:
-                                                    obsx = genVec[glep].Pt()
-                                                    obsy = abs(genVec[glep].Eta())
+                                            if lepton=='Ele':
+                                                obsx = genVec[glep].Eta()
+                                                obsy = genVec[glep].Pt()
+                                            else:
+                                                obsx = genVec[glep].Pt()
+                                                obsy = abs(genVec[glep].Eta())
                                             
-                                                histos[sim][lepton]['gen'].Fill(obsx, obsy)
+                                            histos[sim][lepton]['gen'].Fill(obsx, obsy)
                         
-                                                if genLepTight[glep]>=0: 
-                                                    if (getattr(recoleptons[genLepTight[glep]], leptons[lepton]))==1:
-                                                        histos[sim][lepton]['tightgen'].Fill(obsx, obsy)
+                                            #if genLepTight[glep]>=0: 
+                                            #    if (getattr(recoleptons[genLepTight[glep]], leptons[lepton]))==1:
+                                            #        histos[sim][lepton]['tightgen'].Fill(obsx, obsy)
 
-                                                if genLepReco[glep]>=0:
-                                                    histos[sim][lepton]['recogen'].Fill(obsx, obsy)
+                                            if genLepReco[glep]>=0:
+                                                histos[sim][lepton]['recogen'].Fill(obsx, obsy)
+                                                if isLeptonTight[glep]:
+                                                    histos[sim][lepton]['tightgen'].Fill(obsx, obsy)
 
                 # muon
                 recoMuo = [ ]
-                recoMuoTight = [ ]
+                #recoMuoTight = [ ]
                 muoVec = ROOT.vector('TLorentzVector')()
                 for muo in range(events.nMuon):
                     if muons[muo].genPartIdx>=0.:
@@ -224,31 +245,31 @@ if __name__ == '__main__':
                             recomuon.SetPtEtaPhiM(muons[muo].pt, muons[muo].eta, muons[muo].phi, getLeptonMass(13))
                             muoVec.push_back(recomuon)
 
-                            tidx = -1
+                            #tidx = -1
                             
-                            for tlep in range(events.nLepton): 
-                                if recoleptons[tlep].muonIdx==muo:  
-                                    tidx = tlep 
+                            #for tlep in range(events.nLepton): 
+                            #    if recoleptons[tlep].muonIdx==muo:  
+                            #        tidx = tlep 
          
-                            recoMuoTight.append(tidx)
+                            #recoMuoTight.append(tidx)
 
                 if len(recoMuo)==2:  
                     if (muons[recoMuo[0]].charge*muons[recoMuo[1]].charge)<0.:
                         if abs((muoVec[0] + muoVec[1]).M() - Zmass)<30.: 
 
                             for muo in range(len(recoMuo)):   
-                                if recoMuoTight[1-muo]>=0:
-                                    if (getattr(recoleptons[recoMuoTight[1-muo]], leptons['Muo']))==1:             
+                                #if recoMuoTight[1-muo]>=0:
+                                if isTightMuon(muons[recoMuo[1-muo]]):             
 
-                                        histos[sim]['Muo']['reco'].Fill(muoVec[muo].Pt(), abs(muoVec[muo].Eta()))  
+                                    histos[sim]['Muo']['reco'].Fill(muoVec[muo].Pt(), abs(muoVec[muo].Eta()))
 
-                                        if recoMuoTight[muo]>=0:   
-                                            if (getattr(recoleptons[recoMuoTight[muo]], leptons['Muo']))==1:
-                                                histos[sim]['Muo']['tight'].Fill(muoVec[muo].Pt(), abs(muoVec[muo].Eta()))    
+                                    #if recoMuoTight[muo]>=0:   
+                                    if isTightMuon(muons[recoMuo[muo]]):
+                                        histos[sim]['Muo']['tight'].Fill(muoVec[muo].Pt(), abs(muoVec[muo].Eta()))    
 
                 # electron
                 recoEle = [ ]
-                recoEleTight = [ ]
+                #recoEleTight = [ ]
                 eleVec = ROOT.vector('TLorentzVector')()
                 for ele in range(events.nElectron):
                     if electrons[ele].genPartIdx>=0.:
@@ -259,33 +280,33 @@ if __name__ == '__main__':
                             recoelectron.SetPtEtaPhiM(electrons[ele].pt, electrons[ele].eta, electrons[ele].phi, getLeptonMass(11))
                             eleVec.push_back(recoelectron)
 
-                            tidx = -1
+                            #tidx = -1
  
-                            for tlep in range(events.nLepton): 
-                                if recoleptons[tlep].electronIdx==ele:
-                                    tidx = tlep
+                            #for tlep in range(events.nLepton): 
+                            #    if recoleptons[tlep].electronIdx==ele:
+                            #        tidx = tlep
 
-                            recoEleTight.append(tidx)
+                            #recoEleTight.append(tidx)
 
                 if len(recoEle)==2:  
                     if (electrons[recoEle[0]].charge*electrons[recoEle[1]].charge)<0.:                          
                         if abs((eleVec[0] + eleVec[1]).M() - Zmass)<30.:
                                                                                                                                                         
                             for ele in range(len(recoEle)): 
-                                if recoEleTight[1-ele]>=0:
-                                    if (getattr(recoleptons[recoEleTight[1-ele]], leptons['Ele']))==1:
+                                #if recoEleTight[1-ele]>=0:
+                                if isTightElectron(electrons[recoEle[1-ele]]):
                              
-                                        etaSC = eleVec[ele].Eta() #+ electrons[recoEle[ele]].deltaEtaSC
-                                                                                                                  
-                                        histos[sim]['Ele']['reco'].Fill(etaSC, eleVec[ele].Pt())
+                                    etaSC = eleVec[ele].Eta() #+ electrons[recoEle[ele]].deltaEtaSC
+                                                                                                                
+                                    histos[sim]['Ele']['reco'].Fill(etaSC, eleVec[ele].Pt())
                                                                                            
-                                        if recoEleTight[ele]>=0: 
-                                            if (getattr(recoleptons[recoEleTight[ele]], leptons['Ele']))==1:
-                                                histos[sim]['Ele']['tight'].Fill(etaSC, eleVec[ele].Pt())
+                                    #if recoEleTight[ele]>=0: 
+                                    if isTightElectron(electrons[recoEle[ele]]):
+                                        histos[sim]['Ele']['tight'].Fill(etaSC, eleVec[ele].Pt())
 
-            f = ROOT.TFile.Open(outputDir+'/HistoLeptons_'+campaign+'_'+sim+'.root','recreate')
+            f = ROOT.TFile.Open(outputDir+'/HistoLeptons_'+campaign+'_'+sim+'_Test.root','recreate')
 
-            for lepton in leptons:
+            for lepton in [ 'Ele', 'Muo' ]:
                 for level in levels:
                     histos[sim][lepton][level].Write()
             

@@ -5,7 +5,7 @@ import ROOT
 import math
 import optparse
 from array import *
-from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
+#from PhysicsTools.NanoAODTools.postprocessing.framework.datamodel import Collection 
 
 def getLeptonMass(pdgId) :
     
@@ -38,7 +38,8 @@ def mkDivide(histo1, histo2, kind) :
                 else:
                     error1 = histo1.GetBinError(xb, yb)
                     error2 = histo2.GetBinError(xb, yb)
-                    error = ratio*math.sqrt(math.pow(error1/cont1, 2) + math.pow(error2/cont2, 2))
+                    if cont1>0: error = ratio*math.sqrt(math.pow(error1/cont1, 2) + math.pow(error2/cont2, 2))
+                    else: error = error2
 
                 histo1.SetBinContent(xb, yb, ratio)
                 histo1.SetBinError(xb, yb, error)
@@ -132,7 +133,7 @@ if __name__ == '__main__':
 
             histos[sim] = { }
 
-            inputFile = ROOT.TFile.Open('./Data/'+year+'/'+'Histos_'+sim+'.root', 'read')  
+            inputFile = ROOT.TFile.Open('./Data/'+year+'/'+'HistoLeptons_UL_'+sim+'_Test.root', 'read')  
 
             for key in inputFile.GetListOfKeys():
 
@@ -148,7 +149,7 @@ if __name__ == '__main__':
             inputFile.Close()
 
         outputDir = './Plots/'+year+'/FastSim/'
-        os.system('mkdir -p '+outputDir)
+        os.system('mkdir -p '+outputDir+' ; cp ./Plots/index.php '+outputDir)
 
         for lepton in leptons:
             
@@ -159,27 +160,27 @@ if __name__ == '__main__':
                 mkPlot(histos[sim][lepton]['tight'], lepton, year, 'tight', sim)
 
                 if 'gen' in histos[sim][lepton]:
-                    histos[sim][lepton]['tightgen'].Divide(histos[sim][lepton]['gen'])
-                    histos[sim][lepton]['recogen'].Divide(histos[sim][lepton]['gen']) 
+                    mkDivide(histos[sim][lepton]['tightgen'], histos[sim][lepton]['gen'], 'eff')
+                    mkDivide(histos[sim][lepton]['recogen'], histos[sim][lepton]['gen'], 'eff')
 
             mkDivide(histos['fullsim'][lepton]['tight'], histos['fastsim'][lepton]['tight'], 'sf')
 
             plotLevels = [ 'tight' ]
 
             if 'gen' in histos['fullsim'][lepton] and 'gen' in histos['fastsim'][lepton]:
-                histos['fullsim'][lepton]['tightgen'].Divide(histos['fastsim'][lepton]['tightgen'])
-                histos['fullsim'][lepton]['recogen'].Divide(histos['fastsim'][lepton]['recogen'])
+                mkDivide(histos['fullsim'][lepton]['tightgen'], histos['fastsim'][lepton]['tightgen'], 'sf')
+                mkDivide(histos['fullsim'][lepton]['recogen'], histos['fastsim'][lepton]['recogen'], 'sf')
                 plotLevels.append('tightgen')
                 plotLevels.append('recogen')
 
             for level in plotLevels:
                 mkPlot(histos['fullsim'][lepton][level], lepton, year, level, '')
 
-        #ff = ROOT.TFile.Open('./Data/'+year+'/fastsimLeptonWeights.root', 'recreate')
+        ff = ROOT.TFile.Open('./Data/'+year+'/fastsimLeptonWeights_UL.root', 'recreate')
 
-        #for lepton in leptons:
-        #    histos['fullsim'][lepton]['tight'].Write()
+        for lepton in leptons:
+            histos['fullsim'][lepton]['tight'].Write()
 
-        #ff.Close()
+        ff.Close()
 
 
