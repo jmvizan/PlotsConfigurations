@@ -212,21 +212,22 @@ def merge2016CR(opt):
             opt2.sigset = sigset
             merge2016(opt2)
 
-# To study signal in CRs
-
-def mergeCRToSignal(opt):
+def mergeSignalToSM(opt):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
+            smtag = tag.split('VetoesUL')[0]+'VetoesUL'
+            signaltag = tag.replace('Group','').replace('WWPol1a','').replace('SmtEU','')
+
             for sigset in getSignalList(opt, opt.sigset, tag):
-
+                print sigset
                 outputDir = commonTools.getShapeDirName(opt.shapedir, year, tag)
-                outputFile = outputDir + '/plots_' + tag + '_SM-' + sigset + '.root'
-                smFile     = outputDir + '/plots_' + tag + '_SM.root' 
-                signalFile = outputDir.replace('Group','') + '/plots_' + tag.replace('Group','') + '_' + sigset + '.root'
+                outputFile = outputDir                         + '/plots_' + tag       + '_SM-' + sigset + '.root'
+                smFile     = outputDir.replace(tag, smtag)     + '/plots_' + smtag     + '_SM.root' 
+                signalFile = outputDir.replace(tag, signaltag) + '/plots_' + signaltag + '_' + sigset + '.root'
 
-                os.system('haddfast --compress '+outputFile+' '+smFile+' '+signalFile) 
+                os.system('mkdir -p '+outputDir+' ; haddfast --compress '+outputFile+' '+smFile+' '+signalFile) 
 
 # groups
 
