@@ -304,7 +304,7 @@ if __name__ == '__main__':
                                     if isTightElectron(electrons[recoEle[ele]]):
                                         histos[sim]['Ele']['tight'].Fill(etaSC, eleVec[ele].Pt())
 
-            f = ROOT.TFile.Open(outputDir+'/HistoLeptons_'+campaign+'_'+sim+'_Test.root','recreate')
+            f = ROOT.TFile.Open(outputDir+'/HistoLeptons_'+campaign+'_'+sim+'.root','recreate')
 
             for lepton in [ 'Ele', 'Muo' ]:
                 for level in levels:

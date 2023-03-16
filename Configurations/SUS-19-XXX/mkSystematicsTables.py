@@ -8,9 +8,9 @@ import ROOT
 import LatinoAnalysis.Gardener.hwwtools as hwwtools
 from collections import OrderedDict
 
-def getMaxBinForShapeUncertainty(NbinsX, cut):
+def getMaxBinForShapeUncertainty(NbinsX, cut, useAllBins=True):
 
-    if opt.useallshapebins: return NbinsX
+    if useAllBins: return NbinsX
     if 'Stop' in opt.tag:
         if 'SR3' in cut or 'SR4' in cut: return 6
         else: return NbinsX
@@ -90,6 +90,9 @@ systematicDictionary['pileup']       = 'Pileup'
 systematicDictionary['jesTotal']     = 'Jet energy scale'
 systematicDictionary['jer']          = 'Jet energy resolution'
 systematicDictionary['unclustEn']    =  'Unclustered energy'
+systematicDictionary['SmoothjesTotal']     = 'Jet energy scale'
+systematicDictionary['Smoothjer']          = 'Jet energy resolution'
+systematicDictionary['SmoothunclustEn']    =  'Unclustered energy'
 systematicDictionary['prefiring']    =  'Prefiring'
 systematicDictionary['lepReco']      =  'Lepton reconstruction'
 systematicDictionary['lepReco']      =  'Lepton reconstruction'
@@ -103,6 +106,9 @@ systematicDictionary['pdf']          =  'PDFs'
 systematicDictionary['normDYall']    =  '\\DY normalization'
 systematicDictionary['normSTtWall']  =  '\\tW normalization'
 systematicDictionary['normMinorBkg'] =  'Minor bkg. normalization'
+systematicDictionary['WWshape']      =  '\\mtll tails (\\invM{\\PW} endpoint)'
+systematicDictionary['WWtails']      =  '\\mtll tails (\\invM{\\PW} endpoint)'
+systematicDictionary['WZbin']        =  '\\mtll tails (\\WZ)'
 systematicDictionary['nonpromptLep'] =  'Nonprompt leptons'
 systematicDictionary['toppt']        = '\\ttbar \\pt reweighting'
 systematicDictionary['isrFS']        = 'ISR reweighting'
@@ -169,7 +175,7 @@ if __name__ == '__main__':
         exec(open(opt.cutsFile).read())
         exec(open(opt.variablesFile).read())
         exec(open('./nuisances.py').read())
-
+        print samples.keys()
         centralShapes = getShapes('', cuts, variables, samples, samples, inputFile)
 
         if 'stat' not in systematics:
@@ -184,7 +190,7 @@ if __name__ == '__main__':
             centralIntegralError = ROOT.double(); centralIntegral = centralShape.IntegralAndError(-1, -1, centralIntegralError)
             systematics['stat'][datayear+'_'+centralShape.GetName()]['integralUncertainty'] = 100.*centralIntegralError/centralIntegral
             shapeUncertainty = -1.
-            for ib in range(getMaxBinForShapeUncertainty(centralShape.GetNbinsX(), centralShape.GetName())):           
+            for ib in range(getMaxBinForShapeUncertainty(centralShape.GetNbinsX(), centralShape.GetName(), opt.useallshapebins)):           
                 if centralShape.GetBinContent(ib+1)>0.:
                     if opt.sigset!='SM' and (ib+1<5 or centralShape.GetBinContent(ib+1)<0.3): continue
                     shapeUncertainty = max(100.*centralShape.GetBinError(ib+1)/centralShape.GetBinContent(ib+1), shapeUncertainty)
@@ -196,9 +202,10 @@ if __name__ == '__main__':
 
             hasSamples = False
             for sample in nuisances[nuisance]['samples']:
-                if (('SM' in opt.samples or sample==opt.samples) and not samples[sample]['isSignal'] and not samples[sample]['isDATA']) or (samples[sample]['isSignal'] and sample in opt.samples):
-                    hasSamples = True
-                    break
+                if sample in samples:
+                    if (('SM' in opt.samples or sample==opt.samples) and not samples[sample]['isSignal'] and not samples[sample]['isDATA']) or (samples[sample]['isSignal'] and sample in opt.samples):
+                        hasSamples = True
+                        break
 
             if not hasSamples: continue
 
@@ -265,13 +272,13 @@ if __name__ == '__main__':
                 doShape.Scale(centralShape.Integral()/doShape.Integral()); doShape.Divide(centralShape)
 
                 shapeUncertainty = -1.       
-                for ib in range(getMaxBinForShapeUncertainty(centralShape.GetNbinsX(), cut)):
+                for ib in range(getMaxBinForShapeUncertainty(centralShape.GetNbinsX(), cut, opt.useallshapebins or 'tails' in systematicDictionary[systematic.split('_')[0]])):
                     if centralShape.GetBinContent(ib+1)==0.:
                         fixedUpContent = 1. if upShape.GetBinContent(ib+1)==0. else 1.; upShape.SetBinContent(ib+1, fixedUpContent)
                         fixedDoContent = 1. if doShape.GetBinContent(ib+1)==0. else 1.; doShape.SetBinContent(ib+1, fixedUpContent)
                     if opt.sigset!='SM' and (ib+1<5 or centralShape.GetBinContent(ib+1)<0.3):
                         continue
-                    if opt.usemaxshape and 'ptmiss' not in systematic:
+                    if opt.usemaxshape: #and 'ptmiss' not in systematic:
                         shapeUncertainty = max(100.*abs(upShape.GetBinContent(ib+1) - 1.), shapeUncertainty)
                         shapeUncertainty = max(100.*abs(doShape.GetBinContent(ib+1) - 1.), shapeUncertainty)
                     else:

@@ -104,7 +104,7 @@ def mkPlot(histo, lepton, year, level, sim) :
     ROOT.TColor.CreateGradientColorTable(NRGBs, stops, red, green, blue, NCont)
     ROOT.gStyle.SetNumberContours(NCont)
 
-    minimum = 0.75 if sim=='' else 0.3
+    minimum = 0.70 if sim=='' else 0.3
     histo.SetMinimum(minimum)
     histo.SetMaximum(1.10)
 
@@ -133,7 +133,7 @@ if __name__ == '__main__':
 
             histos[sim] = { }
 
-            inputFile = ROOT.TFile.Open('./Data/'+year+'/'+'HistoLeptons_UL_'+sim+'_Test.root', 'read')  
+            inputFile = ROOT.TFile.Open('./Data/'+year+'/'+'HistoLeptons_UL_'+sim+'.root', 'read')  
 
             for key in inputFile.GetListOfKeys():
 
