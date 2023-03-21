@@ -1064,16 +1064,18 @@ def makeExclusionPlot(year, tag, sigset, limitOptions, fileOption):
 
     lumi = 0.
     if '2016' in year:
-        lumi += 35.92
+        lumi += 36.33
     if '2017' in year:
-        lumi += 41.53
+        lumi += 41.48
     if '2018' in year:
-        lumi += 59.74
+        lumi += 59.83
+    if lumi>100: lumi_i=int(round(lumi, 0))
+    else:        lumi_i=round(lumi, 1)
     cfgFile.write('HISTOGRAM '+ inputFileName.replace('//', '/Histograms/') + ' histo_X_' + limitOptions[1].lower() + '\n')
     cfgFile.write('EXPECTED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up graph_r_'+limitType+'_down kRed kOrange\n')
     cfgFile.write('OBSERVED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_observed graph_r_observed_up graph_r_observed_down kBlack kGray\n')
     cfgFile.write('PRELIMINARY\n')
-    cfgFile.write('LUMI ' + str(round(lumi, 1)) + '\n')
+    cfgFile.write('LUMI ' + str(lumi_i) + '\n')
     cfgFile.write('ENERGY 13\n\n')
 
     cfgFile.close()
