@@ -200,15 +200,25 @@ def limits(opt):
 
     runCombine(opt)
 
+def getFitOptions(options):
+
+    optionList = []
+    if 'noshapes' not in options: 
+        optionList.extend([ '--saveShapes', '--saveWithUncertainties', '--saveOverallShapes' ])
+        if 'asimov' in options: optionList.extend([ '--numToysForShapes 200', '--plots' ])
+    if 'skipbonly' in options: optionList.append('--skipBOnlyFit')
+    if 'asimovb' in options: optionList.append('-t -1 --expectSignal  0 -n _asimovB')
+    if 'asimovs' in options: optionList.append('-t -1 --expectSignal  1 -n _asimovS')
+    if 'asimovi' in options: optionList.append('-t -1 --expectSignal 15 -n _asimovI')
+    if 'autob'   in options: optionList.append('--autoBoundsPOIs="*"')
+    if 'negsign' in options: optionList.append('--rMin -10')
+    return ' '.join(optionList)
+
 def mlfits(opt):
 
     opt.combineAction = 'mlfits'
-    skipBOnlyFit = '--skipBOnlyFit' if 'skipbonly' in opt.option.lower() else ''
-    asimovOption = ''
-    if 'asimovb' in opt.option.lower(): asimovOption = '-t -1 --expectSignal 0  -n _asimovB'
-    if 'asimovs' in opt.option.lower(): asimovOption = '-t -1 --expectSignal 1  -n _asimovS'
-    if 'asimovi' in opt.option.lower(): asimovOption = '-t -1 --expectSignal 15 -n _asimovI'
-    opt.combineCommand = ' '.join(['combine -M FitDiagnostics', '--saveShapes', '--saveWithUncertainties', skipBOnlyFit, '--saveOverallShapes', asimovOption, 'combinedDatacard.txt' ])
+    fitOptions = getFitOptions(opt.option.lower())
+    opt.combineCommand = ' '.join(['combine -M FitDiagnostics', fitOptions, 'combinedDatacard.txt' ])
     opt.combineOutDir = opt.mlfitdir
 
     runCombine(opt)
@@ -216,15 +226,12 @@ def mlfits(opt):
 def impactsPlots(opt):
 
     opt.combineAction = 'impacts'
-    asimovOption = ''
-    if 'asimovb' in opt.option.lower(): asimovOption = ' -t -1 --expectSignal 0  -n _asimovB'
-    if 'asimovs' in opt.option.lower(): asimovOption = ' -t -1 --expectSignal 1  -n _asimovS'
-    if 'asimovi' in opt.option.lower(): asimovOption = ' -t -1 --expectSignal 15 -n _asimovI'
-    autoOption = ' --autoBoundsPOIs="*"' if 'autob'  in opt.option.lower() else ''
+    opt.option += 'noshapes'
+    fitOptions = getFitOptions(opt.option.lower())
     stepList = [ 'text2workspace.py combinedDatacard.txt']
-    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 --doInitialFit --robustFit 1'+autoOption+asimovOption)
-    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 --robustFit 1 --doFits --parallel 100'+autoOption+asimovOption)
-    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 -o impacts.json '+autoOption+asimovOption)
+    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 --doInitialFit --robustFit 1 '+fitOptions)
+    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 --robustFit 1 --doFits --parallel 100 '+fitOptions)
+    stepList.append('combineTool.py -M Impacts -d combinedDatacard.root -m 125 -o impacts.json '+fitOptions)
     stepList.append('plotImpacts.py -i impacts.json -o impacts')
     opt.combineCommand = ' ; '.join(stepList)
     opt.combineOutDir = opt.impactdir
