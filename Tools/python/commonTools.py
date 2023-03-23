@@ -185,6 +185,14 @@ def getSamples(opt):
 
     return getDictionaries(opt, 'samples')
 
+def getSignals(opt):
+
+    signals, samples = {}, getSamples(opt)
+    for sample in samples:
+        if samples[sample]['isSignal']:
+            signals[sample] = samples[sample]
+    return signals
+
 def getSamplesInLoop(configuration, year, tag, sigset, combineAction=''):
 
     return getDictionariesInLoop(configuration, year, tag, sigset, 'samples', combineAction)
