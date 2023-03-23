@@ -139,7 +139,13 @@ def runCombine(opt):
             combineCommandList = [ ]
             if makeDatacards:  combineCommandList.append(prepareDatacards(opt2, 'MASSPOINT', True))
             combineCommandList.append(combineDatacards(opt2, 'MASSPOINT', True))
-            if runCombineJob:  combineCommandList.append(opt.combineCommand)
+            if runCombineJob:  
+                combineCommandList.append(opt.combineCommand)
+                if opt.combineAction=='impacts':
+                   impactPlotDir = '/'.join([ opt2.baseDir, opt.plotsdir, year, 'Impacts' ])
+                   os.system('mkdir -p '+impactPlotDir)
+                   impactPlotString = '_asimovB' if 'asimovb' in opt.option.lower() else '_asimovS' if 'asimovs' in opt.option.lower() else '_asimovI' if 'asimovi' in opt.option.lower() else ''
+                   combineCommandList.append('mv impacts.pdf '+impactPlotDir+'/'+outtag+'_MASSPOINT'+impactPlotString +'.pdf')
             combineCommandList.append( 'cd '+opt2.baseDir )
             if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, outtag, 'MASSPOINT', True))
 
