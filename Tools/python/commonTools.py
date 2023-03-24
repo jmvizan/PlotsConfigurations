@@ -365,7 +365,7 @@ def copyIndexForPlots(mainPlotdir, finalPlotDir):
 
     subDir = mainPlotdir
     for subdir in finalPlotDir.split('/'):
-        if subdir not in subDir:
+        if subdir not in subDir.split('/'):
             subDir += '/'+subdir
             os.system('cp ../../index.php '+subDir)
 
@@ -663,7 +663,8 @@ def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
         outputFileName = 'higgsCombine_'+limitRun+'.AsymptoticLimits.mH120.root'
     elif combineAction=='mlfits': 
         combineOutDir = 'mlfitdir'
-        outputFileName = 'fitDiagnostics.root'
+        asimovOption = '_asimovB' if 'asimovb' in opt.option.lower() else '_asimovS' if 'asimovs' in opt.option.lower() else '_asimovI' if 'asimovi' in opt.option.lower() else ''
+        outputFileName = 'fitDiagnostics'+asimovOption+'.root'
     elif combineAction=='impacts':
         combineOutDir = 'impactdir'
         outputFileName = 'impacts.pdf'

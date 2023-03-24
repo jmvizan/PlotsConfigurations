@@ -124,7 +124,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     os.system('mkdir -p '+plotsDir+' ; cp ../../index.php '+opt.plotsdir)
     commonTools.copyIndexForPlots(opt.plotsdir, plotsDir)
 
-    plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+year+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
+    plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+yearInFit+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
 
     if 'normalizedCR' in opt.option: plotCommand += ' --plotNormalizedCRratio=1' # This is not yet re-implemented in latino's mkPlot.py
     elif 'normalized' in opt.option: plotCommand += ' --plotNormalizedDistributions'
@@ -135,7 +135,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     if 'fit' in opt.option.lower() : plotCommand += ' --postFit=p'
     if 'nostat' in opt.option.lower() : plotCommand += ' --removeMCStat'
     if 'nuisanceVariations' in opt.option: plotCommand += ' --nuisanceVariations'
-
+ 
     os.system(plotCommand)
 
     if not opt.keepallplots:
@@ -249,6 +249,7 @@ def mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, signal, 
     postFitPlotCommandList.append('--inputFileCombine='+commonTools.getCombineFitFileName(opt, signal, fittedYear, tag))
     postFitPlotCommandList.append('--inputFile='+commonTools.getShapeFileName(opt.shapedir, year, tag.split('_')[0], opt.sigset, opt.fileset))
     postFitPlotCommandList.append('--outputFile='+commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', tagoption))
+    if 'asimov' in opt.option.lower(): postFitPlotCommandList.append('--getDataFromCombine')
 
     os.system('mkPostFitPlot.py '+' '.join(postFitPlotCommandList))
 
