@@ -126,7 +126,7 @@ def runCombine(opt):
     for year in yearList:
         for tag in opt.tag.split('-'):
 
-            outtag = commonTools.getTagForDatacards(tag, opt.sigset)
+            outtag = commonTools.getTagForDatacards(tag, opt.sigset)+getAsimovFlag(opt.option)
             opt2.year, opt2.tag = year, outtag
             #datacardList = getDatacardList(opt2)
             combineJobs = { } 
@@ -144,8 +144,7 @@ def runCombine(opt):
                 if opt.combineAction=='impacts':
                    impactPlotDir = '/'.join([ opt2.baseDir, opt.plotsdir, year, 'Impacts' ])
                    os.system('mkdir -p '+impactPlotDir)
-                   impactPlotString = '_asimovB' if 'asimovb' in opt.option.lower() else '_asimovS' if 'asimovs' in opt.option.lower() else '_asimovI' if 'asimovi' in opt.option.lower() else ''
-                   combineCommandList.append('mv impacts.pdf '+impactPlotDir+'/'+outtag+'_MASSPOINT'+impactPlotString +'.pdf')
+                   combineCommandList.append('mv impacts.pdf '+impactPlotDir+'/'+outtag+'_MASSPOINT.pdf')
             combineCommandList.append( 'cd '+opt2.baseDir )
             if cleanDatacards: combineCommandList.append(commonTools.cleanSignalDatacards(opt2, year, outtag, 'MASSPOINT', True))
 
@@ -206,6 +205,13 @@ def limits(opt):
 
     runCombine(opt)
 
+def getAsimovFlag(option):
+
+    if 'asimovb' in option.lower(): return '_asimovB'
+    if 'asimovs' in option.lower(): return '_asimovS'
+    if 'asimovi' in option.lower(): return '_asimovI'
+    return ''
+
 def getFitOptions(options):
 
     optionList = []
@@ -213,9 +219,11 @@ def getFitOptions(options):
         optionList.extend([ '--saveShapes', '--saveWithUncertainties', '--saveOverallShapes' ])
         if 'asimov' in options: optionList.extend([ '--numToysForShapes 200', '--plots' ])
     if 'skipbonly' in options: optionList.append('--skipBOnlyFit')
-    if 'asimovb' in options: optionList.append('-t -1 --expectSignal  0 -n _asimovB')
-    if 'asimovs' in options: optionList.append('-t -1 --expectSignal  1 -n _asimovS')
-    if 'asimovi' in options: optionList.append('-t -1 --expectSignal 15 -n _asimovI')
+    if 'asimov' in options:
+        if 'asimovb' in options: optionList.append('-t -1 --expectSignal  0')
+        if 'asimovs' in options: optionList.append('-t -1 --expectSignal  1')
+        if 'asimovi' in options: optionList.append('-t -1 --expectSignal 15')
+        optionList.append('-n '+getAsimovFlag(options))
     if 'autob'   in options: optionList.append('--autoBoundsPOIs="*"')
     if 'negsign' in options: optionList.append('--rMin -10')
     return ' '.join(optionList)
@@ -249,10 +257,7 @@ def diffNuisances(opt):
     opt.baseDir = os.getenv('PWD')
     commandList = [ setupCombineCommand(opt, ' ; ') ]
     nuisCommand = 'python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py  -a fitDiagnostics.root -g plots.root > diffNuisances.txt'
-    outputString = ''
-    if 'asimovb' in opt.option.lower(): outputString = '_asimovB'
-    if 'asimovs' in opt.option.lower(): outputString = '_asimovS'
-    if 'asimovi' in opt.option.lower(): outputString = '_asimovI'
+    outputString = getAsimovFlag(opt.option)
     nuisCommand = nuisCommand.replace('.root', outputString+'.root').replace('.txt', outputString+'.txt')
 
     yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
