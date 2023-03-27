@@ -649,6 +649,13 @@ def mkPseudoData(opt, reftag=None, refsigset=None):
 
 ### Modules for analyzing results from combine
 
+def getAsimovFlag(option):
+
+    if 'asimovb' in option.lower(): return '_asimovB'
+    if 'asimovs' in option.lower(): return '_asimovS'
+    if 'asimovi' in option.lower(): return '_asimovI'
+    return ''
+
 def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
 
     if year=='': year = opt.year
@@ -663,8 +670,7 @@ def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
         outputFileName = 'higgsCombine_'+limitRun+'.AsymptoticLimits.mH120.root'
     elif combineAction=='mlfits': 
         combineOutDir = 'mlfitdir'
-        asimovOption = '_asimovB' if 'asimovb' in opt.option.lower() else '_asimovS' if 'asimovs' in opt.option.lower() else '_asimovI' if 'asimovi' in opt.option.lower() else ''
-        outputFileName = 'fitDiagnostics'+asimovOption+'.root'
+        outputFileName = 'fitDiagnostics'+getAsimovFlag(opt.option)+'.root'
     elif combineAction=='impacts':
         combineOutDir = 'impactdir'
         outputFileName = 'impacts.pdf'
