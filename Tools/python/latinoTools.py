@@ -113,7 +113,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     else:
         fileset = ''
         if yearInFit==year: yearInFit = ''
-        plotsDirList.extend([ fitoption+tag.split('___')[0].replace('__','/'), yearInFit ])
+        plotsDirList.extend([ tag.split('___')[0].replace('__','/'), commonTools.getCombineOptionFlag(opt.option,True), fitoption, yearInFit ])
         if fitoption=='PostFitS': plotAsExotics = False
 
     if sigset!='SM': plotsDirList.append(sigset.split(':')[-1]+extraOutDirFlag)
@@ -246,7 +246,7 @@ def mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, signal, 
     if fitoption=='PostFitB': postFitPlotCommandList.append('--getSignalFromPrefit=1')
 
     tagoption = fitoption if year==fittedYear else fitoption+year
-    postFitPlotCommandList.append('--inputFileCombine='+commonTools.getCombineFitFileName(opt, signal, fittedYear, tag))
+    postFitPlotCommandList.append('--inputFileCombine='+commonTools.getCombineFitFileName(opt, signal, fittedYear, tag+commonTools.getCombineOptionFlag(opt.option)))
     postFitPlotCommandList.append('--inputFile='+commonTools.getShapeFileName(opt.shapedir, year, tag.split('_')[0], opt.sigset, opt.fileset))
     postFitPlotCommandList.append('--outputFile='+commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', tagoption))
     if 'asimov' in opt.option.lower(): postFitPlotCommandList.append('--getDataFromCombine')
@@ -267,7 +267,16 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
     fittedYearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
     if 'splitandcomb' in opt.option: fittedYearList.append(opt.year)
 
-    for tag in opt.tag.split('-'):
+    for inputtag in opt.tag.split('-'):
+
+        tag = inputtag
+        if '_asimov' in inputtag:
+           if 'asimov' not in opt.option:
+               for tagsplit in inputtag.split('_'):
+                   if 'asimov' in tagsplit: opt.option += tagsplit.lower()
+           tag = tag.replace(commonTools.getCombineOptionFlag(opt.option), '')    
+        combinetag = tag+commonTools.getCombineOptionFlag(opt.option)
+ 
         for fittedYear in fittedYearList:
 
             yearInFitList = fittedYear.split('-')
@@ -277,12 +286,20 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
             for signal in signals:
                 if signals[signal]['isSignal']:
 
-                    if not commonTools.goodCombineFit(opt, fittedYear, tag, signal, fitoption):
+                    if 'PostFit' in fitoption:
+                        covariancePlot = commonTools.getSignalDir(opt, fittedYear, combinetag, signal, 'mlfitdir') 
+                        covariancePlot += '/covariance_fit_'+fitoption.lower().replace('postfit','')+'.png'
+                        if os.path.isfile(covariancePlot):
+                            plotsDir = '/'.join([ opt.plotsdir, fittedYear, tag, commonTools.getCombineOptionFlag(opt.option,True), fitoption ])
+                            os.system('mkdir -p '+plotsDir+' ; cp '+covariancePlot+ ' '+plotsDir)
+
+                    if not commonTools.goodCombineFit(opt, fittedYear, combinetag, signal, fitoption):
                         print 'Warning in postFitPlots: no good fit for year='+fittedYear+', tag='+tag+', signal='+signal+', fitoption='+fitoption
 
                     sigset = opt.sigset if opt.sigset=='' or opt.sigset=='SM' else 'SM-'+signal if 'SM' in opt.sigset else signal
 
                     for year in yearInFitList:
+                        if 'singleyear' in opt.option and 'singleyear'+str(year) not in opt.option: continue
 
                         tagoption = fitoption if year==fittedYear else fitoption+year
                         postFitShapeFile = commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', tagoption)    

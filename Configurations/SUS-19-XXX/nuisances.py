@@ -452,7 +452,7 @@ rateparameters = {
     'NoJetRate_JetBack' : {
         'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
         'subcuts' : [ '_NoJet_' ],
-        'limits'  : '[0.5,1.5]',
+        #'limits'  : '[0.5,1.5]',
     },
     'JetRate_JetBack' : {
         'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
@@ -468,13 +468,16 @@ if '_NoWWRate' not in opt.tag:
     rateparameters['NoJetRate_DibosonBack'] = {
         'samples' : [ 'WW', 'WZ' ],
         'subcuts' : [ '_NoJet_' ],
-        'limits'  : '[0.7,1.3]'
+        #'limits'  : '[0.7,1.3]'
     }
     rateparameters['JetRate_DibosonBack'] = {
         'samples' : [ 'WW', 'WZ' ],
         'subcuts' : [ '_NoTag_' ],
         'bondrate' : 'NoJetRate_DibosonBack',
     }
+if '_NoJetBond' not in opt.tag:
+    rateparameters['NoJetRate_JetBack']['limits'] = '[0.5,1.5]'
+    rateparameters['NoJetRate_DibosonBack']['limits'] = '[0.7,1.3]'
 
 if 'FitCR' in opt.tag:
     backgroundCRs = { 'ttZ' : { 'samples' : [ 'ttZ' ],
@@ -499,7 +502,7 @@ if 'FitCR' in opt.tag:
                 rateparameters['CR'+region+controlregion] = { }
                 rateparameters['CR'+region+controlregion]['samples'] = backgroundCRs[controlregion]['samples']
                 rateparameters['CR'+region+controlregion]['subcuts'] = backgroundCRs[controlregion]['regions'][region]
-                rateparameters['CR'+region+controlregion]['limits'] = '[0.3,1.7]'
+                if '_NoCRBond' not in opt.tag: rateparameters['CR'+region+controlregion]['limits'] = '[0.3,1.7]'
 
 if hasattr(opt, 'outputDirDatacard'):
     for mt2llregion in mt2llRegions: 

@@ -126,7 +126,7 @@ def runCombine(opt):
     for year in yearList:
         for tag in opt.tag.split('-'):
 
-            outtag = commonTools.getTagForDatacards(tag, opt.sigset)+commonTools.getAsimovFlag(opt.option)
+            outtag = commonTools.getTagForDatacards(tag, opt.sigset)+commonTools.getCombineOptionFlag(opt.option)
             opt2.year, opt2.tag = year, outtag
             #datacardList = getDatacardList(opt2)
             combineJobs = { } 
@@ -139,7 +139,7 @@ def runCombine(opt):
             combineCommandList = [ ]
             if makeDatacards:  combineCommandList.append(prepareDatacards(opt2, 'MASSPOINT', True))
             combineCommandList.append(combineDatacards(opt2, 'MASSPOINT', True))
-            if runCombineJob:  
+            if runCombineJob: 
                 combineCommandList.append(opt.combineCommand)
                 if opt.combineAction=='impacts':
                    impactPlotDir = '/'.join([ opt2.baseDir, opt.plotsdir, year, 'Impacts' ])
@@ -161,11 +161,6 @@ def runCombine(opt):
                             os.system('rm -f '+combineOutputFileName)
                         elif commonTools.isGoodFile(combineOutputFileName, 6000.):
                             continue
-
-                    #os.system('mkdir -p '+opt2.combineSignalDir)
-
-                    #combineCommandList = [ ]   
-                    #if makeDatacards:  combineCommandList.append(prepareDatacards(opt2, sample, True))
                     #combineCommandList.append(combineDatacards(opt2, sample, datacardList, True))
                     #if runCombineJob:  combineCommandList.append(' '.join(['combine', opt.combineOption, 'combinedDatacard.txt' ]))
                     #combineCommandList.append( 'cd '+opt2.baseDir )
@@ -198,8 +193,12 @@ def writeDatacards(opt):
 def limits(opt):
 
     opt.combineAction = 'limits'
-    limitRun = getLimitRun(opt.unblind)
-    limitMethod = '-M HybridNew --LHCmode LHC-limits' if 'Toy' in opt.option else ' '.join([ '-M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun ])
+    if 'toy' in opt.option.lower():
+        opt.batchQueue = 'tomorrow'
+        limitMethod = '-M HybridNew --LHCmode LHC-limits'
+    else:
+        limitRun = getLimitRun(opt.unblind) 
+        limitMethod = ' '.join([ '-M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun ])
     opt.combineCommand = ' '.join([ 'combine', limitMethod, 'combinedDatacard.txt' ])
     opt.combineOutDir = opt.limitdir
 
@@ -216,7 +215,7 @@ def getFitOptions(options):
         if 'asimovb' in options: optionList.append('-t -1 --expectSignal  0')
         if 'asimovs' in options: optionList.append('-t -1 --expectSignal  1')
         if 'asimovi' in options: optionList.append('-t -1 --expectSignal 15')
-        optionList.append('-n '+commonTools.getAsimovFlag(options))
+        optionList.append('-n '+commonTools.getCombineOptionFlag(options))
     if 'autob'   in options: optionList.append('--autoBoundsPOIs="*"')
     if 'negsign' in options: optionList.append('--rMin -10')
     return ' '.join(optionList)
@@ -250,7 +249,7 @@ def diffNuisances(opt):
     opt.baseDir = os.getenv('PWD')
     commandList = [ setupCombineCommand(opt, ' ; ') ]
     nuisCommand = 'python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py  -a fitDiagnostics.root -g plots.root > diffNuisances.txt'
-    outputString = commonTools.getAsimovFlag(opt.option)
+    outputString = commonTools.getCombineOptionFlag(opt.option)
     nuisCommand = nuisCommand.replace('.root', outputString+'.root').replace('.txt', outputString+'.txt')
 
     yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
