@@ -169,6 +169,7 @@ def getDictionaries(optOrig, lastDictionary='nuisances'):
             print '    Error: sample cfg file', dictionaryCfg, 'not found'
             exit()
 
+    optOrig.lumi = opt.lumi
     if   lastDictionaryIndex==0: return samples
     elif lastDictionaryIndex==1: return samples, cuts
     elif lastDictionaryIndex==2: return samples, cuts, variables
@@ -664,6 +665,7 @@ def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
 
     if year=='': year = opt.year
     if tag=='': tag = opt.tag
+    if getCombineOptionFlag(opt.option) not in tag: tag += getCombineOptionFlag(opt.option)
 
     if hasattr(opt, 'combineAction'):
         combineAction = opt.combineAction
@@ -730,7 +732,44 @@ def massScanLimits(opt):
 
 def fitMatrices(opt):
 
-    print 'please, port me fromhttps://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkMatrixPlots.py :('
+    signals = getSignals(opt)
+    yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]    
+
+    fitlevels = []
+    if 'prefit' in opt.option.lower(): fitlevels.append('prefit')
+    elif 'postfitb' in opt.option.lower(): fitlevels.append('fit_b')
+    elif 'postfits' in opt.option.lower(): fitlevels.append('fit_s')
+    else: print 'Error in fitMatrices: please choose a fit level (prefit, postfitb, postfits)'
+
+    for year in yearList:
+        for tag in opt.tag.split('-'):
+            for fitlevel in fitlevels:
+
+                opt2 = copy.deepcopy(opt)
+                opt2.year, opt2.tag = year, year+tag
+                signals = getSignals(opt2)
+                luminosity = int(round(opt.lumi, 0)) if opt.lumi>100 else round(opt.lumi, 1)
+                legend = '\'L = '+str(luminosity)+'/fb (#sqrt{s} = 13 TeV)\''
+                fitoption = fitlevel.replace('prefit','PreFit').replace('fit_b','PostFitB').replace('fit_s','PostFitS')
+                mainOutputDir = '/'.join([ opt.plotsdir, year, tag, getCombineOptionFlag(opt.option,True) ])        
+
+                commandList = [ '--postFit='+fitlevel, '--legend='+legend ]
+                if 'nosavecov' not in opt.option.lower(): commandList.append('--saveCovariance')
+                if 'regionsToRemove:' in opt.option:
+                    commandList.append('--regionsToRemove='+opt.option.split('regionsToRemove:')[1].split(':')[0])
+ 
+                fitoption = fitlevel.replace('prefit','PreFit').replace('fit_b','PostFitB').replace('fit_s','PostFitS')
+                mainOutputDir = '/'.join([ opt.plotsdir, year, tag, getCombineOptionFlag(opt.option,True) ])
+
+                for signal in signals:
+
+                    signalCommandList = commandList
+                    signalCommandList.append('--inputFile='+getCombineFitFileName(opt, signal, year, tag))
+                    signalCommandList.append('--outputDir='+'/'.join([ mainOutputDir, fitoption, signal ]))
+                    signalCommandList.append('--signal='+signal)
+
+                    os.system('mkMatrixPlots.py '+' '.join(signalCommandList))
+                    copyIndexForPlots(opt.plotsdir, '/'.join([ mainOutputDir, fitoption, signal ]))
 
 def postFitYieldsTables(opt, cardNameStructure='cut', masspoints=''):
 
