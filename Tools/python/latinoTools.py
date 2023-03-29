@@ -258,7 +258,7 @@ def mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, signal, 
 
     os.system('mkPostFitPlot.py '+' '.join(postFitPlotCommandList))
 
-def postFitPlots(opt, convertShapes=True, makePlots=True):
+def postFitPlots(opt, makePlots=True):
 
     fitoption = ''
     if 'prefit' in opt.option.lower(): fitoption = 'PreFit'
@@ -309,7 +309,7 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
                         tagoption = fitoption if year==fittedYear else fitoption+year
                         postFitShapeFile = commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', tagoption)    
 
-                        if convertShapes or not os.path.isfile(postFitShapeFile):
+                        if not opt.recover or not os.path.isfile(postFitShapeFile):
  
                             os.system('rm -f '+postFitShapeFile)
                             os.system('mkdir -p '+commonTools.getShapeDirName(opt.shapedir, fittedYear, tag, tagoption))
@@ -332,12 +332,7 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
 
 def postFitShapes(opt):
 
-    convertShapes = True if not opt.recover else False
-    postFitPlots(opt, convertShapes, False) 
-
-def postFitPlotsOnly(opt):
-
-    postFitPlots(opt, False, True)
+    postFitPlots(opt, False) 
 
 # Generic plots from mkShapes output
 
