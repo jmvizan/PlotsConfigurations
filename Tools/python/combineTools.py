@@ -194,7 +194,7 @@ def limits(opt):
 
     opt.combineAction = 'limits'
     if 'toy' in opt.option.lower():
-        opt.batchQueue = 'tomorrow'
+        opt.batchQueue = 'nextweek'
         limitMethod = '-M HybridNew --LHCmode LHC-limits'
     else:
         limitRun = getLimitRun(opt.unblind) 

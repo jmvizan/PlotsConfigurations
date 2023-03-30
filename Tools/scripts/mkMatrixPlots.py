@@ -119,24 +119,26 @@ def keepRegion(label, regionsToRemove):
 
     return True
 
-def makeHistoCopy(inputHisto, regionsToRemove='', fillContent=True):
+def makeHistoCopy(inputHisto, regionsToRemove='', histoName='CovarianceMatrix'):
+
+    zeroBins = []
+    nBinsX = 0
+    for xb in range(inputHisto.GetNbinsX()):
+        if keepRegion(inputHisto.GetXaxis().GetBinLabel(xb+1), regionsToRemove):
+            if inputHisto.GetBinContent(xb+1, xb+1)!=0.: nBinsX += 1
+            else: zeroBins.append(inputHisto.GetXaxis().GetBinLabel(xb+1))
+
+    outputHisto = ROOT.TH2D(histoName, '', nBinsX, 0., nBinsX, nBinsX, 0., nBinsX)
 
     nBinsX = 0
     for xb in range(inputHisto.GetNbinsX()) :
-        if keepRegion(inputHisto.GetXaxis().GetBinLabel(xb+1), regionsToRemove) :
-            nBinsX += 1
-
-    outputHisto = ROOT.TH2D('CovarianceMatrix', '', nBinsX, 0., nBinsX, nBinsX, 0., nBinsX)
-
-    nBinsX = 0
-    for xb in range(inputHisto.GetNbinsX()) :
-        if keepRegion(inputHisto.GetXaxis().GetBinLabel(xb+1), regionsToRemove) :
+        if keepRegion(inputHisto.GetXaxis().GetBinLabel(xb+1), regionsToRemove) and inputHisto.GetXaxis().GetBinLabel(xb+1) not in zeroBins:
 
             nBinsY = 0
             for yb in range(inputHisto.GetNbinsY()) :
-                if keepRegion(inputHisto.GetYaxis().GetBinLabel(yb+1), regionsToRemove) :
+                if keepRegion(inputHisto.GetYaxis().GetBinLabel(yb+1), regionsToRemove) and inputHisto.GetYaxis().GetBinLabel(yb+1) not in zeroBins:
 
-                    if fillContent:
+                    if histoName=='CovarianceMatrix':
                         outputHisto.SetBinContent(nBinsX+1, nBinsY+1, inputHisto.GetBinContent(xb+1, yb+1))
                                                   
                     if nBinsX==0 :
@@ -199,8 +201,7 @@ if __name__ == '__main__':
     CorrelationMatrix = ROOT.TMatrixD(covariance.GetNbinsX(), covariance.GetNbinsY())
     CorrelationMatrix.Mult(AuxiliaryMatrix, DiagonalMatrix)
     
-    correlation = makeHistoCopy(covariance, fillContent=False)
-    correlation.SetName('CorrelationMatrix')
+    correlation = makeHistoCopy(covariance, histoName='CorrelationMatrix')
     
     for xb in range(covariance.GetNbinsX()) :
         for yb in range(covariance.GetNbinsY()) :

@@ -28,6 +28,14 @@ def isGoodFile(filename, minSize=100000.):
     fileSize = os.path.getsize(filename)
     return fileSize>minSize
 
+def compile(opt):
+  
+    if 'base' in opt.option.lower(): directory = '$CMSSW_BASE/src/' 
+    elif 'tool' in opt.option.lower() or opt.option=='': directory = '$CMSSW_BASE/src/PlotsConfigurations/Tools/'
+    elif 'latino' in opt.option.lower(): directory = '$CMSSW_BASE/src/LatinoAnalysis/'
+    else: directory = opt.option
+    os.system('cd '+directory+' ; scram b')
+
 ### Plot utilities
 
 def bookHistogram(name, xBins, yBins=(), title='', style=''):
@@ -409,6 +417,13 @@ def purgeDatacards(opt):
 
 # jobs
 
+def showQueue(opt):
+
+    if 'ifca' in os.uname()[1] or 'cloud' in os.uname()[1]: 
+        print '\nAvailable queues in slurm:\n cms_main = 24 hours\n cms_med  = 8 hours\n cms_high = 3 hours\n'
+    else: #cern 
+        print '\nAvailable queues in condor:\n espresso     = 20 minutes\n microcentury = 1 hour\n longlunch    = 2 hours\n workday      = 8 hours\n tomorrow     = 1 day\n testmatch    = 3 days\n nextweek     = 1 week\n'
+
 def batchQueue(opt, batchQueue):
 
     if 'ifca' in os.uname()[1] or 'cloud' in os.uname()[1]:
@@ -758,9 +773,6 @@ def fitMatrices(opt):
                 if 'regionsToRemove:' in opt.option:
                     commandList.append('--regionsToRemove='+opt.option.split('regionsToRemove:')[1].split(':')[0])
  
-                fitoption = fitlevel.replace('prefit','PreFit').replace('fit_b','PostFitB').replace('fit_s','PostFitS')
-                mainOutputDir = '/'.join([ opt.plotsdir, year, tag, getCombineOptionFlag(opt.option,True) ])
-
                 for signal in signals:
 
                     signalCommandList = commandList
