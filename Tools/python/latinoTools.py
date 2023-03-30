@@ -110,10 +110,12 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
         fileset = opt.fileset
         sample = '' if (sigset=='SM' or sigset=='') else sigset.split(':')[-1]+extraOutDirFlag
         plotsDirList.extend([ tag, sample ])
+        lumiYear = year
 
     else:
         fileset = ''
         if yearInFit==year: yearInFit = ''
+        lumiYear = yearInFit if yearInFit!='' else year
         signal = '' 
         if sigset!='SM' and sigset!='':
             signal = sigset
@@ -129,7 +131,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     os.system('mkdir -p '+plotsDir+' ; cp ../../index.php '+opt.plotsdir)
     commonTools.copyIndexForPlots(opt.plotsdir, plotsDir)
 
-    plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+yearInFit+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
+    plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+lumiYear+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
 
     if 'normalizedCR' in opt.option: plotCommand += ' --plotNormalizedCRratio=1' # This is not yet re-implemented in latino's mkPlot.py
     elif 'normalized' in opt.option: plotCommand += ' --plotNormalizedDistributions'
@@ -140,7 +142,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     if 'fit' in opt.option.lower() : plotCommand += ' --postFit=p'
     if 'nostat' in opt.option.lower() : plotCommand += ' --removeMCStat'
     if 'nuisanceVariations' in opt.option: plotCommand += ' --nuisanceVariations'
- 
+
     os.system(plotCommand)
 
     if not opt.keepallplots:
