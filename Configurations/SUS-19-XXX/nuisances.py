@@ -168,7 +168,7 @@ nuisances['isrFS']  = {
 for sample in samples.keys():
     if 'isrObservable' in samples[sample]:
             if samples[sample]['isrObservable']=='njetISR':
-                isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
+                isrWeight = [ '0.5*(3.*isrW-1.)/isrW', '0.5*(isrW+1.)/isrW' ]
             elif samples[sample]['isrObservable']=='ptISR':
                 isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
             else:
