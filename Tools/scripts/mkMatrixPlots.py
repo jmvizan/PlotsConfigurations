@@ -9,7 +9,7 @@ import logging
 import os
 import math
 
-def makeMatrixPlot(outputHisto, outputFile, regionsToRemove, legend):
+def makeMatrixPlot(outputHisto, outputFile, legend):
         
     ROOT.gStyle.SetOptFit(0)
     ROOT.gStyle.SetOptStat(0)
@@ -31,7 +31,7 @@ def makeMatrixPlot(outputHisto, outputFile, regionsToRemove, legend):
 
     #pad.SetGridx()
     #pad.SetGridy()
-    if 'Covariance' in outputHisto.GetName():
+    if 'Covariance' in outputFile:
         pad.SetLogz()
     pad.SetLeftMargin(0.13);
     pad.SetRightMargin(0.13);
@@ -40,7 +40,7 @@ def makeMatrixPlot(outputHisto, outputFile, regionsToRemove, legend):
 
     pad.cd()
 
-    if 'Covariance' in outputHisto.GetName():
+    if 'Covariance' in outputFile:
         outputHisto.SetMinimum(0.01);
     #outputHisto.SetMaximum(+1.);
 
@@ -85,7 +85,6 @@ def makeMatrixPlot(outputHisto, outputFile, regionsToRemove, legend):
     T3.SetTextSize(0.032)
     T3.Draw()
 
-    if regionsToRemove!='': outputFile += '_excl-'+regionsToRemove
     canvas.Print(outputFile+'.pdf')
     canvas.Print(outputFile+'.root')
 
@@ -109,40 +108,42 @@ def convertTitle(yTitle):
 
     return yTitle
 
-def keepRegion(label, regionsToRemove):
+def keepRegion(label, binsToRemove):
 
-    if regionsToRemove=='': return True
+    if binsToRemove=='': return True
 
-    for region in regionsToRemove.split(','):
-        if region in label:
+    for binToRemove in binsToRemove.split(','):
+        if binToRemove in label:
            return False
 
     return True
 
-def makeHistoCopy(inputHisto, regionsToRemove='', histoName='CovarianceMatrix'):
+def makeHistoCopy(inputHisto, binsToRemove='', fillOutputHisto=True, invertAxis=False):
 
     zeroBins = []
     nBinsX = 0
     for xb in range(inputHisto.GetNbinsX()):
-        if keepRegion(inputHisto.GetXaxis().GetBinLabel(xb+1), regionsToRemove):
+        if keepRegion(inputHisto.GetXaxis().GetBinLabel(xb+1), binsToRemove):
             if inputHisto.GetBinContent(xb+1, xb+1)!=0.: nBinsX += 1
             else: zeroBins.append(inputHisto.GetXaxis().GetBinLabel(xb+1))
 
-    outputHisto = ROOT.TH2D(histoName, '', nBinsX, 0., nBinsX, nBinsX, 0., nBinsX)
+    outputHisto = ROOT.TH2D('matrix', '', nBinsX, 0., nBinsX, nBinsX, 0., nBinsX)
 
     nBinsX = 0
     for xb in range(inputHisto.GetNbinsX()) :
-        if keepRegion(inputHisto.GetXaxis().GetBinLabel(xb+1), regionsToRemove) and inputHisto.GetXaxis().GetBinLabel(xb+1) not in zeroBins:
+        if keepRegion(inputHisto.GetXaxis().GetBinLabel(xb+1), binsToRemove) and inputHisto.GetXaxis().GetBinLabel(xb+1) not in zeroBins:
 
             nBinsY = 0
             for yb in range(inputHisto.GetNbinsY()) :
-                if keepRegion(inputHisto.GetYaxis().GetBinLabel(yb+1), regionsToRemove) and inputHisto.GetYaxis().GetBinLabel(yb+1) not in zeroBins:
+                if keepRegion(inputHisto.GetYaxis().GetBinLabel(yb+1), binsToRemove) and inputHisto.GetYaxis().GetBinLabel(yb+1) not in zeroBins:
 
-                    if histoName=='CovarianceMatrix':
-                        outputHisto.SetBinContent(nBinsX+1, nBinsY+1, inputHisto.GetBinContent(xb+1, yb+1))
+                    yBin = nBinsY+1 if not invertAxis else outputHisto.GetNbinsY()-nBinsY
+
+                    if fillOutputHisto:
+                        outputHisto.SetBinContent(nBinsX+1, yBin, inputHisto.GetBinContent(xb+1, yb+1))
                                                   
                     if nBinsX==0 :
-                        outputHisto.GetYaxis().SetBinLabel(nBinsY+1, convertTitle(inputHisto.GetYaxis().GetBinLabel(yb+1)))
+                        outputHisto.GetYaxis().SetBinLabel(yBin, convertTitle(inputHisto.GetYaxis().GetBinLabel(yb+1)))
 
                     nBinsY += 1
 
@@ -150,6 +151,10 @@ def makeHistoCopy(inputHisto, regionsToRemove='', histoName='CovarianceMatrix'):
             nBinsX += 1
                     
     return outputHisto
+
+def riseError(message):
+    print message
+    exit()
 
 ##Main body of the analysis
 if __name__ == '__main__':
@@ -162,29 +167,40 @@ if __name__ == '__main__':
     parser.add_option('--postFit'        , dest='postFit'        , help='postFit'        , default='fit_b'               , type='string')
     parser.add_option('--covarianceHisto', dest='covarianceHisto', help='covarianceHisto', default='overall_total_covar' , type='string')
     parser.add_option('--saveCovariance' , dest='saveCovariance' , help='saveCovariance' , default=False           , action='store_true')
-    parser.add_option('--regionsToRemove', dest='regionsToRemove', help='regionsToRemove', default=''                    , type='string')
+    parser.add_option('--doNuisances'    , dest='doNuisances'    , help='doNuisances'    , default=False           , action='store_true')
+    parser.add_option('--cutsToRemove'   , dest='cutsToRemove'   , help='cutsToRemove'   , default=''                    , type='string')
+    parser.add_option('--nuisToRemove'   , dest='nuisToRemove'   , help='nuisToRemove'   , default=''                    , type='string')
     parser.add_option('--outputDir'      , dest='outputDir'      , help='outputDir'      , default='./Plots/'            , type='string')
     parser.add_option('--signal'         , dest='signal'         , help='signal'         , default=''                    , type='string')
     parser.add_option('--legend'         , dest='legend'         , help='legend'         , default=''                    , type='string')
 
     (opt, args) = parser.parse_args()
 
-    outputName = opt.postFit
-    if opt.signal!='': outputName += '_'+opt.signal
+    if opt.doNuisances and 'prefit' in opt.postFit: riseError('mkMatrixPlot error: prefit parameters can not have covariance matrix') 
+    if not os.path.isfile(opt.inputFile): riseError('mkMatrixPlot error: input file '+opt.inputFile+' not found')
 
     os.system('mkdir -p '+opt.outputDir)
 
     fileIn = ROOT.TFile.Open(opt.inputFile, 'READ')
 
-    covariance = fileIn.Get('shapes_'+opt.postFit+'/'+opt.covarianceHisto)
+    inputHistoName, outputHistoName, binsToRemove = 'shapes_'+opt.postFit+'/overall_total_covar', 'CovarianceMatrix', opt.cutsToRemove
+    if opt.doNuisances:
+       inputHistoName, outputHistoName, binsToRemove = 'covariance_'+opt.postFit, 'CorrelationFit', opt.nuisToRemove
+
+    covariance = fileIn.Get(inputHistoName)
+    if not covariance: riseError('mkMatrixPlot error: '+inputHistoName+' not found in '+opt.inputFile)
     covariance.SetDirectory(0)
     fileIn.Close()
 
-    covariance = makeHistoCopy(covariance, regionsToRemove=opt.regionsToRemove)
+    outputName = opt.postFit
+    if opt.signal!='': outputName += '_'+opt.signal
+    if binsToRemove!='': outputName += '_excl-'+binsToRemove
 
-    if opt.saveCovariance:
-        covariance.SetName('CovarianceMatrix')
-        makeMatrixPlot(covariance, opt.outputDir+'/CovarianceMatrix_'+outputName, opt.regionsToRemove, opt.legend)
+    covariance = makeHistoCopy(covariance, binsToRemove=binsToRemove, invertAxis=opt.doNuisances)
+    if opt.saveCovariance or opt.doNuisances:
+        makeMatrixPlot(covariance, opt.outputDir+'/'+outputHistoName+'_'+outputName, opt.legend)
+
+    if opt.doNuisances: exit()
 
     CovarianceMatrix = ROOT.TMatrixD(covariance.GetNbinsX(), covariance.GetNbinsY())
     DiagonalMatrix = ROOT.TMatrixD(covariance.GetNbinsX(), covariance.GetNbinsY())
@@ -201,11 +217,11 @@ if __name__ == '__main__':
     CorrelationMatrix = ROOT.TMatrixD(covariance.GetNbinsX(), covariance.GetNbinsY())
     CorrelationMatrix.Mult(AuxiliaryMatrix, DiagonalMatrix)
     
-    correlation = makeHistoCopy(covariance, histoName='CorrelationMatrix')
+    correlation = makeHistoCopy(covariance, fillOutputHisto=False)
     
     for xb in range(covariance.GetNbinsX()) :
         for yb in range(covariance.GetNbinsY()) :
             correlation.SetBinContent(xb+1, yb+1, CorrelationMatrix(xb, yb))
 
-    makeMatrixPlot(correlation, opt.outputDir+'/CorrelationMatrix_'+outputName, opt.regionsToRemove, opt.legend)
+    makeMatrixPlot(correlation, opt.outputDir+'/'+outputHistoName.replace('Covariance','Correlation')+'_'+outputName, opt.legend)
 

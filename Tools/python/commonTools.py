@@ -770,8 +770,10 @@ def fitMatrices(opt):
 
                 commandList = [ '--postFit='+fitlevel, '--legend='+legend ]
                 if 'nosavecov' not in opt.option.lower(): commandList.append('--saveCovariance')
-                if 'regionsToRemove:' in opt.option:
-                    commandList.append('--regionsToRemove='+opt.option.split('regionsToRemove:')[1].split(':')[0])
+                if 'cutsToRemove:' in opt.option:
+                    commandList.append('--cutsToRemove='+opt.option.split('cutsToRemove:')[1].split(':')[0])
+                if 'nuisToRemove:' in opt.option:
+                    commandList.append('--nuisToRemove='+opt.option.split('nuisToRemove:')[1].split(':')[0])
  
                 for signal in signals:
 
@@ -780,7 +782,8 @@ def fitMatrices(opt):
                     signalCommandList.append('--outputDir='+'/'.join([ mainOutputDir, fitoption, signal ]))
                     signalCommandList.append('--signal='+signal)
 
-                    os.system('mkMatrixPlots.py '+' '.join(signalCommandList))
+                    if not 'onlynuis' in opt.option.lower(): os.system('mkMatrixPlots.py '+' '.join(signalCommandList))
+                    if not 'onlycuts' in opt.option.lower(): os.system('mkMatrixPlots.py '+' '.join(signalCommandList+['--doNuisances']))
                     copyIndexForPlots(opt.plotsdir, '/'.join([ mainOutputDir, fitoption, signal ]))
 
 def postFitYieldsTables(opt, cardNameStructure='cut', masspoints=''):

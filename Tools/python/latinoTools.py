@@ -294,13 +294,6 @@ def postFitPlots(opt, makePlots=True):
             for signal in signals:
                 if signals[signal]['isSignal']:
 
-                    if 'PostFit' in fitoption:
-                        covariancePlot  = commonTools.getSignalDir(opt, fittedYear, combinetag, signal, 'mlfitdir') 
-                        covariancePlot += '/covariance_'+fitoption.lower().replace('postfit','fit_')+'.png'
-                        if os.path.isfile(covariancePlot):
-                            plotsDir = '/'.join([ opt.plotsdir, fittedYear, tag, combinedataset, fitoption, signal ])
-                            os.system('mkdir -p '+plotsDir+' ; cp '+covariancePlot+ ' '+plotsDir)
-
                     if not commonTools.goodCombineFit(opt, fittedYear, combinetag, signal, fitoption):
                         print 'Warning in postFitPlots: no good fit for year='+fittedYear+', tag='+tag+', signal='+signal+', fitoption='+fitoption
 

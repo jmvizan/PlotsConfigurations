@@ -408,6 +408,9 @@ for cut in cuts: # TODO: Why only in the signal regions?
         nuisances['qcdScale']['cuts'].append(cut)
         nuisances['pdf']['cuts'].append(cut)
 
+if '_NoQCDScale' in opt.tag: del nuisances['qcdScale']
+if '_NoPDF'      in opt.tag: del nuisances['pdf']
+
 ### JES, JER and MET
 
 for treeNuisance in treeNuisances:

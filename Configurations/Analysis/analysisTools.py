@@ -362,6 +362,7 @@ def signalCombine(opt, action):
             if action=='impactsPlots': combineTools.impactsPlots(opt2)
             if action=='postFitShapes': latinoTools.postFitShapes(opt2)
             if action=='plots': latinoTools.plots(opt2)
+            if action=='fitMatrices': commonTools.fitMatrices(opt2)
 
 def signalLimits(opt):
 
@@ -382,6 +383,12 @@ def signalPostFitShapes(opt):
 def signalPlots(opt):
 
     signalCombine(opt, 'plots')
+
+def signalFitMatrices(opt):
+
+    if 'cutsToRemove' not in opt.option and 'allcuts' not in opt.option.lower(): opt.option += 'cutsToRemove:CR:'
+    if 'nuisToRemove' not in opt.option and 'allnuis' not in opt.option.lower(): opt.option += 'nuisToRemove:prop:' 
+    signalCombine(opt, 'fitMatrices')
 
 ### Post fit analysis
 
