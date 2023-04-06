@@ -12,10 +12,6 @@ def submitCombineJobs(opt, jobName, jobTag, combineJobs):
 
     latinoTools.submitJobs(opt, jobName, jobTag, combineJobs, splitBatch, jobSplit, nThreads)
 
-def setupCombineCommand(opt, joinstr='\n'):
-
-    return joinstr.join([ 'cd '+opt.combineLocation, 'eval `scramv1 runtime -sh`', 'cd '+opt.baseDir ])
-
 def getLimitRun(unblind):
 
     return 'Both' if unblind else 'Blind'
@@ -61,7 +57,7 @@ def getDatacardList(opt, signal):
 #def combineDatacards(opt, signal, datacardList, dryRun=False):
 def combineDatacards(opt, signal, dryRun=False):
 
-    combineDatacardCommandList = [ setupCombineCommand(opt) ]
+    combineDatacardCommandList = [ commonTools.setupCombineCommand(opt) ]
 
     signalOutputDir = commonTools.getSignalDir(opt, opt.year, opt.tag, signal, 'combineOutDir')
     combineDatacardCommandList.extend([ 'mkdir -p '+signalOutputDir, 'cd '+signalOutputDir ])
@@ -247,7 +243,7 @@ def impactsPlots(opt):
 def diffNuisances(opt):
 
     opt.baseDir = os.getenv('PWD')
-    commandList = [ setupCombineCommand(opt, ' ; ') ]
+    commandList = [ commonTools.setupCombineCommand(opt, ' ; ') ]
     nuisCommand = 'python $CMSSW_BASE/src/HiggsAnalysis/CombinedLimit/test/diffNuisances.py  -a fitDiagnostics.root -g plots.root > diffNuisances.txt'
     outputString = commonTools.getCombineOptionFlag(opt.option)
     nuisCommand = nuisCommand.replace('.root', outputString+'.root').replace('.txt', outputString+'.txt')

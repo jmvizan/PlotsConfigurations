@@ -10,7 +10,8 @@ from array import array
 ### Analysis defaults
 
 def setAnalysisDefaults(opt):
-    
+   
+    opt.baseDir = os.getenv('PWD')
     opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src'
     opt.isExotics = True
 

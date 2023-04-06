@@ -389,7 +389,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
 # Signal  
 
-signalType = 3 if ('SM' in opt.sigset or 'Backgrounds' in opt.sigset) else 0
+signalType = 1 #3 if ('SM' in opt.sigset or 'Backgrounds' in opt.sigset) else 0
 
 signalColor = 1 if (hasattr(opt, 'postFit') and opt.postFit=='n') else 880 # kViolet
 

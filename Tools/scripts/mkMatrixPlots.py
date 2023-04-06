@@ -176,7 +176,7 @@ if __name__ == '__main__':
 
     (opt, args) = parser.parse_args()
 
-    if opt.doNuisances and 'prefit' in opt.postFit: riseError('mkMatrixPlot error: prefit parameters can not have covariance matrix') 
+    if opt.doNuisances and 'prefit' in opt.postFit: riseError('mkMatrixPlot warning: prefit parameters do not have covariance matrix') 
     if not os.path.isfile(opt.inputFile): riseError('mkMatrixPlot error: input file '+opt.inputFile+' not found')
 
     os.system('mkdir -p '+opt.outputDir)

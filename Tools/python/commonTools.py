@@ -665,6 +665,10 @@ def mkPseudoData(opt, reftag=None, refsigset=None):
 
 ### Modules for analyzing results from combine
 
+def setupCombineCommand(opt, joinstr='\n'):
+
+    return joinstr.join([ 'cd '+opt.combineLocation, 'eval `scramv1 runtime -sh`', 'cd '+opt.baseDir ])
+
 def getCombineOptionFlag(option, isForPlot=False):
 
     combineOptionFlag = '_Toy' if 'toy' in option.lower() else ''
@@ -779,12 +783,12 @@ def fitMatrices(opt):
 
                     signalCommandList = commandList
                     signalCommandList.append('--inputFile='+getCombineFitFileName(opt, signal, year, tag))
-                    signalCommandList.append('--outputDir='+'/'.join([ mainOutputDir, fitoption, signal ]))
+                    signalCommandList.append('--outputDir='+'/'.join([ mainOutputDir, fitoption, signal, 'FitMatrices' ]))
                     signalCommandList.append('--signal='+signal)
 
                     if not 'onlynuis' in opt.option.lower(): os.system('mkMatrixPlots.py '+' '.join(signalCommandList))
                     if not 'onlycuts' in opt.option.lower(): os.system('mkMatrixPlots.py '+' '.join(signalCommandList+['--doNuisances']))
-                    copyIndexForPlots(opt.plotsdir, '/'.join([ mainOutputDir, fitoption, signal ]))
+                    copyIndexForPlots(opt.plotsdir, '/'.join([ mainOutputDir, fitoption, signal, 'FitMatrices' ]))
 
 def postFitYieldsTables(opt, cardNameStructure='cut', masspoints=''):
 
