@@ -394,7 +394,8 @@ for yeartomerge in yearstaglist:
                 continue
             if theoryNormalizations[sample]['qcdScaleStatus']==3:
                 qcdScaleVariations = [ ]
-                for i in [0, 1, 3, 5, 7, 8]:
+                qcdWeightIndexList = [0, 1, 3, 5, 7, 8] if len(theoryNormalizations[sample]['qcdScale'])==9 else [1, 6, 16, 26, 36, 41]
+                for i in qcdWeightIndexList:
                     qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
                 nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
             if not samples[sample]['isSignal'] and theoryNormalizations[sample]['pdfStatus']==3:
