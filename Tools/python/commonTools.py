@@ -691,8 +691,11 @@ def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
 
     if combineAction=='limits':
         combineOutDir = 'limitdir'
-        limitRun = 'Both' if opt.unblind else 'Blind'
-        outputFileName = 'higgsCombine_'+limitRun+'.AsymptoticLimits.mH120.root'
+        if 'toy' in opt.option:
+            outputFileName = 'higgsCombineTest.HybridNew.mH120.root'
+        else:
+            limitRun = 'Both' if opt.unblind else 'Blind'
+            outputFileName = 'higgsCombine_'+limitRun+'.AsymptoticLimits.mH120.root'
     elif combineAction=='mlfits': 
         combineOutDir = 'mlfitdir'
         outputFileName = 'fitDiagnostics'+getCombineOptionFlag(opt.option)+'.root'

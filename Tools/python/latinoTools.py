@@ -290,7 +290,7 @@ def mergePostFitShapes(opt, postFitShapeFile, signal, mlfitDir, cardsDir, year, 
     commandList.append('text2workspace.py combinedDatacard__'+outputCut+'.txt')
     commandList.append('PostFitShapesFromWorkspace -w combinedDatacard__'+outputCut+'.root -o '+outputCut+'.root -d combinedDatacard__'+outputCut+'.txt -f '+mlfitDir+'/fitDiagnostics'+combinedataset+'.root:'+fitdirectory+' '+postfitoption+' --sampling --total-shapes')    
     commandList.append('cd '+opt.baseDir+'; eval `scramv1 runtime -sh`; cd -')
-    commandList.append('mkPostFitCombinedPlot.py --inputFilePostFitShapesFromWorkspace='+outputCut+'.root --update --outputFile='+postFitShapeFile+' --signal='+signal+' --kind='+kind+' --cutName='+outputCut+' --variable='+variable+' --inputForData='+mlfitDir+'/fitDiagnostics'+combinedataset+'.root')
+    commandList.append('mkPostFitCombinedPlot.py --inputFilePostFitShapesFromWorkspace='+outputCut+'.root --update --outputFile='+postFitShapeFile+' --signal='+signal+' --kind='+kind+' --cutName='+cut+' --variable='+variable+' --inputForData='+mlfitDir+'/fitDiagnostics'+combinedataset+'.root')
 
     os.system(' \n '.join(commandList))
 
@@ -360,7 +360,7 @@ def postFitPlots(opt, makePlots=True):
                                         if len(yearInFitList)==1 or year!=fittedYear:
                                             mkPostFitPlot(opt, combinedataset+'/'+fitoption, fittedYear, year, tag, cut, variable, signal, sigset, datacardNameStructure)
 
-                                        else:
+                                        elif '_NoTag' not in cut: # FIXME
                                             opt2 = copy.deepcopy(opt)
                                             opt2.year, opt2.tag, opt2.sigset, opt2.baseDir = year, combinetag, sigset, os.getenv('PWD')
                                             postFitShapeFileFullPath = commonTools.mergeDirPaths(opt2.baseDir, postFitShapeFile)
