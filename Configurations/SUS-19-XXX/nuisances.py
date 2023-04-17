@@ -361,7 +361,7 @@ nuisances['qcdScale'] = {
 
 nuisances['pdf'] = {
     'name': 'pdf', # PDFs correlated through the years?
-    'kind': 'weight_envelope',
+    'kind': 'weight_rms',
     'type': 'shape',
     'samples': { },
     'cuts' : [ ],
@@ -369,10 +369,10 @@ nuisances['pdf'] = {
 
 for yeartomerge in yearstaglist:
 
-    theoryRecoFlag = recoFlag+'SigV6' if ('SigV6' in opt.tag or 'EOY' in opt.sigset) else recoFlag
-    exec(open('./Data/theoryNormalizations/theoryNormalizations'+theoryRecoFlag+'_'+yeartomerge+'.py').read())
+    #theoryRecoFlag = recoFlag+'SigV6' if ('SigV6' in opt.tag or 'EOY' in opt.sigset) else recoFlag
+    exec(open('./Data/theoryNormalizations/theoryNormalizations'+recoFlag+'_'+yeartomerge+'.py').read())
 
-    # LHE scale variation weights (w_var / w_nominal)
+    # LHE sca variation weights (w_var / w_nominal)
     # [0] is muR=0.50000E+00 muF=0.50000E+00
     # [1] is muR=0.50000E+00 muF=0.10000E+01
     # [2] is muR=0.50000E+00 muF=0.20000E+01
@@ -396,13 +396,13 @@ for yeartomerge in yearstaglist:
                 qcdScaleVariations = [ ]
                 qcdWeightIndexList = [0, 1, 3, 5, 7, 8] if len(theoryNormalizations[sample]['qcdScale'])==9 else [1, 6, 16, 26, 36, 41]
                 for i in qcdWeightIndexList:
-                    qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
+                    qcdScaleVariations.append('Alt$(LHEScaleWeight['+str(i)+'],1.)/'+theoryNormalizations[sample]['qcdScale'][i])
                 nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
             if not samples[sample]['isSignal'] and theoryNormalizations[sample]['pdfStatus']==3:
                 pdfVariations = [ ] 
                 for i in range(len(theoryNormalizations[sample]['pdf'])):                              
-                    pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
-                nuisances['pdf']['samples'][sample] = qcdScaleVariations
+                    pdfVariations.append('Alt$(LHEPdfWeight['+str(i)+'],1.)/'+theoryNormalizations[sample]['pdf'][i])
+                nuisances['pdf']['samples'][sample] = pdfVariations
 
 for cut in cuts: # TODO: Why only in the signal regions? 
     if 'SR' in cut.split('_')[0]: #or 'SM' in opt.sigset:

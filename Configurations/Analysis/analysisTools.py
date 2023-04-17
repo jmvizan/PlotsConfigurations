@@ -228,7 +228,7 @@ def mergeSignalToSM(opt):
                 smFile     = outputDir.replace(tag, smtag)     + '/plots_' + smtag     + '_SM.root' 
                 signalFile = outputDir.replace(tag, signaltag) + '/plots_' + signaltag + '_' + sigset + '.root'
 
-                os.system('mkdir -p '+outputDir+' ; haddfast --compress '+outputFile+' '+smFile+' '+signalFile) 
+                os.system('mkdir -p '+outputDir+' ; rm -r -f '+outputFile+' ; haddfast --compress '+outputFile+' '+smFile+' '+signalFile) 
 
 # groups
 
@@ -287,7 +287,7 @@ def mergeFitCR(opt):
                 filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','') ]
                 filesToMerge.append(outputFile.replace('FitCR','').replace('SM-','').replace('Group','').replace('WWTails','').replace('WWHighs','').replace('WWPol1a','').replace('SmtEU',''))
                 for backcr in opt.backgroundsInFit:
-                    filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','').replace('WWTails','').replace('WWHighs','').replace('WWPol1a','').replace('SmtEU',''))
+                    filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','').replace('SmtEU',''))
 
                 foundFilesToMerge = True
                 for fileToMerge in filesToMerge:
@@ -347,7 +347,7 @@ def signalCombine(opt, action):
             for signal in signalList:
                 massPoints = getMassPointList(signal)
                 for massPoint in massPoints:
-                    if opt.fileset!='': signalFileset = opt.fileset
+                    if opt.fileset!='': signalFileset = opt.fileset.replace('massPoint',massPoint)
                     else: signalFileset = smset+getMassPointSubset(opt, massPoint)
                     if signalFileset!=None:
                         if signalFileset not in filesetMap: filesetMap[signalFileset] = []
@@ -568,7 +568,6 @@ def getSignalList(opt, sigset, tag):
     if sigset=='SM': return []
 
     for sr in opt.signalRegionMap:
-        #if tag.split('_')[0].replace('Merge','').replace('FitCR','').replace('Group','').replace('FastReco','').replace('Fast','').replace('SigV6','').replace('WWTails','').replace('SmtEU','')==opt.signalRegionMap[sr]['tag']:
        if opt.signalRegionMap[sr]['tag'].replace('VetoesUL','') in tag:
             if 'all' in sigset:
                 signalList = []
