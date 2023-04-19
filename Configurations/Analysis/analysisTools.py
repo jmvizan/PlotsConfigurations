@@ -134,6 +134,9 @@ def signalShapes(opt, action='shapes'):
                     if opt.recover:
                         if commonTools.isGoodFile(commonTools.getShapeFileName(opt.shapedir, year, tag, signal, '')): continue
 
+                    if opt.reset: 
+                        commonTools.resetFile(commonTools.getShapeFileName(opt.shapedir, year, tag, signal, ''))
+
                     if opt.interactive:
                         opt2.sigset = signal
                         latinoTools.mergeall(opt2)

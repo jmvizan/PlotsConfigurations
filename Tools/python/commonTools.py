@@ -283,6 +283,10 @@ def cleanDirectory(directory):
         if os.path.isdir(directory.replace('*', extension)):
             os.system('rmdir --ignore-fail-on-non-empty '+directory)
 
+def resetFile(filename):
+
+    os.system('rm -f '+filename)
+
 def deleteDirectory(directory):
 
     os.system('rm -r -f '+directory)
