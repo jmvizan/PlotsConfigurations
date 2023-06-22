@@ -158,11 +158,11 @@ if __name__ == '__main__':
                 events.Add(years[year][sim])
             else:
                 jobFlag = '__part'+str(maxentries)
-                nTrees = len(glob.glob(years[year][sim]))
-                nParts = math.ceil(nTrees/10)
-                for part in range(maxentries*nParts, min(maxentries*(nParts+1), nTrees)):
-                    print 'Adding ', years[year][sim].replace('*',part)
-                    events.Add(years[year][sim].replace('*',part)) 
+                nTrees = int(len(glob.glob(years[year][sim])))
+                nParts = int(math.ceil(nTrees/10.))
+                for part in range(maxentries*nParts, min((maxentries+1)*nParts, nTrees)):
+                    print 'Adding ', years[year][sim].replace('*',str(part))
+                    events.Add(years[year][sim].replace('*',str(part))) 
 
             histos[sim] = { }
             for lepton in [ 'Ele', 'Muo' ]:
