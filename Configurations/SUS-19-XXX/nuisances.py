@@ -168,7 +168,7 @@ nuisances['isrFS']  = {
 for sample in samples.keys():
     if 'isrObservable' in samples[sample]:
             if samples[sample]['isrObservable']=='njetISR':
-                isrWeight = [ '0.5*(3.*isrW-1.)', '0.5*(isrW+1.)/isrW' ]
+                isrWeight = [ '0.5*(3.*isrW-1.)/isrW', '0.5*(isrW+1.)/isrW' ]
             elif samples[sample]['isrObservable']=='ptISR':
                 isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
             else:
@@ -361,7 +361,7 @@ nuisances['qcdScale'] = {
 
 nuisances['pdf'] = {
     'name': 'pdf', # PDFs correlated through the years?
-    'kind': 'weight_envelope',
+    'kind': 'weight_rms',
     'type': 'shape',
     'samples': { },
     'cuts' : [ ],
@@ -369,10 +369,10 @@ nuisances['pdf'] = {
 
 for yeartomerge in yearstaglist:
 
-    theoryRecoFlag = recoFlag+'SigV6' if ('SigV6' in opt.tag or 'EOY' in opt.sigset) else recoFlag
-    exec(open('./Data/theoryNormalizations/theoryNormalizations'+theoryRecoFlag+'_'+yeartomerge+'.py').read())
+    #theoryRecoFlag = recoFlag+'SigV6' if ('SigV6' in opt.tag or 'EOY' in opt.sigset) else recoFlag
+    exec(open('./Data/theoryNormalizations/theoryNormalizations'+recoFlag+'_'+yeartomerge+'.py').read())
 
-    # LHE scale variation weights (w_var / w_nominal)
+    # LHE sca variation weights (w_var / w_nominal)
     # [0] is muR=0.50000E+00 muF=0.50000E+00
     # [1] is muR=0.50000E+00 muF=0.10000E+01
     # [2] is muR=0.50000E+00 muF=0.20000E+01
@@ -394,19 +394,23 @@ for yeartomerge in yearstaglist:
                 continue
             if theoryNormalizations[sample]['qcdScaleStatus']==3:
                 qcdScaleVariations = [ ]
-                for i in [0, 1, 3, 5, 7, 8]:
-                    qcdScaleVariations.append('LHEScaleWeight['+str(i)+']/'+str(theoryNormalizations[sample]['qcdScale'][i]))
+                qcdWeightIndexList = [0, 1, 3, 5, 7, 8] if len(theoryNormalizations[sample]['qcdScale'])==9 else [1, 6, 16, 26, 36, 41]
+                for i in qcdWeightIndexList:
+                    qcdScaleVariations.append('Alt$(LHEScaleWeight['+str(i)+'],1.)/'+theoryNormalizations[sample]['qcdScale'][i])
                 nuisances['qcdScale']['samples'][sample] = qcdScaleVariations
             if not samples[sample]['isSignal'] and theoryNormalizations[sample]['pdfStatus']==3:
                 pdfVariations = [ ] 
                 for i in range(len(theoryNormalizations[sample]['pdf'])):                              
-                    pdfVariations.append('LHEPdfWeight['+str(i)+']/'+str(theoryNormalizations[sample]['pdf'][i]))
-                nuisances['pdf']['samples'][sample] = qcdScaleVariations
+                    pdfVariations.append('Alt$(LHEPdfWeight['+str(i)+'],1.)/'+theoryNormalizations[sample]['pdf'][i])
+                nuisances['pdf']['samples'][sample] = pdfVariations
 
 for cut in cuts: # TODO: Why only in the signal regions? 
     if 'SR' in cut.split('_')[0]: #or 'SM' in opt.sigset:
         nuisances['qcdScale']['cuts'].append(cut)
         nuisances['pdf']['cuts'].append(cut)
+
+if '_NoQCDScale' in opt.tag: del nuisances['qcdScale']
+if '_NoPDF'      in opt.tag: del nuisances['pdf']
 
 ### JES, JER and MET
 
@@ -452,7 +456,7 @@ rateparameters = {
     'NoJetRate_JetBack' : {
         'samples' : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
         'subcuts' : [ '_NoJet_' ],
-        'limits'  : '[0.5,1.5]',
+        #'limits'  : '[0.5,1.5]',
     },
     'JetRate_JetBack' : {
         'samples'  : [ 'ttbar', 'tW', 'STtW', 'ttW', 'ttZ' ],
@@ -468,13 +472,16 @@ if '_NoWWRate' not in opt.tag:
     rateparameters['NoJetRate_DibosonBack'] = {
         'samples' : [ 'WW', 'WZ' ],
         'subcuts' : [ '_NoJet_' ],
-        'limits'  : '[0.7,1.3]'
+        #'limits'  : '[0.7,1.3]'
     }
     rateparameters['JetRate_DibosonBack'] = {
         'samples' : [ 'WW', 'WZ' ],
         'subcuts' : [ '_NoTag_' ],
         'bondrate' : 'NoJetRate_DibosonBack',
     }
+if '_NoJetBond' not in opt.tag:
+    rateparameters['NoJetRate_JetBack']['limits'] = '[0.5,1.5]'
+    rateparameters['NoJetRate_DibosonBack']['limits'] = '[0.7,1.3]'
 
 if 'FitCR' in opt.tag:
     backgroundCRs = { 'ttZ' : { 'samples' : [ 'ttZ' ],
@@ -499,7 +506,7 @@ if 'FitCR' in opt.tag:
                 rateparameters['CR'+region+controlregion] = { }
                 rateparameters['CR'+region+controlregion]['samples'] = backgroundCRs[controlregion]['samples']
                 rateparameters['CR'+region+controlregion]['subcuts'] = backgroundCRs[controlregion]['regions'][region]
-                rateparameters['CR'+region+controlregion]['limits'] = '[0.3,1.7]'
+                if '_NoCRBond' not in opt.tag: rateparameters['CR'+region+controlregion]['limits'] = '[0.3,1.7]'
 
 if hasattr(opt, 'outputDirDatacard'):
     for mt2llregion in mt2llRegions: 

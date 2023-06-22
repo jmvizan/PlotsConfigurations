@@ -76,13 +76,13 @@ if __name__ == '__main__':
     groupPlot = { }
     legend = { }
 
-    samples['total_background'] = { 'isData' : 0, 'isSignal' : 0 }
-    plot['total_background'] = { 'isData' : 0, 'isSignal' : 0, 'nameHR' : 'SM Processes' }
-
     exec(open(opt.samplesFile).read())
     exec(open(opt.cutsFile).read())
     exec(open(opt.variablesFile).read())
     exec(open(opt.plotFile).read())
+
+    samples['total_background'] = { 'isData' : 0, 'isSignal' : 0 }
+    plot['total_background'] = { 'isData' : 0, 'isSignal' : 0, 'nameHR' : 'SM Processes' }
 
     if refmasspoint=='SM':
         for sample in plot.keys():

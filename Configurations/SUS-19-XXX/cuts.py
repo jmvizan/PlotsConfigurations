@@ -763,24 +763,24 @@ if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):
 
         cuts[cut] = expr
 
-# For postfit plots
+# For postfit plots (old style)
 
-if hasattr(opt, 'postFit'):
-    if opt.postFit!='n' and 'Fit' not in opt.postFit:
-        if opt.tag!=opt.inputFile.split('/')[2]+opt.inputFile.split('/')[3]:
-            
-            cutList = [ ]
-            for cut in cuts.keys(): cutList.append(cut)
-
-            yearcut = '_'+opt.tag.replace(opt.inputFile.split('/')[3], '')
-
-            for cut in cutList:
-
-                cuts[cut+yearcut] = { }
-                for key in cuts[cut]: 
-                    cuts[cut+yearcut][key] = cuts[cut][key]
-            
-                del cuts[cut]
+#if hasattr(opt, 'postFit'):
+#    if opt.postFit!='n' and 'Fit' not in opt.postFit:
+#        if opt.tag!=opt.inputFile.split('/')[2]+opt.inputFile.split('/')[3]:
+#            
+#            cutList = [ ]
+#            for cut in cuts.keys(): cutList.append(cut)
+#
+#            yearcut = '_'+opt.tag.replace(opt.inputFile.split('/')[3], '')
+#
+#            for cut in cutList:
+#
+#                cuts[cut+yearcut] = { }
+#                for key in cuts[cut]: 
+#                    cuts[cut+yearcut][key] = cuts[cut][key]
+#            
+#                del cuts[cut]
 
 if 'SearchRegion' in opt.tag:
 

@@ -1,4 +1,5 @@
 import os
+import glob
 import copy
 import math
 import commonTools
@@ -108,15 +109,22 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
 
     if fitoption=='':
         fileset = opt.fileset
-        plotsDirList.append(tag)
+        sample = '' if (sigset=='SM' or sigset=='') else sigset.split(':')[-1]+extraOutDirFlag
+        plotsDirList.extend([ tag, sample ])
+        lumiYear = year
 
     else:
         fileset = ''
         if yearInFit==year: yearInFit = ''
-        plotsDirList.extend([ fitoption+tag.split('___')[0].replace('__','/'), yearInFit ])
-        if fitoption=='PostFitS': plotAsExotics = False
+        lumiYear = yearInFit if yearInFit!='' else year
+        signal = '' 
+        if sigset!='SM' and sigset!='':
+            signal = sigset
+	    for ismp in range(len(sigset.split('_')[0].split('-'))-1):
+                signal = signal.replace(sigset.split('_')[0].split('-')[ismp]+'-','')
+        plotsDirList.extend([ tag.split('___')[0].replace('__','/'), fitoption, signal, yearInFit ])
+        if 'PostFitS' in fitoption: plotAsExotics = False
 
-    if sigset!='SM': plotsDirList.append(sigset.split(':')[-1]+extraOutDirFlag)
     plotsDir = '/'.join(plotsDirList)
 
     shapeFileName = commonTools.getShapeFileName(opt.shapedir, year, tag, sigset, fileset, fitoption+yearInFit) 
@@ -124,7 +132,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     os.system('mkdir -p '+plotsDir+' ; cp ../../index.php '+opt.plotsdir)
     commonTools.copyIndexForPlots(opt.plotsdir, plotsDir)
 
-    plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+year+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
+    plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+lumiYear+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --scaleToPlot=2 --nuisancesFile='+nuisances
 
     if 'normalizedCR' in opt.option: plotCommand += ' --plotNormalizedCRratio=1' # This is not yet re-implemented in latino's mkPlot.py
     elif 'normalized' in opt.option: plotCommand += ' --plotNormalizedDistributions'
@@ -132,7 +140,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     if 'noyields' not in opt.option: plotCommand += ' --showIntegralLegend=1'
     if 'saveC'        in opt.option: plotCommand += ' --fileFormats=\'png,root,C\''
     if 'plotsmearvar' in opt.option: plotCommand += ' --plotSmearVariation=1'    # This is not yet re-implemented in latino's mkPlot.py
-    if 'fit' in opt.option.lower() : plotCommand += ' --postFit=p'
+    if 'postfit' in opt.option.lower(): plotCommand += ' --postFit=p'
     if 'nostat' in opt.option.lower() : plotCommand += ' --removeMCStat'
     if 'nuisanceVariations' in opt.option: plotCommand += ' --nuisanceVariations'
 
@@ -237,22 +245,56 @@ def getDatacardNameStructure(addYearToDatacardName, addCutToDatacardName, addVar
 
 def mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, signal, sigset, datacardNameStructure):
 
-    fitkind = 'p' if fitoption=='PreFit' else fitoption[7:].lower()
+    fitkind = 'p' if 'PreFit' in fitoption else fitoption.split('PostFit')[-1].lower()
     postFitPlotCommandList = [ '--kind='+fitkind, '--structureFile='+commonTools.getCfgFileName(opt, 'structure') ]
     postFitPlotCommandList.extend([ '--tag='+fittedYear+tag, '--sigset='+sigset ])
 
     postFitPlotCommandList.extend([ '--cutNameInOriginal='+cut, '--variable='+variable ])
     postFitPlotCommandList.append('--cut='+datacardNameStructure.replace('year', year).replace('cut', cut).replace('variable', variable))
-    if fitoption=='PostFitB': postFitPlotCommandList.append('--getSignalFromPrefit=1')
+    if 'PostFitB' in fitoption: postFitPlotCommandList.append('--getSignalFromPrefit=1')
 
     tagoption = fitoption if year==fittedYear else fitoption+year
     postFitPlotCommandList.append('--inputFileCombine='+commonTools.getCombineFitFileName(opt, signal, fittedYear, tag))
     postFitPlotCommandList.append('--inputFile='+commonTools.getShapeFileName(opt.shapedir, year, tag.split('_')[0], opt.sigset, opt.fileset))
     postFitPlotCommandList.append('--outputFile='+commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', tagoption))
+    if 'asimov' in opt.option.lower(): postFitPlotCommandList.append('--getDataFromCombine')
 
     os.system('mkPostFitPlot.py '+' '.join(postFitPlotCommandList))
 
-def postFitPlots(opt, convertShapes=True, makePlots=True):
+def mergePostFitShapes(opt, postFitShapeFile, signal, mlfitDir, cardsDir, year, cut, variable, datacardNameStructure):
+
+    combinedataset = '_asimovS' if 'asimovs' in opt.option.lower() else '_asimovB' if 'asimovb' in opt.option.lower() else ''
+    fitdirectory = 'fit_b' if 'postfitb' in opt.option.lower() else 'fit_s'
+    postfitoption = '--postfit' if 'postfit' in opt.option.lower() else ''
+    kind = 'P' if 'postfit' in opt.option.lower() else 'p'
+
+    commandList = [ ]
+
+    if not os.path.exists(cardsDir): 
+        opt.cardsdir = cardsDir
+        datacards(opt, signal)
+
+    outputCut = datacardNameStructure.replace('year',year).replace('cut',cut).replace('variable',variable).replace('*','').replace('__','_')
+    if outputCut[0]=='_': outputCut = outputCut[1:]
+    if outputCut[-1]=='_': outputCut = outputCut[:-1]
+
+    inputCardList = []
+    for card in glob.glob('/'.join([ cardsDir, year, opt.tag, signal, cut, variable, 'datacard.txt' ])):
+        cardInputs = card.split(cardsDir)[1].split('/')
+        inputCardName = datacardNameStructure.replace('year',cardInputs[1]).replace('cut',cardInputs[4]).replace('variable',cardInputs[5]) 
+        inputCardList.append(inputCardName+'='+card.split(cardsDir+'/')[1])
+
+    commandList = [ commonTools.setupCombineCommand(opt) ]
+    commandList.append('cd '+cardsDir)
+    commandList.append('combineCards.py '+' '.join(inputCardList)+' > combinedDatacard__'+outputCut+'.txt')
+    commandList.append('text2workspace.py combinedDatacard__'+outputCut+'.txt')
+    commandList.append('PostFitShapesFromWorkspace -w combinedDatacard__'+outputCut+'.root -o '+outputCut+'.root -d combinedDatacard__'+outputCut+'.txt -f '+mlfitDir+'/fitDiagnostics'+combinedataset+'.root:'+fitdirectory+' '+postfitoption+' --sampling --total-shapes')    
+    commandList.append('cd '+opt.baseDir+'; eval `scramv1 runtime -sh`; cd -')
+    commandList.append('mkPostFitCombinedPlot.py --inputFilePostFitShapesFromWorkspace='+outputCut+'.root --update --outputFile='+postFitShapeFile+' --signal='+signal+' --kind='+kind+' --cutName='+cut+' --variable='+variable+' --inputForData='+mlfitDir+'/fitDiagnostics'+combinedataset+'.root')
+
+    os.system(' \n '.join(commandList))
+
+def postFitPlots(opt, makePlots=True):
 
     fitoption = ''
     if 'prefit' in opt.option.lower(): fitoption = 'PreFit'
@@ -266,62 +308,79 @@ def postFitPlots(opt, convertShapes=True, makePlots=True):
     fittedYearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
     if 'splitandcomb' in opt.option: fittedYearList.append(opt.year)
 
-    for tag in opt.tag.split('-'):
+    for inputtag in opt.tag.split('-'):
+
+        tag = inputtag
+        if '_asimov' in inputtag:
+           if 'asimov' not in opt.option:
+               for tagsplit in inputtag.split('_'):
+                   if 'asimov' in tagsplit: opt.option += tagsplit.lower()
+           tag = tag.replace(commonTools.getCombineOptionFlag(opt.option), '')    
+        combinetag = tag+commonTools.getCombineOptionFlag(opt.option)
+        combinedataset = commonTools.getCombineOptionFlag(opt.option,True)
+ 
         for fittedYear in fittedYearList:
 
             yearInFitList = fittedYear.split('-')
-            if 'mergeyear' in opt.option and '-' in fittedYear: yearInFitList.append('') 
+            if 'mergeyear' in opt.option and '-' in fittedYear: yearInFitList.append(fittedYear) 
 
             signals = commonTools.getDictionariesInLoop(opt.configuration, yearInFitList[0], tag, opt.sigset, 'samples')
             for signal in signals:
                 if signals[signal]['isSignal']:
 
-                    if not commonTools.goodCombineFit(opt, fittedYear, tag, signal, fitoption):
+                    if not commonTools.goodCombineFit(opt, fittedYear, combinetag, signal, fitoption):
                         print 'Warning in postFitPlots: no good fit for year='+fittedYear+', tag='+tag+', signal='+signal+', fitoption='+fitoption
 
                     sigset = opt.sigset if opt.sigset=='' or opt.sigset=='SM' else 'SM-'+signal if 'SM' in opt.sigset else signal
 
                     for year in yearInFitList:
+                        if 'singleyear' in opt.option and 'singleyear'+str(year) not in opt.option: continue
+                        if 'mergeyearonly' in opt.option and year!=fittedYear: continue
 
-                        tagoption = fitoption if year==fittedYear else fitoption+year
-                        postFitShapeFile = commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', tagoption)    
+                        fityearoption = combinedataset+'/'+fitoption if year==fittedYear else combinedataset+'/'+fitoption+year
+                        postFitShapeFile = commonTools.getShapeFileName(opt.shapedir, fittedYear, tag, sigset, '', fityearoption)    
 
-                        if convertShapes or not os.path.isfile(postFitShapeFile):
+                        if not opt.recover or not os.path.isfile(postFitShapeFile):
  
                             os.system('rm -f '+postFitShapeFile)
-                            os.system('mkdir -p '+commonTools.getShapeDirName(opt.shapedir, fittedYear, tag, tagoption))
+                            os.system('mkdir -p '+commonTools.getShapeDirName(opt.shapedir, fittedYear, tag, fityearoption))
 
-                            if year!='':
+                            samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, tag, sigset, 'variables')
+                            datacardNameStructure = getDatacardNameStructure(len(fittedYear.split('-'))>1, len(cuts.keys())>1, len(variables.keys())>1)
 
-                                samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, tag, sigset, 'variables')
-                                datacardNameStructure = getDatacardNameStructure(len(fittedYear.split('-'))>1, len(cuts.keys())>1, len(variables.keys())>1)
+                            if len(yearInFitList)>1 and year==fittedYear:
+                                mlfitDir = commonTools.mergeDirPaths(os.getenv('PWD'), commonTools.getSignalDir(opt, opt.year, combinetag, signal, 'mlfitdir'))
+                                cardsDir = mlfitDir+'/Datacards'
+                                os.system('rm -r -f '+cardsDir)
 
-                                for cut in cuts:
-                                    for variable in variables:
-                                        if 'cuts' not in variables[variable] or cut in  variables[variable]['cuts']:
-                                            mkPostFitPlot(opt, fitoption, fittedYear, year, tag, cut, variable, signal, sigset, datacardNameStructure)
+                            for cut in cuts:
+                                for variable in variables:
+                                    if 'cuts' not in variables[variable] or cut in  variables[variable]['cuts']:
 
-                            else:
-                                pass
+                                        if len(yearInFitList)==1 or year!=fittedYear:
+                                            mkPostFitPlot(opt, combinedataset+'/'+fitoption, fittedYear, year, tag, cut, variable, signal, sigset, datacardNameStructure)
+
+                                        elif '_NoTag' not in cut: # FIXME
+                                            opt2 = copy.deepcopy(opt)
+                                            opt2.year, opt2.tag, opt2.sigset, opt2.baseDir = year, combinetag, sigset, os.getenv('PWD')
+                                            postFitShapeFileFullPath = commonTools.mergeDirPaths(opt2.baseDir, postFitShapeFile)
+                                            mergePostFitShapes(opt2, postFitShapeFileFullPath, signal, mlfitDir, cardsDir, '*', cut, variable, datacardNameStructure)
+
+                            if len(yearInFitList)>1 and year==fittedYear: os.system('rm -r -f '+cardsDir)
 
                         if makePlots:
-                            mkPlot(opt, fittedYear, tag, sigset, 'None', fitoption, year)
+                            mkPlot(opt, fittedYear, tag, sigset, 'None', combinedataset+'/'+fitoption, year)
 
 def postFitShapes(opt):
 
-    convertShapes = True if not opt.recover else False
-    postFitPlots(opt, convertShapes, False) 
-
-def postFitPlotsOnly(opt):
-
-    postFitPlots(opt, False, True)
+    postFitPlots(opt, False) 
 
 # Generic plots from mkShapes output
 
 def plots(opt):
 
-    if 'merge' in opt.option: mergedPlots(opt)
-    elif 'fit' in opt.option.lower(): postFitPlots(opt)
+    if 'prefit' in opt.option.lower() or 'postfit' in opt.option.lower(): postFitPlots(opt)
+    elif 'merge' in opt.option: mergedPlots(opt)
     else: 
 
         if not commonTools.foundShapeFiles(opt): exit()

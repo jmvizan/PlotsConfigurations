@@ -259,6 +259,9 @@ for treeNuisance in treeNuisances:
 treeNuisanceDirs = { }
 treeNuisanceSuffix = '__hadd' if ('cern' in SITE and 'EOY' in opt.sigset) else ''
 for treeNuisance in treeNuisances:
+    if '_NoJER' in opt.tag and 'jer' in treeNuisance: continue
+    if '_NoJES' in opt.tag and 'jesTotal' in treeNuisance: continue
+    if '_NoMET' in opt.tag and 'unclustEn' in treeNuisance: continue
     treeNuisanceDirs[treeNuisance] = { 'Bkg' : { }, 'Sig' : { }, }
     if treeNuisance=='nosmear' or treeNuisance=='smaer':
         treeNuisanceDirs[treeNuisance]['Bkg']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
@@ -929,15 +932,15 @@ if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset:
 
         if 'ZZValidationRegion' in opt.tag or 'ttZ' in opt.tag or 'WZValidationRegion' in opt.tag or 'WZtoWW' in opt.tag or 'FitCRWZ' in opt.tag or 'FitCRZZ' in opt.tag or ('FitCR' in opt.tag and isDatacardOrPlot) or 'TheoryNormalizations' in opt.tag:
         
-            samples['ZZTo4L']   = {    'name'  :    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ZZTo4L'              , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2m'            , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2e2t'            , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ2m2t'            , False,treePrefix,skipTreesCheck) + 
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4e'              , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4m'              , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'ggZZ4t'              , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'VBFHToZZTo4L_M125'   , False,treePrefix,skipTreesCheck) +
-                                                    getSampleFiles(directoryBkg.replace('reco', 'ctrl'),'GluGluHToZZTo4L_M125', False,treePrefix,skipTreesCheck),
+            samples['ZZTo4L']   = {    'name'  :    getSampleFiles(directoryBkg,'ZZTo4L'              , False,treePrefix,skipTreesCheck) +
+                                                    getSampleFiles(directoryBkg,'ggZZ2e2m'            , False,treePrefix,skipTreesCheck) +
+                                                    getSampleFiles(directoryBkg,'ggZZ2e2t'            , False,treePrefix,skipTreesCheck) +
+                                                    getSampleFiles(directoryBkg,'ggZZ2m2t'            , False,treePrefix,skipTreesCheck) + 
+                                                    getSampleFiles(directoryBkg,'ggZZ4e'              , False,treePrefix,skipTreesCheck) +
+                                                    getSampleFiles(directoryBkg,'ggZZ4m'              , False,treePrefix,skipTreesCheck) +
+                                                    getSampleFiles(directoryBkg,'ggZZ4t'              , False,treePrefix,skipTreesCheck) +
+                                                    getSampleFiles(directoryBkg,'VBFHToZZTo4L_M125'   , False,treePrefix,skipTreesCheck) +
+                                                    getSampleFiles(directoryBkg,'GluGluHToZZTo4L_M125', False,treePrefix,skipTreesCheck),
                                        'weight' : XSWeight+'*'+SFweight ,
                                        'JobsPerSample' : 6,
                                        'isControlSample' : 1,

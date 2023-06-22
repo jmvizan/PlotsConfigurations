@@ -28,6 +28,14 @@ def isGoodFile(filename, minSize=100000.):
     fileSize = os.path.getsize(filename)
     return fileSize>minSize
 
+def compile(opt):
+  
+    if 'base' in opt.option.lower(): directory = '$CMSSW_BASE/src/' 
+    elif 'tool' in opt.option.lower() or opt.option=='': directory = '$CMSSW_BASE/src/PlotsConfigurations/Tools/'
+    elif 'latino' in opt.option.lower(): directory = '$CMSSW_BASE/src/LatinoAnalysis/'
+    else: directory = opt.option
+    os.system('cd '+directory+' ; scram b')
+
 ### Plot utilities
 
 def bookHistogram(name, xBins, yBins=(), title='', style=''):
@@ -169,6 +177,7 @@ def getDictionaries(optOrig, lastDictionary='nuisances'):
             print '    Error: sample cfg file', dictionaryCfg, 'not found'
             exit()
 
+    optOrig.lumi = opt.lumi
     if   lastDictionaryIndex==0: return samples
     elif lastDictionaryIndex==1: return samples, cuts
     elif lastDictionaryIndex==2: return samples, cuts, variables
@@ -184,6 +193,14 @@ def getDictionariesInLoop(configuration, year, tag, sigset, lastDictionary='nuis
 def getSamples(opt):
 
     return getDictionaries(opt, 'samples')
+
+def getSignals(opt):
+
+    signals, samples = {}, getSamples(opt)
+    for sample in samples:
+        if samples[sample]['isSignal']:
+            signals[sample] = samples[sample]
+    return signals
 
 def getSamplesInLoop(configuration, year, tag, sigset, combineAction=''):
 
@@ -265,6 +282,10 @@ def cleanDirectory(directory):
     for extension in [ '', '__ALL' ]:
         if os.path.isdir(directory.replace('*', extension)):
             os.system('rmdir --ignore-fail-on-non-empty '+directory)
+
+def resetFile(filename):
+
+    os.system('rm -f '+filename)
 
 def deleteDirectory(directory):
 
@@ -357,7 +378,7 @@ def copyIndexForPlots(mainPlotdir, finalPlotDir):
 
     subDir = mainPlotdir
     for subdir in finalPlotDir.split('/'):
-        if subdir not in subDir:
+        if subdir not in subDir.split('/'):
             subDir += '/'+subdir
             os.system('cp ../../index.php '+subDir)
 
@@ -399,6 +420,13 @@ def purgeDatacards(opt):
     deleteDirectory(opt.cardsdir+'/*')
 
 # jobs
+
+def showQueue(opt):
+
+    if 'ifca' in os.uname()[1] or 'cloud' in os.uname()[1]: 
+        print '\nAvailable queues in slurm:\n cms_main = 24 hours\n cms_med  = 8 hours\n cms_high = 3 hours\n'
+    else: #cern 
+        print '\nAvailable queues in condor:\n espresso     = 20 minutes\n microcentury = 1 hour\n longlunch    = 2 hours\n workday      = 8 hours\n tomorrow     = 1 day\n testmatch    = 3 days\n nextweek     = 1 week\n'
 
 def batchQueue(opt, batchQueue):
 
@@ -641,21 +669,40 @@ def mkPseudoData(opt, reftag=None, refsigset=None):
 
 ### Modules for analyzing results from combine
 
+def setupCombineCommand(opt, joinstr='\n'):
+
+    return joinstr.join([ 'cd '+opt.combineLocation, 'eval `scramv1 runtime -sh`', 'cd '+opt.baseDir ])
+
+def getCombineOptionFlag(option, isForPlot=False):
+
+    combineOptionFlag = '_Toy' if 'toy' in option.lower() else ''
+    if 'asimovb' in option.lower(): combineOptionFlag = '_asimovB'
+    if 'asimovs' in option.lower(): combineOptionFlag = '_asimovS'
+    if 'asimovi' in option.lower(): combineOptionFlag = '_asimovI'
+    if not isForPlot: return combineOptionFlag
+    else:
+        if combineOptionFlag=='': return 'FitsToData'
+        else: return combineOptionFlag.replace('_a', 'A')
+
 def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
 
     if year=='': year = opt.year
     if tag=='': tag = opt.tag
+    if getCombineOptionFlag(opt.option) not in tag: tag += getCombineOptionFlag(opt.option)
 
     if hasattr(opt, 'combineAction'):
         combineAction = opt.combineAction
 
     if combineAction=='limits':
         combineOutDir = 'limitdir'
-        limitRun = 'Both' if opt.unblind else 'Blind'
-        outputFileName = 'higgsCombine_'+limitRun+'.AsymptoticLimits.mH120.root'
+        if 'toy' in opt.option:
+            outputFileName = 'higgsCombineTest.HybridNew.mH120.root'
+        else:
+            limitRun = 'Both' if opt.unblind else 'Blind'
+            outputFileName = 'higgsCombine_'+limitRun+'.AsymptoticLimits.mH120.root'
     elif combineAction=='mlfits': 
         combineOutDir = 'mlfitdir'
-        outputFileName = 'fitDiagnostics.root'
+        outputFileName = 'fitDiagnostics'+getCombineOptionFlag(opt.option)+'.root'
     elif combineAction=='impacts':
         combineOutDir = 'impactdir'
         outputFileName = 'impacts.pdf'
@@ -711,7 +758,44 @@ def massScanLimits(opt):
 
 def fitMatrices(opt):
 
-    print 'please, port me fromhttps://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkMatrixPlots.py :('
+    signals = getSignals(opt)
+    yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]    
+
+    fitlevels = []
+    if 'prefit' in opt.option.lower(): fitlevels.append('prefit')
+    elif 'postfitb' in opt.option.lower(): fitlevels.append('fit_b')
+    elif 'postfits' in opt.option.lower(): fitlevels.append('fit_s')
+    else: print 'Error in fitMatrices: please choose a fit level (prefit, postfitb, postfits)'
+
+    for year in yearList:
+        for tag in opt.tag.split('-'):
+            for fitlevel in fitlevels:
+
+                opt2 = copy.deepcopy(opt)
+                opt2.year, opt2.tag = year, year+tag
+                signals = getSignals(opt2)
+                luminosity = int(round(opt.lumi, 0)) if opt.lumi>100 else round(opt.lumi, 1)
+                legend = '\'L = '+str(luminosity)+'/fb (#sqrt{s} = 13 TeV)\''
+                fitoption = fitlevel.replace('prefit','PreFit').replace('fit_b','PostFitB').replace('fit_s','PostFitS')
+                mainOutputDir = '/'.join([ opt.plotsdir, year, tag, getCombineOptionFlag(opt.option,True) ])        
+
+                commandList = [ '--postFit='+fitlevel, '--legend='+legend ]
+                if 'nosavecov' not in opt.option.lower(): commandList.append('--saveCovariance')
+                if 'cutsToRemove:' in opt.option:
+                    commandList.append('--cutsToRemove='+opt.option.split('cutsToRemove:')[1].split(':')[0])
+                if 'nuisToRemove:' in opt.option:
+                    commandList.append('--nuisToRemove='+opt.option.split('nuisToRemove:')[1].split(':')[0])
+ 
+                for signal in signals:
+
+                    signalCommandList = commandList
+                    signalCommandList.append('--inputFile='+getCombineFitFileName(opt, signal, year, tag))
+                    signalCommandList.append('--outputDir='+'/'.join([ mainOutputDir, fitoption, signal, 'FitMatrices' ]))
+                    signalCommandList.append('--signal='+signal)
+
+                    if not 'onlynuis' in opt.option.lower(): os.system('mkMatrixPlots.py '+' '.join(signalCommandList))
+                    if not 'onlycuts' in opt.option.lower(): os.system('mkMatrixPlots.py '+' '.join(signalCommandList+['--doNuisances']))
+                    copyIndexForPlots(opt.plotsdir, '/'.join([ mainOutputDir, fitoption, signal, 'FitMatrices' ]))
 
 def postFitYieldsTables(opt, cardNameStructure='cut', masspoints=''):
 
