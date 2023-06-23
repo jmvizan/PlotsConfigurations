@@ -71,8 +71,8 @@ if __name__ == '__main__':
 
         if 'DY' in sample:
             stepName = 'SFSusyDY'
-            treeNameFast = 'nanoLatino_DYJetsToLL_M-50-LO__part*root'
-            treeNameFull = 'nanoLatino_DYJetsToLL_M-50-LO__part*root'
+            treeNameFast = 'nanoLatino_DYJetsToLL_M-50-LO__part*.root'
+            treeNameFull = 'nanoLatino_DYJetsToLL_M-50-LO__part*.root'
         elif 'ttbar' in sample:
             stepName = 'SFSusyTT'
             treeNameFast = 'nanoLatino_TTJets_DiLept__part*.root'
