@@ -26,7 +26,64 @@ if opt.tag=='btagefficiencies':
     cuts[btagAlgo+'_'+btagWP+'_c']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])==4 && '+jetTagSelection
     cuts[btagAlgo+'_'+btagWP+'_l']  = jetKinSelection+' && abs(Jet_hadronFlavour[CleanJet_jetIdx])<4  && '+jetTagSelection
 
-if 'Trigger' in opt.tag:
+if 'SingleMuonTrigger' in opt.tag:
+
+    nLooseMuon  = 'Sum$(Muon_pt>20. && abs(Muon_eta)<2.4 && Muon_looseId==1)'
+    nLooseElectron = 'Sum$(abs(Lepton_pdgId)==11)'
+    #nTightMuon  = 'Sum$(Muon_pt>20. && abs(Muon_eta)<2.4 && Muon_tightId==1  && Muon_pfRelIso04_all<0.15)'
+    #nMediumMuon = 'Sum$(Muon_pt>20. && abs(Muon_eta)<2.4 && Muon_mediumId==1 && Muon_pfRelIso04_all<0.20)'
+    tightMuon  = nLooseMuon+'==1 && nLepton<=2 && Muon_pt[0]>20. && abs(Muon_eta[0])<2.4 && Muon_tightId[0]==1  && Muon_pfRelIso04_all[0]<0.15'
+    mediumMuon = nLooseMuon+'==1 && nLepton<=2 && Muon_pt[0]>20. && abs(Muon_eta[0])<2.4 && Muon_mediumId[0]==1 && Muon_pfRelIso04_all[0]<0.20'
+    dfCut = nLooseElectron+'==1'
+    triggerCuts = { 'tight'      : tightMuon                             , 'medium'      : mediumMuon,
+                    'tightmet'   : tightMuon+' && MET_pt>100.'           , 'mediummet'   : mediumMuon+' && MET_pt>100.',
+                    'tightdf'    : tightMuon+' && '+dfCut                , 'mediumdf'    : mediumMuon+' && '+dfCut,
+                    'tightmetdf' : tightMuon+' && MET_pt>100. && '+dfCut , 'mediummetdf' : mediumMuon+' && MET_pt>100. && '+dfCut }
+    triggerBits = { }
+    if '2016' in opt.tag: triggerBits['MuIso24'] = '(HLT_IsoMu24 || HLT_IsoTkMu24)'
+    if '2017' in opt.tag: triggerBits['MuIso27'] = 'HLT_IsoMu27'
+    if '2018' in opt.tag: triggerBits['MuIso24'] = 'HLT_IsoMu24'
+    etaBins = { 'anyEta' : 'abs(Muon_eta[0])>=0.', 'eta0' : 'abs(Muon_eta[0])<=0.9', 'eta1' : 'abs(Muon_eta[0])>0.9 && abs(Muon_eta[0])<=1.2',
+                'eta2' : 'abs(Muon_eta[0])>1.2 && abs(Muon_eta[0])<=2.1', 'eta3' : 'abs(Muon_eta[0])>2.1 && abs(Muon_eta[0])<=2.4' }
+
+    if 'MET' in opt.sigset:
+        metHLT = ''
+    else:
+        #metHLT = ''
+        metHLT = '(HLT_PFMET200_HBHECleaned > 0 || HLT_PFMET200_HBHE_BeamHaloCleaned > 0 || HLT_PFMETTypeOne200_HBHE_BeamHaloCleaned > 0 || HLT_PFMETNoMu120_PFMHTNoMu120_IDTight > 0 || HLT_PFMET120_PFMHT120_IDTight > 0 || HLT_PFMETNoMu120_PFMHTNoMu120_IDTight_PFHT60 > 0 || HLT_PFMET120_PFMHT120_IDTight_PFHT60 > 0 || HLT_PFHT500_PFMET100_PFMHT100_IDTight > 0 || HLT_PFHT700_PFMET85_PFMHT85_IDTight > 0 || HLT_PFHT800_PFMET75_PFMHT75_IDTight > 0) && '
+
+    for cuttr in triggerCuts:
+        for etabin in etaBins:
+            cuts['_'.join([cuttr,etabin])] = { 'expr' : metHLT + triggerCuts[cuttr] + ' && ' + etaBins[etabin] }
+            for bit in triggerBits:
+                cuts['_'.join([cuttr,etabin,bit])] = { 'expr' : metHLT + triggerCuts[cuttr] + ' && ' + etaBins[etabin] + ' && ' + triggerBits[bit] }
+
+elif 'MuPt50Trigger' in opt.tag:
+
+    triggerOC = OC.replace('mll'+ctrltag+'>=20. && ', '')
+    triggerCuts = { 'none' : '', 'met' : ' && MET_pt>100.' }
+    etaBins = { '_full' : '', '_cent' : ' && abs(Lepton_eta[0])<=1.2', '_forw' : ' && abs(Lepton_eta[0])>1.2 && abs(Lepton_eta[0])<=2.4' }
+
+    HLTMu50 = 'Alt$(HLT_Mu50,0)'
+    if '2016' in opt.tag: HLTMu50 = 'Alt$(HLT_TkMu50,0) || Alt$(HLT_Mu50,0)'
+    triggerBits = { 'mm' : { 'cut' : MM, 'double' : 'Trigger_dblEl', 'both' : '(Trigger_dblMu || Trigger_sngMu)'                 , 'Mu50' : '(Trigger_dblMu || Trigger_sngMu || '+HLTMu50+')' },
+                    'em' : { 'cut' : DF, 'double' : 'Trigger_ElMu' , 'both' : '(Trigger_ElMu  || Trigger_sngEl || Trigger_sngMu)', 'Mu50' : '(Trigger_ElMu  || Trigger_sngEl || Trigger_sngMu || '+HLTMu50+')' }
+                   }
+
+    for ch in triggerBits:
+        for etab in etaBins:
+            for cutt in triggerCuts:
+
+                denominatorName = ch+etab+'_'+cutt
+                denominatorCut  = triggerOC + ' && ' + triggerBits[ch]['cut'] + etaBins[etab] + triggerCuts[cutt]
+                cuts[denominatorName] = denominatorCut
+
+                if 'MET' in opt.sigset:
+                    for trgbit in triggerBits[ch]:
+                        if trgbit!='cut':
+                            cuts[denominatorName+'_'+trgbit] = denominatorCut + ' && ' + triggerBits[ch][trgbit]
+
+elif 'Trigger' in opt.tag:
 
     triggerOC = OC.replace('mll'+ctrltag+'>=20. && ', '') 
     #triggerCuts = { 'none' : '', 'mll' : ' && mll>=20.',  'met' : ' && MET_pt>100.', 'all' : ' && mll>=20. && MET_pt>100.' }
