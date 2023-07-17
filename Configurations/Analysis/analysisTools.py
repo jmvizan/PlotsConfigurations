@@ -677,16 +677,30 @@ def makeFastSimLeptonEfficiencies(opt):
  
     for year in opt.year.split('-'): 
         mergeJobs = {}
-        for sample in [ 'fullsim', 'fastsim' ]:
-            if opt.sigset=='SM' or sample in opt.sigset:
-                mergeJobs[sample] = ' '.join([ cdWorkDir, './mkFastSimDYEfficiencies.py', year, sample, '-1' ])
+        sampleList = []
+        if opt.sigset=='SM' or 'DY' in opt.sigset: sampleList.append('DY')
+        if 'ttbar' in opt.sigset: sampleList.append('ttbar')
+        if 'signal' in opt.sigset or 'TChipm' in opt.sigset: sampleList.extend([ 'TChipmSlepSnu_mC-1150_mX-1', 'TChipmSlepSnu_mC-900_mX-475', 'TChipmSlepSnu_mX-1', 'TChipmSlepSnu_dm-425' ])
+        if 'signal' in opt.sigset or 'T2tt' in opt.sigset: sampleList.extend([ 'T2tt_mStop-525_mLSP-350', 'T2tt_mStop-525_mLSP-438', 'T2tt_dm-87', 'T2tt_dm-175' ])
+        for reco in [ 'fullsim', 'fastsim' ]:
+            if reco=='fullsim' and 'fastsim' in opt.option: continue
+            if reco=='fastsim' and 'fullsim' in opt.option: continue
+            for sample in sampleList:
+                if 'split' in opt.option:
+                    for part in range(10): mergeJobs[reco+'_'+sample+'_'+str(part)] = ' '.join([ cdWorkDir, './mkFastSimDYEfficienciesJobs.py', year, reco, sample , str(part) ])
+                else:
+                    mergeJobs[reco+'_'+sample] = ' '.join([ cdWorkDir, './mkFastSimDYEfficienciesJobs.py', year, reco, sample , '-1' ])      
         if len(mergeJobs.keys())>0:
-            latinoTools.submitJobs(opt, 'fastsimlep', year+'Efficiency', mergeJobs, 'Targets', True, 1) 
+            latinoTools.submitJobs(opt, 'fastsimlep', year+'EfficiencyJobs', mergeJobs, 'Targets', True, 1) 
 
 def plotFastSimLeptonEfficiencies(opt):
 
     for year in opt.year.split('-'):
-        os.system('./mkFastSimDYMorePlots.py '+year)
+        if opt.sigset=='SM' or opt.sigset=='DY':
+            os.system('./mkFastSimDYMorePlots.py '+year+' DY')
+        else:                                                 
+            for signal in [ 'T2tt_mStop-525_mLSP-350', 'T2tt_mStop-525_mLSP-438' ]:
+	        os.system('./mkFastSimDYMorePlots.py '+year+' '+signal)
 
 
 
