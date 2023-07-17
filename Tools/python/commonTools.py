@@ -13,6 +13,29 @@ tdrStyle.setTDRStyle()
 class Object(object):
     pass
 
+def getBranch():
+
+    proc=subprocess.Popen('git branch', stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
+    out, err = proc.communicate()
+
+    for line in out.split("\n"): 
+        if '*' in line:
+            return line.replace('* ','')
+
+def isGoodFile(filename, minSize=100000.):
+
+    if not os.path.isfile(filename): return False
+    fileSize = os.path.getsize(filename)
+    return fileSize>minSize
+
+def compile(opt):
+  
+    if 'base' in opt.option.lower(): directory = '$CMSSW_BASE/src/' 
+    elif 'tool' in opt.option.lower() or opt.option=='': directory = '$CMSSW_BASE/src/PlotsConfigurations/Tools/'
+    elif 'latino' in opt.option.lower(): directory = '$CMSSW_BASE/src/LatinoAnalysis/'
+    else: directory = opt.option
+    os.system('cd '+directory+' ; scram b')
+
 ### Plot utilities
 
 def bookHistogram(name, xBins, yBins=(), title='', style=''):
@@ -154,34 +177,60 @@ def getDictionaries(optOrig, lastDictionary='nuisances'):
             print '    Error: sample cfg file', dictionaryCfg, 'not found'
             exit()
 
+    optOrig.lumi = opt.lumi
     if   lastDictionaryIndex==0: return samples
     elif lastDictionaryIndex==1: return samples, cuts
     elif lastDictionaryIndex==2: return samples, cuts, variables
     elif lastDictionaryIndex==3: return samples, cuts, variables, nuisances
 
-def getDictionariesInLoop(configuration, year, tag, sigset, lastDictionary='nuisances'):
+def getDictionariesInLoop(configuration, year, tag, sigset, lastDictionary='nuisances', combineAction=''):
 
     opt2 = Object()
     opt2.configuration, opt2.year, opt2.tag, opt2.sigset = configuration, year, tag, sigset
+    if combineAction!='': opt2.combineAction = combineAction
     return getDictionaries(opt2, lastDictionary)
 
 def getSamples(opt):
 
     return getDictionaries(opt, 'samples')
 
-def getSamplesInLoop(configuration, year, tag, sigset):
+def getSignals(opt):
 
-    return getDictionariesInLoop(configuration, year, tag, sigset, 'samples')
+    signals, samples = {}, getSamples(opt)
+    for sample in samples:
+        if samples[sample]['isSignal']:
+            signals[sample] = samples[sample]
+    return signals
+
+def getSamplesInLoop(configuration, year, tag, sigset, combineAction=''):
+
+    return getDictionariesInLoop(configuration, year, tag, sigset, 'samples', combineAction)
 
 def setFileset(fileset, sigset):
 
     if fileset=='':
         if sigset=='': return '' # So we are prepared to switch from 'SM' to '' if required 
         else: return '_'+sigset
-    else:
-        return '_'+fileset.replace('_','')
+    elif fileset[0]=='_': return fileset
+    else: return '_'+fileset
+
+def getTagForDatacards(tag, sigset):
+
+    flagsToAppend = []
+    for fl in range(len(sigset.split('_')[0].split('-'))-1):
+        if sigset.split('-')[fl]!='SM' and sigset.split('-')[fl] not in tag: flagsToAppend.append(sigset.split('-')[fl])
+
+    if len(flagsToAppend)!=0:
+        rawtag = tag.split('_')[0]
+        tag = tag.replace(rawtag, rawtag+'_'+'_'.join([ x for x in flagsToAppend ]))
+
+    return tag
 
 def getSignalDir(opt, year, tag, signal, directory):
+
+    if hasattr(opt, 'combineOutDir') and opt.combineOutDir.split('/')[-1]==opt.cardsdir.split('/')[-1]:
+        signalDirList = [ getattr(opt, directory), tag, signal, year ]
+        return '/'.join(signalDirList)
 
     signalDirList = [ getattr(opt, directory), year ]
     tag = tag.replace('___','_')
@@ -195,9 +244,7 @@ def getSignalDir(opt, year, tag, signal, directory):
 
 def isExotics(opt):
 
-    process=subprocess.Popen('grep "isExotics" '+opt.configuration, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
-    processOutput, processError = process.communicate()
-    return 'True' in processOutput
+    return hasattr(opt, 'isExotics')
 
 def plotAsExotics(opt):
 
@@ -240,6 +287,10 @@ def cleanDirectory(directory):
         if os.path.isdir(directory.replace('*', extension)):
             os.system('rmdir --ignore-fail-on-non-empty '+directory)
 
+def resetFile(filename):
+
+    os.system('rm -f '+filename)
+
 def deleteDirectory(directory):
 
     os.system('rm -r -f '+directory)
@@ -253,7 +304,8 @@ def cleanLogs(opt):
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
 
-            samples = getSamplesInLoop(opt.configuration, year, tag, opt.sigset)
+            combineAction = opt.combineAction if hasattr(opt, 'combineAction') else ''
+            samples = getSamplesInLoop(opt.configuration, year, tag, opt.sigset, combineAction)
 
             for sample in samples:
                 cleanSampleLogs(opt, year, tag, sample)
@@ -313,6 +365,7 @@ def cleanShapes(opt):
 
     for year in opt.year.split('-'):
         for tag in opt.tag.split('-'):
+
             deleteDirectory('/'.join([ opt.shapedir, year, tag, 'AsMuchAsPossible' ]))
 
 def deleteShapes(opt):
@@ -329,7 +382,7 @@ def copyIndexForPlots(mainPlotdir, finalPlotDir):
 
     subDir = mainPlotdir
     for subdir in finalPlotDir.split('/'):
-        if subdir not in subDir:
+        if subdir not in subDir.split('/'):
             subDir += '/'+subdir
             os.system('cp ../../index.php '+subDir)
 
@@ -342,10 +395,13 @@ def deletePlots(opt):
 
 def cleanSignalDatacards(opt, year, tag, signal, dryRun=False):
 
-    cleanSignalDatacardCommand = 'rm -r -f '+getSignalDir(opt, year, tag, signal, 'cardsdir')
+    cleanSignalDatacardCommandList = []
 
-    if dryRun: return cleanSignalDatacardCommand
-    else: os.system(cleanSignalDatacardCommand)
+    for singleYear in year.split('-'):
+        cleanSignalDatacardCommandList.append('rm -r -f '+getSignalDir(opt, singleYear, tag, signal, 'cardsdir'))
+
+    if dryRun: return '\n'.join(cleanSignalDatacardCommandList)
+    else: os.system('\n'.join(cleanSignalDatacardCommandList))
 
 def cleanDatacards(opt):
 
@@ -369,15 +425,22 @@ def purgeDatacards(opt):
 
 # jobs
 
-def batchQueue(batchQueue):
+def showQueue(opt):
+
+    if 'ifca' in os.uname()[1] or 'cloud' in os.uname()[1]: 
+        print '\nAvailable queues in slurm:\n cms_main = 24 hours\n cms_med  = 8 hours\n cms_high = 3 hours\n'
+    else: #cern 
+        print '\nAvailable queues in condor:\n espresso     = 20 minutes\n microcentury = 1 hour\n longlunch    = 2 hours\n workday      = 8 hours\n tomorrow     = 1 day\n testmatch    = 3 days\n nextweek     = 1 week\n'
+
+def batchQueue(opt, batchQueue):
 
     if 'ifca' in os.uname()[1] or 'cloud' in os.uname()[1]:
         if batchQueue not in [ 'cms_main', 'cms_med', 'cms_high' ]: 
-            print 'Batch queue', batchQueue, 'not available in gridui. Setting it to cms_high'
+            if opt.verbose: print 'Batch queue', batchQueue, 'not available in gridui. Setting it to cms_high'
             return 'cms_high'
     else: # cern
         if batchQueue not in ['espresso', 'microcentury', 'longlunch', 'workday', 'tomorrow', 'testmatch', 'nextweek' ]:
-            print 'Batch queue', batchQueue, 'not available in lxplus. Setting it to workday'
+            if opt.verbose: print 'Batch queue', batchQueue, 'not available in lxplus. Setting it to workday'
             return 'workday'
 
     return batchQueue
@@ -415,6 +478,8 @@ def getProcessIdList(opt):
            
             if opt.sigset=='*':
                 logDirList += getLogDir(opt, year, tag, '*').split(' ')
+            elif 'mergesig' in opt.logprocess:
+                logDirList += getLogDir(opt, year, tag, opt.sigset).split(' ')
             else:
                 for sample in getSamplesInLoop(opt.configuration, year, tag, opt.sigset):
                     logDirList += getLogDir(opt, year, tag, sample).split(' ')
@@ -440,7 +505,7 @@ def getProcessIdList(opt):
 
                 if processOutput:
 
-                    processId = processOutput.split('\n')[0].split('.')[0]
+                    processId = processOutput.replace('Submitted batch job','').split('\n')[0].split('.')[0]
                     if processId not in processIdList.keys(): 
                         processIdList[processId] = { 'logprocess' : logprocess, 'year' : yearJob, 'tag' : tagJob, 'samples' : [] }
                     if sample not in processIdList[processId]['samples']: processIdList[processId]['samples'].append(sample)    
@@ -456,7 +521,7 @@ def checkJobs(opt):
     if len(processIdList.keys())==0:
         logprocessInfo = 'logprocess='+opt.logprocess+', ' if opt.logprocess!='*' else ''
         print 'No job running for '+logprocessInfo+'year='+opt.year+', tag='+opt.tag+', sigset='+opt.sigset
-        exit()
+        return
 
     process=subprocess.Popen(checkCommand, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
     processOutput, processError = process.communicate()
@@ -467,7 +532,6 @@ def checkJobs(opt):
     if '*' in opt.logprocess: jobInfoList.insert(0, 'logprocess') 
 
     if processOutput:
-
         for processLine in processOutput.split('\n'):
             if 'JOB' in processLine: print processLine
             else:
@@ -522,7 +586,7 @@ def printKilledJobs(opt):
 
 ### Methods for analyzing shapes 
 
-def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
+def getShapeDirName(shapeDir, year, tag, fitoption=''):
 
     shapeDirList = [ shapeDir, year, tag.split('_')[0], fitoption ]
 
@@ -530,10 +594,17 @@ def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
         tag = tag.replace('___','_')
         if '__' in tag:
             shapeDirList.append(tag.replace(tag.split('__')[0],'').replace('__','/'))
-            tag = tag.split('__')[0]
-            
-    os.system('mkdir -p '+'/'.join(shapeDirList))
-    return '/'.join(shapeDirList)+'/plots_'+tag+setFileset(fileset, sigset)+'.root'
+
+    return '/'.join(shapeDirList)
+
+def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
+
+    shapeDirList = [ shapeDir, year, tag.split('_')[0], fitoption ]
+
+    #if fitoption!='':
+    tag = tag.replace('___','_').split('__')[0]
+
+    return getShapeDirName(shapeDir, year, tag, fitoption)+'/plots_'+tag+setFileset(fileset, sigset)+'.root'
 
 def foundShapeFiles(opt, rawShapes=False):
 
@@ -549,6 +620,16 @@ def foundShapeFiles(opt, rawShapes=False):
      
     return not missingShapeFiles
 
+def countedSampleShapeFiles(shapeDir, year, tag, sample):
+
+    sampleShapeDir = '/'.join([ shapeDir, year, tag, 'AsMuchAsPossible' ])
+    return len(glob.glob(sampleShapeDir+'/plots_'+year+tag+'_ALL_'+sample+'.*.root'))
+
+def foundSampleShapeFile(shapeDir, year, tag, sample):
+
+    sampleShapeDir = '/'.join([ shapeDir, year, tag, 'Samples' ])
+    return os.path.isfile(sampleShapeDir+'/plots_'+year+tag+'_ALL_'+sample+'.root')
+
 def openRootFile(fileName, mode='READ'):
 
     return ROOT.TFile(fileName, mode)
@@ -557,41 +638,80 @@ def openShapeFile(shapeDir, year, tag, sigset, fileset):
 
     return openRootFile(getShapeFileName(shapeDir, year, tag, sigset, fileset))
 
-def mergeShapes(opt):
+def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outputdir=None, inputnuisances=None, outputnuisances=None, verbose=False):
 
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mergeShapes.py :('
+    mergeCommandList = [ '--inputDir='+opt.shapedir, '--years='+years, '--tag='+tag, '--sigset='+fileset, '--nuisancesFile='+inputnuisances ]
+    if verbose: mergeCommandList.append('--verbose')
 
-def yieldsTables(opt):
+    if strategy=='deep': mergeCommandList.extend([ '--outputShapeDir='+outputdir, '--skipLNN' ])
+    else:                mergeCommandList.extend([ '--outputNuisFile='+outputnuisances, '--saveNuisances' ])
 
-    if 'fit' in opt.option.lower(): postfitYieldsTables(opt)
+    os.system('mergeDataTakingPeriodShapes.py '+' '.join( mergeCommandList ))
+
+def yieldsTables(opt, masspoints=''):
+
+    if 'fit' in opt.option.lower(): postFitYieldsTables(opt, masspoints)
     else: 
         print 'please, complete me :('
-        print 'using postfitYieldsTables for the time being'
+        print 'using postFitYieldsTables for the time being'
         opt.option += 'prefit'
-        postfitYieldsTables(opt)
+        postFitYieldsTables(opt, masspoints)
 
 def systematicsTables(opt):
 
     print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkSystematicsTables.py :('
 
+def mkPseudoData(opt, reftag=None, refsigset=None):
+  
+    optionCommand = ''
+    if opt.verbose: optionCommand += ' --verbose'
+    if reftag!=None: optionCommand += ' --reftag='+reftag
+    if refsigset!=None: optionCommand += ' --refsigset='+refsigset
+
+    for year in opt.year.split('-'):
+        os.system('mkPseudoData.py --year='+year+' --tag='+opt.tag+' --sigset='+opt.sigset+optionCommand)
+
 ### Modules for analyzing results from combine
+
+def setupCombineCommand(opt, joinstr='\n'):
+
+    return joinstr.join([ 'cd '+opt.combineLocation, 'eval `scramv1 runtime -sh`', 'cd '+opt.baseDir ])
+
+def getCombineOptionFlag(option, isForPlot=False):
+
+    combineOptionFlag = '_Toy' if 'toy' in option.lower() else ''
+    if 'asimovb' in option.lower(): combineOptionFlag = '_asimovB'
+    if 'asimovs' in option.lower(): combineOptionFlag = '_asimovS'
+    if 'asimovi' in option.lower(): combineOptionFlag = '_asimovI'
+    if not isForPlot: return combineOptionFlag
+    else:
+        if combineOptionFlag=='': return 'FitsToData'
+        else: return combineOptionFlag.replace('_a', 'A')
 
 def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
 
     if year=='': year = opt.year
     if tag=='': tag = opt.tag
+    if getCombineOptionFlag(opt.option) not in tag: tag += getCombineOptionFlag(opt.option)
 
-    if hasattr(opt, combineAction):
+    if hasattr(opt, 'combineAction'):
         combineAction = opt.combineAction
 
     if combineAction=='limits':
         combineOutDir = 'limitdir'
-        outputFileName = 'higgsCombine_'+getLimitRun(opt.unblind)+'.AsymptoticLimits.mH120.root'
+        if 'toy' in opt.option:
+            outputFileName = 'higgsCombineTest.HybridNew.mH120.root'
+        else:
+            limitRun = 'Both' if opt.unblind else 'Blind'
+            outputFileName = 'higgsCombine_'+limitRun+'.AsymptoticLimits.mH120.root'
     elif combineAction=='mlfits': 
         combineOutDir = 'mlfitdir'
-        outputFileName = 'fitDiagnostics.root'
+        outputFileName = 'fitDiagnostics'+getCombineOptionFlag(opt.option)+'.root'
+    elif combineAction=='impacts':
+        combineOutDir = 'impactdir'
+        outputFileName = 'impacts.pdf'
     else:
-        'Error in getCombineOutputFileName: please speficy if you want the output from a limit or a ML fit'
+        print 'Error in getCombineOutputFileName: please speficy if you want the output from a limit or a ML fit'
         exit()
 
     return getSignalDir(opt, year, tag, signal, combineOutDir)+'/'+outputFileName
@@ -642,11 +762,65 @@ def massScanLimits(opt):
 
 def fitMatrices(opt):
 
-    print 'please, port me fromhttps://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkMatrixPlots.py :('
+    signals = getSignals(opt)
+    yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]    
 
-def postfitYieldsTables(opt):
+    fitlevels = []
+    if 'prefit' in opt.option.lower(): fitlevels.append('prefit')
+    elif 'postfitb' in opt.option.lower(): fitlevels.append('fit_b')
+    elif 'postfits' in opt.option.lower(): fitlevels.append('fit_s')
+    else: print 'Error in fitMatrices: please choose a fit level (prefit, postfitb, postfits)'
 
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkYieldsTables.py :('
+    for year in yearList:
+        for tag in opt.tag.split('-'):
+            for fitlevel in fitlevels:
+
+                opt2 = copy.deepcopy(opt)
+                opt2.year, opt2.tag = year, year+tag
+                signals = getSignals(opt2)
+                luminosity = int(round(opt.lumi, 0)) if opt.lumi>100 else round(opt.lumi, 1)
+                legend = '\'L = '+str(luminosity)+'/fb (#sqrt{s} = 13 TeV)\''
+                fitoption = fitlevel.replace('prefit','PreFit').replace('fit_b','PostFitB').replace('fit_s','PostFitS')
+                mainOutputDir = '/'.join([ opt.plotsdir, year, tag, getCombineOptionFlag(opt.option,True) ])        
+
+                commandList = [ '--postFit='+fitlevel, '--legend='+legend ]
+                if 'nosavecov' not in opt.option.lower(): commandList.append('--saveCovariance')
+                if 'cutsToRemove:' in opt.option:
+                    commandList.append('--cutsToRemove='+opt.option.split('cutsToRemove:')[1].split(':')[0])
+                if 'nuisToRemove:' in opt.option:
+                    commandList.append('--nuisToRemove='+opt.option.split('nuisToRemove:')[1].split(':')[0])
+ 
+                for signal in signals:
+
+                    signalCommandList = commandList
+                    signalCommandList.append('--inputFile='+getCombineFitFileName(opt, signal, year, tag))
+                    signalCommandList.append('--outputDir='+'/'.join([ mainOutputDir, fitoption, signal, 'FitMatrices' ]))
+                    signalCommandList.append('--signal='+signal)
+
+                    if not 'onlynuis' in opt.option.lower(): os.system('mkMatrixPlots.py '+' '.join(signalCommandList))
+                    if not 'onlycuts' in opt.option.lower(): os.system('mkMatrixPlots.py '+' '.join(signalCommandList+['--doNuisances']))
+                    copyIndexForPlots(opt.plotsdir, '/'.join([ mainOutputDir, fitoption, signal, 'FitMatrices' ]))
+
+def postFitYieldsTables(opt, cardNameStructure='cut', masspoints=''):
+
+    yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
+
+    if 'prefit' in opt.option.lower(): fittype = 'PreFit'
+    elif 'postfitb' in opt.option.lower(): fittype = 'PostFitB'
+    else: fittype = 'PostFitS'
+
+    for year in yearList:
+        for tag in opt.tag.split('-'):
+
+            commandList = [ '--tag='+year+tag, '--year='+year, '--fit='+fittype, '--cardName='+cardNameStructure, '--masspoints='+masspoints ]
+
+            commandList.append('--inputDirMaxFit='+'/'.join([ opt.mlfitdir, year, tag ]))
+            commandList.append('--outputTableDir='+'/'.join([ opt.tabledir, year, tag ]))
+
+            if opt.unblind: commandList.append('--unblind')
+            if 'nosignal' in opt.option: commandList.append('--nosignal')
+    
+            os.system('mkPostFitYieldsTables.py '+' '.join(commandList))
 
 ### Methods for computing weights, efficiencies, scale factors, etc.
 
