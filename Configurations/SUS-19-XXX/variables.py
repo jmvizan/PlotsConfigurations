@@ -257,6 +257,34 @@ elif 'btagefficiencies' in opt.tag:
                             'xaxis' : 'jet pseudorapodity',        #   x axis name
                             } 
 
+elif 'SingleMuonTrigger' in opt.tag:
+
+    minPt = 29 if '2017' in opt.tag else 26
+    variables['muonpt']  = { 'name'  : 'Muon_pt[0]',                              #   variable name
+                             'range' : ([minPt, 30, 40, 50, 60, 120, 200],[1]), #   variable range
+                             'xaxis' : 'Muon'+pt+gv,                           #   x axis name
+                             'fold'  : overflow                               #   fold overflow
+                            }
+
+    variables['muon_pt']  = { 'name'  : 'Muon_pt[0]',                              #   variable name
+                             'range' : ( 40, 0., 200.),                          #   variable range
+                             'xaxis' : 'Muon'+pt+gv,                           #   x axis name
+                             'fold'  : overflow                               #   fold overflow
+                            }
+
+    variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+
+    variables['mll']           = {   'name'  : 'mll',                #   variable name
+                                     'range' : ( 40,    0.,  400.), #   variable range
+                                     'xaxis' : 'm' + pll + gv,       #   x axis name
+                                     'fold'  : overflow              #   fold overflow
+                                 }
+
 elif 'Trigger' in opt.tag:
 
     variables['Leptonpt1pt2']  = {  'name'  : 'Lepton_pt[1]:Lepton_pt[0]',                                                       #   variable name  
