@@ -3,15 +3,14 @@
 
 ## Trigger efficiencies
 
-if recoFlag=='_UL' and 'TrigLatino' not in opt.tag and 'Trigger' not in opt.tag and 'TriggerEffWeight_2l' in TriggerEff: # Too low stat for 3Lep
+if recoFlag=='_UL' and 'TrigLatino' not in opt.tag and 'Trigger' not in opt.tag:
 
-    leptonFlag = '_3Lep' if 'TriggerEffWeight_3l' in TriggerEff else ''
+    leptonFlag = '_3Lep' if 'TriggerEffWeight_3lXXX' in TriggerEff else '' # and 'TriggerEffWeight_2l' in TriggerEff: # Too low stat for 3Lep
     triggerEfficiencyFile = os.getenv('PWD')+'/Data/'+yeartag+'/TriggerEfficiencies_UL'+yeartag+leptonFlag+'.root'
     triggerPtBins = 'Leptonpt1pt2' # [20, 25, 30, 40, 50, 70, 100, 150, 200]
     #triggerPtBins = 'Leptonpt1pt2bis' # [20, 30, 40, 60, 100, 160, 200]
     triggerEtaBins = 'split' if ('TrigEta' in opt.tag or 'TrigBTagEta' in opt.tag) else 'merged'
-   
-    trW = 'triggerWeight' 
+  
     aliases['triggerWeight'] = {
             'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/triggerWeightReader.cc+' ],
             'class': 'TriggerWeightReader',
@@ -31,13 +30,14 @@ if recoFlag=='_UL' and 'TrigLatino' not in opt.tag and 'Trigger' not in opt.tag 
                 'args': ( triggerEfficiencyFile, triggerPtBins, triggerEtaBins, 'veto' ),
                 'samples': [ ]
         }
-        trW = '1.'
     for sample in samples:
         if not samples[sample]['isDATA']:
             aliases['triggerWeight']['samples'].append(sample)
+            trW = 'triggerWeight[1]' if 'TriggerEffWeight_2l' in TriggerEff else '1.' # Too low stat for 3Lep
             if 'TrigBTag' in opt.tag:
                 aliases['triggerWeightBTag']['samples'].append(sample)
                 aliases['triggerWeightVeto']['samples'].append(sample)
+                trW = '1.'
             samples[sample]['weight'] = samples[sample]['weight'].replace(TriggerEff, trW)
 
 ## Signal anlges
@@ -76,7 +76,12 @@ if recoFlag=='_UL':
  
 ## FastSim lepton scale factors
 
-fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag.replace('noHIPM','').replace('HIPM','')+'/fastsimLeptonWeights.root' # TODO switch to UL scale factors when FastSim available
+if 'FSv6' in opt.tag: 
+    fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag.replace('noHIPM','').replace('HIPM','')+'/fastsimLeptonWeights.root'
+elif 'T2' in opt.sigset:
+    fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag+'/fastsimLeptonWeights_UL_ttbar__all.root'
+else:
+    fastsimLeptonScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag+'/fastsimLeptonWeights_UL_DY.root'
 fastsimMuonScaleFactorHisto = 'Muo_tight_fullsim'
 fastsimElectronScaleFactorHisto = 'Ele_tight_fullsim'
 
@@ -98,23 +103,21 @@ for sample in samples:
 
 ## d_xy/d_z/noLostHits scale factors
 
-if 'nanoAODv8' in opt.samplesFile or 'TestExtraV8' in opt.tag:
-        
-    if "noweights" in opt.tag.lower(): 
-        print "no additional lepton weights being applied"
-    else:
-        AdditionalElectronScaleFactorFile = os.getenv('PWD')+'/Data/'+yeartag+'/AdditionalSF_'+yeartag+'Ele.root'
-        AdditionalMuonScaleFactorFile     = os.getenv('PWD')+'/Data/'+yeartag+'/AdditionalSF_'+yeartag+'Muon.root'
-        aliases['additionalLeptonWeight'] = {
-            'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/additionalLeptonWeightReader.cc+' ],
-            'class': 'AdditionalLeptonWeightReader',
-            'args': ( AdditionalMuonScaleFactorFile , AdditionalElectronScaleFactorFile, "hSFDataMC_central" ),
-            'samples': [ ]
-        }
-        for sample in samples:
-            if  not samples[sample]['isDATA']:
-                aliases['additionalLeptonWeight']['samples'].append(sample)
-                samples[sample]['weight'] = samples[sample]['weight'].replace(LepWeight, LepWeight+'*additionalLeptonWeight')
+if 'nanoAODv9' in opt.samplesFile and 'ExtraV1' not in opt.tag:
+
+    additionalSFDir = os.getenv('PWD')+'/../../../LatinoAnalysis/NanoGardener/python/data/scale_factor/Full'+yeartag.replace('noHIPM','').replace('HIPM','')+'v8/'       
+    AdditionalElectronScaleFactorFile = additionalSFDir+'AdditionalSF_'+yeartag.replace('2016','2016_')+'Ele_v2.root'
+    AdditionalMuonScaleFactorFile     = additionalSFDir+'AdditionalSF_'+yeartag.replace('2016','2016_')+'Muon.root'
+    aliases['additionalLeptonWeight'] = {
+        'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/additionalLeptonWeightReader.cc+' ],
+        'class': 'AdditionalLeptonWeightReader',
+        'args': ( AdditionalMuonScaleFactorFile , AdditionalElectronScaleFactorFile, "hSFDataMC_central" ),
+        'samples': [ ]
+    }
+    for sample in samples:
+        if  not samples[sample]['isDATA']:
+            aliases['additionalLeptonWeight']['samples'].append(sample)
+            samples[sample]['weight'] += '*additionalLeptonWeight[1]'
     
 elif 'nanoAODv6' in opt.samplesFile or 'TestExtraV6' in opt.tag:
 
@@ -139,4 +142,28 @@ elif 'nanoAODv6' in opt.samplesFile or 'TestExtraV6' in opt.tag:
         if not samples[sample]['isDATA']:
             aliases['zerohitLeptonWeight']['samples'].append(sample)
             samples[sample]['weight'] = samples[sample]['weight'].replace(EleWeight, EleWeight+'*zerohitLeptonWeight')
+
+## jet PU ID
+
+if recoFlag=='_UL' and 'JPUW' in opt.tag:
+
+    jetPUIDfile = os.getenv('PWD')+'/Data/PUID_106XTraining_ULRun2_EffSFandUncties_v1.root'
+    jetPUIDhisto = 'UL'
+    if '2016HIPM' in yeartag: jetPUIDhisto += '2016APV'
+    elif '2016noHIPM' in yeartag: jetPUIDhisto += '2016'
+    else: jetPUIDhisto += yeartag
+    jetPUIDhisto += '_L'
+
+    aliases['jetPUIDweight'] = {
+        'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/jetPUIDWeightReader.cc+' ],
+        'class': 'JetPUIDWeightReader',
+        'args': ( jetPUIDfile , jetPUIDhisto, float(bTagCut)),
+        'samples': [ ]
+    }
+    for sample in samples:
+        if not samples[sample]['isDATA']:
+            aliases['jetPUIDweight']['samples'].append(sample)
+            #samples[sample]['weight'] += '*jetPUIDweight'
+
+
 

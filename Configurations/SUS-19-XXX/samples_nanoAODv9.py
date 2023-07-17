@@ -54,7 +54,7 @@ nuis_btag_split = True
 
 treePrefix= 'nanoLatino_'
 
-isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit') or hasattr(opt, 'combineAction') or hasattr(opt, 'groups')
+isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit') or hasattr(opt, 'combineAction') or hasattr(opt, 'groups') or hasattr(opt, 'cutNameInOriginal')
 isShape = hasattr(opt, 'doHadd')
 isFillShape = isShape and not opt.doHadd
 isShapeOrPlot = isShape or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN')
@@ -68,6 +68,8 @@ if isShapeOrPlot:
 skipTreesCheck = False if len(yeartag.split('-'))==1 else True
 
 if 'SignalStudies' in opt.tag and not isFillShape: 
+    skipTreesCheck = True
+elif ('S2tt' in opt.sigset and 'T2tt' in opt.sigset) or ('TChipm' in opt.sigset and 'SChipm' in opt.sigset):
     skipTreesCheck = True
 elif isShape and skipTreesCheck:
     print 'Error: it is not allowed to fill shapes and skipping trees check!'
@@ -247,7 +249,7 @@ if metnom=='Nomin':
 elif metnom=='Smear':
     if not isDatacardOrPlot or not nuis_jer_whole:
         treeNuisances[SmtEU+'jer']      = { 'name' : 'JER',  'jetname' : 'JER', 'onesided' : False }
-    if not isDatacardOrPlot or nuis_jer_whole:
+    if (not isDatacardOrPlot or nuis_jer_whole) and 'cern' not in SITE:
         treeNuisances['nosmear']  = { 'name' : metsmr,                    'onesided' : True  }
     treeNuisances[SmtEU+'jesTotal']  = { 'name' : 'SJS',  'jetname' : 'JES', 'onesided' : False }
     treeNuisances[SmtEU+'unclustEn'] = { 'name' : 'SMT',                     'onesided' : False }
@@ -259,9 +261,6 @@ for treeNuisance in treeNuisances:
 treeNuisanceDirs = { }
 treeNuisanceSuffix = '__hadd' if ('cern' in SITE and 'EOY' in opt.sigset) else ''
 for treeNuisance in treeNuisances:
-    if '_NoJER' in opt.tag and 'jer' in treeNuisance: continue
-    if '_NoJES' in opt.tag and 'jesTotal' in treeNuisance: continue
-    if '_NoMET' in opt.tag and 'unclustEn' in treeNuisance: continue
     treeNuisanceDirs[treeNuisance] = { 'Bkg' : { }, 'Sig' : { }, }
     if treeNuisance=='nosmear' or treeNuisance=='smaer':
         treeNuisanceDirs[treeNuisance]['Bkg']['Up']   = directoryBkg.replace(metnom+'/', metsmr+'/') 
@@ -283,7 +282,8 @@ for treeNuisance in treeNuisances:
             treeNuisanceDirs[treeNuisance]['Sig'][variation]  = directorySigTemp.replace('variation', variation[:2])
 
 globalNuisances = { }
-globalNuisances['trigger'] = { 'name' : 'trigger_yeartag', 'value' : trigger_uncertainty }
+if 'TrigLatino' in opt.tag:
+    globalNuisances['trigger'] = { 'name' : 'trigger_yeartag', 'value' : trigger_uncertainty }
 if nuis_lumi_split:
     globalNuisances['lumi_unc'] = { 'name' : 'lumi_yeartag', 'value' : lumi_uncertainty_unc }
     globalNuisances['lumi_cor'] = { 'name' : 'lumi'         , 'value' : lumi_uncertainty_cor }
@@ -292,17 +292,19 @@ if nuis_lumi_split:
 else:
     globalNuisances['lumi']     = { 'name' : 'lumi_yeartag', 'value' : lumi_uncertainty }
 
-bTagNuisances = {
-    'mistag'   : { 'name' : 'mistag_yeartag',   'var' : 'l_VAR' },
-    'btagFS'   : { 'name' : 'btagFS_yeartag',   'var' : 'b_VAR_fastsim' },
-    'ctagFS'   : { 'name' : 'ctagFS_yeartag',   'var' : 'c_VAR_fastsim' },
-    'mistagFS' : { 'name' : 'mistagFS_yeartag', 'var' : 'l_VAR_fastsim' },
-}
-if nuis_btag_split and 'EOY' not in opt.sigset:
-    bTagNuisances['btagunc'] = { 'name' : 'btag_yeartag',     'var' : 'b_VAR_uncorrelated' }
-    bTagNuisances['btagcor'] = { 'name' : 'btag',              'var' : 'b_VAR_correlated' }
+if 'NoBTV' in opt.tag: bTagNuisances = {}
 else:
-    bTagNuisances['btag']    = { 'name' : 'btag_yeartag',     'var' : 'b_VAR' }
+    bTagNuisances = {
+        'mistag'   : { 'name' : 'mistag_yeartag',   'var' : 'l_VAR' },
+        'btagFS'   : { 'name' : 'btagFS_yeartag',   'var' : 'b_VAR_fastsim' },
+        'ctagFS'   : { 'name' : 'ctagFS_yeartag',   'var' : 'c_VAR_fastsim' },
+        'mistagFS' : { 'name' : 'mistagFS_yeartag', 'var' : 'l_VAR_fastsim' },
+    }
+    if nuis_btag_split and 'EOY' not in opt.sigset:
+        bTagNuisances['btagunc'] = { 'name' : 'btag_yeartag',     'var' : 'b_VAR_uncorrelated' }
+        bTagNuisances['btagcor'] = { 'name' : 'btag',              'var' : 'b_VAR_correlated' }
+    else:
+        bTagNuisances['btag']    = { 'name' : 'btag_yeartag',     'var' : 'b_VAR' }
 
 # Complex cut variables
 
@@ -442,7 +444,7 @@ btagWP += bTagWP
 
 #bTagPass = '(leadingPtTagged_'+btagAlgo+bTagWP+'_1c>='+bTagPtCut+')'
 bTagPass  = '(Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')>=1)' 
-bTagVeto  = '!'+bTagPass
+bTagVeto  = '(!'+bTagPass+')'
 #b2TagPass = bTagPass.replace('leadingPt', 'trailingPt')
 b2TagPass = '(Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')>=2)'
 
@@ -461,9 +463,33 @@ else:
     btagWeightNoCut = '1.'
 btagWeight2tag = btagWeight1tag.replace('_1tag_', '_2tag_')
 
-ISRCut     = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
-ISRCutData = ' '+ISRCut+' && '
-ISRCutMC   = '&& '+ISRCut
+ISRCut = 'CleanJet_pt[0]>150. && CleanJet_pt[0]!=leadingPtTagged_'+btagAlgo+bTagWP+'_1c && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'
+ISRWeightTag = btagWeight1tag
+ISRWeightTagRelVar = {}
+if 'Data' in opt.sigset or 'SingleLepton' in opt.sigset or 'NoBTV' in opt.tag: # from nAODv9 it should't matter anymore for data
+    btagWeightNoCut = '1.'
+    btagWeight1tag = bTagPass
+    btagWeight0tag = bTagVeto
+    btagWeight2tag = b2TagPass
+    ISRWeightTag   = bTagPass
+elif 'ObjectReview' in opt.tag or 'FXbtv' in opt.tag:
+    ISRCut = 'CleanJet_pt[0]>150. && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'  
+    #ISRWeightTag  = '(CleanJet_pt[0]>150.)*(acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5)*(1.-(Jet_'+btagDisc+'[CleanJet_jetIdx[0]]>='+bTagCut+')*Jet_btagSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx[0]]-('+btagWeight0tag+'))'
+    if 'SM' in opt.sigset or 'Backgrounds' in opt.sigset or not fastsimSignal:
+        ISRWeightTag = '('+btagWeight1tag+'-(CleanJet_pt[0]==leadingPtTagged_'+btagAlgo+bTagWP+'_1c)*Jet_btagSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx[0]])'
+        ISRWeightTagVar = '('+btagWeight1tag+'_syst-(CleanJet_pt[0]==leadingPtTagged_'+btagAlgo+bTagWP+'_1c)*((abs(Jet_hadronFlavour[CleanJet_jetIdx[0]])JFLCUT)*(Jet_btagSF_'+btagAlgo+bTagWP+'SFVAR[CleanJet_jetIdx[0]])+(!(abs(Jet_hadronFlavour[CleanJet_jetIdx[0]])JFLCUT))*(Jet_btagSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx[0]])))'
+    else:
+        ISRWeightTag = '('+btagWeight1tag+'-(CleanJet_pt[0]==leadingPtTagged_'+btagAlgo+bTagWP+'_1c)*Jet_btagSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx[0]]*Jet_btagFastSimSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx[0]])' 
+        ISRWeightTagVar = '('+btagWeight1tag+'_syst-(CleanJet_pt[0]==leadingPtTagged_'+btagAlgo+bTagWP+'_1c)*((abs(Jet_hadronFlavour[CleanJet_jetIdx[0]])JFLCUT)*(Jet_btagSF_'+btagAlgo+bTagWP+'SFVAR[CleanJet_jetIdx[0]])*(Jet_btagFastSimSF_'+btagAlgo+bTagWP+'SFVARFS[CleanJet_jetIdx[0]])+(!(abs(Jet_hadronFlavour[CleanJet_jetIdx[0]])JFLCUT))*(Jet_btagSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx[0]])*(Jet_btagFastSimSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx[0]])))'
+    for btagnuisance in bTagNuisances:
+        nuisVAR, nuisVARFS = '', ''
+        if 'fastsim' in bTagNuisances[btagnuisance]['var']: nuisVARFS = '_VAR'+bTagNuisances[btagnuisance]['var'].split('VAR')[-1].replace('_fastsim','')
+        else: nuisVAR = '_VAR'+bTagNuisances[btagnuisance]['var'].split('VAR')[-1]
+        nuisJFL = '!=0'
+        if 'l_' in bTagNuisances[btagnuisance]['var']: nuisJFL = '==0'
+        elif 'c_' in bTagNuisances[btagnuisance]['var']: nuisJFL = '==4'
+        elif 'fastsim' in bTagNuisances[btagnuisance]['var']: nuisJFL = '==5'
+        ISRWeightTagRelVar[btagnuisance] = ISRWeightTagVar.replace('SFVARFS', nuisVARFS).replace('SFVAR', nuisVAR).replace('JFLCUT', nuisJFL)+'/'+ISRWeightTag 
 
 ### MET Filters 
 
@@ -533,10 +559,10 @@ elif '2018' in yeartag and 'HEM' in DataQualityCuts:
 
 ### Trigger Efficiencies
 
-TriggerEff = 'TriggerEffWeight_2l' if ('Trigger' not in opt.tag and 'LeptonL2TRate' not in opt.tag) else '1.'
-
+TriggerEff = 'TriggerEffWeight_2l'
 if 'WZtoWW' in opt.tag or 'WZVal' in opt.tag or 'ZZVal' in opt.tag or 'ttZ' in opt.tag or 'FitCRZZ' in opt.tag or 'FitCRWZ' in opt.tag:
-    TriggerEff = 'TriggerEffWeight_3l' if 'TrigLatino' in opt.tag else '1.'
+    TriggerEff = 'TriggerEffWeight_3l'
+if 'Trigger' in opt.tag or 'LeptonL2TRate' in opt.tag: TriggerEff = '1.'
 
 ### MC weights
 
@@ -571,21 +597,24 @@ for lep_i in ['Lep']:
     for weight_i in allweights:
         lepW_i = LepWeight[lep_i][weight_i]
         if weight_i == 'FastSim': leptonSF["leptonIdIsoFS"] = { 'type' : 'lnN', 'weight' : '1.04' }
-        else: leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
-        if weight_i=='Extra':
-            if '2016HIPM' in yeartag or '2016noHIPM' in yeartag:
-                if lep_i=='Lep' or lep_i=='Ele':
-                    extraElectronSF    = ElectronSF+'_ExtraSF[lepIDX]'
-                    extraElectronSFvar = ElectronSF+'_ExtraSF_VAR[lepIDX]' 
-                    extraSFcorrection  = '(('+extraElectronSFvar+'*(abs('+extraElectronSF+'-'+extraElectronSFvar+')<0.4))+(FIXERR*'+extraElectronSF+'*(abs('+extraElectronSF+'-'+extraElectronSFvar+')>=0.4)))'
-                    extraElectronSF0up = extraSFcorrection.replace('lepIDX', '0').replace('VAR', 'Up').replace('FIXERR', '1.1')
-                    extraElectronSF1up = extraSFcorrection.replace('lepIDX', '1').replace('VAR', 'Up').replace('FIXERR', '1.1')
-                    extraElectronSF0do = extraSFcorrection.replace('lepIDX', '0').replace('VAR', 'Down').replace('FIXERR', '0.9')
-                    extraElectronSF1do = extraSFcorrection.replace('lepIDX', '1').replace('VAR', 'Down').replace('FIXERR', '0.9')
-                    leptonSFExtraUp = leptonSF[lep_i.lower()+weight_i]['weight'][0].replace(ElectronSF+'_ExtraSF_Up[0]',   extraElectronSF0up).replace(ElectronSF+'_ExtraSF_Up[1]',   extraElectronSF1up)
-                    leptonSF[lep_i.lower()+weight_i]['weight'][0] = leptonSFExtraUp 
-                    leptonSFExtraDo = leptonSF[lep_i.lower()+weight_i]['weight'][1].replace(ElectronSF+'_ExtraSF_Down[0]', extraElectronSF0do).replace(ElectronSF+'_ExtraSF_Down[1]', extraElectronSF1do)
-                    leptonSF[lep_i.lower()+weight_i]['weight'][1] = leptonSFExtraDo
+        elif weight_i=='Extra' and 'ExtraV1' not in opt.tag:
+            leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [ 'additionalLeptonWeight[2]/additionalLeptonWeight[1]', 'additionalLeptonWeight[0]/additionalLeptonWeight[1]' ]}
+        else: 
+            leptonSF[lep_i.lower()+weight_i] = {'type' : 'shape', 'weight' : [lepW_i.replace('SF[', 'SF_Up[')+'/('+lepW_i+')', lepW_i.replace('SF[', 'SF_Down[')+'/('+lepW_i+')']}
+            if weight_i=='Extra':
+                if '2016HIPM' in yeartag or '2016noHIPM' in yeartag:
+                    if lep_i=='Lep' or lep_i=='Ele':
+                        extraElectronSF    = ElectronSF+'_ExtraSF[lepIDX]'
+                        extraElectronSFvar = ElectronSF+'_ExtraSF_VAR[lepIDX]' 
+                        extraSFcorrection  = '(('+extraElectronSFvar+'*(abs('+extraElectronSF+'-'+extraElectronSFvar+')<0.4))+(FIXERR*'+extraElectronSF+'*(abs('+extraElectronSF+'-'+extraElectronSFvar+')>=0.4)))'
+                        extraElectronSF0up = extraSFcorrection.replace('lepIDX', '0').replace('VAR', 'Up').replace('FIXERR', '1.1')
+                        extraElectronSF1up = extraSFcorrection.replace('lepIDX', '1').replace('VAR', 'Up').replace('FIXERR', '1.1')
+                        extraElectronSF0do = extraSFcorrection.replace('lepIDX', '0').replace('VAR', 'Down').replace('FIXERR', '0.9')
+                        extraElectronSF1do = extraSFcorrection.replace('lepIDX', '1').replace('VAR', 'Down').replace('FIXERR', '0.9')
+                        leptonSFExtraUp = leptonSF[lep_i.lower()+weight_i]['weight'][0].replace(ElectronSF+'_ExtraSF_Up[0]',   extraElectronSF0up).replace(ElectronSF+'_ExtraSF_Up[1]',   extraElectronSF1up)
+                        leptonSF[lep_i.lower()+weight_i]['weight'][0] = leptonSFExtraUp 
+                        leptonSFExtraDo = leptonSF[lep_i.lower()+weight_i]['weight'][1].replace(ElectronSF+'_ExtraSF_Down[0]', extraElectronSF0do).replace(ElectronSF+'_ExtraSF_Down[1]', extraElectronSF1do)
+                        leptonSF[lep_i.lower()+weight_i]['weight'][1] = leptonSFExtraDo
 
 
 
@@ -612,7 +641,7 @@ else:
     nonpromptLepSF_Down = '( ' + promptLeptons + ' + (1. - ' + promptLeptons + ')*' + nonpromptLep['rateDown']  + ')'
 
 # global SF weights 
-if 'EOY' in opt.sigset or 'TestExtra' in opt.tag:
+if 'EOY' in opt.sigset or 'ExtraV1' not in opt.tag:
     SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight['Lep']['Reco'] + '*' + LepWeight['Lep']['IdIso'] + '*' + nonpromptLepSF
 else:
     SFweightCommon = 'puWeight*' + TriggerEff + '*' + LepWeight['Lep']['Tot'] + '*' + nonpromptLepSF
@@ -625,6 +654,7 @@ if '2018' in yeartag and 'HEM' in DataQualityCuts:
     SFweightCommon += '*' + VetoHEMmc
 SFweight       = SFweightCommon + '*' + METFilters_MC
 SFweightFS     = SFweightCommon + '*' + METFilters_FS + '*' + LepWeight['Lep']['FastSim'] + '*isrW'
+if 'noLepFS' in opt.tag: SFweightFS = SFweightCommon + '*' + METFilters_FS + '*isrW'
     
 ### Special weights
 

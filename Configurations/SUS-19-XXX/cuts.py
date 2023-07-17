@@ -7,12 +7,11 @@ SF    = LL+' && '+vetoZ
 
 NoJets = 'Alt$(CleanJet_pt[0],0)<' +jetPtCut
 HasJet = 'Alt$(CleanJet_pt[0],0)>='+jetPtCut
- 
-if 'Data' in opt.sigset or 'SingleLepton' in opt.sigset: # from nAODv9 it should't matter anymore 
-    btagWeightNoCut = '1.'
-    btagWeight1tag = bTagPass
-    btagWeight0tag = bTagVeto
-    btagWeight2tag = b2TagPass
+NoJetsWeight, HasJetWeight = '1.', '1.'
+if 'JPUW' in opt.tag and 'Data' not in opt.sigset:
+    NoJets = 'Alt$(CleanJet_pt[0],0)>=0'
+    NoJetsWeight = '(1.-jetPUIDweight)'
+    HasJetWeight = '(jetPUIDweight)'
 
 #cuts = {}
 
@@ -110,6 +109,12 @@ if 'unEn' in opt.tag:
     cuts['TwoLepNoSystLow'] = OC
     cuts['TwoLepNoSystMedium'] = OC
     cuts['TwoLepNoSystHigh'] = OC
+
+if 'EGM' in opt.tag:
+
+    cuts['TwoLep']    = OC
+    cuts['TwoLep_em'] = OC+' && '+DF
+    cuts['TwoLep_sf'] = OC+' && '+LL
 
 if 'SignalStudies' in opt.tag:
 
@@ -286,6 +291,7 @@ if 'DYMeasurements' in opt.tag:
 
     DY = OC+' && '+LL+' && mll>=60. && mll<=140.'
 
+    cuts['DY_ll']       = { 'expr' : '(' + DY+')', 'weight' : btagWeight0tag }
     cuts['DY_ee']       = { 'expr' : '(' + DY+' && '+EE+')', 'weight' : btagWeight0tag }
     cuts['DY_mm']       = { 'expr' : '(' + DY+' && '+MM+')', 'weight' : btagWeight0tag }
     cuts['DY_ee_nojet'] = { 'expr' : '(' + DY+' && '+EE+' && Alt$(CleanJet_pt[0],0)<30.)', 'weight' : btagWeight0tag }
@@ -311,7 +317,9 @@ if 'DYDarkMatterControlRegion' in opt.tag:
     cuts['DY_ee_pfmet'] = '(' + DY+' && '+EE+') && Alt$(CleanJet_pt[1],0)>=30. && ptmiss>=50.'
     cuts['DY_mm_pfmet'] = '(' + DY+' && '+MM+') && Alt$(CleanJet_pt[1],0)>=30. && ptmiss>=50.'
 
-if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.tag:
+if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.tag or 'HighPtMissDY' in opt.tag:
+
+    if 'HighPtMissDY' in opt.tag: SF = LL
 
     if not hasattr(opt, 'outputDirDatacard'):
 
@@ -324,10 +332,10 @@ if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.t
     cuts['VR1_Tag_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
     cuts['VR1_Tag_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
 
-    cuts['VR1_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
-    cuts['VR1_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
-    cuts['VR1_NoJet_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+NoJets, 'weight' : btagWeight0tag }
-    cuts['VR1_NoJet_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+NoJets, 'weight' : btagWeight0tag }
+    cuts['VR1_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag+'*'+HasJetWeight }
+    cuts['VR1_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag+'*'+HasJetWeight }
+    cuts['VR1_NoJet_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+NoJets, 'weight' : btagWeight0tag+'*'+NoJetsWeight }
+    cuts['VR1_NoJet_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140 && '+NoJets, 'weight' : btagWeight0tag+'*'+NoJetsWeight }
 
 if 'JetSelectionRegions' in opt.tag: # To optimize jet selections 
 
@@ -513,6 +521,29 @@ if 'ttZNormalization' in opt.tag or 'FitCRttZ' in opt.tag:
         ttZ4Lep += ' && '+ptmissTTZ4Lep+'>=METCUT'
     ttZselectionLoose = nTightLepton+'>=3 && (('+ ttZ3Lep + ') || (' + ttZ4Lep + ')) && nCleanJet>=2 && Alt$(CleanJet_pt[1],0)>='+jetPtCut   
     btagweightmixtag = '(('+btagWeight2tag+')*('+nLooseLepton+'==3) + ('+btagWeight1tag+')*('+nLooseLepton+'==4))'
+    btagweightmixtagSyst = {}
+    btagweightmixtagISRSyst = {}
+    if 'Data' not in opt.sigset and 'NoBTV' not in opt.tag:
+        btagJetSFsyst = '((abs(Jet_hadronFlavour[CleanJet_jetIdx])JFLCUT)*(Jet_btagSF_'+btagAlgo+bTagWP+'_SFVAR[CleanJet_jetIdx])+(!(abs(Jet_hadronFlavour[CleanJet_jetIdx])JFLCUT))*(Jet_btagSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx]))'
+        btagWeight1tagonlysyst = '(Sum$((Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')*'+btagJetSFsyst+'*(1.-'+btagWeight1tag+'_syst)/(1.-'+btagJetSFsyst+')))'
+        btagWeight2tagsyst = '(' +btagWeight1tag+'_syst - '+btagWeight1tagonlysyst+ ')'
+        #btagWeight2tagcorr = btagWeight2tagsyst.replace('_syst','').replace(btagJetSFsyst,'(Jet_btagSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx])')    
+        #btagweightmixtag = '(('+btagWeight2tagcorr+')*('+nLooseLepton+'==3) + ('+btagWeight1tag+')*('+nLooseLepton+'==4))'
+        btagWeight2tagisr = '('+btagWeight2tag+'-(CleanJet_pt[0]==leadingPtTagged_'+btagAlgo+bTagWP+'_1c)*Jet_btagSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx[0]]*(1.-(1.-'+btagWeight1tag+')/(1.-Jet_btagSF_'+btagAlgo+bTagWP+'[CleanJet_jetIdx[0]])))'
+        btagWeight2tagisrsyst = '('+btagWeight2tagsyst+'-(CleanJet_pt[0]==leadingPtTagged_'+btagAlgo+bTagWP+'_1c)*'+btagJetSFsyst.replace('CleanJet_jetIdx','CleanJet_jetIdx[0]')+'*(1.-(1.-'+btagWeight1tag+'_syst)/(1.-'+btagJetSFsyst.replace('CleanJet_jetIdx','CleanJet_jetIdx[0]')+')))'
+        for btagnuisance in bTagNuisances:
+            nuisVAR = 'VAR'+bTagNuisances[btagnuisance]['var'].split('VAR')[-1]
+            nuisJFL = '!=0'
+            if 'l_' in bTagNuisances[btagnuisance]['var']: nuisJFL = '==0'
+            elif 'c_' in bTagNuisances[btagnuisance]['var']: nuisJFL = '==4'
+            elif 'fastsim' in bTagNuisances[btagnuisance]['var']: nuisJFL = '==5'
+            btagWeight2tagsystnuis = btagWeight2tagsyst.replace('SFVAR', nuisVAR).replace('JFLCUT', nuisJFL)
+            btagweightmixtagsyst = '(('+btagWeight2tagsystnuis+')*('+nLooseLepton+'==3) + ('+btagWeight1tag+'_syst)*('+nLooseLepton+'==4))' 
+            btagweightmixtagSyst[btagnuisance] = btagweightmixtagsyst+'/'+btagweightmixtag     
+            if len(ISRWeightTagRelVar.keys())>0:
+                ISRWeightMixTag = '(('+btagWeight2tagisr+')*('+nLooseLepton+'==3) + ('+ISRWeightTag+')*('+nLooseLepton+'==4))'
+                btagWeight2tagisrsystnuis = btagWeight2tagisrsyst.replace('SFVAR', nuisVAR).replace('JFLCUT', nuisJFL) 
+                btagweightmixtagISRSyst[btagnuisance] = '(('+btagWeight2tagisrsystnuis+')/('+btagWeight2tagisr+')*('+nLooseLepton+'==3)+'+ISRWeightTagRelVar[btagnuisance]+'*('+nLooseLepton+'==4))'
 
     if 'ttZNormalization' in opt.tag:
 
@@ -550,7 +581,7 @@ if 'ttZNormalization' in opt.tag or 'FitCRttZ' in opt.tag:
         cuts['ttZ_ptmiss-100_loosemixtag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '100') + ')', 'weight' : btagweightmixtag }
         cuts['ttZ_ptmiss-160_loosemixtag'] = { 'expr' : '(' + ttZselectionLoose.replace('METCUT', '160') + ')', 'weight' : btagweightmixtag }
 
-if 'DYValidationRegion' in opt.tag:
+if 'DYValidationRegion' in opt.tag and 'HighPtMissDY' not in opt.tag:
 
     DY = OC + ' && ' + LL + ' && ' + Zcut.replace('ZCUT',  '15.')
 
@@ -624,8 +655,10 @@ if 'SignalRegion' in opt.tag:
 
     for SR in ptmiss_cuts:
 
-        isrcut = ''
-        if SR in isrRegions: isrcut=' && '+ISRCut
+        isrcut, tageventweight = '', btagWeight1tag
+        if SR in isrRegions:
+            isrcut = ' && '+ISRCut 
+            tageventweight = ISRWeightTag 
 
         if splitjets is True:
             if   SR == "SR1":
@@ -638,8 +671,8 @@ if 'SignalRegion' in opt.tag:
         btagcut=''
         vetocut=''
 
-        cuts[SR+'_Tag_em' ]  = { 'expr' : '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+btagcut+')', 'weight' : btagWeight1tag }
-        cuts[SR+'_Tag_sf' ]  = { 'expr' : '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+btagcut+')', 'weight' : btagWeight1tag }
+        cuts[SR+'_Tag_em' ]  = { 'expr' : '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+btagcut+')', 'weight' : tageventweight }
+        cuts[SR+'_Tag_sf' ]  = { 'expr' : '(' + OC+' && '+SF+ptmiss_cuts[SR]+isrcut+btagcut+')', 'weight' : tageventweight }
         
         if splitjets is True and SR in ["SR1","SR2"]:
             cuts[SR+'_NoTag_em'] = { 'expr' : '(' + OC+' && '+DF+ptmiss_cuts[SR]+isrcut+vetocut+jetscut +')', 'weight' : btagWeight0tag }
@@ -679,12 +712,17 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 if isDatacardOrPlot: # Ugly, but in this case these variables are not used
                     ttZselectionLoose = ''
                     btagweightmixtag = '1.'
+                    ISRWeightMixTag = '1.'
 
                 exprCR = exprcut.replace('ptmiss_phi', ptmiss_phi_ttZLoose)
                 exprCR = exprCR.replace('ptmiss>', ptmiss_ttZLoose+'>')
                 exprCR = exprCR.replace('ptmiss<', ptmiss_ttZLoose+'<')
                 exprCR = exprCR.replace(OC, ttZselectionLoose)
                 crcuts[crcut.replace('_sf', '_ttZ')] = { 'expr' : exprCR, 'weight' : btagweightmixtag }
+
+                if len(ISRWeightTagRelVar.keys())>0:
+                    if '3_Tag' in crcut or '4_Tag' in crcut:
+                        crcuts[crcut.replace('_sf', '_ttZ')]['weight'] = ISRWeightMixTag
 
             if '_Tag_' not in cut and ('FitCRWZ' in opt.tag or isStrictDatacardOrPlot):
              
@@ -784,7 +822,6 @@ if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):
 
 if 'SearchRegion' in opt.tag:
 
-
     cuts['Search_em']        = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeightNoCut }
     cuts['Search_sf']        = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeightNoCut }
 
@@ -798,6 +835,22 @@ if 'SearchRegion' in opt.tag:
     cuts['Search_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160 && '+HasJet, 'weight' : btagWeight0tag }
     cuts['Search_NoJet_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160 && '+NoJets, 'weight' : btagWeight0tag }
     cuts['Search_NoJet_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160 && '+NoJets, 'weight' : btagWeight0tag } 
+
+if 'SearchVetoRegion' in opt.tag:
+
+    cuts['Search_em']        = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+    cuts['Search_sf']        = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+
+    cuts['Search_Veto_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
+    cuts['Search_Veto_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
+
+    cuts['Search_Tag_em']    = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
+    cuts['Search_Tag_sf']    = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'<140', 'weight' : btagWeight1tag }
+
+    cuts['Search_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
+    cuts['Search_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'<140 && '+HasJet, 'weight' : btagWeight0tag }
+    cuts['Search_NoJet_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'<140 && '+NoJets, 'weight' : btagWeight0tag }
+    cuts['Search_NoJet_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'<140 && '+NoJets, 'weight' : btagWeight0tag }
 
 # For structure and plot cfg files
 

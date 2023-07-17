@@ -81,20 +81,28 @@ void AdditionalLeptonWeightReader::bindTree_(multidraw::FunctionLibrary& _librar
 }
 
 void AdditionalLeptonWeightReader::setValues() {
+
   additionalLeptonWeightReader.clear();
-  float additionalLeptonWeight = 1.;
-  for (int ilep = 0; ilep<2; ilep++) {  
-    double lepEta{Lepton_eta->At(ilep)}; //TODO will use scEta for electron 
-    double lepPt{Lepton_pt->At(ilep)};
-    int lepId{Lepton_pdgId->At(ilep)};
-    if (lepId==11 || lepId==-11) { // How was abs in C++?
-      additionalLeptonWeight *= this->GetBinContent4Weight(histEleAdditionalLeptonWeightReader, lepEta, lepPt, 0);
-    } else {
-      additionalLeptonWeight *= this->GetBinContent4Weight(histMuoAdditionalLeptonWeightReader, lepEta, lepPt, 0);
+
+  for (int sfsyst = -1; sfsyst<=1; sfsyst++) {
+
+    float additionalLeptonWeight = 1.;
+
+    for (int ilep = 0; ilep<2; ilep++) {  
+      double lepEta{Lepton_eta->At(ilep)}; //TODO will use scEta for electron 
+      double lepPt{Lepton_pt->At(ilep)};
+      int lepId{Lepton_pdgId->At(ilep)};
+      if (lepId==11 || lepId==-11) { // How was abs in C++?
+        additionalLeptonWeight *= this->GetBinContent4Weight(histEleAdditionalLeptonWeightReader, lepEta, lepPt, sfsyst);
+      } else {
+        additionalLeptonWeight *= this->GetBinContent4Weight(histMuoAdditionalLeptonWeightReader, lepEta, lepPt, sfsyst);
+      }
+      //std::cout<<"ilep:"<<ilep<<" ID:"<<lepId<<", weight: "<<additionalLeptonWeight<<", pt "<<lepPt<<", eta: "<< lepEta<< std::endl;
     }
-    //std::cout<<"ilep:"<<ilep<<" ID:"<<lepId<<", weight: "<<additionalLeptonWeight<<", pt "<<lepPt<<", eta: "<< lepEta<< std::endl;
+
+    additionalLeptonWeightReader.push_back(additionalLeptonWeight);
+
   }
-  additionalLeptonWeightReader.push_back(additionalLeptonWeight);
 
 }
 

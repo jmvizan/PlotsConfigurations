@@ -94,7 +94,6 @@ void TriggerWeightReader::setValues() {
 
   triggerWeightReader.clear();
 
-  float triggerWeight = -1.;
   double LeadingLeptonPt{Lepton_pt->At(0)};
   double TrailingLeptonPt{Lepton_pt->At(1)};
   double LeadingLeptonEta{Lepton_eta->At(0)};
@@ -102,30 +101,36 @@ void TriggerWeightReader::setValues() {
   int TrailingLeptonId{Lepton_pdgId->At(1)};
   int channel = LeadingLeptonId*TrailingLeptonId;
 
-  if (abs(channel)==121) {
-      if (fabs(LeadingLeptonEta)<=1.2) {
-          triggerWeight = this->GetBinContent4Weight(histEleEleCentralTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, 0);
-      } else {
-          triggerWeight = this->GetBinContent4Weight(histEleEleForwardTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, 0);
+  for (int trsyst = -1; trsyst<=1; trsyst++) {
+
+      float triggerWeight = -1.;
+
+      if (abs(channel)==121) {
+          if (fabs(LeadingLeptonEta)<=1.2) {
+              triggerWeight = this->GetBinContent4Weight(histEleEleCentralTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, trsyst);
+          } else {
+              triggerWeight = this->GetBinContent4Weight(histEleEleForwardTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, trsyst);
+          }
+      } else if (abs(channel)==169) {
+          if (fabs(LeadingLeptonEta)<=1.2) {
+              triggerWeight = this->GetBinContent4Weight(histMuoMuoCentralTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, trsyst);
+          } else {
+              triggerWeight = this->GetBinContent4Weight(histMuoMuoForwardTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, trsyst);
+          }
+      } else if (abs(channel)==143) {
+          if (fabs(LeadingLeptonEta)<=1.2) {
+              triggerWeight = this->GetBinContent4Weight(histEleMuoCentralTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, trsyst);
+          } else {
+              triggerWeight = this->GetBinContent4Weight(histEleMuoForwardTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, trsyst);
+          }
       }
-  } else if (abs(channel)==169) {
-      if (fabs(LeadingLeptonEta)<=1.2) {
-          triggerWeight = this->GetBinContent4Weight(histMuoMuoCentralTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, 0);
-      } else {
-          triggerWeight = this->GetBinContent4Weight(histMuoMuoForwardTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, 0);
-      }
-  } else if (abs(channel)==143) {
-      if (fabs(LeadingLeptonEta)<=1.2) {
-          triggerWeight = this->GetBinContent4Weight(histEleMuoCentralTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, 0);
-      } else {
-          triggerWeight = this->GetBinContent4Weight(histEleMuoForwardTriggerWeightReader, LeadingLeptonPt, TrailingLeptonPt, 0);
-      }
+
+      if (triggerWeight<=0.) 
+          std::cout << "TriggerWeightReader Error for " << channel << " " << LeadingLeptonPt << " " << TrailingLeptonPt << " " << LeadingLeptonEta << std::endl;
+
+      triggerWeightReader.push_back(triggerWeight);
+
   }
-
-  if (triggerWeight<=0.) 
-      std::cout << "TriggerWeightReader Error for " << channel << " " << LeadingLeptonPt << " " << TrailingLeptonPt << " " << LeadingLeptonEta << std::endl;
-
-  triggerWeightReader.push_back(triggerWeight);
 
 }
 
@@ -143,7 +148,8 @@ double TriggerWeightReader::GetBinContent4Weight(TH2* hist, double valx, double 
   if(valy>ymax) valy=ymax-0.001;
   float weight = hist->GetBinContent(hist->FindBin(valx,valy));
   if (sys!=0) {
-    weight += sys*hist->GetBinError(hist->FindBin(valx,valy));
+    float weightError = sqrt((0.02*weight)*(0.02*weight)+(hist->GetBinError(hist->FindBin(valx,valy))*hist->GetBinError(hist->FindBin(valx,valy))));
+    weight += sys*weightError;
   }
   return weight;
 }

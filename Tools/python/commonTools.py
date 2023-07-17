@@ -228,6 +228,10 @@ def getTagForDatacards(tag, sigset):
 
 def getSignalDir(opt, year, tag, signal, directory):
 
+    if hasattr(opt, 'combineOutDir') and opt.combineOutDir.split('/')[-1]==opt.cardsdir.split('/')[-1]:
+        signalDirList = [ getattr(opt, directory), tag, signal, year ]
+        return '/'.join(signalDirList)
+
     signalDirList = [ getattr(opt, directory), year ]
     tag = tag.replace('___','_')
     if '__' in tag:
@@ -597,8 +601,8 @@ def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
 
     shapeDirList = [ shapeDir, year, tag.split('_')[0], fitoption ]
 
-    if fitoption!='':
-        tag = tag.replace('___','_').split('__')[0]
+    #if fitoption!='':
+    tag = tag.replace('___','_').split('__')[0]
 
     return getShapeDirName(shapeDir, year, tag, fitoption)+'/plots_'+tag+setFileset(fileset, sigset)+'.root'
 

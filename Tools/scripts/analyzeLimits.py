@@ -742,7 +742,6 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
         histoMin[axis] = minEdge - histogramSettings[axis]['minCenter']*binWidth
         histoMax[axis] = maxEdge + histogramSettings[axis]['maxCenter']*binWidth
         histoBin[axis] = int((histoMax[axis] - histoMin[axis])/binWidth)
-        
     massScanHistos = { } 
 
     for massPoint in massPoints:

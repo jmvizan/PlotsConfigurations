@@ -280,6 +280,7 @@ def mergeFitCR(opt):
             outputTag = tag.replace('VetoesUL', 'FitCRVetoesUL')
             outputDir = commonTools.getShapeDirName(opt.shapedir, year, outputTag)
             os.system('mkdir -p '+outputDir)
+            signalTag = tag.split('VetoesUL')[-1] 
 
             for signal in getSignalList(opt, opt.sigset, tag):
 
@@ -287,10 +288,10 @@ def mergeFitCR(opt):
                 if opt.recover and commonTools.isGoodFile(outputFile): continue
                 os.system('rm -r -f '+outputFile)
 
-                filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','') ]
+                filesToMerge = [ outputFile.replace('FitCR','').replace('-'+signal,'').replace('FastReco','').replace(signalTag,'') ]
                 filesToMerge.append(outputFile.replace('FitCR','').replace('SM-','').replace('Group','').replace('WWTails','').replace('WWHighs','').replace('WWPol1a','').replace('SmtEU',''))
                 for backcr in opt.backgroundsInFit:
-                    filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,'').replace('FastReco','').replace('Fast','').replace('SigV6','').replace('SmtEU',''))
+                    filesToMerge.append(outputFile.replace('FitCR','FitCR'+backcr).replace('-'+signal,'').replace('FastReco','').replace(signalTag,'').replace('SmtEU',''))
 
                 foundFilesToMerge = True
                 for fileToMerge in filesToMerge:
@@ -513,7 +514,8 @@ def makeContours(opt, plotoption='2', fitOption='Blind'):
     histogramFile                = histogramDir + '_'.join([ '/massScan', opt.tag, sigset, fitOption ]) + '.root'
     contourFile                  = contourDir   + '_'.join([ '/massScan', opt.tag, sigset, fitOption ]) + '.root' 
 
-    if opt.reset: 
+    if opt.reset:
+        print ' '.join([ histogramFileNoFillEmptyBins, histogramFile, contourFile ]) 
         os.system('rm -f '+' '.join([ histogramFileNoFillEmptyBins, histogramFile, contourFile ]))
  
     commandList = [ '--years='+opt.year, '--tag='+opt.tag, '--sigset='+sigset, '--limitoption='+fitOption ]

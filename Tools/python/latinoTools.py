@@ -383,7 +383,7 @@ def plots(opt):
     elif 'merge' in opt.option: mergedPlots(opt)
     else: 
 
-        if not commonTools.foundShapeFiles(opt): exit()
+        if not commonTools.foundShapeFiles(opt, True): exit()
 
         nuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
 

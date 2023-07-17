@@ -35,6 +35,20 @@ for globalNuisance in globalNuisances:
         if not samples[sample]['isDATA']:
             nuisances[globalNuisance]['samples'][sample] = globalNuisances[globalNuisance]['value']
 
+# trigger stat
+
+if 'TrigLatino' not in opt.tag:
+    nuisances['trigger']  = {
+        'name'    : 'trigger'+year,
+        'type'    : 'shape',
+        'kind'    : 'weight',
+        'samples' : { },
+    }
+    for sample in samples.keys():
+        if not samples[sample]['isDATA']:
+            if 'SigV6' not in opt.tag or not samples[sample]['isSignal']:
+                nuisances['trigger']['samples'][sample] = [ 'triggerWeight[2]/triggerWeight[1]', 'triggerWeight[0]/triggerWeight[1]' ]
+ 
 # background cross section and scale factor uncertainties
 
 for background in normBackgroundNuisances:
@@ -58,6 +72,8 @@ for background in normBackgroundNuisances:
             for globalNuisance in globalNuisances: 
                 if background in nuisances[globalNuisance]['samples']:
                     del nuisances[globalNuisance]['samples'][background]
+            if background in nuisances['triggerStat']['samples']:
+                    del nuisances['triggerStat']['samples'][background]
 
 ### shapes
 
@@ -86,6 +102,22 @@ bSelections = { '1b' : { 'weight' : btagWeight1tagSyst+'_syst/'+btagWeight1tagSy
                 '0b' : { 'weight' : '(1.-'+btagWeight1tagSyst+'_syst)/(1.-'+btagWeight1tagSyst+')',
                          'cuts'   : [ '_Veto', 'SSV_', '_NoTag', 'WZ_', 'WZtoWW_', 'ZZ', 'Zpeak' ] },
                }
+if 'ttZNormalization' in opt.tag or 'FitCRttZ' in opt.tag:
+    if len(btagweightmixtagSyst.keys())>0:
+        bSelections['ttZ'] = { 'weight' : btagweightmixtagSyst }
+        if len(btagweightmixtagISRSyst.keys())==0:
+            bSelections['ttZ']['cuts'] = [ '_Tag', 'ttZ' ] 
+        else:
+            bSelections['ttZ']['cuts'] = [ 'SR1_Tag', 'SR2_Tag', 'CR1_Tag', 'CR2_Tag' ]
+            bSelections['isr'] = { 'weight' : btagweightmixtagISRSyst,
+                                   'cuts'   : [ 'SR3_Tag', 'SR4_Tag', 'CR3_Tag', 'CR4_Tag' ] }
+        del bSelections['1b']
+        del bSelections['0b']
+elif len(ISRWeightTagRelVar.keys())>0:
+    bSelections['isr'] = { 'weight' : ISRWeightTagRelVar,
+                           'cuts'   : [ 'SR3_Tag', 'SR4_Tag' ] }
+    bSelections['1b']['cuts'].remove('_Tag')
+    bSelections['1b']['cuts'].extend([ 'SR1_Tag', 'SR2_Tag']) 
 
 for scalefactor in bTagNuisances:
     for bsel in bSelections:
@@ -102,8 +134,13 @@ for scalefactor in bTagNuisances:
             if not samples[sample]['isDATA']:
                 if 'FS' not in scalefactor or samples[sample]['isFastsim']:
                     if ('EOY' not in sample and not samples[sample]['isFastsim']) or scalefactor!='btagcor': 
-                        nuisances[scalefactor+bsel]['samples'][sample] = [ bselweight.replace('syst', scafactvar.replace('VAR', 'up'  )),
-                                                                           bselweight.replace('syst', scafactvar.replace('VAR', 'down')) ]
+                        if isinstance(bselweight, str):
+                            nuisances[scalefactor+bsel]['samples'][sample] = [ bselweight.replace('syst', scafactvar.replace('VAR', 'up'  )),
+                                                                               bselweight.replace('syst', scafactvar.replace('VAR', 'down')) ]
+                        else:
+                            nuisances[scalefactor+bsel]['samples'][sample] = [ bselweight[scalefactor].replace('syst', scafactvar).replace('VAR', 'up'  ), 
+                                                                               bselweight[scalefactor].replace('syst', scafactvar).replace('VAR', 'down') ] 
+
         for cut in cuts.keys():
             for bselcut in bSelections[bsel]['cuts']:
                 if bselcut in cut:
@@ -112,15 +149,16 @@ for scalefactor in bTagNuisances:
 
 # pileup
 
-nuisances['pileup']  = {
-    'name'  : 'pileup', # inelastic cross section correlated through the years
-    'samples'  : { },
-    'kind'  : 'weight',
-    'type'  : 'shape',
-}
-for sample in samples.keys():
-    if not samples[sample]['isDATA']:
-        nuisances['pileup']['samples'][sample] = [ 'puWeightUp/puWeight', 'puWeightDown/puWeight' ] 
+if '_NoPU' not in opt.tag:
+    nuisances['pileup']  = {
+        'name'  : 'pileup', # inelastic cross section correlated through the years
+        'samples'  : { },
+        'kind'  : 'weight',
+        'type'  : 'shape',
+    }
+    for sample in samples.keys():
+        if not samples[sample]['isDATA']:
+            nuisances['pileup']['samples'][sample] = [ 'puWeightUp/puWeight', 'puWeightDown/puWeight' ] 
 
 # ECAL prefiring
 
@@ -405,7 +443,7 @@ for yeartomerge in yearstaglist:
                 nuisances['pdf']['samples'][sample] = pdfVariations
 
 for cut in cuts: # TODO: Why only in the signal regions? 
-    if 'SR' in cut.split('_')[0]: #or 'SM' in opt.sigset:
+    if 'SR' in cut.split('_')[0] and 'ObjectReview' not in opt.tag:
         nuisances['qcdScale']['cuts'].append(cut)
         nuisances['pdf']['cuts'].append(cut)
 
@@ -417,6 +455,10 @@ if '_NoPDF'      in opt.tag: del nuisances['pdf']
 for treeNuisance in treeNuisances:
 
     for mcType in treeNuisanceDirs[treeNuisance]:
+        if '_NoSigEU' in opt.tag and mcType=='Sig': continue
+        if '_NoJER' in opt.tag and 'jer' in treeNuisance: continue
+        if '_NoJES' in opt.tag and 'jes' in treeNuisance: continue
+        if '_NoMET' in opt.tag and 'unc' in treeNuisance: continue
         if 'Down' not in treeNuisanceDirs[treeNuisance][mcType] or 'Up' not in treeNuisanceDirs[treeNuisance][mcType]:
             print 'nuisance warning: missing trees for', treeNuisance, mcType, 'variations'
         else:
@@ -479,9 +521,19 @@ if '_NoWWRate' not in opt.tag:
         'subcuts' : [ '_NoTag_' ],
         'bondrate' : 'NoJetRate_DibosonBack',
     }
+if '_NewBond4' in opt.tag:
+    rateparameters['Topnorm']['limits'] = '[0.7,1.3]'
+    rateparameters['WWnorm']['limits'] = '[0.5,1.5.]'
 if '_NoJetBond' not in opt.tag:
-    rateparameters['NoJetRate_JetBack']['limits'] = '[0.5,1.5]'
-    rateparameters['NoJetRate_DibosonBack']['limits'] = '[0.7,1.3]'
+    if '_NewBond3' in opt.tag or '_NewBond4' in opt.tag:
+        rateparameters['NoJetRate_JetBack']['limits'] = '[0.2,2.]'
+        rateparameters['NoJetRate_DibosonBack']['limits'] = '[0.2.,2.]'
+    else:
+        rateparameters['NoJetRate_JetBack']['limits'] = '[0.5,1.5]'
+        rateparameters['NoJetRate_DibosonBack']['limits'] = '[0.7,1.3]'
+if '_KeepVetoNorm' not in opt.tag:
+    del rateparameters['JetRate_JetBack']
+    del rateparameters['JetRate_DibosonBack']
 
 if 'FitCR' in opt.tag:
     backgroundCRs = { 'ttZ' : { 'samples' : [ 'ttZ' ],
@@ -491,6 +543,7 @@ if 'FitCR' in opt.tag:
                       'ZZ'  : { 'samples' : [ 'ZZTo2L2Nu', 'ZZTo4L' ],
                                 'regions' : { '_Veto_' : [ '_Veto_', '_Tag_' ] , '_NoTag_' : [ '_NoTag_', '_Tag_' ], '_NoJet_' : [ '_NoJet_' ] }, },
                     }
+    if '_NoZZ2Lrate' in opt.tag: backgroundCRs['ZZ']['samples'] = [ 'ZZTo4L' ]
     for controlregion in backgroundCRs:
         for sample in backgroundCRs[controlregion]['samples']:
             for rateparam in rateparameters.keys():
@@ -506,7 +559,10 @@ if 'FitCR' in opt.tag:
                 rateparameters['CR'+region+controlregion] = { }
                 rateparameters['CR'+region+controlregion]['samples'] = backgroundCRs[controlregion]['samples']
                 rateparameters['CR'+region+controlregion]['subcuts'] = backgroundCRs[controlregion]['regions'][region]
-                if '_NoCRBond' not in opt.tag: rateparameters['CR'+region+controlregion]['limits'] = '[0.3,1.7]'
+                if '_NoCRBond' not in opt.tag: 
+                    if '_NewBond2' in opt.tag or '_NewBond3' in opt.tag or '_NewBond4' in opt.tag: rateparameters['CR'+region+controlregion]['limits'] = '[0.,5.]' 
+                    elif '_NewBond' in opt.tag: rateparameters['CR'+region+controlregion]['limits'] = '[0.2,2.]'
+                    else: rateparameters['CR'+region+controlregion]['limits'] = '[0.3,1.7]'
 
 if hasattr(opt, 'outputDirDatacard'):
     for mt2llregion in mt2llRegions: 
@@ -608,7 +664,7 @@ for nuisance in nuisanceToRemove:
 nuisanceToRemove = [ ]  
 
 if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag or 'SearchRegion' in opt.tag:
-
+    
     if ('nanoAODv6' in opt.samplesFile and 'ctrl' in regionName and 'cern' in SITE): 
  
         if hasattr(opt, 'batchSplit'): # Remove only when running shapes, so can make shapes in gridui and plots+datacards in lxplus
@@ -653,6 +709,23 @@ else:
     for nuisance in nuisances:
         if nuisance!='stat' and 'lumi' not in nuisance: # example ...
             nuisanceToRemove.append(nuisance)
+
+if '_KeepNuis' in opt.tag:
+    for nuisance in nuisances:
+        if nuisance!='stat' and 'name' in nuisances[nuisance]:
+            keepNuis = False
+            for nuisToKeep in opt.tag.split('_KeepNuis:')[-1].split('_')[0].split(':'):
+                if nuisToKeep in nuisances[nuisance]['name']: 
+                    keepNuis = True
+                    break
+            if not keepNuis: nuisanceToRemove.append(nuisance)
+
+if '_BTV' in opt.tag:
+    nuisanceToRemove.append('stat')
+    for nuisance in nuisances:
+        if 'name' in nuisances[nuisance]:
+            if 'mistag' not in nuisances[nuisance]['name'] and 'ctag' not in nuisances[nuisance]['name'] and 'btag' not in nuisances[nuisance]['name']:
+                nuisanceToRemove.append(nuisance)
 
 for nuisance in nuisanceToRemove:
     del nuisances[nuisance]
