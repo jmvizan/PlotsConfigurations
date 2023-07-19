@@ -11,7 +11,7 @@ def mkShapesMulti(opt, year, tag, splits, action):
 
     mainDir = '/'.join([ opt.shapedir, year, tag ])
 
-    shapeMultiCommand = 'mkShapesMulti.py --pycfg='+opt.configuration+' --treeName=Events --tag='+year+tag+' --sigset=SIGSET'
+    shapeMultiCommand = 'mkShapesMulti.py --pycfg='+opt.configuration+' --treeName='+opt.treeName+' --tag='+year+tag+' --sigset=SIGSET'
     if 'shapes' in action:
         if not opt.interactive: shapeMultiCommand += ' --doBatch=True --batchQueue='+opt.batchQueue
         if opt.dryRun: shapeMultiCommand += ' --dry-run '
@@ -28,12 +28,12 @@ def mkShapesMulti(opt, year, tag, splits, action):
  
             if 'merge' in action:
 
-                sampleFlag = '_SIGSET' if 'worker' in commonTools.getBranch() else '' 
+                sampleFlag = '_SIGSET' #if 'worker' in commonTools.getBranch() else '' 
                 outputDir = mainDir if 'mergeall' in action else mainDir+'/Samples'
                 splitCommand += ' ; mkdir -p '+outputDir+' ; mv '+splitDir+'/plots_'+year+tag+sampleFlag+'.root '+outputDir
                 if 'mergesingle' in action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
                 else: splitCommand += '/plots_'+tag+commonTools.setFileset('',opt.sigset)+'.root'
-
+          
             for sample in splits[split]:
                 commonTools.resetShapes(opt, split, year, tag, sample, opt.reset)
                 os.system(splitCommand.replace('SIGSET', sample).replace('SAMPLE', sample.split(':')[-1]))
