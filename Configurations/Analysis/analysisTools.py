@@ -10,11 +10,13 @@ import PlotsConfigurations.Tools.combineTools as combineTools
 
 def setAnalysisDefaults(opt):
 
+    opt.treeName = 'btagana/ttree'
+
     opt.method = 'PtRel' if 'PtRel' in opt.tag else 'System8'
 
     opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src' 
 
-    if opt.year=='test' or opt.year=='*': opt.year = 'UL17nano'
+    if opt.year=='test' or opt.year=='*': opt.year = 'Summer22'
 
     opt.btagWPs = [ 'DeepCSVL', 'DeepCSVM', 'DeepCSVT', 'DeepJetL', 'DeepJetM', 'DeepJetT' ]
     opt.ptBins = [ 'Pt20to30', 'Pt30to50', 'Pt50to70','Pt70to100','Pt100to140','Pt140to200','Pt200to300','Pt300to600', 'Pt600to1000','Pt1000to1400' ]
@@ -478,6 +480,66 @@ def storeBTagScaleFactors(opt):
 
     getBTagPerfResults(opt)
     print 'please, complete me :('
+
+### Working points
+
+def workingPoints(opt): 
+
+    if 'WorkingPoints' not in opt.tag: opt.tag = 'WorkingPoints'
+    opt.sigset='MC'
+
+    samples = {}
+    if os.path.exists(commonTools.getCfgFileName(opt,'samples')):
+        handle = open(commonTools.getCfgFileName(opt,'samples'),'r')
+        exec(handle)
+        handle.close()
+
+    inputFile = ROOT.TFile.Open('/'.join([ opt.shapedir, opt.year, opt.tag, 'Samples', 'plots_'+opt.year+opt.tag+'_ALL_QCD.root' ]), 'read')
+
+    discriminantDone = []
+
+    for btagwp in bTagWorkingPoints:
+        if bTagWorkingPoints[btagwp]['discriminant'] not in discriminantDone:
+
+            bJetDisc = inputFile.Get('QCD/Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'_5_0/histo_QCD')
+            lJetDisc = inputFile.Get('QCD/Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'_0_0/histo_QCD')
+
+            for ijet in range(1, 20):
+                bJetDisc.Add(inputFile.Get('QCD/Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'_5_'+str(ijet)+'/histo_QCD'))
+                lJetDisc.Add(inputFile.Get('QCD/Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'_0_'+str(ijet)+'/histo_QCD'))
+
+            print '\n\nWorking Points for', btagwp[:-1]
+
+            workingPointName = [ 'Loose', 'Medium', 'Tight' ]
+            workingPointLimit = [ 0.1, 0.01, 0.001 ]
+
+            oldWorkingPoint = [ float(bTagWorkingPoints[btagwp[:-1]+wp[:1]]['cut'])  for wp in workingPointName ]
+
+            integralLightJets  = lJetDisc.Integral(0, lJetDisc.GetNbinsX())
+            integralBottomJets = bJetDisc.Integral(0, bJetDisc.GetNbinsX())
+ 
+            for wp in range(len(workingPointName)):
+
+                mistagRateDistance =  999.
+                binAtWorkingPoint  = -999
+
+                for ib in range(1, bJetDisc.GetNbinsX()+1):
+
+                    mistagRate = lJetDisc.Integral(ib, lJetDisc.GetNbinsX())/integralLightJets
+
+                    if abs(mistagRate-workingPointLimit[wp])<mistagRateDistance: 
+
+                        mistagRateDistance = abs(mistagRate-workingPointLimit[wp])
+                        binAtWorkingPoint = ib
+
+                print '   ', workingPointName[wp], 'working point:', lJetDisc.GetBinLowEdge(binAtWorkingPoint), '(', lJetDisc.GetBinLowEdge(binAtWorkingPoint-1), ',', lJetDisc.GetBinLowEdge(binAtWorkingPoint+1), ')'
+                print '        MistagRate:', lJetDisc.Integral(binAtWorkingPoint, lJetDisc.GetNbinsX())/integralLightJets, '(', lJetDisc.Integral(binAtWorkingPoint-1, lJetDisc.GetNbinsX())/integralLightJets, ', ', lJetDisc.Integral(binAtWorkingPoint+1, lJetDisc.GetNbinsX())/integralLightJets, ') over', integralLightJets
+                print '        Efficiency:', bJetDisc.Integral(binAtWorkingPoint, bJetDisc.GetNbinsX())/integralBottomJets, '(', bJetDisc.Integral(binAtWorkingPoint-1, bJetDisc.GetNbinsX())/integralBottomJets, ', ', bJetDisc.Integral(binAtWorkingPoint+1, bJetDisc.GetNbinsX())/integralBottomJets, ') over', integralBottomJets
+
+                binOldWorkingPoint = lJetDisc.FindBin(oldWorkingPoint[wp])
+                print '        OldWorkingPoint', oldWorkingPoint[wp], lJetDisc.Integral(binOldWorkingPoint, lJetDisc.GetNbinsX())/integralLightJets, bJetDisc.Integral(binOldWorkingPoint, lJetDisc.GetNbinsX())/integralBottomJets, '\n'
+
+            discriminantDone.append(bTagWorkingPoints[btagwp]['discriminant'])
 
 ### Analysis specific weights, efficiencies, scale factors, etc.
 
