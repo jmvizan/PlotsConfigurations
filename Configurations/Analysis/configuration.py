@@ -12,7 +12,7 @@ variablesFile = 'variables.py'
 cutsFile = 'cuts.py' 
 
 # file with list of samples
-samplesFile = 'samples_Run2018106X-UL17.py'
+samplesFile = 'samples_Run2022-124X.py'
 
 # file with list of samples
 plotFile = 'plots.py' 
