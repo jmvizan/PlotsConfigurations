@@ -606,6 +606,10 @@ def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
 
     return getShapeDirName(shapeDir, year, tag, fitoption)+'/plots_'+tag+setFileset(fileset, sigset)+'.root'
 
+def getSampleShapeFileName(shapeDir, year, tag, sample):
+
+    return '/'.join([ shapeDir, year, tag.split('_')[0], 'Samples', 'plots_'+year+tag.split('_')[0]+'_ALL_'+sample+'.root')
+
 def foundShapeFiles(opt, rawShapes=False):
 
     missingShapeFiles = False
@@ -637,6 +641,10 @@ def openRootFile(fileName, mode='READ'):
 def openShapeFile(shapeDir, year, tag, sigset, fileset):
 
     return openRootFile(getShapeFileName(shapeDir, year, tag, sigset, fileset))
+
+def openSampleShapeFile(shapeDir, year, tag, samples, mode='READ'):
+
+    return openRootFile(getSampleShapeFileName(shapeDir, year, tag, samples), mode)
 
 def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outputdir=None, inputnuisances=None, outputnuisances=None, verbose=False):
 
