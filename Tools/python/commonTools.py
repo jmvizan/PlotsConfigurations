@@ -608,7 +608,7 @@ def getShapeFileName(shapeDir, year, tag, sigset, fileset, fitoption=''):
 
 def getSampleShapeFileName(shapeDir, year, tag, sample):
 
-    return '/'.join([ shapeDir, year, tag.split('_')[0], 'Samples', 'plots_'+year+tag.split('_')[0]+'_ALL_'+sample+'.root')
+    return '/'.join([ shapeDir, year, tag.split('_')[0], 'Samples', 'plots_'+year+tag.split('_')[0]+'_ALL_'+sample+'.root' ])
 
 def foundShapeFiles(opt, rawShapes=False):
 
