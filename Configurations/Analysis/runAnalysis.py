@@ -19,6 +19,7 @@ if __name__ == '__main__':
     parser.add_option('--sigset'          , dest='sigset'          , help='Sample to run on'               , default='SM')
     parser.add_option('--fileset'         , dest='fileset'         , help='Input shape file'               , default='')
     parser.add_option('--option'          , dest='option'          , help='Options for the action'         , default='')
+    parser.add_option('--treeName'        , dest='treeName'        , help='Name of the input tree'         , default='Events')
     parser.add_option('--keepallplots'    , dest='keepallplots'    , help='Keep all plots'                 , default=False, action='store_true')
     parser.add_option('--shapedir'        , dest='shapedir'        , help='Directory to store shapes'      , default='./Shapes')
     parser.add_option('--plotsdir'        , dest='plotsdir'        , help='Directory to store plots'       , default='./Plots')
