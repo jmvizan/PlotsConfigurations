@@ -216,6 +216,7 @@ def plotNuisances(opt):
 def mergedPlots(opt):
 
     inputNuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
+    fileset = commonTools.setFileset(opt.fileset, opt.sigset).replace('_','')
 
     for tag in opt.tag.split('-'):
 
@@ -223,12 +224,12 @@ def mergedPlots(opt):
             year = opt.deepMerge
             outputNuisances = inputNuisances
             outputDir = '/'.join([ opt.shapedir, year, tag ])
-            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, opt.fileset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
+            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, fileset, 'deep', outputDir, inputNuisances, 'None', opt.verbose)
 
         else:
             year = opt.year
             outputNuisances =  '_'.join([ 'nuisances', opt.year, opt.tag, opt.sigset+'.py' ])
-            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, opt.fileset, '', 'None', inputNuisances, outputNuisances, opt.verbose)
+            commonTools.mergeDataTakingPeriodShapes(opt, opt.year, tag, fileset, '', 'None', inputNuisances, outputNuisances, opt.verbose)
         
         mkPlot(opt, year, tag, opt.sigset, outputNuisances)
         os.system('rm -f nuisances_*.py')
