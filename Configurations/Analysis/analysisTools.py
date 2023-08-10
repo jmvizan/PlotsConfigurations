@@ -16,7 +16,7 @@ def setAnalysisDefaults(opt):
     opt.isExotics = True
 
     if opt.year.lower()=='run2split': opt.year = '2016HIPM-2016noHIPM-2017-2018'
-    elif opt.year.lower()=='2016split': opt.year = '2016HIPM-2016noHIPM'
+    elif '2016split' in opt.year: opt.year = opt.year.replace('2016split','2016HIPM-2016noHIPM')
     elif opt.year.lower()=='run2': opt.year = '2016-2017-2018'
 
     inputTag = opt.tag
@@ -515,7 +515,6 @@ def makeContours(opt, plotoption='2', fitOption='Blind'):
     contourFile                  = contourDir   + '_'.join([ '/massScan', opt.tag, sigset, fitOption ]) + '.root' 
 
     if opt.reset:
-        print ' '.join([ histogramFileNoFillEmptyBins, histogramFile, contourFile ]) 
         os.system('rm -f '+' '.join([ histogramFileNoFillEmptyBins, histogramFile, contourFile ]))
  
     commandList = [ '--years='+opt.year, '--tag='+opt.tag, '--sigset='+sigset, '--limitoption='+fitOption ]
@@ -701,6 +700,12 @@ def plotFastSimLeptonEfficiencies(opt):
         else:                                                 
             for signal in [ 'T2tt_mStop-525_mLSP-350', 'T2tt_mStop-525_mLSP-438' ]:
 	        os.system('./mkFastSimDYMorePlots.py '+year+' '+signal)
+
+### Miscellanea
+
+def mergeSearchRegionKinematics(opt):
+
+    for year in opt.year.split("")
 
 
 
