@@ -447,6 +447,7 @@ bTagPass  = '(Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+
 bTagVeto  = '(!'+bTagPass+')'
 #b2TagPass = bTagPass.replace('leadingPt', 'trailingPt')
 b2TagPass = '(Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')>=2)'
+b3TagPass = '(Sum$(CleanJet_pt>='+bTagPtCut+' && abs(CleanJet_eta)<'+bTagEtaMax+' && Jet_'+btagDisc+'[CleanJet_jetIdx]>='+bTagCut+')>=3)'
 
 btagWeight1tag = 'btagWeight_1tag_'+btagAlgo+bTagWP+'_1c'
 if 'pt25' in opt.tag: btagWeight1tag += '_Pt25'
@@ -471,6 +472,7 @@ if 'Data' in opt.sigset or 'SingleLepton' in opt.sigset or 'NoBTV' in opt.tag: #
     btagWeight1tag = bTagPass
     btagWeight0tag = bTagVeto
     btagWeight2tag = b2TagPass
+    btagWeight3tag = b3TagPass
     ISRWeightTag   = bTagPass
 elif 'ObjectReview' in opt.tag or 'FXbtv' in opt.tag:
     ISRCut = 'CleanJet_pt[0]>150. && acos(cos(ptmiss_phi-CleanJet_phi[0]))>2.5'  

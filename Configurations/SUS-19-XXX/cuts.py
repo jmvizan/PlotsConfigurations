@@ -879,19 +879,23 @@ if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):
 
 if 'SearchRegion' in opt.tag:
 
-    cuts['Search_em']        = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeightNoCut }
-    cuts['Search_sf']        = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeightNoCut }
+    if 'Kinematics' in opt.tag:
+        cuts['Search']        = { 'expr' : OC+' && ('+DF+' || '+SF+') && ptmiss'+ctrltag+'>=160', 'weight' : btagWeightNoCut }
 
-    cuts['Search_Veto_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeight0tag }
-    cuts['Search_Veto_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeight0tag }
+    else:
+        cuts['Search_em']        = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeightNoCut }
+        cuts['Search_sf']        = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeightNoCut }
 
-    cuts['Search_Tag_em']    = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeight1tag }
-    cuts['Search_Tag_sf']    = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeight1tag }
+        cuts['Search_Veto_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeight0tag }
+        cuts['Search_Veto_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeight0tag }
 
-    cuts['Search_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160 && '+HasJet, 'weight' : btagWeight0tag }
-    cuts['Search_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160 && '+HasJet, 'weight' : btagWeight0tag }
-    cuts['Search_NoJet_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160 && '+NoJets, 'weight' : btagWeight0tag }
-    cuts['Search_NoJet_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160 && '+NoJets, 'weight' : btagWeight0tag } 
+        cuts['Search_Tag_em']    = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeight1tag }
+        cuts['Search_Tag_sf']    = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeight1tag }
+
+        cuts['Search_NoTag_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160 && '+HasJet, 'weight' : btagWeight0tag }
+        cuts['Search_NoTag_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160 && '+HasJet, 'weight' : btagWeight0tag }
+        cuts['Search_NoJet_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160 && '+NoJets, 'weight' : btagWeight0tag }
+        cuts['Search_NoJet_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=160 && '+NoJets, 'weight' : btagWeight0tag } 
 
 if 'SearchVetoRegion' in opt.tag:
 

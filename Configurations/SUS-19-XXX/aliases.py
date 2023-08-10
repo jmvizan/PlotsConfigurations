@@ -115,7 +115,7 @@ if 'nanoAODv9' in opt.samplesFile and 'ExtraV1' not in opt.tag:
         'samples': [ ]
     }
     for sample in samples:
-        if  not samples[sample]['isDATA']:
+        if not samples[sample]['isDATA']:
             aliases['additionalLeptonWeight']['samples'].append(sample)
             samples[sample]['weight'] += '*additionalLeptonWeight[1]'
     
@@ -142,6 +142,18 @@ elif 'nanoAODv6' in opt.samplesFile or 'TestExtraV6' in opt.tag:
         if not samples[sample]['isDATA']:
             aliases['zerohitLeptonWeight']['samples'].append(sample)
             samples[sample]['weight'] = samples[sample]['weight'].replace(EleWeight, EleWeight+'*zerohitLeptonWeight')
+
+if 'SearchRegionKinematics' in opt.tag:
+
+    aliases['btagWeightNtag'] = {
+        'linesToAdd': [ 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE'), '.L '+os.getenv('PWD')+'/btagWeightNtag.cc+' ],
+        'class': 'BTagWeightNtag',
+        'args': ( btagDisc, btagAlgo+bTagWP, float(bTagCut), float(bTagEtaMax) ),
+        'samples': [ ]
+    }
+    for sample in samples:
+        if not samples[sample]['isDATA']:
+            aliases['btagWeightNtag']['samples'].append(sample)
 
 ## jet PU ID
 
