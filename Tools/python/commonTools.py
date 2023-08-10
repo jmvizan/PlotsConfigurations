@@ -649,9 +649,13 @@ def openRootFile(fileName, mode='READ'):
 
     return ROOT.TFile(fileName, mode)
 
-def openShapeFile(shapeDir, year, tag, sigset, fileset):
+def openShapeFile(shapeDir, year, tag, sigset, fileset, mode='READ'):
 
-    return openRootFile(getShapeFileName(shapeDir, year, tag, sigset, fileset))
+    return openRootFile(getShapeFileName(shapeDir, year, tag, sigset, fileset), mode)
+
+def openSampleShapeFile(shapeDir, year, tag, samples, mode='READ'):
+
+    return openRootFile(getSampleShapeFileName(shapeDir, year, tag, samples), mode)
 
 def openSampleShapeFile(shapeDir, year, tag, samples, mode='READ'):
 
