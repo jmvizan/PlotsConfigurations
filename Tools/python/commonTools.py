@@ -657,10 +657,6 @@ def openSampleShapeFile(shapeDir, year, tag, samples, mode='READ'):
 
     return openRootFile(getSampleShapeFileName(shapeDir, year, tag, samples), mode)
 
-def openSampleShapeFile(shapeDir, year, tag, samples, mode='READ'):
-
-    return openRootFile(getSampleShapeFileName(shapeDir, year, tag, samples), mode)
-
 def mergeDataTakingPeriodShapes(opt, years, tag, fileset, strategy='deep', outputdir=None, inputnuisances=None, outputnuisances=None, verbose=False):
 
     mergeCommandList = [ '--inputDir='+opt.shapedir, '--years='+years, '--tag='+tag, '--sigset='+fileset, '--nuisancesFile='+inputnuisances ]
