@@ -1,6 +1,6 @@
 ### nuisances = {}
 
-### statistical uncertainty
+# statistical uncertainty
 
 nuisances['stat']  = { 'type'          : 'auto', # Use the following if you want to apply the automatic combine MC stat nuisances.
                        'maxPoiss'      : '10',   # Number of threshold events for Poisson modelling
@@ -10,62 +10,110 @@ nuisances['stat']  = { 'type'          : 'auto', # Use the following if you want
 
 if 'Templates' in opt.tag:
 
-    if hasattr(opt, 'outputDirDatacard'):
+    # pileup
+    if 'NoPU' not in opt.tag:
+        nuisances['pileup']  = { 'name'  : 'pileup',
+                                 'samples'  : { },
+                                 'kind'  : 'weight',
+                                 'type'  : 'shape'
+                                }
 
-        ### rate parameters
+        for sample in samples.keys():
+            if not samples[sample]['isDATA']:
+                nuisances['pileup']['samples'][sample] = [ 'pileupWeight[2]/pileupWeight[1]', 'pileupWeight[0]/pileupWeight[1]' ]
 
-        for cut in cuts:
-            for sample in samples:
-                if not samples[sample]['isDATA']:
+    # b specific nuisances
+    if 'bjets' in samples:
 
-                    nuisances[sample+'_'+cut]  = { 'name'    : sample+'_'+cut,
-                                                   'type'    : 'rateParam',
-                                                   'samples' : { sample : '1.' },
-                                                   'cuts'    : [ cut ]
-                                                  }
+        # gluon splitting
+        nuisances['gluonsplitting']  = { 'name'  : 'gluonSplitting',
+                                         'samples'  : { 'bjets' : [ '1.5*'+isGluonSplitting+'(!('+isGluonSplitting+'))', '0.5*'+isGluonSplitting+'(!('+isGluonSplitting+'))' ] },
+                                         'kind'  : 'weight',
+                                         'type'  : 'shape'
+                                        }
 
-                    if 'AwayJet' not in cut or 'Pass' in cut or not samples[sample]['isSignal'] or '_NoAwayJetBond' in opt.tag:
+        # b hadron fragmentation
+        nuisances['bfragmentation']  = { 'name'  : 'bfragmentation',
+                                         'samples'  : { 'bjets' : [ 'bHadronWeight[2]/bHadronWeight[1]', 'bHadronWeight[0]/bHadronWeight[1]' ] },
+                                         'kind'  : 'weight',
+                                         'type'  : 'shape'
+                                        }
 
-                        nuisances[sample+'_'+cut]['limits'] = '[0.01,20]'
+        # b semileptonic decays' br
+        nuisances['bdecay']  = { 'name'  : 'bdecay',
+                                 'samples'  : { 'bjets' : [ 'bHadronWeight[4]', 'bHadronWeight[3]' ] },
+                                 'kind'  : 'weight',
+                                 'type'  : 'shape'
+                                }
 
-                    else:
+    # ptrel specific nuisances
+    if 'PtRel' in opt.method:
 
-                        fileIn = ROOT.TFile(opt.inputFile, 'READ')
+        # light specific nuisances
+        if 'ljets' in samples:
 
-                        nuisances[sample+'_'+cut]['bond'] = {}
-                        nuisances[sample+'_'+cut]['bond'][cut] = {}
+            # light to charm ratio
+            nuisances['lightCharmRatio'] = { 'name'  : 'lightCharmRatio',
+                                             'samples'  : { 'ljets' : '1.3' },
+                                             'type'  : 'lnN'
+                                            }
 
-                        for variable in variables:
-                            if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+        # rate parameters
+        if hasattr(opt, 'outputDirDatacard'):
 
-                                awayJetFailCut   = cut
-                                awayJetPassCut   = cut.replace('Fail','Pass')
-                                muonJetFailCut   = cut.replace('_AwayJetUp','').replace('_AwayJetDown','')
-                                muonJetPassCut   = muonJetFailCut.replace('Fail','Pass')
+            for cut in cuts:
+                for sample in samples:
+                    if not samples[sample]['isDATA']:
 
-                                awayJetFailHisto = fileIn.Get(awayJetFailCut+'/'+variable+'/histo_'+sample)
-                                awayJetPassHisto = fileIn.Get(awayJetPassCut+'/'+variable+'/histo_'+sample)
-                                muonJetFailHisto = fileIn.Get(muonJetFailCut+'/'+variable+'/histo_'+sample)   
-                                muonJetPassHisto = fileIn.Get(muonJetPassCut+'/'+variable+'/histo_'+sample)                            
+                        nuisances[sample+'_'+cut]  = { 'name'    : sample+'_'+cut,
+                                                       'type'    : 'rateParam',
+                                                       'samples' : { sample : '1.' },
+                                                       'cuts'    : [ cut ]
+                                                      }
 
-                                awayJetFailYield = awayJetFailHisto.Integral()
-                                awayJetPassYield = awayJetPassHisto.Integral()
-                                muonJetFailYield = muonJetFailHisto.Integral()
-                                muonJetPassYield = muonJetPassHisto.Integral()
+                        if 'AwayJet' not in cut or 'Pass' in cut or not samples[sample]['isSignal'] or '_NoAwayJetBond' in opt.tag:
+   
+                            nuisances[sample+'_'+cut]['limits'] = '[0.01,20]'
+
+                        else:
+
+                            fileIn = ROOT.TFile(opt.inputFile, 'READ')
+
+                            nuisances[sample+'_'+cut]['bond'] = {}
+                            nuisances[sample+'_'+cut]['bond'][cut] = {}
+
+                            for variable in variables:
+                                if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+
+                                    awayJetFailCut   = cut
+                                    awayJetPassCut   = cut.replace('Fail','Pass')
+                                    muonJetFailCut   = cut.replace('_AwayJetUp','').replace('_AwayJetDown','')
+                                    muonJetPassCut   = muonJetFailCut.replace('Fail','Pass')
+
+                                    awayJetFailHisto = fileIn.Get(awayJetFailCut+'/'+variable+'/histo_'+sample)
+                                    awayJetPassHisto = fileIn.Get(awayJetPassCut+'/'+variable+'/histo_'+sample)
+                                    muonJetFailHisto = fileIn.Get(muonJetFailCut+'/'+variable+'/histo_'+sample)   
+                                    muonJetPassHisto = fileIn.Get(muonJetPassCut+'/'+variable+'/histo_'+sample)                            
+
+                                    awayJetFailYield = awayJetFailHisto.Integral()
+                                    awayJetPassYield = awayJetPassHisto.Integral()
+                                    muonJetFailYield = muonJetFailHisto.Integral()
+                                    muonJetPassYield = muonJetPassHisto.Integral()
   
-                                awayJetFailRelativeYield = awayJetFailYield/(awayJetFailYield+awayJetPassYield)
-                                awayJetPassRelativeYield = awayJetPassYield/(awayJetFailYield+awayJetPassYield)
-                                muonJetFailRelativeYield = muonJetFailYield/(muonJetFailYield+muonJetPassYield)
-                                muonJetPassRelativeYield = muonJetPassYield/(muonJetFailYield+muonJetPassYield)
+                                    awayJetFailRelativeYield = awayJetFailYield/(awayJetFailYield+awayJetPassYield)
+                                    awayJetPassRelativeYield = awayJetPassYield/(awayJetFailYield+awayJetPassYield)
+                                    muonJetFailRelativeYield = muonJetFailYield/(muonJetFailYield+muonJetPassYield)
+                                    muonJetPassRelativeYield = muonJetPassYield/(muonJetFailYield+muonJetPassYield)
  
-                                differencePassRelativeYields = str(muonJetPassRelativeYield-awayJetPassRelativeYield)
-                                muonJetFailFactor = '(@1/@0)*'+str(muonJetFailRelativeYield)
-                                awayJetFailFactor = '@2/'+str(awayJetFailRelativeYield)
+                                    differencePassRelativeYields = str(muonJetPassRelativeYield-awayJetPassRelativeYield)
+                                    muonJetFailFactor = '(@1/@0)*'+str(muonJetFailRelativeYield)
+                                    awayJetFailFactor = '@2/'+str(awayJetFailRelativeYield)
 
-                                bond_formula = '(('+differencePassRelativeYields+'+'+muonJetFailFactor+')*'+awayJetFailFactor+') '
-                                bond_parameters = ','.join([ sample+'_'+muonJetPassCut, sample+'_'+muonJetFailCut, sample+'_'+awayJetPassCut  ])
+                                    bond_formula = '(('+differencePassRelativeYields+'+'+muonJetFailFactor+')*'+awayJetFailFactor+') '
+                                    bond_parameters = ','.join([ sample+'_'+muonJetPassCut, sample+'_'+muonJetFailCut, sample+'_'+awayJetPassCut  ])
 
-                                nuisances[sample+'_'+cut]['bond'][cut][variable] = { bond_formula : bond_parameters }
+                                    nuisances[sample+'_'+cut]['bond'][cut][variable] = { bond_formula : bond_parameters }
 
-                        fileIn.Close()
+                            fileIn.Close()
+
 
