@@ -104,7 +104,7 @@ def mergeLightShapes(opt):
     for sample in samples:    
 
         inputFile  = commonTools.openSampleShapeFile(opt.shapedir, opt.year, opt.tag, sample)
-        outputFile = commonTools.openSampleShapeFile(opt.shapedir, opt.year, opt.tag.replace('Light', 'MergedLight'), sample, 'recreate')
+        outputFile = commonTools.openSampleShapeFile(opt.shapedir, opt.year, outtag, sample, 'recreate')
 
         for cut in cuts:
 
