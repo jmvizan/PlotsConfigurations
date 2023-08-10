@@ -705,7 +705,59 @@ def plotFastSimLeptonEfficiencies(opt):
 
 def mergeSearchRegionKinematics(opt):
 
-    for year in opt.year.split("")
+    if 'SearchRegionKinematics' not in opt.tag:
+        print 'Please choose a tag with SearchRegionKinematics'
+        exit()
 
+    for year in opt.year.split('-'):
+        
+        outtag = opt.tag.replace('Kinematics', 'KinematicsMerged')
+
+        samples, cuts, variables, nuisances = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, opt.sigset, 'nuisances')
+
+        inputFile  = commonTools.openShapeFile(opt.shapedir, year, opt.tag, opt.sigset, opt.fileset)
+        outputFile = commonTools.openShapeFile(opt.shapedir, year, outtag,  opt.sigset, opt.fileset, 'recreate')
+ 
+        for cut in cuts:
+
+            outputFile.mkdir(cut)
+
+
+            mergedShapes = {}
+
+            for variable in variables:
+                if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+
+                    shapeName = '_'.join([ variableString for variableString in variable.replace('nbjets','nbjets_').split('_') if not variableString.isdigit() ])
+                    if shapeName not in mergedShapes:
+                        mergedShapes[shapeName] = {}
+
+                    for sample in samples:
+
+                        histoList = [ 'histo_'+sample ]
+
+                        for nuisance in nuisances:
+                            if nuisances[nuisance]['type']=='shape':
+                                if sample in nuisances[nuisance]['samples']:
+                                    for variation in [ 'Up', 'Down' ]:
+                                        histoList.append('_'.join([ 'histo', sample, nuisances[nuisance]['name']+variation ]))
+
+                        for histo in histoList:
+ 
+                            if histo not in mergedShapes[shapeName]:
+                                mergedShapes[shapeName][histo] = inputFile.Get('/'.join([ cut, variable, histo ]))
+                            else:
+                                mergedShapes[shapeName][histo].Add(inputFile.Get('/'.join([ cut, variable, histo ])))
+
+            for variable in mergedShapes:
+
+                 outputFile.mkdir(cut+'/'+variable)
+                 outputFile.cd(cut+'/'+variable)
+
+                 for histo in mergedShapes[variable]:
+                     mergedShapes[variable][histo].Write(histo)
+
+        inputFile.Close()
+        outputFile.Close()
 
 

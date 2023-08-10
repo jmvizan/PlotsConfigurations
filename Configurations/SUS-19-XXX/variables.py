@@ -1428,6 +1428,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                          'xaxis' : 'visht' + gv,           #   x axis name
                                          'fold'  : overflow               #   fold overflow
                                      }
+
 if 'SearchRegionKinematics' in opt.tag:
 
     variables['mt2ll'] = { 'name'  : 'mt2ll',               # variable name
@@ -1465,37 +1466,48 @@ if 'SearchRegionKinematics' in opt.tag:
                                   'xaxis' : '|#Delta#phi(ISR jet,'+met+')| [rad]',         #   x axis name
                                  }
 
-    variables['nbjets0']  = { 'name'  : '0.', #   variable name
-                              'weight': btagWeight0tag,
-                              'range' : (  4,    -0.5, 3.5),    #   variable range
-                              'xaxis' : 'number of b-tagged jets',         #   x axis name
-                              'fold'  : overflow                 #   fold overflow
-                             }
+    if 'Merged' in opt.tag:
 
-    if 'Data' not in opt.sigset:
-        btagWeight2tag = 'btagWeightNtag[2]'
-        btagWeight3tag = 'btagWeightNtag[3]'
+        variables['nbjets']  = { 'name'  : '0.', #   variable name
+                                 'range' : (  4,    -0.5, 3.5),    #   variable range
+                                 'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                 'fold'  : overflow                 #   fold overflow
+                                }
 
-    variables['nbjets1']  = { 'name'  : '1.', #   variable name
-                              'weight': '('+btagWeight1tag+')-('+btagWeight2tag+')',
-                              'range' : (  4,    -0.5, 3.5),    #   variable range
-                              'xaxis' : 'number of b-tagged jets',         #   x axis name
-                              'fold'  : overflow                 #   fold overflow
-                             }
 
-    variables['nbjets2']  = { 'name'  : '2.', #   variable name
-                              'weight': '('+btagWeight2tag+')-('+btagWeight3tag+')',
-                              'range' : (  4,    -0.5, 3.5),    #   variable range
-                              'xaxis' : 'number of b-tagged jets',         #   x axis name
-                              'fold'  : overflow                 #   fold overflow
-                             }
+    else:
 
-    variables['nbjets3']  = {  'name'  : '3.', #   variable name
-                               'weight': btagWeight3tag,
-                               'range' : (  4,    -0.5, 3.5),    #   variable range
-                               'xaxis' : 'number of b-tagged jets',         #   x axis name
-                               'fold'  : overflow                 #   fold overflow
-                              }
+        variables['nbjets0']  = { 'name'  : '0.', #   variable name
+                                  'weight': btagWeight0tag,
+                                  'range' : (  4,    -0.5, 3.5),    #   variable range
+                                  'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                  'fold'  : overflow                 #   fold overflow
+                                 }
+
+        if 'Data' not in opt.sigset:
+           btagWeight2tag = 'btagWeightNtag[2]'
+           btagWeight3tag = 'btagWeightNtag[3]'
+
+        variables['nbjets1']  = { 'name'  : '1.', #   variable name
+                                  'weight': '('+btagWeight1tag+')-('+btagWeight2tag+')',
+                                  'range' : (  4,    -0.5, 3.5),    #   variable range
+                                  'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                  'fold'  : overflow                 #   fold overflow
+                                 }
+
+        variables['nbjets2']  = { 'name'  : '2.', #   variable name
+                                  'weight': '('+btagWeight2tag+')-('+btagWeight3tag+')',
+                                  'range' : (  4,    -0.5, 3.5),    #   variable range
+                                  'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                  'fold'  : overflow                 #   fold overflow
+                                 }
+
+        variables['nbjets3']  = {  'name'  : '3.', #   variable name
+                                   'weight': btagWeight3tag,
+                                   'range' : (  4,    -0.5, 3.5),    #   variable range
+                                   'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                   'fold'  : overflow                 #   fold overflow
+                                  }
 
 elif 'SearchRegion' in opt.tag or 'SearchVetoRegion' in opt.tag or 'ObjectReview' in opt.tag or 'EGM' in opt.tag:
 

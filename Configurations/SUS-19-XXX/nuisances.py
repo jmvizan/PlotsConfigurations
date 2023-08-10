@@ -91,7 +91,7 @@ for scalefactor in leptonSF:
     for sample in samples.keys():
         if not samples[sample]['isDATA']:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
-                if ('nanoAODv6' not in opt.samplesFile and 'EOY' not in sample and (not samples[sample]['isFastsim'] or 'SigV6' not in opt.tag )) or 'Extra' not in scalefactor:
+                if ('EOY' not in sample and (not samples[sample]['isFastsim'] or 'SigV6' not in opt.tag)) or 'Extra' not in scalefactor:
                     nuisances[scalefactor]['samples'][sample] = leptonSF[scalefactor]['weight']
 
 # b-tagging scale factors
@@ -664,13 +664,6 @@ for nuisance in nuisanceToRemove:
 nuisanceToRemove = [ ]  
 
 if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag or 'SearchRegion' in opt.tag:
-    
-    if ('nanoAODv6' in opt.samplesFile and 'ctrl' in regionName and 'cern' in SITE): 
- 
-        if hasattr(opt, 'batchSplit'): # Remove only when running shapes, so can make shapes in gridui and plots+datacards in lxplus
-            for nuisance in nuisances:
-                if 'jesTotal' in nuisance or 'unclustEn' in nuisance: 
-                    nuisanceToRemove.append(nuisance)
         
     if 'SignalRegion' not in opt.tag:
         for nuisance in nuisances:
