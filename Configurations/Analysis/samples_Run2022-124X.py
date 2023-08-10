@@ -9,11 +9,18 @@ from LatinoAnalysis.Tools.commonTools import *
 opt.method = 'System8' if 'System8' in opt.tag else 'PtRel'
 opt.campaign = 'Summer22EE' if 'Summer22EE' in opt.tag else 'Summer22'
 opt.CME = '13.6'
-opt.lumi = 1. if 'Summer22EE' in opt.tag else 1.
+opt.lumi = 26.337 if 'Summer22EE' in opt.tag else 7.875
 treePrefix= ''
 
 isDatacardOrPlot = hasattr(opt, 'outputDirDatacard') or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN') or hasattr(opt, 'inputDirMaxFit')
 isPlot = hasattr(opt, 'postFit')
+isShape = hasattr(opt, 'doHadd')
+isFillShape = isShape and not opt.doHadd
+opt.isShape = isShape
+
+if isFillShape and 'MergedLight' in opt.tag:
+    print 'Cannot fill shapes for', opt.tag, 'directly from trees'
+    exit()
 
 ### Directories
 
@@ -30,7 +37,7 @@ SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
 if 'cern' in SITE:
-    treeBaseDirMC   = '/eos/cms/store/group/phys_btag/milee/BTA/'
+    treeBaseDirMC   = '/eos/cms/store/group/phys_btag/milee/BTA/' if 'Short' not in opt.tag else '/eos/cms/store/user/scodella/BTV/'
     treeBaseDirData = '/eos/cms/store/group/phys_btag/milee/BTA/'
 else: print 'trees for', campaign, 'available only at cern'
 
@@ -40,20 +47,17 @@ ProductionData = opt.campaign+'/'
 directoryBkg  = treeBaseDirMC   + ProductionMC 
 directoryData = treeBaseDirData + ProductionData 
 
-### Nuisance parameters
-
-treeNuisances = { }
-
-globalNuisances = { }
-
-bTagNuisances = { }
-
 ### Campaign parameters
 
-# jet range
+# global parameters
 minJetPt  =   20.
 maxJetPt  = 1400.
 maxJetEta = '2.5'
+
+campaignRunPeriod = { 'year' : '2022' }
+campaignRunPeriod['period'] = '2022EFG' if 'Summer22EE' in opt.tag else '2022CD'
+
+ptrelRange = (50, 0., 4.) if opt.method=='PtRel' else (70, 0., 7.)
 
 # triggers
 triggerInfos = { 'BTagMu_AK4DiJet20_Mu5'  : { 'jetPtRange' : [  '20.',   '50.' ], 'ptAwayJet' : '20.', 'ptTriggerEmulation' :  '30.', 'jetTrigger' :  'PFJet40', 'idx' : '32', 'idxJetTrigger' : '0' },
@@ -67,11 +71,13 @@ triggerInfos = { 'BTagMu_AK4DiJet20_Mu5'  : { 'jetPtRange' : [  '20.',   '50.' ]
 # b-tagging algorithms
 if opt.campaign=='Summer22':
     bTagWorkingPoints = {'DeepJetT': {'cut': '0.7217', 'discriminant': 'DeepFlavourBDisc'}, 'ParTL': {'cut': '0.0834', 'discriminant': 'ParTBDisc'}, 'ParTT': {'cut': '0.8506', 'discriminant': 'ParTBDisc'}, 'ParticleNetT': {'cut': '0.6685', 'discriminant': 'PNetBDisc'}, 'DeepJetM': {'cut': '0.3064', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.0575', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetM': {'cut': '0.2421', 'discriminant': 'PNetBDisc'}, 'ParticleNetL': {'cut': '0.0462', 'discriminant': 'PNetBDisc'}, 'ParTM': {'cut': '0.4278', 'discriminant': 'ParTBDisc'}}
+    #bTagWorkingPoints = {'DeepJetT': {'cut': '0.7217', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetV': {'cut': '0.8125', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetS': {'cut': '0.9498', 'discriminant': 'DeepFlavourBDisc'}, 'ParTL': {'cut': '0.0834', 'discriminant': 'ParTBDisc'}, 'ParticleNetM': {'cut': '0.2421', 'discriminant': 'PNetBDisc'}, 'ParticleNetL': {'cut': '0.0462', 'discriminant': 'PNetBDisc'}, 'ParTM': {'cut': '0.4278', 'discriminant': 'ParTBDisc'}, 'ParticleNetS': {'cut': '0.9615', 'discriminant': 'PNetBDisc'}, 'ParTS': {'cut': '0.9849', 'discriminant': 'ParTBDisc'}, 'ParTT': {'cut': '0.8506', 'discriminant': 'ParTBDisc'}, 'ParticleNetT': {'cut': '0.6685', 'discriminant': 'PNetBDisc'}, 'ParTV': {'cut': '0.9161', 'discriminant': 'ParTBDisc'}, 'ParticleNetV': {'cut': '0.7823', 'discriminant': 'PNetBDisc'}, 'DeepJetM': {'cut': '0.3064', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.0575', 'discriminant': 'DeepFlavourBDisc'}}
     btagAwayJetTagger, btagAwayJetDiscriminant = 'JBP', 'Bprob'
     btagAwayJetVariations = { 'Central' : '2.821',  'AwayJetDown' : '1.370' , 'AwayJetUp' : '5.129' }
 
 elif opt.campaign=='Summer22EE':
     bTagWorkingPoints = {'DeepJetT': {'cut': '0.7134', 'discriminant': 'DeepFlavourBDisc'}, 'ParTL': {'cut': '0.0828', 'discriminant': 'ParTBDisc'}, 'ParTT': {'cut': '0.8443', 'discriminant': 'ParTBDisc'}, 'ParticleNetT': {'cut': '0.6651', 'discriminant': 'PNetBDisc'}, 'DeepJetM': {'cut': '0.3033', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.057', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetM': {'cut': '0.2386', 'discriminant': 'PNetBDisc'}, 'ParticleNetL': {'cut': '0.0458', 'discriminant': 'PNetBDisc'}, 'ParTM': {'cut': '0.4244', 'discriminant': 'ParTBDisc'}}
+    #bTagWorkingPoints = {'DeepJetT': {'cut': '0.7134', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetV': {'cut': '0.8067', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetS': {'cut': '0.9483', 'discriminant': 'DeepFlavourBDisc'}, 'ParTL': {'cut': '0.0828', 'discriminant': 'ParTBDisc'}, 'ParticleNetM': {'cut': '0.2386', 'discriminant': 'PNetBDisc'}, 'ParticleNetL': {'cut': '0.0458', 'discriminant': 'PNetBDisc'}, 'ParTM': {'cut': '0.4244', 'discriminant': 'ParTBDisc'}, 'ParticleNetS': {'cut': '0.9571', 'discriminant': 'PNetBDisc'}, 'ParTS': {'cut': '0.9864', 'discriminant': 'ParTBDisc'}, 'ParTT': {'cut': '0.8443', 'discriminant': 'ParTBDisc'}, 'ParticleNetT': {'cut': '0.6651', 'discriminant': 'PNetBDisc'}, 'ParTV': {'cut': '0.9117', 'discriminant': 'ParTBDisc'}, 'ParticleNetV': {'cut': '0.7789', 'discriminant': 'PNetBDisc'}, 'DeepJetM': {'cut': '0.3033', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.057', 'discriminant': 'DeepFlavourBDisc'}}
     btagAwayJetTagger, btagAwayJetDiscriminant = 'JBP', 'Bprob'
     btagAwayJetVariations = { 'Central' : '2.831',  'AwayJetDown' : '1.371' , 'AwayJetUp' : '5.129' }
 
@@ -110,145 +116,168 @@ else:
     for trigger in triggerInfos:
         jetPtBins[trigger] = triggerInfos[trigger]['jetPtRange']
 
-# samples for kinematic weights
+# muon kinematics bins
+  
+if 'PtRel' in opt.method:
+    muonKinBins = { 'Bin1' : { 'range' : [ str(minJetPt),         '30.' ], 'pt' : [ '5.', '6.', '8.' ], 'dr' : [ '0.20', '0.15', '999.' ] },
+                    'Bin2' : { 'range' : [         '30.',         '80.' ], 'pt' : [ '5.', '6.', '8.' ], 'dr' : [ '0.15', '0.12', '999.' ] },
+                    'Bin3' : { 'range' : [         '80.', str(maxJetPt) ], 'pt' : [ '5.', '6.', '8.' ], 'dr' : [ '0.12', '0.09', '999.' ] } }
+
+elif 'System8' in opt.method:
+    muonKinBins = { 'Bin1' : { 'range' : [ str(minJetPt), str(maxJetPt) ], 'pt' : [ '5.', '6.', '8.' ], 'dr' : [ '0.40', '0.30', '999.' ] } }
+
+# pt-hat safety thresholds
+
+if 'Light' not in opt.tag:
+    pthatThresholds = {  20. :  60.,  30. :  85.,  50. : 120.,  80. : 160., 120. : 220., 
+                        170. : 320., 300. : 440., 470. : 620., 600. : 720., 800. : 920. }
+else:
+    #pthatThresholds = {  30. : 200.,  50. : 200.,  80. : 200., 120. : 250., 170. : 340., 300. : 520. }
+    pthatThresholds = {  80. : 200., 120. : 250., 170. : 340., 300. : 520. }
+
+# kinematic weights setting
 kinematicWeightsMap = { 'QCDMu'  : [ 'QCDMu', 'bjets', 'light' ],
-                        'IncQCD' : [ 'IncQCD' ],
+                        'QCD'    : [ 'QCD' ],
                         'JetHT'  : [ 'JetHT' ]
                        }
 
 ### Complex variables
 
-# Event
-goodPV = 'PV_chi2<100.'
+# event
+nJetMax = 20
+goodPV  = 'PV_chi2<100.' # No nPV so far in the trees
 
-# Working points
-
+# working points
 goodJetForDisc = '((JETIDX<nJet)*(Alt$(Jet_pT[JETIDX],0.)>=30.)*(abs(Alt$(Jet_eta[JETIDX],5.))<'+maxJetEta+')*(Alt$(Jet_hadronFlavour[JETIDX],-1)==JETFLV)*(Alt$(Jet_tightID[JETIDX],0)==1))'
 jetDisc = '(999999.*(!('+goodJetForDisc+')) + '+goodJetForDisc+'*(Alt$(Jet_BTAGDISC[JETIDX],999999.)))'
 
+# kinematic weights
+jetKinematicWeight = '*'.join([ x+'[JETIDX]' for x in opt.tag.split(':') if opt.method not in x ]) if ':' in opt.tag else '1.'
+
 # mu-jet
 jetPt    = 'Jet_pT'
-jetSel   = 'Jet_tightID==1 && abs(Jet_eta)<='+maxJetEta
+jetSel   = 'Jet_tightID==1 && abs(Jet_eta)<='+maxJetEta+' && '+jetPt+'>='+str(minJetPt)
 muSel    = 'PFMuon_GoodQuality>=2 && PFMuon_pt>5. && abs(PFMuon_eta)<2.4 && PFMuon_IdxJet>=0'
 muJetEvt = 'Sum$('+muSel+')==1'
 muPt     = 'Sum$(('+muSel+')*PFMuon_pt)'
+muEta    = 'Sum$(('+muSel+')*PFMuon_eta)'
+muPhi    = 'Sum$(('+muSel+')*PFMuon_phi)'
 muPtRel  = 'Sum$(('+muSel+')*PFMuon_ptrel)'
 muJetIdx = 'Sum$(('+muSel+')*PFMuon_IdxJet)'
 muJetPt  = jetPt+'['+muJetIdx+']'
 muJetEta = 'Jet_eta['+muJetIdx+']'
+muJetPhi = 'Jet_phi['+muJetIdx+']'
 muJetSel = muJetIdx+'>=0 && Jet_tightID['+muJetIdx+']==1 && abs('+muJetEta+')<='+maxJetEta
+muJetDR  = 'sqrt(acos(cos('+muPhi+'-'+muJetPhi+'))*acos(cos('+muPhi+'-'+muJetPhi+'))+('+muEta+'-'+muJetEta+')*('+muEta+'-'+muJetEta+'))'
+muJetKinematicWeight = jetKinematicWeight.replace('JETIDX',muJetIdx)
 
-# Trigger
-bitIdx     = 'int(triggerIdx/32)'
-triggerCut = '( BitTrigger['+bitIdx+'] & ( 1 << (triggerIdx - '+bitIdx+'*32) ) )>0'
-
-# light jets
-lightJetSel = '((JETIDX<nJet)*(Alt$(Jet_tightID[JETIDX],0)==1)*(abs(Alt$(Jet_eta[JETIDX],5.))<'+maxJetEta+')*(Alt$('+jetPt+'[JETIDX],-1.)>=PTMIN)*(Alt$('+jetPt+'[JETIDX],999999.)<PTMAX)*(Alt$(Jet_'+btagAwayJetDiscriminant+'[JETIDX],999.)<'+btagAwayJetVariations['AwayJetDown']+')*(Sum$(PFMuon_GoodQuality>=1 && PFMuon_IdxJet==JETIDX)==0))'
-lightJetPt  = 'Alt$('+jetPt+'[JETIDX],-999.)' #'(-999.*(!('+lightJetSel+')) + '+lightJetSel+'*(Alt$('+jetPt+'[JETIDX],-999.)))'
-lightJetEta = 'Alt$(Jet_eta[JETIDX],-999.)'   #'(-999.*(!('+lightJetSel+')) + '+lightJetSel+'*(Alt$(Jet_eta[JETIDX],-999.)))'
-
-# Away jet
+# away jet
 awayDeltaPhi = 'acos(cos(Jet_phi-Jet_phi['+muJetIdx+']))'
 awayDeltaEta = '(Jet_eta-Jet_eta['+muJetIdx+'])'
 awayDeltaR   = 'sqrt('+awayDeltaPhi+'*'+awayDeltaPhi+'+'+awayDeltaEta+'*'+awayDeltaEta+')'
 
-awayJet = 'Sum$('+jetSel+' && '+jetPt+'>=AWAYJETPTCUT && '+awayDeltaR+'>AWAYDRCUT && Jet_BTAGDISC>BTAGAWAYJETCUT)'
-
 if 'PtRel' in opt.method:
+    awayJetNCut     = 'Sum$('+jetSel+' && '+awayDeltaR+'>1.5 && Jet_'+btagAwayJetDiscriminant+'>='+btagAwayJetVariations['Central']+')==1'
+    awayJetPtCut    = 'Sum$('+jetSel+' && '+awayDeltaR+'>1.5 && Jet_'+btagAwayJetDiscriminant+'>='+btagAwayJetVariations['Central']+' && '+jetPt+'>=AWAYJETPTCUT)==1'
+    awayJetLightCut = 'Sum$('+jetSel+' && '+awayDeltaR.replace(muJetIdx,'JETIDX')+'>1.5 && '+jetPt+'>=AWAYJETPTCUT)>=1'
+    awayJetCut      = awayJetNCut+' && '+awayJetPtCut
 
-    awayJetCut = awayJet.replace('AWAYDRCUT', '1.5')+'==1'
-    awayJetCut = awayJetCut.replace('BTAGDISC>BTAGAWAYJETCUT', btagAwayJetDiscriminant+'>'+btagAwayJetVariations['Central'])
-
-elif 'System8' in opt.method:
-
-    awayJetCut = awayJet.replace('AWAYDRCUT', '0.05')+'>=1'
-
-    isTaggedLeadingJet  = jetPt+'=='+jetPt+'[0] && Jet_'+btagAwayJetDiscriminant+'>-999999.'
+elif 'System8' in opt.method: # Not sure System8 does really this
+    isTaggedLeadingJet  = jetPt+'=='+jetPt+'[0] && Jet_'+btagAwayJetDiscriminant+'>=-999999.'
     isTaggedTrailingJet = isTaggedLeadingJet.replace('[0]','[1]')
-    muJetIsLeadingJet = muJetPt+'==Jet_pt[0]'
+    muJetIsLeadingJet = muJetPt+'=='+jetPt+'[0]'
     isTaggedAwayJet = '( ('+isTaggedLeadingJet+') || ('+isTaggedTrailingJet+' && '+muJetIsLeadingJet+') )'
-    awayJetCut = awayJetCut.replace('Jet_BTAGDISC>BTAGAWAYJETCUT', isTaggedAwayJet)
+    awayJetCut = 'Sum$('+jetSel+' && '+jetPt+'>=AWAYJETPTCUT && '+awayDeltaR+'>0.05 && '+isTaggedAwayJet+')>=1'
 
-### Weights and filters
+# trigger
+bitIdx      = 'int(triggerIdx/32)'
+triggerCut  = '( BitTrigger['+bitIdx+'] & ( 1 << (triggerIdx - '+bitIdx+'*32) ) )>0'
+triggerEmul = 'Sum$('+jetSel+' && '+awayDeltaR+'>0.05 && '+jetPt+'>=TRGEMULJETPTCUT)>=1' 
 
-## MET Filters 
+# light jets
+lightJetSel = '((JETIDX<nJet)*(Alt$(Jet_tightID[JETIDX],0)==1)*(abs(Alt$(Jet_eta[JETIDX],5.))<'+maxJetEta+')*(Alt$('+jetPt+'[JETIDX],-1.)>=PTMIN)*(Alt$('+jetPt+'[JETIDX],999999.)<PTMAX)*(Sum$(PFMuon_GoodQuality>=1 && PFMuon_IdxJet==JETIDX)==0)*(Sum$(Jet_tightID==1 && '+jetPt+'!='+jetPt+'[JETIDX] && Jet_'+btagAwayJetDiscriminant+'>='+btagAwayJetVariations['AwayJetDown']+')==0))'
+lightJetPt  = 'Alt$('+jetPt+'[JETIDX],-999.)'
+lightJetEta = 'Alt$(Jet_eta[JETIDX],-999.)'
 
-# https://twiki.cern.ch/twiki/bin/viewauth/CMS/MissingETOptionalFiltersRun2#UL_data (checked on may20)
-
-METFilters_Common = 'Flag_goodVertices*Flag_globalSuperTightHalo2016Filter*Flag_HBHENoiseFilter*Flag_HBHENoiseIsoFilter*Flag_EcalDeadCellTriggerPrimitiveFilter*Flag_BadPFMuonFilter*Flag_BadPFMuonDzFilter*Flag_ecalBadCalibFilter'
-
-
-METFilters_MC   = METFilters_Common
-METFilters_Data = METFilters_Common + '*Flag_eeBadScFilter'
-
-## Trigger Efficiencies
-
-TriggerEff = '(1.)'
-
-## MC weights
+# light tracks
+nLightTrkMax  = 50
+trackJetIdx   = 'TrkInc_jetIdx'
+trakPt        = 'TrkInc_pt'
+trackJetDR    = muJetDR.replace(muJetIdx,'JETIDX').replace(muPhi,'TrkInc_phi[TRKIDX]').replace(muEta,'TrkInc_eta[TRKIDX]')
+lightTrkPtRel = 'Alt$(TrkInc_ptrel[TRKIDX],-999.)'
+lightTrkSel   = '((TRKIDX<nTrkInc)*('+trackJetIdx+'[TRKIDX]>=0)*(Alt$('+trakPt+'[TRKIDX],0.)>TRKPTCUT)*(abs(Alt$(TrkInc_eta[TRKIDX],5.))<2.4)*('+trackJetDR+'<TRKDRCUT))'
+nLightTrkJet  = 'Sum$('+trackJetIdx+'==JETIDX && '+trakPt+'>TRKPTCUT && abs(TrkInc_eta)<2.4 && '+trackJetDR.replace('[TRKIDX]','')+'<TRKDRCUT)'
 
 # generation weights
-
-XSWeight      = 'baseW*genWeight'
-
 muJetFromB    = '(Jet_hadronFlavour['+muJetIdx+']==5)'
 muJetFromC    = '(Jet_hadronFlavour['+muJetIdx+']==4)'
 muJetFromL    = '(Jet_hadronFlavour['+muJetIdx+']<4)'
 muJetNotFromB = '(Jet_hadronFlavour['+muJetIdx+']!=5)'
 
-# lepton weights
-        
-leptonSF = {}
-
-# global SF weights 
-
-SFweight      = 'puWeight*' + TriggerEff + '*' + METFilters_MC
-    
-## Special weights
-
-### MC cross section uncertainties and normalization scale factors
-
-normBackgrounds = {}
+# gluon splitting
+BHadronDeltaR    = 'sqrt(acos(cos(BHadron_phi-Jet_phi['+muJetIdx+']))*acos(cos(BHadron_phi-Jet_phi['+muJetIdx+']))+(BHadron_eta-Jet_eta['+muJetIdx+'])*(BHadron_eta-Jet_eta['+muJetIdx+']))'
+isGluonSplitting = '(Sum$('+BHadronDeltaR+'<=0.4 && BHadron_hasBdaughter==0)>=2)' 
 
 ### MC
 
 if 'SM' in opt.sigset or 'MC' in opt.sigset:
 
-    qcdMuTrees, qcdTrees = [], []
     qcdMuName = 'QCD_PT-PTHATBIN_MuEnrichedPt5_TuneCP5_13p6TeV_pythia8'
-    qcdName = 'QCD_PT-PTHATBIN_TuneCP5_13p6TeV_pythia8'
+    qcdName   = 'QCD_PT-PTHATBIN_TuneCP5_13p6TeV_pythia8'
+    ttbarName = 'TTto4Q_TuneCP5_13p6TeV_powheg-pythia8'
 
     if opt.campaign=='Summer22':
-        qcdMuPtHatBins = {'15to20': {'xSec': '892600000*0.00328', 'events': '987', 'weight': '2966289.76697'}}
-        qcdPtHatBins = {'80to120': {'xSec': '2762530*1', 'events': '1168834', 'weight': '2363.49216399'}}
+        qcdMuPtHatBins = {'15to20': {'ext': '', 'xSec': '892600000*0.00328', 'events': '987', 'weight': '2966289.76697'}}
+        qcdPtHatBins = {'80to120': {'ext': '_ext1', 'xSec': '2762530*1', 'events': '29798700', 'weight': '92.7063932319'}}
+
     elif opt.campaign=='Summer22EE':
         qcdMuPtHatBins = {}
-        qcdPtHatBins = {'80to120': {'xSec': '2762530*1', 'events': '29920690', 'weight': '92.3284188968'}}
+        qcdPtHatBins = {'80to120': {'xSec': '2762530*1', 'events': '29920690', 'weight': '92.3284188968', 'ext' : ''}}
 
-    for pth in qcdMuPtHatBins:
-        qcdMuTrees += getSampleFiles(directoryBkg+qcdMuName.replace('PTHATBIN',pth)+'/',qcdMuName.replace('PTHATBIN',pth),True,treePrefix,skipTreesCheck)
+    if 'WorkingPoints' in opt.tag or 'PtHatWeights' in opt.tag or 'Light' in opt.tag:
 
-    for pth in qcdPtHatBins:
-        if pth=='80to120' or 'WorkingPoints' not in opt.tag:
-            qcdTrees += getSampleFiles(directoryBkg+qcdName.replace('PTHATBIN',pth)+'/',qcdName.replace('PTHATBIN',pth),True,treePrefix,skipTreesCheck)
+        qcdTrees = []
+        for pth in qcdPtHatBins:
+            if pth=='80to120' or 'WorkingPoints' not in opt.tag:
+                ptHatTrees = getSampleFiles(directoryBkg+qcdName.replace('PTHATBIN',pth)+qcdPtHatBins[pth]['ext']+'/',qcdName.replace('PTHATBIN',pth),True,treePrefix,skipTreesCheck)
+                if 'PtHatWeights' in opt.tag: samples['QCD_'+pth] = { 'name' : ptHatTrees }
+                else: qcdTrees += ptHatTrees
 
-    if opt.method+'Kinematics' in opt.tag or 'DataKinematics' in opt.tag:
-        samples['QCDMu'] = { 'name'     : qcdMuTrees, 'weight'   : '1.', 'isSignal' : 0 }
+        if 'WorkingPoints' in opt.tag or 'Light' in opt.tag:
+            samples['QCD']   = { 'name' : qcdTrees, 'weight' : '1.', 'isSignal' : 0 }
+            if 'WorkingPoints' in opt.tag:
+                samples['ttbar'] = { 'name' : getSampleFiles(directoryBkg+ttbarName+'/',ttbarName,True,treePrefix,skipTreesCheck), 'weight' : '1.', 'isSignal' : 0 }
 
-    elif opt.method+'Templates' in opt.tag:
-        samples['bjets'] = { 'name'     : qcdMuTrees, 'weight'   : '1.*'+muJetFromB,    'isSignal' : 1 }
-        samples['light'] = { 'name'     : qcdMuTrees, 'weight'   : '1.*'+muJetNotFromB, 'isSignal' : 0 }
+        for sample in samples:
+            for treeName in samples[sample]['name']:
+                for pth in qcdPtHatBins:
+                    if qcdName.replace('PTHATBIN',pth) in treeName.split('/')[-1]:
+                        addSampleWeight(samples, sample, treeName.split('/')[-1].split('_',1)[-1].replace('.root',''), qcdPtHatBins[pth]['weight'])
 
-    if 'WorkingPoints' in opt.tag or (opt.method=='PtRel' and ('LightKinematics' in opt.tag or 'LightTemplates' in opt.tag)):
-        samples['QCD'] = { 'name'     : qcdTrees , 'weight'   : '1.', 'isSignal' : 0 }
+    else:
 
-    for sample in samples:
-        if sample=='QCDMu' or sample=='bjets' or sample=='light':
-            for pth in qcdMuPtHatBins:
-                addSampleWeight(samples, sample, qcdMuName.replace('PTHATBIN',pth), qcdMuPtHatBins[pth]['weight'])
-        elif sample=='QCD':
-            for pth in qcdPtHatBins:
-                addSampleWeight(samples, sample, qcdName.replace('PTHATBIN',pth), qcdPtHatBins[pth]['weight'])
+        qcdMuTrees = []
+        for pth in qcdMuPtHatBins:
+            ptHatTrees = getSampleFiles(directoryBkg+qcdMuName.replace('PTHATBIN',pth)+qcdMuPtHatBins[pth]['ext']+'/',qcdMuName.replace('PTHATBIN',pth),True,treePrefix,skipTreesCheck)
+            if 'PtHatWeights' in opt.tag: samples['QCDMu_'+pth] = { 'name' : ptHatTrees }
+            else: qcdMuTrees += ptHatTrees
+
+        if opt.method+'Kinematics' in opt.tag or 'DataKinematics' in opt.tag:
+            samples['QCDMu'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight               , 'isSignal' : 0 }
+
+        elif opt.method+'Templates' in opt.tag:
+            samples['bjets'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetFromB, 'isSignal' : 1 }
+            if 'PtRel' in opt.method:
+                samples['cjets'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetFromC, 'isSignal' : 0 }
+                samples['ljets'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetFromL, 'isSignal' : 0 }
+            elif 'System8' in opt.method:
+                samples['light'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetNotFromB, 'isSignal' : 0 }
+
+        for sample in samples:
+            for treeName in samples[sample]['name']:
+                for pth in qcdMuPtHatBins:
+                    if qcdMuName.replace('PTHATBIN',pth) in treeName.split('/')[-1]:
+                        addSampleWeight(samples, sample, treeName.split('/')[-1].split('_',1)[-1].replace('.root',''), qcdMuPtHatBins[pth]['weight'])
 
 # Common MC keys
 
@@ -290,12 +319,19 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
         pass
 
 ### Files per job
+
+removeFromSplit = []
  
 for sample in samples:
     if 'FilesPerJob' not in samples[sample]:
         ntrees = len(samples[sample]['name']) 
         multFactor = 6 if 'JobsPerSample' not in samples[sample] else int(samples[sample]['JobsPerSample'])
-        samples[sample]['FilesPerJob'] = int(math.ceil(float(ntrees)/multFactor))
+        filesPerJob = int(math.ceil(float(ntrees)/multFactor))
+        if filesPerJob>1: samples[sample]['FilesPerJob'] = filesPerJob
+        else: removeFromSplit.append(sample)
+
+for sample in removeFromSplit:
+    del samples[sample]['split']
 
 ### Cleaning
 

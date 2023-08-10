@@ -28,9 +28,10 @@ public:
 
 protected:
   void bindTree_(multidraw::FunctionLibrary&) override;
-  
-  FloatArrayReader* muJet_pt{};
-  FloatArrayReader* muJet_eta{};
+ 
+  IntArrayReader*  nJet{}; 
+  FloatArrayReader* Jet_pT{};
+  FloatArrayReader* Jet_eta{};
 
   std::vector<double> kinematicWeightsReader{};
   void setValues();
@@ -63,23 +64,28 @@ KinematicWeightsReader::evaluate(unsigned iJ) {
 }
 
 void KinematicWeightsReader::bindTree_(multidraw::FunctionLibrary& _library) {
-  _library.bindBranch(muJet_pt,  "muJet_pt");
-  _library.bindBranch(muJet_eta, "muJet_eta");
+  _library.bindBranch(nJet,    "nJet");
+  _library.bindBranch(Jet_pT,  "Jet_pT");
+  _library.bindBranch(Jet_eta, "Jet_eta");
 }
 
 void KinematicWeightsReader::setValues() {
 
   kinematicWeightsReader.clear();
 
-  double muJetPt{muJet_pt->At(0)};
-  double muJetEta{muJet_eta->At(0)};
+  for (int ijet = 0; ijet<nJet->At(0); ijet++) { 
 
-  double kinematicWeight = this->GetBinContent4Weight(kinematicWeightsHisto, muJetPt, muJetEta, 0);
+    double JetPt{Jet_pT->At(ijet)};
+    double JetEta{Jet_eta->At(ijet)};
 
-  if (kinematicWeight<=0.) 
+    double kinematicWeight = this->GetBinContent4Weight(kinematicWeightsHisto, JetPt, JetEta, 0);
+
+    if (kinematicWeight<=0.) 
       std::cout << "KinematicWeightsReader Error for " << weightFile_ << " " << histoName_ << " " << muJetPt << " " << muJetEta << std::endl;
 
-  kinematicWeightsReader.push_back(kinematicWeight);
+    kinematicWeightsReader.push_back(kinematicWeight);
+
+  }
 
 }
 
