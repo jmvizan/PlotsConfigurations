@@ -94,6 +94,7 @@ systematicDictionary['SmoothjesTotal']     = 'Jet energy scale'
 systematicDictionary['Smoothjer']          = 'Jet energy resolution'
 systematicDictionary['SmoothunclustEn']    =  'Unclustered energy'
 systematicDictionary['prefiring']    =  'Prefiring'
+systematicDictionary['lep']          =  'Lepton ident./isolation'
 systematicDictionary['lepReco']      =  'Lepton reconstruction'
 systematicDictionary['lepReco']      =  'Lepton reconstruction'
 systematicDictionary['lepIdIso']     =  'Lepton ident./isolation'
@@ -106,6 +107,7 @@ systematicDictionary['pdf']          =  'PDFs'
 systematicDictionary['normDYall']    =  '\\DY normalization'
 systematicDictionary['normSTtWall']  =  '\\tW normalization'
 systematicDictionary['normMinorBkg'] =  'Minor bkg. normalization'
+systematicDictionary['mt2ll']      =  '\\mtll tails'
 systematicDictionary['WWshape']      =  '\\mtll tails (\\invM{\\PW} endpoint)'
 systematicDictionary['WWtails']      =  '\\mtll tails (\\invM{\\PW} endpoint)'
 systematicDictionary['WZbin']        =  '\\mtll tails (\\WZ)'
@@ -136,6 +138,8 @@ if __name__ == '__main__':
     parser.add_option('--debugcut'          , dest='debugcut'          , help='Debug cut'                                , default='XXX')
     parser.add_option('--debugsyst'         , dest='debugsyst'         , help='Debug systematic'                         , default='XXX')
     parser.add_option('--usemaxshape'       , dest='usemaxshape'       , help='Use max shape instead of symmetric'       , default=False, action='store_true')
+    parser.add_option('--ispaper'           , dest='ispaper'           , help='Table for the paper'                      , default=False, action='store_true')   
+
     # read default parsing options as well
     hwwtools.addOptions(parser)
     hwwtools.loadOptDefaults(parser)
@@ -175,7 +179,7 @@ if __name__ == '__main__':
         exec(open(opt.cutsFile).read())
         exec(open(opt.variablesFile).read())
         exec(open('./nuisances.py').read())
-        print samples.keys()
+
         centralShapes = getShapes('', cuts, variables, samples, samples, inputFile)
 
         if 'stat' not in systematics:
@@ -211,6 +215,12 @@ if __name__ == '__main__':
 
             systematic = nuisances[nuisance]['name'].replace(datayear, 'uncorrelated').replace('ctagFS', 'btagFS_c').replace('mistagFS', 'btagFS_l') 
             if opt.mergeminorbkg and 'DY' not in systematic and 'STtW' not in systematic: systematic = systematic.replace('norm', 'normMinorBkg_')
+            if opt.ispaper:
+                if 'prefiring' in nuisances[nuisance]['name']: continue
+                if 'FS' not in systematic: systematic = systematic.replace('lep', 'lep_')
+                systematic = systematic.replace('WWshape', 'mt2ll_WWshape')
+                systematic = systematic.replace('WWtails', 'mt2ll_WWtails')
+                systematic = systematic.replace('WZbin',   'mt2ll_WZbin')
 
             if systematic not in systematics:
                 systematics[systematic] = { }
@@ -293,6 +303,7 @@ if __name__ == '__main__':
         systematicsToMerge = { }
 
         for systematic in systematics:
+
             for testedsyst in systematics:
                 if systematic!=testedsyst and systematic.split('_')[0]==testedsyst.split('_')[0]:
                     if systematic.split('_')[0] not in systematicsToMerge:

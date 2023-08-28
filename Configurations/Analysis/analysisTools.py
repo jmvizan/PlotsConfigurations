@@ -1,6 +1,7 @@
 import os
 import ROOT
 import copy
+import math
 import PlotsConfigurations.Tools.commonTools as commonTools
 import PlotsConfigurations.Tools.latinoTools as latinoTools
 import PlotsConfigurations.Tools.combineTools as combineTools
@@ -26,7 +27,7 @@ def setAnalysisDefaults(opt):
 
     opt.signalRegionMap, opt.signalSubsets, opt.tableSigset = { }, { }, { }
 
-    opt.signalRegionMap['stopSR'] = { 'tag' : 'StopSignalRegionsVetoesUL',     'signals' : [ 'T2tt_mS-150to800_dm-80to175' ] } #, 'T2bW_mS-200to1000_mX-1to700' ] }
+    opt.signalRegionMap['stopSR'] = { 'tag' : 'StopSignalRegionsVetoesUL',     'signals' : [ 'T2tt_mS-150to800_dm-80to175', 'T2bW_mS-200to1000_mX-1to700' ] }
     opt.signalRegionMap['charSR'] = { 'tag' : 'CharginoSignalRegionsVetoesUL', 'signals' : [ 'TChipmSlepSnu_mC-100to1500_mX-1to750', 'TSlepSlep_mS-100to1000_mX-1to650' ] }
     opt.signalRegionMap['chwwSR'] = { 'tag' : 'TChipmWWSignalRegionsVetoesUL', 'signals' : [ 'TChipmWW_mC-100to700_mX-1to250' ] }
 
@@ -36,8 +37,8 @@ def setAnalysisDefaults(opt):
     opt.tableSigset['TChipmWW']      = [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-150_mX-1', 'TChipmWW_mC-200_mX-1', 'TChipmWW_mC-200_mX-25', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50' ]    
     opt.tableSigset['Studies']      = [ 'T2tt_mS-525_mX-350','T2tt_mS-525_mX-438','TChipmSlepSnu_mC-1150_mX-1','TChipmSlepSnu_mC-900_mX-475','EOYT2tt_mS-525_mX-350','EOYT2tt_mS-525_mX-438','EOYTChipmSlepSnu_mC-1150_mX-1','EOYTChipmSlepSnu_mC-900_mX-475' ]
 
-    opt.signalSubsets['T2tt']          = [ 'T2tt_mS-150to800_dm-80to175' ]
-    opt.signalSubsets['T2bW']          = [ 'T2bW_mS-200to1000_mX-1to700' ]
+    opt.signalSubsets['T2tt'] = [ 'T2tt_mS-150to800_dm-80to175' ]
+    opt.signalSubsets['T2bW'] = ['T2bW_mS-200to600_mX-1to700', 'T2bW_mS-625to800_mX-1to700', 'T2bW_mS-825to1000_mX-1to700']
 
     if 'SigV6' in inputTag or 'sigv6' in inputTag:
         opt.tableSigset['TSlepSlep'] = [ 'TSlepSlep_mS-200_mX-120', 'TSlepSlep_mS-400_mX-250', 'TSlepSlep_mS-400_mX-300', 'TSlepSlep_mS-600_mX-300', 'TSlepSlep_mS-800_mX-1' ]
@@ -401,13 +402,14 @@ def signalFitMatrices(opt):
 
 def yieldsSR(opt):
 
-    yearInDatacard = '-' in opt.year and 'split' not in opt.option
+    yearInDatacard = '-' in opt.year and 'split' not in opt.option and 'merged' not in opt.option
 
     for tag in opt.tag.split('-'):
         opt2 = copy.deepcopy(opt)
         opt2.tag = tag
         cardNameStructure = latinoTools.getDatacardNameStructure(yearInDatacard, True, 'Merge' in tag)
-        commonTools.postFitYieldsTables(opt2, cardNameStructure, ','.join(getSignalList(opt, 'tabsignal', tag)))
+        if opt.sigset=='SM': opt.sigset += '-tabsignal'
+        commonTools.postFitYieldsTables(opt2, cardNameStructure, ','.join(getSignalList(opt, opt.sigset, tag)))
 
 def preFitYieldsSR(opt):
     
@@ -755,7 +757,20 @@ def mergeSearchRegionKinematics(opt):
                  outputFile.cd(cut+'/'+variable)
 
                  for histo in mergedShapes[variable]:
-                     mergedShapes[variable][histo].Write(histo)
+                     if 'ptmiss' in variable:
+                         charTotal = ROOT.TH1F(mergedShapes[variable][histo].GetName(), mergedShapes[variable][histo].GetTitle(), 12,    160.,  400.)
+                         for ib in range(1,12):
+                             charTotal.SetBinContent(ib, mergedShapes[variable][histo].GetBinContent(ib))
+                             charTotal.SetBinError(ib, mergedShapes[variable][histo].GetBinError(ib))
+                         y12, e12 = 0., 0.
+                         for ib in range(12,18):
+                             y12 += mergedShapes[variable][histo].GetBinContent(ib)
+                             e12 += mergedShapes[variable][histo].GetBinError(ib)*mergedShapes[variable][histo].GetBinError(ib)
+                         charTotal.SetBinContent(12, y12)
+                         charTotal.SetBinError(12, math.sqrt(e12))
+                         charTotal.Write(histo)
+                     else:
+                         mergedShapes[variable][histo].Write(histo)
 
         inputFile.Close()
         outputFile.Close()

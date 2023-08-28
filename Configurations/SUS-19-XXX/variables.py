@@ -1446,7 +1446,7 @@ if 'SearchRegionKinematics' in opt.tag:
                                 }
 
     variables['ptmiss']  = {  'name'  : 'ptmiss',                #   variable name
-                              'range' : (  17,    160.,  500.),    #   variable range
+                              'range' : (  12,    160.,  400.),    #   variable range
                               'xaxis' : met + gv,                #   x axis name
                               'fold'  : overflow                 #   fold overflow
                              }
