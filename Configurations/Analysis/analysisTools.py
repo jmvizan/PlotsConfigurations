@@ -757,20 +757,7 @@ def mergeSearchRegionKinematics(opt):
                  outputFile.cd(cut+'/'+variable)
 
                  for histo in mergedShapes[variable]:
-                     if 'ptmiss' in variable:
-                         charTotal = ROOT.TH1F(mergedShapes[variable][histo].GetName(), mergedShapes[variable][histo].GetTitle(), 12,    160.,  400.)
-                         for ib in range(1,12):
-                             charTotal.SetBinContent(ib, mergedShapes[variable][histo].GetBinContent(ib))
-                             charTotal.SetBinError(ib, mergedShapes[variable][histo].GetBinError(ib))
-                         y12, e12 = 0., 0.
-                         for ib in range(12,18):
-                             y12 += mergedShapes[variable][histo].GetBinContent(ib)
-                             e12 += mergedShapes[variable][histo].GetBinError(ib)*mergedShapes[variable][histo].GetBinError(ib)
-                         charTotal.SetBinContent(12, y12)
-                         charTotal.SetBinError(12, math.sqrt(e12))
-                         charTotal.Write(histo)
-                     else:
-                         mergedShapes[variable][histo].Write(histo)
+                     mergedShapes[variable][histo].Write(histo)
 
         inputFile.Close()
         outputFile.Close()
