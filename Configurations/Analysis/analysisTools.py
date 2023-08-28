@@ -8,88 +8,87 @@ import PlotsConfigurations.Tools.combineTools as combineTools
 
 ### Analysis defaults
 
+def getCampaignParameters(opt):
+
+    origTag = opt.tag
+    opt.tag = opt.year+opt.tag
+
+    samples = {}
+    if os.path.exists(commonTools.getCfgFileName(opt,'samples')):
+        handle = open(commonTools.getCfgFileName(opt,'samples'),'r')
+        exec(handle)
+        handle.close()
+
+    opt.tag = origTag
+    if opt.year=='test': opt.year = opt.campaign
+    opt.btagWPs = bTagWorkingPoints.keys()
+    opt.ptBins = jetPtBins.keys()
+    opt.Selections = systematicVariations
+
+    if opt.action=='ptHatWeights':
+        opt.samples = samples
+        opt.qcdMuPtHatBins = qcdMuPtHatBins
+        opt.qcdPtHatBins = qcdPtHatBins 
+
+    elif opt.action=='workingPoints':
+        opt.samples = samples
+        opt.nJetMax = nJetMax
+        opt.bTagWorkingPoints = bTagWorkingPoints
+
+    elif opt.action=='frameworkValidation':
+        opt.samples = samples.keys()        
+        opt.triggerInfos = triggerInfos
+
+    elif opt.action=='kinematicWeights':
+        opt.jetPtBins = jetPtBins
+        opt.minJetPt  = minJetPt 
+        opt.maxJetPt  = maxJetPt
+        opt.maxJetEta = float(maxJetEta)
+
 def setAnalysisDefaults(opt):
 
     opt.baseDir = os.getenv('PWD') 
     opt.treeName = 'btagana/ttree'
 
-    opt.method = 'PtRel' if 'PtRel' in opt.tag else 'System8'
-
+    opt.dataConditionScript = '../../../LatinoAnalysis/NanoGardener/python/data/dataTakingConditionsAnalyzer.py'
     opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src' 
 
-    if opt.year=='test' or opt.year=='*': opt.year = 'Summer22'
+    if opt.action=='ptHatWeights':
+        opt.tag = 'PtHatWeights'
+        opt.sigset = 'MC'
 
-    opt.btagWPs = [ 'DeepCSVL', 'DeepCSVM', 'DeepCSVT', 'DeepJetL', 'DeepJetM', 'DeepJetT' ]
-    opt.ptBins = [ 'Pt20to30', 'Pt30to50', 'Pt50to70','Pt70to100','Pt100to140','Pt140to200','Pt200to300','Pt300to600', 'Pt600to1000','Pt1000to1400' ]
+    elif opt.action=='workingPoints':
+        if 'WorkingPoints' not in opt.tag: opt.tag = 'WorkingPoints'
+        opt.sigset='MCQCD' if 'SM' in opt.sigset or opt.sigset=='MC' else opt.sigset
 
-    if '_btag' in opt.tag:
-        btagToKeepString = opt.tag.split('_btag')[1].split('_')[0]
-        btagToKeep = []
-        for btagWP in opt.btagWPs:
-            if btagToKeepString in btagWP:
-                btagToKeep.append(btagWP)
-        opt.btagWPs = btagToKeep
-
-    if '_Pt' in opt.tag:
-        ptbinToKeep = []
-        for ptbin in opt.ptBins:
-            if ptbin in opt.tag:
-                ptbinToKeep.append(ptbin)
-        opt.ptBins = ptbinToKeep
-        
-    opt.Systematics = [ 'Central' ]
-    if 'systematicsawayjet' in opt.option.lower() or 'systematicawayjet' in opt.option.lower() or 'systawayjet' in opt.option.lower():
-        opt.Systematics.extend([ 'AwayJetDown', 'AwayJetUp' ])
-
-    opt.dataConditionScript = '../../../LatinoAnalysis/NanoGardener/python/data/dataTakingConditionsAnalyzer.py'
-
-    if 'Summer22' in opt.year:
-        opt.simulationPileupFile = 'pileup_DistrWinter22_Run3_2022_LHC_Simulation_10h_2h.root'
-        if opt.year=='Summer22EE': opt.dataPileupFile = '/afs/cern.ch/work/s/scodella/BTagging/CMSSW_10_6_28/src/LatinoAnalysis/NanoGardener/python/data/PUweights/2022/2022EFG.root'
-        elif opt.year=='Summer22': opt.dataPileupFile = '/afs/cern.ch/work/s/scodella/BTagging/CMSSW_10_6_28/src/LatinoAnalysis/NanoGardener/python/data/PUweights/2022/2022CD.root'
+    getCampaignParameters(opt) 
 
 ### Shapes, kinematic weights and prefit plots
 
-def bTagPerfShapes(opt):
+def bTagPerfShapes(opt, tag, action):
 
-    if 'step' not in opt.option:
-        print 'Error in ptRelShapes: please choose a step'
-        exit()
-    
-    if 'step0' in opt.option:
-        opt.tag = opt.method+'Kinematics'
-    elif 'step1' in opt.option:
-        opt.tag = opt.method+'Kinematics:mujetpt'
-    elif 'step2' in opt.option:
-        opt.tag = opt.method+'Kinematics:mujetptProdRun2'
-    elif 'step3' in opt.option:
-        opt.tag = opt.method+'Kinematics:mujetpt:mujetetaProdRun2'
-    elif 'step4' in opt.option:
-        opt.tag = opt.method+'TemplatesKinematics:mujetpt:mujetetaProdRun2'
-    elif 'step5' not in opt.option or opt.method!='System8':
-        print 'Error in bTagPerfShapes: please choose an existing step'
-        exit()
+    for selection in opt.Selections:
 
-    if 'kin' in opt.option.lower():
-        if 'step0' in opt.option: opt.option += 'mujetpt'
-        if 'step2' in opt.option: opt.option += 'mujeteta'
-        kinematicWeights(opt)
-    elif 'step5' in opt.option:
-        opt.tag = 'System8TemplatesKinematics:mujetpt:mujetetaProdRun2'
-        system8Input(opt)
-    elif 'plot' in opt.option:
-        latinoTools.plots(opt)
-    elif 'merges' in opt.option:
-        opt.action = 'mergesingle'
-        latinoTools.mergesingle(opt)
-    elif 'mergea' in opt.option:
-        opt.action = 'mergeall'
-        latinoTools.mergeall(opt)
-    else:
-        opt.action = 'shapes'
-        opt.batchQueue = 'workday'
-        opt.option += 'reset'
-        latinoTools.shapes(opt)
+        sel = 'Central' if selection=='' else selection
+        if 'vetosel' in opt.option:
+            if sel in opt.option: continue
+        elif 'sel' in opt.option and sel not in opt.option: continue  
+
+        opt2 = copy.deepcopy(opt)
+        opt2.tag = tag+selection
+        if '.' in tag and 'Light' not in tag: opt2.sigset = 'MC'
+        if 'shapes' in action: latinoTools.shapes(opt2)
+        elif 'mergesingle' in action: latinoTools.mergesingle(opt2)
+
+def makeShapes(opt):
+
+    for tag in opt.tag.split('-'):
+        bTagPerfShapes(opt, tag, 'shapes')
+
+def mergeShapes(opt):
+
+    for tag in opt.tag.split('-'):
+        bTagPerfShapes(opt, tag, 'mergesingle')
 
 def mergeLightShapes(opt):
 
@@ -130,17 +129,6 @@ def mergeLightShapes(opt):
 
         inputFile.Close()
         outputFile.Close()
-            
-
-def mergeLightKinematics(opt):
-
-    opt.tag = 'PtRelLightKinematics' if 'PtRelLightKinematics' not in opt.tag else opt.tag
-    mergeLightShapes(opt)
-
-def mergeLightTemplates(opt):
-    
-    opt.tag = 'PtRelLightTemplates' if 'PtRelLightTemplates' not in opt.tag else opt.tag
-    mergeLightShapes(opt)
 
 def system8Input(opt):
 
@@ -225,6 +213,138 @@ def system8Input(opt):
                         outputFile.cd()
                         outputFile.Write()
                         outputFile.Close()
+
+def frameworkValidation(opt):
+
+    if 'JEU' in opt.tag:
+        print 'frameworkValidation: JEU in PtRelTools not up-to-date, exiting'
+        exit()
+
+    if 'Light' in opt.tag and 'Merged' not in opt.tag:
+        mergeLightShapes(opt)
+        opt.tag = opt.tag.replace('Light', 'MergedLight')
+
+    ptRelToolsDir = '/afs/cern.ch/work/s/scodella/BTagging/CMSSW_10_6_28/src/PlotsConfigurations/Configurations/Analysis/PtRelTools/Templates/Histograms/'
+
+    histoToCompare = { 'LightKinematics'   : { 'jetpt'         : [ 'jetPt_DATASET_PTTBIN_anyEta_TRIGGER_SELECTION',                    'PTBIN/lightjetpt_PTBIN/histo_SAMPLE'       ] },
+                       'PtRelKinematics'   : { 'jetpt'         : [ 'jetPt_DATASET_PTTBIN_anyEta_TRIGGER_SELECTION',                    'PTBIN/mujetpt_PTBIN/histo_SAMPLE'          ] },
+                       'System8Kinematics' : { 'jetpt'         : [ 'jetPt_DATASET_PTTBIN_anyEta_TRIGGER_SELECTION',                    'PTBIN/mujetpt_PTBIN/histo_SAMPLE'          ] },
+                       'LightTemplates'    : { 'ptrel'         : [ 'PtRel_DATASET_PTTBIN_anyEta_TRIGGER_SELECTION_DeepJetM_Untag_trk', 'PTBIN/ptrel_PTBIN/histo_SAMPLE'            ] },
+                       'PtRelTemplates'    : { 'ptrelpass'     : [ 'PtRel_DATASET_PTTBIN_anyEta_TRIGGER_SELECTION_TAGWP_TagFLAVOUR',   'PTBIN/ptrel_TAGWP_Pass/histo_SAMPLE'       ],
+                                               'ptrelfail'     : [ 'PtRel_DATASET_PTTBIN_anyEta_TRIGGER_SELECTION_TAGWP_UntagFLAVOUR', 'PTBIN/ptrel_TAGWP_Fail/histo_SAMPLE'       ] },
+                       'System8Templates'  : { 'ptrel'         : [ 'n_pT_PTTBIN_anyEta_TRIGGER_SELECTIONFLAVOUR',                      'PTBIN/ptrel/histo_SAMPLE'                  ],
+                                               'ptrelpass'     : [ 'ntag_pT_PTTBIN_anyEta_TRIGGER_SELECTION_TAGWPFLAVOUR',             'PTBIN/ptrel_TAGWP/histo_SAMPLE'            ],
+                                               'ptrelaway'     : [ 'p_pT_PTTBIN_anyEta_TRIGGER_SELECTIONFLAVOUR',                      'PTBIN_AwayJetTag/ptrel/histo_SAMPLE'       ],
+                                               'ptrelawaypass' : [ 'ptag_pT_PTTBIN_anyEta_TRIGGER_SELECTION_TAGWPFLAVOUR',             'PTBIN_AwayJetTag/ptrel_TAGWP/histo_SAMPLE' ] } }
+
+    keyTag = ''
+    for key in histoToCompare:
+        if key in opt.tag: keyTag = key
+    if keyTag=='': 
+        print 'frameworkValidation: invalid keyTag, exiting'
+        exit()
+
+    selection = 'Central'
+    for sel in opt.Selections:
+        if sel in opt.tag: 
+            if sel=='AwayJetUp': selection = 'JBPT'
+            elif sel=='AwayJetDown': selection = 'JBPL'
+            elif sel=='MuPtUp': selection = 'MuPt8'
+            elif sel=='MuPtDown': selection = 'MuPt6'
+            elif sel=='MuDRUp': selection = 'MuDRPlus'
+            elif sel=='MuDRDown': selection = 'MuDRMinus'
+
+    for sample in opt.samples:
+
+        if sample=='JetMET': 
+            ptRelToolsFileName = 'PtRel_LightHistograms_Run2022FG_LowPtAwayTrgConf.root'
+            dataset = 'JetHT'
+        elif sample=='QCD': 
+            ptRelToolsFileName = 'PtRel_LightHistograms_PT-80to120_LowPtAwayTrgConf.root'
+            dataset = 'QCD'
+        elif 'PtRel' in opt.tag:
+            if sample=='DATA': 
+                ptRelToolsFileName = 'PtRel_Histograms_BTagMu_Run2022FG_LowPtAwayTrgConf.root'
+                dataset = 'BTagMu'
+            else:
+                ptRelToolsFileName = 'PtRel_Histograms_QCDMu_PT-80to120_LowPtAwayTrgConf.root'
+                dataset = 'QCDMu'
+        elif 'System8' in opt.tag:
+            if sample=='DATA':  
+                ptRelToolsFileName = 'System8_Histograms_Run2022FG_LowPtAway.root'
+                dataset = 'BTagMu'
+            else: 
+                ptRelToolsFileName = 'System8_Histograms_PT-80to120_LowPtAway.root'
+                dataset = 'QCDMu'
+
+        inputFile = [ commonTools.openRootFile(ptRelToolsDir+ptRelToolsFileName), commonTools.openSampleShapeFile(opt.shapedir, opt.year, opt.tag, sample) ]
+
+        flavour = ''
+        if sample=='light': flavour = '_cl'
+        elif sample=='ljets': flavour = '_lg'
+        elif 'jets' in sample: flavour = '_'+sample.replace('jets','')
+
+        for ptbin in opt.ptBins:
+            
+            for tr in opt.triggerInfos:
+                if float(ptbin.split('Pt')[1].split('to')[0])<float(opt.triggerInfos[tr]['jetPtRange'][1]) and float(opt.triggerInfos[tr]['jetPtRange'][0])<float(ptbin.split('to')[1]):
+                    trigger = tr.replace('BTagMu_AK4','').replace('_Mu5','')                  
+
+            for histokey in histoToCompare[keyTag]:
+
+                btagWPList = opt.btagWPs if 'pass' in histokey or 'fail' in histokey else [ '' ] 
+                for wp in btagWPList:
+                    if 'VT' in wp or 'VVT' in wp or 'JBPT' in wp: continue 
+
+                    histos = []
+                    for his in range(2):
+                        histoName = histoToCompare[keyTag][histokey][his].replace('DATASET',dataset).replace('PTTBIN',ptbin.replace('to','')).replace('TRIGGER',trigger).replace('SELECTION',selection).replace('FLAVOUR',flavour).replace('PTBIN',ptbin).replace('SAMPLE',sample).replace('TAGWP',wp).replace('10001400','1000')
+                        histos.append(inputFile[his].Get(histoName))
+
+                    if histos[0].GetEntries()==0.: continue
+
+                    if sample!='DATA' and sample!='JetMET':
+                        weight0 = 0.39821973443 if 'LightTemplates' in opt.tag else histos[0].Integral(-1,-1)/histos[0].GetEntries()
+                        histos[0].Scale(1./weight0)
+
+                    lastBin0 = histos[0].GetBinContent(histos[0].GetNbinsX())+histos[0].GetBinContent(histos[0].GetNbinsX()+1)
+                    histos[0].SetBinContent(histos[0].GetNbinsX(), lastBin0)
+
+                    if abs(histos[1].Integral()/histos[0].Integral()-1.)>0.00003 or opt.verbose:
+                        print 'Events', sample, ptbin, histokey, wp, histos[0].Integral(), histos[1].Integral(), histos[1].Integral()/histos[0].Integral()-1.
+
+                    if 'events' in opt.option: continue
+ 
+                    if 'jetpt' not in histokey and histos[0].GetNbinsX()!=histos[1].GetNbinsX():
+                        if histos[0].GetNbinsX()>histos[1].GetNbinsX():
+                            rbin = float(histos[0].GetNbinsX())/float(histos[1].GetNbinsX())
+                            if rbin==int(rbin): histos[0].Rebin(int(rbin))
+                            elif opt.verbose: 
+                                print 'Binning not comparable:', ptbin, histokey, wp, histos[0].GetNbinsX(), histos[1].GetNbinsX()
+                                continue
+                        elif histos[1].GetNbinsX()>histos[0].GetNbinsX():
+                            rbin = float(histos[1].GetNbinsX())/float(histos[0].GetNbinsX())
+                            if rbin==int(rbin): histos[1].Rebin(int(rbin))
+                            elif opt.verbose: 
+                                print 'Binning not comparable:', ptbin, histokey, wp, histos[0].GetNbinsX(), histos[1].GetNbinsX()
+                                continue
+
+                    binoffset = int(ptbin.split('Pt')[1].split('to')[0]) if 'jetpt' in histokey else 0
+
+                    for ib in range(1, histos[1].GetNbinsX()+1):
+                        if histos[0].GetBinContent(ib+binoffset)>0.:
+                            if abs(histos[1].GetBinContent(ib)/histos[0].GetBinContent(ib+binoffset)-1.)>0.00003 and (opt.verbose or abs(histos[1].GetBinContent(ib)-histos[0].GetBinContent(ib+binoffset))>1):
+                                print 'Shapes', sample, ptbin, histokey, wp, histos[1].GetBinLowEdge(ib), histos[0].GetBinContent(ib+binoffset), histos[1].GetBinContent(ib), histos[1].GetBinContent(ib)/histos[0].GetBinContent(ib+binoffset)-1.
+
+### Prefit plots
+
+def plotKinematics(opt):
+
+    if not commonTools.foundShapeFiles(opt, True, False):
+        os.system('cp '+commonTools.getSampleShapeFileName(opt.shapedir, opt.year, opt.tag.split('.')[0], 'DATA')+' '+commonTools.getSampleShapeFileName(opt.shapedir, opt.year, opt.tag, 'DATA'))
+        latinoTools.mergeall(opt) 
+
+    latinoTools.plots(opt)
 
 ### Fits and postfit plots
 
@@ -367,7 +487,7 @@ def getPtRelFitResults(opt):
     motherFile = commonTools.openShapeFile(opt.shapedir, opt.year, opt.tag.split('_')[0], 'SM', 'SM')
     fitFile = commonTools.openCombineFitFile(opt, '', opt.year, opt.tag)
 
-    for systematic in opt.Systematics:
+    for systematic in opt.Selections:
  
         efficiencyMC,  uncertaintyMC  = getPtRelEfficiency(opt, motherFile, 'shapes', btagWP, ptbin, systematic)
         efficiencyFit, uncertaintyFit = getPtRelEfficiency(opt, fitFile,    'fit',    btagWP, ptbin, systematic)
@@ -545,46 +665,39 @@ def storeBTagScaleFactors(opt):
 def workingPoints(opt): 
 
     tag = 'WorkingPoints' if 'WorkingPoints' not in opt.tag else opt.tag
-    opt.tag = opt.year+tag
-    opt.sigset='MCQCD' if 'SM' in opt.sigset or opt.sigset=='MC' else opt.sigset
-
-    samples = {}
-    if os.path.exists(commonTools.getCfgFileName(opt,'samples')):
-        handle = open(commonTools.getCfgFileName(opt,'samples'),'r')
-        exec(handle)
-        handle.close()
 
     wpSamples = []
-    for sample in samples:
-        if not samples[sample]['isDATA']: wpSamples.append(sample)
+    for sample in opt.samples:
+        if not opt.samples[sample]['isDATA']: wpSamples.append(sample)
 
     if len(wpSamples)!=1: 
         print 'workingPoints error: too many samples selected ->', wpSamples
         exit()
 
-    inputFile = ROOT.TFile.Open('/'.join([ opt.shapedir, opt.year, tag.split('_')[0], 'Samples', 'plots_'+opt.tag.split('_')[0]+'_ALL_'+wpSamples[0]+'.root' ]), 'read')
+    inputFile = ROOT.TFile.Open('/'.join([ opt.shapedir, opt.year, opt.tag.split('_')[0], 'Samples', 'plots_'+opt.year+opt.tag.split('_')[0]+'_ALL_'+wpSamples[0]+'.root' ]), 'read')
 
     discriminantDone = []
 
-    for btagwp in bTagWorkingPoints.keys():
-        if bTagWorkingPoints[btagwp]['discriminant'] not in discriminantDone:
+    for btagwp in opt.bTagWorkingPoints.keys():
+        if opt.bTagWorkingPoints[btagwp]['discriminant'] not in discriminantDone:
 
-            bJetDisc = inputFile.Get('QCD/Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'_5_0/histo_'+wpSamples[0])
-            lJetDisc = inputFile.Get('QCD/Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'_0_0/histo_'+wpSamples[0])
+            bJetDisc = inputFile.Get('QCD/Jet_'+opt.bTagWorkingPoints[btagwp]['discriminant']+'_5_0/histo_'+wpSamples[0])
+            lJetDisc = inputFile.Get('QCD/Jet_'+opt.bTagWorkingPoints[btagwp]['discriminant']+'_0_0/histo_'+wpSamples[0])
 
-            for ijet in range(1, nJetMax):
-                bJetDisc.Add(inputFile.Get('QCD/Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'_5_'+str(ijet)+'/histo_'+wpSamples[0]))
-                lJetDisc.Add(inputFile.Get('QCD/Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'_0_'+str(ijet)+'/histo_'+wpSamples[0]))
+            for ijet in range(1, opt.nJetMax):
+                bJetDisc.Add(inputFile.Get('QCD/Jet_'+opt.bTagWorkingPoints[btagwp]['discriminant']+'_5_'+str(ijet)+'/histo_'+wpSamples[0]))
+                lJetDisc.Add(inputFile.Get('QCD/Jet_'+opt.bTagWorkingPoints[btagwp]['discriminant']+'_0_'+str(ijet)+'/histo_'+wpSamples[0]))
 
             if 'noprint' not in opt.option:
                 print '\n\nWorking Points for', btagwp[:-1]
 
-            workingPointName = [ 'Loose', 'Medium', 'Tight', 'VeryTight', 'SuperTight' ]
+            workingPointName = [ 'Loose', 'Medium', 'Tight', 'VeryTight', 'VeryVeryTight' ]
             workingPointLimit = [ 0.1, 0.01, 0.001, 0.0005, 0.0001 ]
 
             oldWorkingPoint = []
             for wp in workingPointName:
-                if btagwp[:-1]+wp[:1] in bTagWorkingPoints: oldWorkingPoint.append(float(bTagWorkingPoints[btagwp[:-1]+wp[:1]]['cut']))
+                wpflag = ''.join([ x for x in wp if x.isupper() ])
+                if btagwp[:-1]+wpflag in opt.bTagWorkingPoints: oldWorkingPoint.append(float(opt.bTagWorkingPoints[btagwp[:-1]+wpflag]['cut']))
                 else: oldWorkingPoint.append(0.9) 
 
             integralLightJets  = lJetDisc.Integral(0, lJetDisc.GetNbinsX())
@@ -597,6 +710,7 @@ def workingPoints(opt):
 
             for wp in range(len(workingPointName)):
 
+                wpflag = ''.join([ x for x in workingPointName[wp] if x.isupper() ])
                 mistagRateDistance =  999.
                 binAtWorkingPoint  = -999
 
@@ -622,23 +736,23 @@ def workingPoints(opt):
                     print round((100.*bJetDisc.Integral(binAtWorkingPoint, bJetDisc.GetNbinsX())/integralBottomJets),1),
                     print round((100.*lJetDisc.Integral(binAtWorkingPoint, lJetDisc.GetNbinsX())/integralLightJets),1 if workingPointName[wp]=='Loose' else 2), 
                 elif 'yml' in opt.option:
-                    print '   ',workingPointName[wp][:1]+':'
+                    print '   ',wpflag+':'
                     print '       ', 'eff:', round((100.*bJetDisc.Integral(binAtWorkingPoint, bJetDisc.GetNbinsX())/integralBottomJets),1)
                     print '       ', 'wp:', lJetDisc.GetBinLowEdge(binAtWorkingPoint) 
 
 
-                if btagwp[:-1]+workingPointName[wp][:1] not in bTagWorkingPoints:
-                    bTagWorkingPoints[btagwp[:-1]+workingPointName[wp][:1]] = {}
-                    bTagWorkingPoints[btagwp[:-1]+workingPointName[wp][:1]]['discriminant'] = bTagWorkingPoints[btagwp]['discriminant']
+                if btagwp[:-1]+wpflag not in opt.bTagWorkingPoints:
+                    opt.bTagWorkingPoints[btagwp[:-1]+wpflag] = {}
+                    opt.bTagWorkingPoints[btagwp[:-1]+wpflag]['discriminant'] = opt.bTagWorkingPoints[btagwp]['discriminant']
 
-                bTagWorkingPoints[btagwp[:-1]+workingPointName[wp][:1]]['cut'] = str(lJetDisc.GetBinLowEdge(binAtWorkingPoint))
+                opt.bTagWorkingPoints[btagwp[:-1]+wpflag]['cut'] = str(lJetDisc.GetBinLowEdge(binAtWorkingPoint))
 
             if 'csv' in opt.option: print ''
 
-            discriminantDone.append(bTagWorkingPoints[btagwp]['discriminant'])
+            discriminantDone.append(opt.bTagWorkingPoints[btagwp]['discriminant'])
 
     if 'noprint' not in opt.option:
-        print '\n\nbTagWorkingPoints =', bTagWorkingPoints, '\n\n' 
+        print '\n\nbTagWorkingPoints =', opt.bTagWorkingPoints, '\n\n' 
 
 ### Analysis specific weights, efficiencies, scale factors, etc.
 
@@ -648,7 +762,7 @@ from rest import McM
 
 def getGeneratorParametersFromMCM(mcm_query):
 
-    mcm = McM(dev=False)
+    mcm = McM(dev=True)
     requests = mcm.get('requests', None, mcm_query)
     nValidRequests = 0
     for request in requests:
@@ -664,44 +778,36 @@ def getGeneratorParametersFromMCM(mcm_query):
 
 def ptHatWeights(opt):
 
-    opt.tag = opt.year+'PtHatWeights'
-    opt.sigset = 'MC'
+    for sample in opt.samples:
 
-    samples = {}
-    if os.path.exists(commonTools.getCfgFileName(opt,'samples')):
-        handle = open(commonTools.getCfgFileName(opt,'samples'),'r')
-        exec(handle)
-        handle.close()
-
-    for sample in samples:
- 
         ptHatBin = sample.split('_')[-1]
         events = ROOT.TChain(opt.treeName)
-        for tree in samples[sample]['name']: events.Add(tree.replace('#',''))
+        for tree in opt.samples[sample]['name']: events.Add(tree.replace('#',''))
             
         if 'QCDMu_' in sample:
-            qcdMuPtHatBins[ptHatBin]['events'] = str(events.GetEntries())
-            if not 'xSec' in qcdMuPtHatBins[ptHatBin]: 
-             xSec, fEff = getGeneratorParametersFromMCM('dataset_name=QCD_*'+ptHatBin+'_MuEnrichedPt5_*&prepid=BTV*'+opt.year+'G*')
-             qcdMuPtHatBins[ptHatBin]['xSec'] = str(xSec)+'*'+str(fEff)
+            opt.qcdMuPtHatBins[ptHatBin]['events'] = str(events.GetEntries())
+            if not 'xSec' in opt.qcdMuPtHatBins[ptHatBin]: 
+                xSec, fEff = getGeneratorParametersFromMCM('dataset_name=QCD_*'+ptHatBin+'_MuEnrichedPt5_*&prepid=BTV*'+opt.year+'G*')
+                opt.qcdMuPtHatBins[ptHatBin]['xSec'] = str(xSec)+'*'+str(fEff)
             else:
-                genPars = qcdMuPtHatBins[ptHatBin]['xSec'].split('*')
+                genPars = opt.qcdMuPtHatBins[ptHatBin]['xSec'].split('*')
                 xSec = float(genPars[0])
                 fEff = 1. if len(genPars)==1 else float(genPars[1])
-            qcdMuPtHatBins[ptHatBin]['weight'] = str(1000.*xSec*fEff/events.GetEntries())
-        elif 'QCD_' in sample:
-            qcdPtHatBins[ptHatBin]['events'] = str(events.GetEntries())
-            if not 'xSec' in qcdPtHatBins[ptHatBin]:
-                xSec, fEff = getGeneratorParametersFromMCM('dataset_name=QCD_*'+ptHatBin+'_Tune*&prepid=BTV*'+opt.year+'G*')
-                qcdPtHatBins[ptHatBin]['xSec'] = str(xSec)+'*'+str(fEff)
-            else:
-                genPars = qcdPtHatBins[ptHatBin]['xSec'].split('*')
-                xSec = float(genPars[0])
-                fEff = 1. if len(genPars)==1 else float(genPars[1])
-            qcdPtHatBins[ptHatBin]['weight'] = str(1000.*xSec*fEff/events.GetEntries())
+            opt.qcdMuPtHatBins[ptHatBin]['weight'] = str(1000.*xSec*fEff/events.GetEntries())
 
-    print '\nqcdMuPtHatBins =', qcdMuPtHatBins
-    print '\nqcdPtHatBins =', qcdPtHatBins, '\n'
+        elif 'QCD_' in sample:
+            opt.qcdPtHatBins[ptHatBin]['events'] = str(events.GetEntries())
+            if not 'xSec' in opt.qcdPtHatBins[ptHatBin]:
+                xSec, fEff = getGeneratorParametersFromMCM('dataset_name=QCD_*'+ptHatBin+'_Tune*&prepid=BTV*'+opt.year+'G*')
+                opt.qcdPtHatBins[ptHatBin]['xSec'] = str(xSec)+'*'+str(fEff)
+            else:
+                genPars = opt.qcdPtHatBins[ptHatBin]['xSec'].split('*')
+                xSec = float(genPars[0])
+                fEff = 1. if len(genPars)==1 else float(genPars[1])
+            opt.qcdPtHatBins[ptHatBin]['weight'] = str(1000.*xSec*fEff/events.GetEntries())
+            print sample, opt.qcdPtHatBins[ptHatBin]['weight']
+    print '\nqcdMuPtHatBins =', opt.qcdMuPtHatBins
+    print '\nqcdPtHatBins =', opt.qcdPtHatBins, '\n'
 
 def triggerPrescales(opt):
 
@@ -743,122 +849,124 @@ def kinematicWeights(opt):
         print 'kinematicWeights in 2D not supported yet'
         exit()
 
-    if 'jetpt' in opt.option.lower() or 'jeteta' in opt.option.lower():
+    if 'jetpt' not in opt.option.lower() and 'jeteta' not in opt.option.lower():
         print 'kinematicWeights only supported for jetpt and jeteta'
         exit()
 
-    samples = {}
-    if os.path.exists(commonTools.getCfgFileName(opt,'samples')):
-        handle = open(commonTools.getCfgFileName(opt,'samples'),'r')
-        exec(handle)
-        handle.close() 
-
     jetPtEdges = []
-    for jetBin in jetPtBins:
-        for edge in range(2):
-            if float(jetPtBins[jetBin][edge]) not in jetPtEdges:
-                jetPtEdges.append(float(jetPtBins[jetBin][edge])) 
+    for jetBin in opt.jetPtBins:
+        for ptEdge in [ float(opt.jetPtBins[jetBin][0]), float(opt.jetPtBins[jetBin][1]) ]:
+            if ptEdge not in jetPtEdges:
+                jetPtEdges.append(ptEdge)
     jetPtEdges.sort()
 
-    for year in opt.year.split('-'):
+    outputDir = '/'.join([ opt.datadir, opt.year, 'Kinematics' ])
+    os.system('mkdir -p '+outputDir)
 
-        outputDir = '/'.join([ opt.datadir, year, 'Kinematics' ])
-        os.system('mkdir -p '+outputDir)
+    if 'Light' in opt.tag and 'MergedLight' not in opt.tag:
+        mergeLightShapes(opt)
+        opt.tag = opt.tag.replace('Light', 'MergedLight')
 
-        samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, opt.sigset, 'variables')
+    samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, opt.year, opt.tag, opt.sigset, 'variables')
 
-        data, backgrounds = 'DATA', [ ]
-        for sample in samples:
-            if samples[sample]['isDATA']: data = sample
-            else: backgrounds.append(sample)
+    data, backgrounds = 'DATA', [ ]
+    for sample in samples:
+        if sample!='DATA': backgrounds.append(sample)
 
-        data_File = commonTools.openSampleShapeFile(opt.shapedir, opt.year, opt.tag.replace('MergedLight','').split(':')[0], data) 
+    data_File = commonTools.openSampleShapeFile(opt.shapedir, opt.year, opt.tag.replace('MergedLight','').split('.')[0], data) 
 
-        for variable in variables: # There should be just one
-            if variable.split('_')[0] not in opt.option.lower(): continue
+    kinematicVariable = ''
+    for variable in variables: 
+        if variable.split('_')[0] in opt.option.lower(): kinematicVariable = variable.split('_')[0]
 
-            if 'jetpt' in variable:
-                xBins = ( int(maxJetPt-minJetPt), minJetPt, maxJetPt )
-                yBins = ( 1, -1.*float(maxJetEta), float(maxJetEta) )
-            elif 'jeteta' in variable:
-                xBins = [ jetPtEdges ]
-                yBins = ( int((2.*float(maxJetEta))/0.1), 1.*float(maxJetEta), float(maxJetEta) )
-            else:
-                print 'Error in kinematicWeights: no function variable chosen for corrections'
-                exit()
+    if kinematicVariable=='': 
+        print 'kinematicWeights: no valid variable found for', opt.option.lower()
+        exit()
 
-            for back in backgrounds:
+    if 'jetpt' in kinematicVariable:
+        xBins = ( int(opt.maxJetPt-opt.minJetPt), opt.minJetPt, opt.maxJetPt )
+        yBins = ( 1, -opt.maxJetEta, opt.maxJetEta )
+    elif 'jeteta' in kinematicVariable:
+        xBins = [ jetPtEdges ]
+        yBins = ( int((2.*opt.maxJetEta)/0.1), -opt.maxJetEta, opt.maxJetEta )
+    else:
+        print 'Error in kinematicWeights: no function variable chosen for corrections'
+        exit()
 
-                inputFile = commonTools.openSampleShapeFile(opt.shapedir, opt.year, opt.tag, back)
+    for back in backgrounds:
 
-                outputname = opt.tag.split('Prod')[0].replace('Kinematics','').replace('MergedLight','') + '_' + back + ':' + variable.split('_')[0]
-                outputFile = commonTools.openRootFile(outputDir+'/'+outputname+'.root', 'recreate')
+        inputFile = commonTools.openSampleShapeFile(opt.shapedir, opt.year, opt.tag, back)
 
-                weightsHisto = commonTools.bookHistogram(opt.option.lower(), xBins, yBins)    
+        tagkinweights = '' if '.' not in opt.tag else '.'+opt.tag.split('.',1)[-1]
+        outputname = opt.method + '_' + back + tagkinweights + '.' + kinematicVariable
+        outputFile = commonTools.openRootFile(outputDir+'/'+outputname+'.root', 'recreate')
 
-                for cut in cuts: 
-                    if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+        weightsHisto = commonTools.bookHistogram(kinematicVariable, xBins, yBins)   
 
-                        dataHisto = data_File.Get('/'.join([ cut, variable.replace('mujet','lightjet'), 'histo_'+data ])) ; dataHisto.SetDirectory(0)
-                        backHisto = inputFile.Get('/'.join([ cut, variable                            , 'histo_'+back ])) ; backHisto.SetDirectory(0)
+        for cut in cuts:
+            for variable in variables:
+                if variable.split('_')[0]!=kinematicVariable: continue
+                if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
 
-                        if 'skipfixspikes' not in opt.option:
+                    dataHisto = data_File.Get('/'.join([ cut, variable.replace('lightjet','mujet').replace('jeteta_'+cut,'jeteta'), 'histo_'+data ])) ; dataHisto.SetDirectory(0)
+                    backHisto = inputFile.Get('/'.join([ cut, variable                                                            , 'histo_'+back ])) ; backHisto.SetDirectory(0)
 
-                            spikeList = [ ]
-                            for ib in range(1, backHisto.GetNbinsX()+1):
-                                isSpike = True
-                                for shift in [ ib-1, ib+1 ]:
-                                    if backHisto.GetBinContent(shift)>0.:
-                                        if backHisto.GetBinContent(ib)/backHisto.GetBinContent(shift)<1.1:
-                                            isSpike = False
-                                if isSpike: spikeList.append(ib)
+                    if 'skipfixspikes' not in opt.option:
 
-                            for spike in spikeList:
-                                spikeContent, spikeShifts = 0., 0
-                                for shift in [ spike-1, spike+1 ]:
-                                    if backHisto.GetBinContent(shift)>0.:
-                                        spikeContent += backHisto.GetBinContent(shift)
-                                        spikeShifts += 1
+                        spikeList = [ ]
+                        for ib in range(1, backHisto.GetNbinsX()+1):
+                            isSpike = True
+                            for shift in [ ib-1, ib+1 ]:
+                                if backHisto.GetBinContent(shift)>0.:
+                                    if backHisto.GetBinContent(ib)/backHisto.GetBinContent(shift)<1.1:
+                                        isSpike = False
+                            if isSpike: spikeList.append(ib)
+
+                        for spike in spikeList:
+                            spikeContent, spikeShifts = 0., 0
+                            for shift in [ spike-1, spike+1 ]:
+                                if backHisto.GetBinContent(shift)>0.:
+                                    spikeContent += backHisto.GetBinContent(shift)
+                                    spikeShifts += 1
+                            if spikeShifts>0:
                                 spikeContent /= spikeShifts
                                 backHisto.SetBinContent(spike, spikeContent)
 
-                        if 'jetpt' in opt.option.lower() or 'jeteta' in opt.option.lower():
+                    if 'jetpt' in opt.option.lower() or 'jeteta' in opt.option.lower():
 
-                            dataHisto.Divide(backHisto) 
+                        dataHisto.Divide(backHisto) 
+
+                        if 'jetpt' in opt.option.lower():
+                        
+                            minPtFit, maxPtFit = dataHisto.GetBinLowEdge(1), dataHisto.GetBinLowEdge(dataHisto.GetNbinsX()+1)
+                            ptfit = ROOT.TF1('ptfit', 'pol3', minPtFit, maxPtFit)
+                            dataHisto.Fit('ptfit')
+
+                        binx, biny, binz = ROOT.Long(), ROOT.Long(), ROOT.Long()
+
+                        ptval  = float(opt.jetPtBins[cut][0]) + 0.1
+                        etaval = weightsHisto.GetYaxis().GetBinCenter(1)
+
+                        for ib in range(dataHisto.GetNbinsX()):
 
                             if 'jetpt' in opt.option.lower():
-                        
-                                minPtFit, maxPtFit = dataHisto.GetBinLowEdge(1), dataHisto.GetBinLowEdge(dataHisto.GetNbinsX()+1)
-                                ptfit = ROOT.TF1('ptfit', 'pol3', minPtFit, maxPtFit)
-                                dataHisto.Fit('ptfit')
+                                ptval  = dataHisto.GetBinCenter(ib+1)
+                                weight = ptfit.Eval(dataHisto.GetBinCenter(ib+1))
 
-                            binx, biny, binz = ROOT.Long(), ROOT.Long(), ROOT.Long()
+                            elif 'jeteta' in opt.option.lower():
+                                etaval = dataHisto.GetBinCenter(ib+1)
+                                weight = dataHisto.GetBinContent(ib+1)
 
-                            ptval  = cutLowerPtEdge[cut] + 0.1
-                            etaval = weightsHisto.GetYaxis().GetBinCenter(1)
+                            weightsHisto.SetBinContent(weightsHisto.FindBin(ptval, etaval), weight)
 
-                            for ib in range(dataHisto.GetNbinsX()):
+                            if opt.verbose:
+                                print back, cut, ptval, etaval, weight
 
-                                if 'jetpt' in opt.option.lower():
-                                    ptval  = dataHisto.GetBinCenter(ib+1)
-                                    weight = ptfit.Eval(dataHisto.GetBinCenter(ib+1))
+        inputFile.Close()
 
-                                elif 'jeteta' in opt.option.lower():
-                                    etaval = dataHisto.GetBinCenter(ib+1)
-                                    weight = dataHisto.GetBinContent(ib+1)
+        outputFile.cd()
+        weightsHisto.Write()                        
+        outputFile.Close()
 
-                                bin2D = weightsHisto.FindBin(ptval, etaval)
-                                weightsHisto.GetBinXYZ(bin2D, binx, biny, binz)
-                                weightsHisto.SetBinContent(binx, biny, weight)
-
-                                if 'verbose' in opt.option:
-                                    print back, cut, ptval, etaval, weight
-
-                inputFile.Close()
-
-                outputFile.cd()
-                weightsHisto.Write()                        
-                outputFile.Close()
-
-        data_File.Close()
+    data_File.Close()
 

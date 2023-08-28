@@ -40,12 +40,13 @@ protected:
   FloatArrayReader*  Jet_eta{};
   FloatArrayReader*  Jet_phi{};
   DoubleArrayReader* Jet_genpt{};
+  UCharArrayReader*  Jet_hadronFlavour;
   IntArrayReader*    nBHadron{};
   FloatArrayReader*  BHadron_pT{};
   FloatArrayReader*  BHadron_eta{};
   FloatArrayReader*  BHadron_phi{};
   DoubleArrayReader* BHadron_mass{};
-  IntArrayReader*    BHadron_pdgId{};
+  IntArrayReader*    BHadron_pdgID{};
   LongArrayReader*   BHadron_hasBdaughter{};
 
   std::vector<double> bFragmentationWeightsReader{};
@@ -79,12 +80,12 @@ BFragmentationWeightsReader::BFragmentationWeightsReader(char const* bfragWeight
   bdecayWeightFile_{bdecayWeightFile}
 {
   bfragRootFile = new TFile(bfragWeightFile_);
-  bFragmentationWeightsHisto     = (TH2F*)fragRootFile->Get(histoName_);
-  bFragmentationWeightsUpHisto   = (TH2F*)fragRootFile->Get(histoName_+"up");
-  bFragmentationWeightsDownHisto = (TH2F*)fragRootFile->Get(histoName_+"down");
+  bFragmentationWeightsHisto     = (TH2F*)bfragRootFile->Get(histoName_);
+  bFragmentationWeightsUpHisto   = (TH2F*)bfragRootFile->Get(histoName_+"up");
+  bFragmentationWeightsDownHisto = (TH2F*)bfragRootFile->Get(histoName_+"down");
   bdecayRootFile = new TFile(bdecayWeightFile_);
-  bdecayWeightsUpGraph   = (TH2F*)bdecayRootFile->Get("semilepbrup");
-  bdecayWeightsDownGraph = (TH2F*)bdecayRootFile->Get("semilepbrdown");
+  bdecayWeightsUpGraph   = (TGraph*)bdecayRootFile->Get("semilepbrup");
+  bdecayWeightsDownGraph = (TGraph*)bdecayRootFile->Get("semilepbrdown");
 }
 
 double
@@ -103,12 +104,13 @@ void BFragmentationWeightsReader::bindTree_(multidraw::FunctionLibrary& _library
   _library.bindBranch(Jet_eta,              "Jet_eta");
   _library.bindBranch(Jet_phi,              "Jet_phi");
   _library.bindBranch(Jet_genpt,            "Jet_genpt");
+  _library.bindBranch(Jet_hadronFlavour,    "Jet_hadronFlavour");
   _library.bindBranch(nBHadron,             "nBHadron");
   _library.bindBranch(BHadron_pT,           "BHadron_pT");
   _library.bindBranch(BHadron_eta,          "BHadron_eta");
   _library.bindBranch(BHadron_phi,          "BHadron_phi");
-  _library.bindBranch(BHadron_mass          "BHadron_mass");
-  _library.bindBranch(BHadron_pdgId,        "BHadron_pdgId");
+  _library.bindBranch(BHadron_mass,         "BHadron_mass");
+  _library.bindBranch(BHadron_pdgID,        "BHadron_pdgID");
   _library.bindBranch(BHadron_hasBdaughter, "BHadron_hasBdaughter");
 }
 
@@ -116,6 +118,7 @@ void BFragmentationWeightsReader::setValues() {
 
   bFragmentationWeightsReader.clear();
 
+  int muJetIsB = 0;
   double xB = -1., genJetPt = -1.;
   int bHadronId = -1;
 
@@ -130,11 +133,12 @@ void BFragmentationWeightsReader::setValues() {
 
       double jetPt{Jet_pT->At(muJet)};
       double jetEta{Jet_eta->At(muJet)};
-      
-      if (jetPt>=20. && jetEta>-2.5 && jetEta<2.5) {
+      int jetFlavour{Jet_hadronFlavour->At(muJet)};
+      if (jetPt>=20. && jetEta>-2.5 && jetEta<2.5 && jetFlavour==5) {
 
         double maxBHadronMass = -1.;
         double jetPhi{Jet_phi->At(muJet)};
+        muJetIsB = 1;
 
         for (int ibh = 0; ibh<nBHadron->At(0); ibh++) {
 
@@ -148,14 +152,14 @@ void BFragmentationWeightsReader::setValues() {
             double    bHadronMass{BHadron_mass->At(ibh)};
             float     bHadronPt{BHadron_pT->At(ibh)};     
             long long bHadronHasDaughter{BHadron_hasBdaughter->At(ibh)};            
-   
+
             if (bHadronMass>maxBHadronMass) {
-              genJetPt       = Jet_genpt->At(muJet)
-              xB             = bHadronPt/genJetPt;
+              genJetPt       = Jet_genpt->At(muJet);
+              xB             = bHadronPt/fabs(genJetPt);
               maxBHadronMass = bHadronMass;
             }
 
-            if (bHadronHasDaughter==0) bHadronId = abs(BHadron_pdgId->At(ibh));
+            if (bHadronHasDaughter==0) bHadronId = abs(BHadron_pdgID->At(ibh));
 
           }
 
@@ -167,18 +171,29 @@ void BFragmentationWeightsReader::setValues() {
 
   }
 
+  
+
   for (int bfsyst = 0; bfsyst<=4; bfsyst++) {
 
     double bFragmentationWeight = -1.;
-    if (bfsyst==0) bFragmentationWeight = this->GetBinContent4Weight(bFragmentationWeightsDownHisto, xB, genJetPt);
-    if (bfsyst==1) bFragmentationWeight = this->GetBinContent4Weight(bFragmentationWeightsHisto,     xB, genJetPt);
-    if (bfsyst==2) bFragmentationWeight = this->GetBinContent4Weight(bFragmentationWeightsUpHisto,   xB, genJetPt);
-    if (bfsyst==3) bFragmentationWeight = this->GetBinContent4Weight(bdecayWeightsDownGraph,             bHadronId);
-    if (bfsyst==4) bFragmentationWeight = this->GetBinContent4Weight(bdecayWeightsUpGraph,               bHadronId);
 
-    if (bFragmentationWeight<=0.) 
-      if (bfsyst>=2) std::cout << "BFragmentationWeightsReader Error for " << bfragWeightFile_ << " " << xB << " " << genJetPt << std::endl;
-      else std::cout << "BFragmentationWeightsReader Error for " << bdecayWeightFile_ << " " << bHadronId << std::endl;
+    if (muJetIsB==0) {
+      bFragmentationWeight = 1.; // Jusr for safety. It will not be used!
+    } else if (muJetIsB==1) {
+
+      double bFragmentationWeight = -1.;
+      if (bfsyst==0) bFragmentationWeight = this->GetBFragWeight(bFragmentationWeightsDownHisto, xB, genJetPt);
+      if (bfsyst==1) bFragmentationWeight = this->GetBFragWeight(bFragmentationWeightsHisto,     xB, genJetPt);
+      if (bfsyst==2) bFragmentationWeight = this->GetBFragWeight(bFragmentationWeightsUpHisto,   xB, genJetPt);
+      if (bfsyst==3) bFragmentationWeight = this->GetBRWeight(bdecayWeightsDownGraph,             bHadronId);
+      if (bfsyst==4) bFragmentationWeight = this->GetBRWeight(bdecayWeightsUpGraph,               bHadronId);
+
+      if (bFragmentationWeight<=0.) { 
+        if (bfsyst>=2) { std::cout << "BFragmentationWeightsReader Error for " << bfragWeightFile_ << " " << xB << " " << genJetPt << std::endl; }
+        else { std::cout << "BFragmentationWeightsReader Error for " << bdecayWeightFile_ << " " << bHadronId << std::endl; }
+      }
+
+    }
 
     bFragmentationWeightsReader.push_back(bFragmentationWeight);
 

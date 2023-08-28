@@ -5,11 +5,21 @@ import os
 includePath = 'gSystem->AddIncludePath("-I%s/src/");' % os.getenv('CMSSW_RELEASE_BASE')
 aliasDir = os.getenv('PWD')+'/aliases'
 
+## MuonJet finder
+
+if 'Light' not in opt.tag:
+
+    aliases['muonJetFinder'] = { 'linesToAdd': [ includePath, '.L '+aliasDir+'/muonJetFinder.cc+' ],
+                                 'class': 'MuonJetFinder',
+                                 'args': ( 5., 999. ),
+                                 'samples': samples.keys()
+                                }
+
 ## Pileup
 
-if 'NoPU' not in opt.tag and ('SM' in opt.sigset or 'MC' in opt.sigset):
+if 'NoPU' not in opt.tag and ('SM' in opt.sigset or 'MC' in opt.sigset) and 'Validation' not in opt.tag:
 
-    dataDir = '/'.join([ os.getenv('PWD') , 'Data', opt.campaign, 'Pileup' ])
+    dataDir = '/'.join([ os.getenv('PWD') , 'Data', campaignRunPeriod['pileup'], 'Pileup' ])
 
     aliases['pileupWeight'] = { 'linesToAdd': [ includePath, '.L '+aliasDir+'/pileupWeightsReader.cc+' ],
                                 'class': 'PileupWeightsReader',
@@ -24,9 +34,9 @@ if 'NoPU' not in opt.tag and ('SM' in opt.sigset or 'MC' in opt.sigset):
 
 ## Trigger prescales
 
-if 'NoPS' not in opt.tag and ('SM' in opt.sigset or 'Data' in opt.sigset):
+if 'NoPS' not in opt.tag and ('SM' in opt.sigset or 'Data' in opt.sigset) and 'Validation' not in opt.tag:
 
-    dataDir = '/'.join([ os.getenv('PWD') , 'Data', opt.campaign, 'Prescales' ])
+    dataDir = '/'.join([ os.getenv('PWD') , 'Data', campaignRunPeriod['prescales'], 'Prescales' ])
 
     for trigger in triggerInfos:
 
@@ -36,8 +46,8 @@ if 'NoPS' not in opt.tag and ('SM' in opt.sigset or 'Data' in opt.sigset):
         if prescaleWeight not in aliases:
 
             aliases[prescaleWeight] = { 'linesToAdd': [ includePath, '.L '+aliasDir+'/triggerPrescalesReader.cc+' ],
-                                        'class': 'PrescalesWeightsReader',
-                                        'args': ( dataDir+'/Prescales_'+campaignRunPeriod['period']+'_'+hltPath+'.csv' ),
+                                        'class': 'TriggerPrescalesReader',
+                                        'args': ( dataDir+'/Prescales_'+campaignRunPeriod['period']+'_HLT_'+hltPath+'.csv' ),
                                         'samples': []
                                        }
 
@@ -53,11 +63,34 @@ if 'bjets' in samples:
 
     aliases['bHadronWeight'] = { 'linesToAdd': [ includePath, '.L '+aliasDir+'/bFragmentationWeightsReader.cc+' ],
                                  'class': 'BFragmentationWeightsReader',
-                                 'args': ( dataDir+'/bfragweights_vs_pt.root', 'fragCP5BL', dataDir+'bdecayweights.root' ),
+                                 'args': ( dataDir+'/bfragweights_vs_pt.root', fragTune, dataDir+'/bdecayweights.root' ),
                                  'samples': [ 'bjets' ]
                                 }
 
-    if 'NoBFrag' not in opt.tag: samples['bjets']['weight'] += '*bHadronWeight[1]'
+    if 'NoBFrag' not in opt.tag  and 'Validation' not in opt.tag and applyBFragmentation>=2: samples['bjets']['weight'] += '*bHadronWeight[1]'
+
+## JEU
+
+if 'JEU' in opt.tag and ('SM' in opt.sigset or 'MC' in opt.sigset) and 'Templates' in opt.tag:
+
+    dataDir = '/'.join([ os.getenv('PWD') , 'Data',  opt.campaign, 'JEU' ]) 
+
+    aliases['jetEnUp'] = { 'linesToAdd': [ includePath, '.L '+aliasDir+'/jetEnergyUncertaintyReader.cc+' ],
+                           'class': 'JetEnergyUncertaintyReader',
+                           'args': ( dataDir+'/'+jetEnergyUncertaintyFile, 'up'),
+                           'samples': []
+                          }
+
+    aliases['jetEnDown'] = { 'linesToAdd': [ includePath, '.L '+aliasDir+'/jetEnergyUncertaintyReader.cc+' ],
+                             'class': 'JetEnergyUncertaintyReader',
+                             'args': ( dataDir+'/'+jetEnergyUncertaintyFile, 'down'),
+                             'samples': []
+                            }
+
+    for sample in samples:
+        if not samples[sample]['isDATA']:
+            aliases['jetEnUp']['samples'].append(sample)
+            aliases['jetEnDown']['samples'].append(sample)
 
 ## Inclusive track associator
 
@@ -71,7 +104,7 @@ if 'Light' in opt.tag:
 
 ## Kinematic weights
 
-if ':' in opt.tag:
+if '.' in opt.tag:
 
     dataDir = '/'.join([ os.getenv('PWD') , 'Data', opt.campaign, 'Kinematics' ]) 
 
@@ -87,10 +120,12 @@ if ':' in opt.tag:
 
         if len(applicationSamples)>0:
 
-            for weightFile in weightFileList:
-                if opt.method+'_'+source+':' in weightFile and weightFile.replace(opt.method+'_'+source+':','').replace('.root','') in opt.tag:
+            tagWeightList = [ opt.tag.split('.',1)[-1].replace('.'+opt.tag.split('.',1)[-1].split('.',x)[x],'') for x in range(len(opt.tag.split('.'))-1) ]
 
-                    weightName = weightFile.split(':')[-1].replace('.root','') # so far we cannot fill shapes for more than one source in a job!!!
+            for weightFile in weightFileList:
+                if opt.method+'_'+source+'.' in weightFile and weightFile.replace(opt.method+'_'+source+'.','').replace('.root','') in tagWeightList:
+
+                    weightName = weightFile.replace('.root','').split('.')[-1] # so far we cannot fill shapes for more than one source in a job!!!
                     aliases[weightName] = { 'linesToAdd': [ includePath, '.L '+aliasDir+'/kinematicWeightsReader.cc+' ],
                                             'class': 'KinematicWeightsReader',
                                             'args': ( dataDir+'/'+weightFile, weightName ),

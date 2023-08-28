@@ -11,7 +11,7 @@ nuisances['stat']  = { 'type'          : 'auto', # Use the following if you want
 if 'Templates' in opt.tag:
 
     # pileup
-    if 'NoPU' not in opt.tag:
+    if 'NoPU' not in opt.tag and 'Validation' not in opt.tag:
         nuisances['pileup']  = { 'name'  : 'pileup',
                                  'samples'  : { },
                                  'kind'  : 'weight',
@@ -27,17 +27,18 @@ if 'Templates' in opt.tag:
 
         # gluon splitting
         nuisances['gluonsplitting']  = { 'name'  : 'gluonSplitting',
-                                         'samples'  : { 'bjets' : [ '1.5*'+isGluonSplitting+'(!('+isGluonSplitting+'))', '0.5*'+isGluonSplitting+'(!('+isGluonSplitting+'))' ] },
+                                         'samples'  : { 'bjets' : [ '1.5*'+isGluonSplitting+'+(!('+isGluonSplitting+'))', '0.5*'+isGluonSplitting+'+(!('+isGluonSplitting+'))' ] },
                                          'kind'  : 'weight',
                                          'type'  : 'shape'
                                         }
 
         # b hadron fragmentation
-        nuisances['bfragmentation']  = { 'name'  : 'bfragmentation',
-                                         'samples'  : { 'bjets' : [ 'bHadronWeight[2]/bHadronWeight[1]', 'bHadronWeight[0]/bHadronWeight[1]' ] },
-                                         'kind'  : 'weight',
-                                         'type'  : 'shape'
-                                        }
+        if applyBFragmentation>=1:
+            nuisances['bfragmentation']  = { 'name'  : 'bfragmentation',
+                                             'samples'  : { 'bjets' : [ 'bHadronWeight[2]/bHadronWeight[1]', 'bHadronWeight[0]/bHadronWeight[1]' ] },
+                                             'kind'  : 'weight',
+                                             'type'  : 'shape'
+                                            }
 
         # b semileptonic decays' br
         nuisances['bdecay']  = { 'name'  : 'bdecay',

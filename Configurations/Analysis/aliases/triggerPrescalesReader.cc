@@ -65,38 +65,34 @@ TriggerPrescalesReader::TriggerPrescalesReader(char const* prescaleFileName) :
 
   std::string delimiter = ",";
 
+  int runNumber = -1, lumiSection = -1; float triggerPrescale = -1.;
+
+  std::string line;
+
   while (prescaleFile) {
 
-    int runNumber = -1, lumiSection = -1; float triggerPrescale = -1.;
+    prescaleFile >> line;
 
-    std::string line;
+    if (line.find("#")!=std::string::npos) continue;
 
-    while (prescaleFile) {
+    int ntoken = 0;
+    size_t pos = 0;
+    std::string token;
+    while ((pos = line.find(delimiter)) != std::string::npos) {
+      token = line.substr(0, pos);
+      if (ntoken==0) runNumber = atoi(token.c_str());
+      if (ntoken==1) lumiSection = atoi(token.c_str());
+      if (ntoken==3) triggerPrescale = atof(token.c_str());
+      line.erase(0, pos + delimiter.length());
+      ntoken++;
+    }
 
-      prescaleFile >> line;
+    if (runNumber>0 && lumiSection>0 && triggerPrescale>0.) {
 
-      if (line.find("#")!=std::string::npos) continue;
-
-      int ntoken = 0;
-      size_t pos = 0;
-      std::string token;
-      while ((pos = line.find(delimiter)) != std::string::npos) {
-        token = line.substr(0, pos);
-        if (ntoken==0) runNumber = atoi(token.c_str());
-        if (ntoken==1) lumiSection = atoi(token.c_str());
-        if (ntoken==3) triggerPrescale = atof(token.c_str());
-        line.erase(0, pos + delimiter.length());
-        ntoken++;
-      }
-
-      if (runNumber>0 && lumiSection>0 && triggerPrescale>0.) {
-
-        triggerPrescaleRunNumber[nPrescales] = runNumber;
-        triggerPrescaleLumiSection[nPrescales] = lumiSection;
-        triggerPrescaleValue[nPrescales] = triggerPrescale;
-        nPrescales++;
-
-      }
+      triggerPrescaleRunNumber[nPrescales] = runNumber;
+      triggerPrescaleLumiSection[nPrescales] = lumiSection;
+      triggerPrescaleValue[nPrescales] = triggerPrescale;
+      nPrescales++;
 
     }
 
@@ -131,7 +127,7 @@ void TriggerPrescalesReader::setValues() {
       triggerPrescale = triggerPrescaleValue[ps];
 
   if (triggerPrescale<0.)
-    std::cout << "TriggerPrescalesReader Error for " << prescaleFileName_ << " " << run << " " << lumiblock << std::endl;
+    std::cout << "TriggerPrescalesReader Error for " << prescaleFileName_ << " " << run << " " << lumiblock << " " << triggerPrescale << std::endl;
 
   triggerPrescalesReader.push_back(triggerPrescale);
 

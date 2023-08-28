@@ -81,7 +81,7 @@ void KinematicWeightsReader::setValues() {
     double kinematicWeight = this->GetBinContent4Weight(kinematicWeightsHisto, JetPt, JetEta, 0);
 
     if (kinematicWeight<=0.) 
-      std::cout << "KinematicWeightsReader Error for " << weightFile_ << " " << histoName_ << " " << muJetPt << " " << muJetEta << std::endl;
+      std::cout << "KinematicWeightsReader Error for " << weightFile_ << " " << histoName_ << " " << JetPt << " " << JetEta << std::endl;
 
     kinematicWeightsReader.push_back(kinematicWeight);
 

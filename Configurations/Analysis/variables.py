@@ -92,17 +92,47 @@ elif opt.method+'Kinematics' in opt.tag:
 
 elif opt.method+'Templates' in opt.tag:
 
-    variables['ptrel'] = { 'name'  : muPtRel,
-                           'range' : ptrelRange,
-                           'xaxis' : '#mu-jet '+ptrel+gv,
-                           'fold'  : overflow
-                          }
+    if opt.method=='PtRel':
+
+        for btagwp in bTagWorkingPoints:
+            for btagselection in [ 'Pass', 'Fail' ]:
+
+                variableName = '_'.join([ 'ptrel', btagwp, btagselection ])
+                discCut  = 'Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'['+muJetIdx+']>='+bTagWorkingPoints[btagwp]['cut']
+                if btagselection=='Fail': discCut = discCut.replace('>=', '<')
+
+                variables[variableName] = { 'name'  : muPtRel,
+                                            'range' : ptrelRange,
+                                            'xaxis' : '#mu-jet '+ptrel+gv,
+                                            'weight': discCut,
+                                            'fold'  : overflow
+                                           }
+
+    elif opt.method=='System8':
+
+        variables['ptrel'] = { 'name'  : muPtRel,
+                               'range' : ptrelRange,
+                               'xaxis' : '#mu-jet '+ptrel+gv,
+                               'fold'  : overflow
+                              }
+
+        for btagwp in bTagWorkingPoints:
+
+            variableName = '_'.join([ 'ptrel', btagwp ])
+            discCut  = 'Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'['+muJetIdx+']>='+bTagWorkingPoints[btagwp]['cut']
+
+            variables[variableName] = { 'name'  : muPtRel,
+                                        'range' : ptrelRange,
+                                        'xaxis' : '#mu-jet '+ptrel+gv,
+                                        'weight': discCut,
+                                        'fold'  : overflow
+                                       }
 
 elif 'Light' in opt.tag:
 
     for cut in cuts:
 
-        ptbin = cut.split('_')[0]
+        ptbin = cut
         lightJetWeight  = cuts[cut]['lightJetWeight']
         cutNLightTrkJet = cuts[cut]['cutNLightTrkJet']
 
