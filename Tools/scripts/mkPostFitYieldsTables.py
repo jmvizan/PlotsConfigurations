@@ -74,18 +74,9 @@ if __name__ == '__main__':
         else:
             opt.sigset = 'SM-'+opt.masspoints
             for masspoint in opt.masspoints.split(','):
-                if masspoint=='TChipmSlepSnu_mC-1150_mX-1':
-                    if os.path.isfile('/'.join([ './MaxLikelihoodFits/2016-2017-2018/CharginoSignalRegionsMergeWWPol1aGroupSmtEUFitCRVetoesULSigV6_NewBond3', masspoint, 'fitDiagnostics.root' ])):
-                       inputFiles[masspoint] = ROOT.TFile('/'.join([ './MaxLikelihoodFits/2016-2017-2018/CharginoSignalRegionsMergeWWPol1aGroupSmtEUFitCRVetoesULSigV6_NewBond3', masspoint, 'fitDiagnostics.root' ]))
-                       refmasspoint = masspoint
-                elif masspoint=='T2tt_mS-525_mX-438': 
-                    if os.path.isfile('/'.join([ 'MaxLikelihoodFits/2016-2017-2018/StopSignalRegionsFXbtvWWPol1aGroupSmtEUFitCRVetoesULFast_NewBond2', masspoint, 'fitDiagnostics.root' ])):
-                       inputFiles[masspoint] = ROOT.TFile('/'.join([ './MaxLikelihoodFits/2016-2017-2018/StopSignalRegionsFXbtvWWPol1aGroupSmtEUFitCRVetoesULFast_NewBond2', masspoint, 'fitDiagnostics.root' ]))
-                       refmasspoint = masspoint
-                else:
-                    if os.path.isfile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ])):
-                        inputFiles[masspoint] = ROOT.TFile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ]), 'READ')
-                        #refmasspoint = masspoint 
+                if os.path.isfile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ])):
+                    inputFiles[masspoint] = ROOT.TFile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ]), 'READ')
+                    refmasspoint = masspoint 
 
     opt.tag = opt.year+opt.tag
     samples = { }
@@ -124,10 +115,7 @@ if __name__ == '__main__':
                         else:
                             histoprefix = ''
                             inDir = 'shapes_'+fittype.lower().replace('postfit','_fit_') + '/' + cardName
-                            inDirRef = 'shapes_'+fittype.lower().replace('postfit','_fit_') + '/' + cardName + '_' + year
-                        #if not inputFiles[refmasspoint].GetListOfKeys().Contains(inDir):
-                        #    print 'warning: missing directory', inDir, 'in', inputFiles[refmasspoint].GetName()
-                        #    continue
+
                         if 'CR' in inDir: continue
 
                         if len(variables[variable]['range'])<=2: nBins = len(variables[variable]['range'][0])-1
@@ -155,7 +143,7 @@ if __name__ == '__main__':
 
                         table.write(' \\\\\n')
                    
-                        refDir = inputFiles[refmasspoint].Get(inDirRef)
+                        refDir = inputFiles[refmasspoint].Get(inDir)
                      
 
                         SMyields = [ ]

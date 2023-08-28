@@ -221,8 +221,8 @@ def mlfits(opt):
 
     opt.combineAction = 'mlfits'
     fitOptions = getFitOptions(opt.option.lower())
-    #opt.combineCommand = ' '.join(['combine -M FitDiagnostics', fitOptions, '--cminDefaultMinimizerStrategy 0	combinedDatacard.txt' ])
-    opt.combineCommand = ' '.join(['combine -M GoodnessOfFit   combinedDatacard.txt' ])
+    opt.combineCommand = ' '.join(['combine -M FitDiagnostics', fitOptions, '--cminDefaultMinimizerStrategy 0	combinedDatacard.txt' ])
+    #opt.combineCommand = ' '.join(['combine -M GoodnessOfFit   combinedDatacard.txt' ])
     opt.combineOutDir = opt.mlfitdir
 
     runCombine(opt)

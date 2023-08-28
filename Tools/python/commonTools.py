@@ -614,7 +614,7 @@ def getSampleShapeFileName(shapeDir, year, tag, sample):
 
     return '/'.join([ shapeDir, year, tag.split('_')[0], 'Samples', 'plots_'+year+tag.split('_')[0]+'_ALL_'+sample+'.root' ])
 
-def foundShapeFiles(opt, rawShapes=False):
+def foundShapeFiles(opt, rawShapes=False, verbose=True):
 
     missingShapeFiles = False
 
@@ -623,7 +623,7 @@ def foundShapeFiles(opt, rawShapes=False):
             rawtag = tag.split('_')[0] if rawShapes else tag
 
             if not os.path.isfile(getShapeFileName(opt.shapedir, year, rawtag, opt.sigset, opt.fileset)): 
-                print 'Error: input shape file', getShapeFileName(opt.shapedir, year, rawtag, opt.sigset, opt.fileset), 'is missing'
+                if verbose: print 'Error: input shape file', getShapeFileName(opt.shapedir, year, rawtag, opt.sigset, opt.fileset), 'is missing'
                 missingShapeFiles = True
      
     return not missingShapeFiles
