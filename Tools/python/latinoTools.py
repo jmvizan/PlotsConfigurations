@@ -362,7 +362,7 @@ def postFitPlots(opt, makePlots=True):
                                         if len(yearInFitList)==1 or year!=fittedYear:
                                             mkPostFitPlot(opt, combinedataset+'/'+fitoption, fittedYear, year, tag, cut, variable, signal, sigset, datacardNameStructure)
 
-                                        elif '_NoTag' not in cut: # FIXME
+                                        else: #if 'SR1_NoJet_em' in cut: 
                                             opt2 = copy.deepcopy(opt)
                                             opt2.year, opt2.tag, opt2.sigset, opt2.baseDir = year, combinetag, sigset, os.getenv('PWD')
                                             postFitShapeFileFullPath = commonTools.mergeDirPaths(opt2.baseDir, postFitShapeFile)
