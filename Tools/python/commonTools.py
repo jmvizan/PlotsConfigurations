@@ -831,14 +831,22 @@ def postFitYieldsTables(opt, cardNameStructure='cut', masspoints=''):
     for year in yearList:
         for tag in opt.tag.split('-'):
 
-            commandList = [ '--tag='+year+tag, '--year='+year, '--fit='+fittype, '--cardName='+cardNameStructure, '--masspoints='+masspoints ]
-
-            commandList.append('--inputDirMaxFit='+'/'.join([ opt.mlfitdir, year, tag ]))
+            commandList = [ '--tag='+tag, '--year='+year, '--fit='+fittype, '--cardName='+cardNameStructure, '--masspoints='+masspoints ]
             commandList.append('--outputTableDir='+'/'.join([ opt.tabledir, year, tag ]))
+            
+            if 'fromshapes' in opt.option:
+                commandList.append('--fromshapes')
+                if 'merged' in opt.option: commandList.append('--mergedyears')
+                dataflag = 'AsimovB' if 'asimovb' in opt.option else 'AsimovS' if 'asimovs' in opt.option else 'FitsToData'
+                yearFlag = year if len(yearList)>1 else ''
+                commandList.append('--inputDir='+'/'.join([ opt.shapedir, year, tag.split('_')[0], dataflag, fittype+yearFlag ]))
+            else:
+                dataflag = '_asimovB' if 'asimovb' in opt.option else '_asimovS' if 'asimovs' in opt.option else ''
+                commandList.append('--inputDirMaxFit='+'/'.join([ opt.mlfitdir, year, tag+dataflag ]))
 
             if opt.unblind: commandList.append('--unblind')
             if 'nosignal' in opt.option: commandList.append('--nosignal')
-    
+
             os.system('mkPostFitYieldsTables.py '+' '.join(commandList))
 
 ### Methods for computing weights, efficiencies, scale factors, etc.

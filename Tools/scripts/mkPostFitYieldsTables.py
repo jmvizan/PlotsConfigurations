@@ -38,8 +38,9 @@ if __name__ == '__main__':
     usage = 'usage: %prog [options]'
     parser = optparse.OptionParser(usage)
 
+    parser.add_option('--inputDir'        , dest='inputDir'        , help='Intput directory from shapes'           , default='./Shapes')
     parser.add_option('--inputDirMaxFit'  , dest='inputDirMaxFit'  , help='Intput directory from fit'              , default='./MaxLikelihoodFits')
-    parser.add_option('--outputTableDir'  , dest='outputTableDir' , help='Output directory for the tables'        , default='./Tables')
+    parser.add_option('--outputTableDir'  , dest='outputTableDir'  , help='Output directory for the tables'        , default='./Tables')
     parser.add_option('--tag'             , dest='tag'             , help='Tag used for the tag file name'         , default='test')
     parser.add_option('--year'            , dest='year'            , help='Year in the fit'                        , default='test')    
     parser.add_option('--masspoints'      , dest='masspoints'      , help='Masspoints'                             , default=[])
@@ -47,6 +48,8 @@ if __name__ == '__main__':
     parser.add_option('--cardName'        , dest='cardName'        , help='Card name structure'                    , default='cut')
     parser.add_option('--unblind'         , dest='unblind'         , help='Unblind data'                           , default=False, action='store_true')
     parser.add_option('--nosignal'        , dest='nosignal'        , help='Do not write signal yields'             , default=False, action='store_true')
+    parser.add_option('--fromshapes'      , dest='fromshapes'      , help='Use processe shapes'                    , default=False, action='store_true')
+    parser.add_option('--mergedyears'     , dest='mergedyears'     , help='mergedyears'                            , default=False, action='store_true')
     parser.add_option('--maxsignallines'  , dest='maxsignallines'  , help='Maximum number of lines for signals'    , default=5)
     parser.add_option('--minsignalyields' , dest='minsignalyields' , help='Minimal signal yields for tables'       , default=0.6)
     parser.add_option('--minsignalsig'    , dest='minsignalsig'    , help='Minimal signal significance for tables' , default=0.5)
@@ -58,17 +61,24 @@ if __name__ == '__main__':
     os.system('mkdir -p '+opt.outputTableDir)
 
     inputFiles = { }
-    if opt.masspoints=='':
-        inputFiles['SM'] = ROOT.TFile(opt.inputDirMaxFit+'/fitDiagnostics.root', 'READ')
-        refmasspoint = 'SM' 
-        opt.sigset = 'SM'
-    else:
+    if opt.fromshapes:
         opt.sigset = 'SM-'+opt.masspoints
+        refmasspoint = opt.masspoints
         for masspoint in opt.masspoints.split(','):
-            if os.path.isfile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ])):
-                inputFiles[masspoint] = ROOT.TFile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ]), 'READ')
-                refmasspoint = masspoint 
+            inputFiles[masspoint] = ROOT.TFile(opt.inputDir+'/plots_'+opt.tag+'_SM-'+masspoint+'.root', 'READ')
+    else:
+        if opt.masspoints=='':
+            inputFiles['SM'] = ROOT.TFile(opt.inputDirMaxFit+'/fitDiagnostics.root', 'READ')
+            refmasspoint = 'SM' 
+            opt.sigset = 'SM'
+        else:
+            opt.sigset = 'SM-'+opt.masspoints
+            for masspoint in opt.masspoints.split(','):
+                if os.path.isfile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ])):
+                    inputFiles[masspoint] = ROOT.TFile('/'.join([ opt.inputDirMaxFit, masspoint, 'fitDiagnostics.root' ]), 'READ')
+                    refmasspoint = masspoint 
 
+    opt.tag = opt.year+opt.tag
     samples = { }
     cuts = { }
     variables = { }
@@ -89,16 +99,27 @@ if __name__ == '__main__':
             if plot[sample]['isSignal']:
                 plot[sample]['isSignal'] = 0
 
+    yearList = opt.year if opt.mergedyears else opt.year.split('-')
+
     for fittype in opt.fit.split('-'):
-        for year in opt.year.split('-'):
+        for year in yearList:
             for cut in cuts:
                 for variable in variables:
                     if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
 
+                        cardName = opt.cardName.replace('year', year).replace('cut', cut).replace('variable', variable)
+
+                        if opt.fromshapes:
+                            histoprefix = 'histo_'
+                            inDir = '/'.join([ cut, variable ])
+                        else:
+                            histoprefix = ''
+                            inDir = 'shapes_'+fittype.lower().replace('postfit','_fit_') + '/' + cardName
+
+                        if 'CR' in inDir: continue
+
                         if len(variables[variable]['range'])<=2: nBins = len(variables[variable]['range'][0])-1
                         elif len(variables[variable]['range'])==3: nBins = variables[variable]['range'][0]
-
-                        cardName = opt.cardName.replace('year', year).replace('cut', cut).replace('variable', variable)
 
                         tableName = opt.outputTableDir+'/Yields_'+fittype+'_'+cardName+'.tex'
                         table = open(tableName , 'w')
@@ -122,8 +143,8 @@ if __name__ == '__main__':
 
                         table.write(' \\\\\n')
                    
-                        inDir = 'shapes_'+fittype.lower().replace('postfit','_fit_') + '/' + cardName
                         refDir = inputFiles[refmasspoint].Get(inDir)
+                     
 
                         SMyields = [ ]
                         signalPoint = [ ]
@@ -143,17 +164,17 @@ if __name__ == '__main__':
                                 sampleName = 'data' if plot[sample]['isData'] else sample
                                 if plot[sample]['isSignal']:
                                     if sample in inputFiles:
-                                        shape = inputFiles[sample].Get(inDir+'/'+sample)
+                                        shape = inputFiles[sample].Get(inDir+'/'+histoprefix+sample)
                                     else: continue
-                                elif plot[sample]['isData']:
+                                elif plot[sample]['isData'] and not opt.fromshapes:
                                     graph = refDir.Get('data')
                                     shape = ROOT.TH1F('shape', '', graph.GetN(), 0, graph.GetN())
                                     for ipoint in range(0, graph.GetN()):
                                         shape.SetBinContent(int(graph.GetX()[ipoint])+1, graph.GetY()[ipoint])
                                         shape.SetBinError(int(graph.GetX()[ipoint])+1,  graph.GetErrorY(ipoint))
                                 else:
-                                    if refDir.GetListOfKeys().Contains(sample):
-                                        shape = refDir.Get(sample)
+                                    if refDir.GetListOfKeys().Contains(histoprefix+sample):
+                                        shape = refDir.Get(histoprefix+sample)
                                     else: continue
 
                                 if shape:

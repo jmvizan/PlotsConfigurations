@@ -195,6 +195,7 @@ def limits(opt):
     else:
         limitRun = getLimitRun(opt.unblind) 
         limitMethod = ' '.join([ '-M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun ])
+    if 'asimovb' in opt.option: limitMethod += ' -t -1 --expectSignal  0'
     opt.combineCommand = ' '.join([ 'combine', limitMethod, 'combinedDatacard.txt' ])
     opt.combineOutDir = opt.limitdir
 
