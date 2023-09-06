@@ -964,7 +964,7 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
     plotTitle = sigset + '_' + limitOptions[0] + '_' + plotOption+ '_'+ year + emptyBinsOption
     if tags[1]!='':
         plotName.replace(tags[0], tags[0] + '_to_' + tags[1]) 
-    tagObj[0].SetTitle(plotTitle)   
+    #tagObj[0].SetTitle(plotTitle)   
    
     tagObj[0].GetXaxis().SetLabelFont(42)
     tagObj[0].GetXaxis().SetTitleFont(42)
@@ -974,6 +974,10 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
     tagObj[0].GetYaxis().SetLabelFont(42)
     tagObj[0].GetYaxis().SetTitleFont(42)
     tagObj[0].GetYaxis().SetLabelSize(0.035)
+
+    tagObj[0].GetYaxis().SetTitle("m#kern[0.1]{_{#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}}} [GeV]")
+    if 'T2' in tagnm or 'Stop' in tagnm: tagObj[0].GetXaxis().SetTitle("m#kern[0.1]{_{#lower[-0.12]{#tilde{t}}}} [GeV]")
+    elif 'TChipm' in tagnm or 'Chargino' in tagnm: tagObj[0].GetXaxis().SetTitle("m#kern[0.1]{_{#lower[-0.12]{#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}}}} [GeV]")
 
     if plotOption=='Histograms':
         legend = ROOT.TLegend(0.12,0.8,0.55,0.88);
@@ -1036,7 +1040,9 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
             same = 'same'
             hname = tagObj[iobj].GetName()
             if "down" not in hname and "up" not in hname: 
-                legend.AddEntry(tagObj[iobj],tags[ntag], 'l')
+                #legend.AddEntry(tagObj[iobj],tags[ntag], 'l')
+                legeflag = '#font[50]{m}_{T2}(#font[12]{ll}) correction applied' if 'WWPol1a' in tags[ntag] else 'No #font[50]{m}_{T2}(#font[12]{ll}) correction applied'
+                legend.AddEntry(tagObj[iobj],legeflag, 'l')
                 ntag+=1
         legend.Draw()
         #exit()
