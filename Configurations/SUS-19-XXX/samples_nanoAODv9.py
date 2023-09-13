@@ -1066,7 +1066,7 @@ for sample in samples:
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
     samples[sample]['treeType']  = 'Backgrounds' 
-    if sample in [ 'ttbar', 'DY', 'ZZTo2L2Nu', 'ZZTo4L', 'VZ', 'WW' ]:
+    if sample in [ 'ttbar', 'DY', 'ZZTo2L2Nu', 'ZZTo4L', 'VZ' ]:
         samples[sample]['split'] = 'AsMuchAsPossible'
     elif 'BackSF' in opt.tag and sample in [ 'WZ', 'ttZ' ]:
         samples[sample]['split'] = 'Single'
