@@ -305,6 +305,7 @@ if addMT2Shapes:
                     'type'  : 'shape',
                     'cuts'  : [ ]
             }
+            if '_WWcorr' in opt.tag: nuisances[nuisancekey]['correlatedName'] = 'WWtails'
 
             for cut in cuts.keys():
                 if mt2llregion in cut:
@@ -665,7 +666,7 @@ nuisanceToRemove = [ ]
 
 if 'SignalRegion' in opt.tag or 'ValidationRegion' in opt.tag or 'ttZNormalization' in opt.tag or 'SearchRegion' in opt.tag:
         
-    if 'SignalRegion' not in opt.tag:
+    if 'SignalRegion' not in opt.tag and 'SearchRegion' not in opt.tag:
         for nuisance in nuisances:
             if nuisance!='stat' and 'norm' in nuisances[nuisance]['name']:
                 nuisanceToRemove.append(nuisance)

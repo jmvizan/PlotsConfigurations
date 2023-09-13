@@ -217,6 +217,86 @@ elif 'VetoNoiseEE' in opt.tag:
                                       'fold'  : overflow                  #   fold overflow
                                       }
 
+if 'VetoHEM' in opt.tag:
+
+    HEMele      = 'Electron_pt>30. && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87'
+    nVetoHEMele = 'Sum$('+HEMele+')'
+    JetPt, JetEta, JetPhi = 'Jet_pt', 'Jet_eta', 'Jet_phi'
+    if 'Clean' in opt.tag: 
+        JetPt, JetEta, JetPhi = 'CleanJet_pt', 'CleanJet_eta', 'CleanJet_phi'
+    HEMjet      = JetPt+'>30. && '+JetEta+'>-3.2 && '+JetEta+'<-1.2 && '+JetPhi+'>-1.77 && '+JetPhi+'<-0.67'
+    nVetoHEMjet = 'Sum$('+HEMjet+')'
+
+    variables['ptmiss']        = {  'name'  : 'ptmiss',                #   variable name
+                                    'range' : (  40,    0.,  400.),    #   variable range
+                                    'xaxis' : met + gv,                #   x axis name
+                                    'fold'  : overflow                 #   fold overflow
+                                }
+
+
+
+    variables['mt2ll']         = {   'name'  : 'mt2ll',                #   variable name
+                                     'range' : (   7,    0.,  140.),   #   variable range
+                                     'xaxis' : mt2 + pll + gv,         #   x axis name
+                                     'fold'  : overflow,               #   fold overflow
+                                     'nameLatex' : '\\mtll'
+                                  }
+
+    variables['mt2llOptim']    = {   'name'  : 'mt2ll',                #   variable name
+                                     'range' : ([0, 20, 40, 60, 80, 100, 160, 220],[1]),    #   variable range
+                                     'xaxis' : mt2 + pll + gv,         #   x axis name
+                                     'fold'  : overflow,               #   fold overflow
+                                     'CRbins' : [1, 4]
+                                  }
+
+    variables['nVetoHEMele']          = { 'name'  : nVetoHEMele,                          #   variable name
+                                          'range' : (  5, 0., 5.),                        #   variable range
+                                          'xaxis' : 'Number of HEM electrons',            #   x axis name
+                                          'fold'  : overflow                              #   fold overflow
+                                          }
+
+    variables['nVetoHEMjet']          = { 'name'  : nVetoHEMjet,                          #   variable name
+                                          'range' : (  5, 0., 5.),                        #   variable range
+                                          'xaxis' : 'Number of HEM jets',            #   x axis name
+                                          'fold'  : overflow                              #   fold overflow
+                                          }
+
+    variables['HTjet']     = { 'name'  : 'Sum$('+JetPt+'*('+HEMjet+'))',            #   variable name
+                                   'range' : (  30,    0.,  300),  #   variable range
+                                   'xaxis' : 'H_{T} HEM jets' + gv, #   x axis name
+                                   'fold'  : overflow              #   fold overflow
+                                  }
+
+    variables['HTele']     = { 'name'  : 'Sum$(Electron_pt*('+HEMele+'))',            #   variable name
+                                   'range' : (  30,    0.,  300),  #   variable range
+                                   'xaxis' : 'H_{T} HEM electrons' + gv, #   x axis name
+                                   'fold'  : overflow              #   fold overflow
+                                  }
+
+    variables['ptjet']     = { 'name'  : JetPt+'*('+HEMjet+')',            #   variable name
+                                   'range' : (  30,    0.,  300),  #   variable range
+                                   'xaxis' : pt+' HEM jets' + gv, #   x axis name
+                                   'fold'  : overflow              #   fold overflow
+                                  }
+
+    variables['ptele']     = { 'name'  : 'Electron_pt*('+HEMele+')',            #   variable name
+                                   'range' : (  30,    0.,  300),  #   variable range
+                                   'xaxis' : pt+' HEM electrons' + gv, #   x axis name
+                                   'fold'  : overflow              #   fold overflow
+                                  }
+
+    variables['dphiptmissHEMjet']     = { 'name'  : 'acos(cos('+JetPhi+'-'+ptmiss_phi+'))*(2.*(('+HEMjet+')==1)-1.)', #   variable name
+                                                   'range' : (  10,    0.,  3.2),    #   variable range
+                                                   'xaxis' : dphijetptmiss,          #   x axis name
+                                                   'fold'  : overflow                #   fold overflow
+                                                  }
+
+    variables['dphiptmissHEMele']     = { 'name'  : 'acos(cos(Electron_phi-'+ptmiss_phi+'))*(2.*(('+HEMele+')==1)-1.)', #   variable name
+                                                   'range' : (  10,    0.,  3.2),    #   variable range
+                                                   'xaxis' : '#Delta#phi(electron,'+met+')',          #   x axis name
+                                                   'fold'  : overflow                #   fold overflow
+                                                  }
+
 elif 'HighPtMissOptimisationRegion' in opt.tag: 
     
     variables['ptmissmt2ll']      = {  'name'  : 'ptmiss:mt2ll',                                             #   variable name    
@@ -1320,7 +1400,8 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                                   'range' : (mt2llOptimHighBin,[1]), #   variable range
                                                   'xaxis' : mt2 + pll + gv,          #   x axis name
                                                   'fold'  : overflow,                #   fold overflow
-                                                  'CRbins' : [1, 4]                                                                                                                                                      }
+                                                  'CRbins' : [1, 4]          
+                                                }
 
                 variables['mt2llOptimHighExtra'] = {   'name'  : mt2ll,                        #   variable name
                                                        'range' : (mt2llOptimHighExtraBin,[1]), # variable range
@@ -1380,7 +1461,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
             variables['ptmiss']      = {  'name'  : 'ptmiss'+ctrltag,        #   variable name
                                           'range' : (  40,    0.,  400.),    #   variable range
                                           'xaxis' : met + gv,                #   x axis name
-                                          'fold'  : overflow                 #   fold overflow
+                                          #'fold'  : overflow                 #   fold overflow
                                          }
 
             variables['ptmissSR']     = {  'name'  : 'ptmiss'+ctrltag,        #   variable name  
@@ -1389,7 +1470,15 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                            'fold'  : overflow                 #   fold overflow
                                          }
 
-        if 'DYValidationRegion' in opt.tag:   
+        if 'DYValidationRegion' in opt.tag:  
+
+            for varjes in [ 'Up', 'Down' ]:
+                variables['ptmiss_jesTotal_2017'+varjes] = {  'name'  : 'MET_T1Smear_pt_jesTotal'+varjes, #   variable name
+                                                   'range' : (  40,    0.,  400.),    #   variable range
+                                                   'xaxis' : met + gv,                #   x axis name
+                                                   'cuts' : [ 'Zpeak' ],
+                                                   #'fold'  : overflow                 #   fold overflow
+                                                 } 
 
             variables['deltaPhiLep']   = {  'name'  : dPhill,                  #   variable name    
                                             'range' : (  10,    0.,  3.2),     #   variable range
@@ -1431,10 +1520,18 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
 
 if 'SearchRegionKinematics' in opt.tag:
 
+    notagCuts, ptmissCuts, searchCuts = [], [], []
+    for cut in cuts:
+        if 'noptmiss' in cut: ptmissCuts.append(cut)
+        else:
+            searchCuts.append(cut)
+            if 'Veto' not in cut and 'Tag' not in cut: notagCuts.append(cut)
+
     variables['mt2ll'] = { 'name'  : 'mt2ll',               # variable name
                            'range' : (10,  0., 200. ), # variable range
                            'xaxis' : mt2 + pll + gv,      # x axis name
                            'fold'  : overflow,            # fold overflow
+                           'cuts'  : searchCuts,
                            'nameLatex' : '\\mtll'
                           }
 
@@ -1442,11 +1539,21 @@ if 'SearchRegionKinematics' in opt.tag:
                                    'range' : ([0, 20, 40, 60, 80, 100, 160, 220],[1]),    #   variable range
                                    'xaxis' : mt2 + pll + gv,         #   x axis name
                                    'fold'  : overflow,               #   fold overflow
+                                   'cuts'  : searchCuts,
                                    'CRbins' : [1, 4]
                                 }
 
+    if 'Slep' in opt.tag or 'Chargino' in opt.tag or 'TChipmWW'  in opt.tag:
+        variables['mt2llOptimHighExtra'] = {   'name'  : 'mt2ll',                        #   variable name
+                                               'range' : ([0, 20, 40, 60, 80, 100, 160, 240, 370, 500],[1]), # variable range
+                                               'xaxis' : mt2 + pll + gv,               #   x axis name
+                                               'fold'  : overflow,                     #   fold overflow
+                                               'cuts'  : searchCuts,
+                                               'CRbins' : [1, 4]
+                                             }
+
     variables['ptmiss']  = {  'name'  : 'ptmiss',                #   variable name
-                              'range' : (  12,    160.,  400.),    #   variable range
+                              'range' : (  20,    0.,  400.),    #   variable range
                               'xaxis' : met + gv,                #   x axis name
                               'fold'  : overflow                 #   fold overflow
                              }
@@ -1454,6 +1561,7 @@ if 'SearchRegionKinematics' in opt.tag:
     variables['njets']    = {  'name'  : 'nCleanJet',             #   variable name
                                'range' : (  6 ,    0.,  6.),      #   variable range
                                'xaxis' : 'number of jets',        #   x axis name
+                               'cuts'  : searchCuts,
                                'fold'  : overflow                 #   fold overflow
                               }
 
@@ -1462,6 +1570,7 @@ if 'SearchRegionKinematics' in opt.tag:
         isrJetWeight = '(CleanJet_pt[0]>150.)*(Jet_'+btagDisc+'[CleanJet_jetIdx[0]]<'+bTagCut+')'
     variables['dphiisrmet']  = {  'name'  : 'acos(cos(ptmiss_phi-CleanJet_phi[0]))', #   variable name
                                   'weight': isrJetWeight,
+                                  'cuts'  : searchCuts,
                                   'range' : (  10,    0., 3.2),    #   variable range
                                   'xaxis' : '|#Delta#phi(ISR jet,'+met+')| [rad]',         #   x axis name
                                  }
@@ -1471,16 +1580,28 @@ if 'SearchRegionKinematics' in opt.tag:
         variables['nbjets']  = { 'name'  : '0.', #   variable name
                                  'range' : (  4,    -0.5, 3.5),    #   variable range
                                  'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                 'cuts'  : notagCuts,
                                  'fold'  : overflow                 #   fold overflow
                                 }
 
 
     else:
 
+        if 'Data' not in opt.sigset:
+            for jeuncert in [ 'jesTotal', 'jer', 'unclustEn' ]:
+                for varjes in [ 'Up', 'Down' ]:
+                    variables['ptmiss_'+jeuncert+'_'+yeartag+varjes] = {  'name'  : 'MET_T1Smear_pt_'+jeuncert+varjes, #   variable name
+                                                                          'range' : (  20,    0.,  400.),    #   variable range
+                                                                          'xaxis' : met + gv,                #   x axis name
+                                                                          'cuts' : ptmissCuts,
+                                                                          'fold'  : overflow                 #   fold overflow
+                                                                        }
+
         variables['nbjets0']  = { 'name'  : '0.', #   variable name
                                   'weight': btagWeight0tag,
                                   'range' : (  4,    -0.5, 3.5),    #   variable range
                                   'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                  'cuts'  : notagCuts,
                                   'fold'  : overflow                 #   fold overflow
                                  }
 
@@ -1492,6 +1613,7 @@ if 'SearchRegionKinematics' in opt.tag:
                                   'weight': '('+btagWeight1tag+')-('+btagWeight2tag+')',
                                   'range' : (  4,    -0.5, 3.5),    #   variable range
                                   'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                  'cuts'  : notagCuts,
                                   'fold'  : overflow                 #   fold overflow
                                  }
 
@@ -1499,6 +1621,7 @@ if 'SearchRegionKinematics' in opt.tag:
                                   'weight': '('+btagWeight2tag+')-('+btagWeight3tag+')',
                                   'range' : (  4,    -0.5, 3.5),    #   variable range
                                   'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                  'cuts'  : notagCuts,
                                   'fold'  : overflow                 #   fold overflow
                                  }
 
@@ -1506,6 +1629,7 @@ if 'SearchRegionKinematics' in opt.tag:
                                    'weight': btagWeight3tag,
                                    'range' : (  4,    -0.5, 3.5),    #   variable range
                                    'xaxis' : 'number of b-tagged jets',         #   x axis name
+                                  'cuts'  : notagCuts,
                                    'fold'  : overflow                 #   fold overflow
                                   }
 

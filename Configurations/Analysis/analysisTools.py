@@ -34,8 +34,9 @@ def setAnalysisDefaults(opt):
     #opt.tableSigset['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-200_mX-125', 'TChipmSlepSnu_mC-200_mX-150', 'TChipmSlepSnu_mC-250_mX-175', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ]
     opt.tableSigset['TChipmSlepSnu'] = [ 'TChipmSlepSnu_mC-300_mX-1', 'TChipmSlepSnu_mC-400_mX-225', 'TChipmSlepSnu_mC-500_mX-50', 'TChipmSlepSnu_mC-300_mX-175', 'TChipmSlepSnu_mC-500_mX-300', 'TChipmSlepSnu_mC-650_mX-125', 'TChipmSlepSnu_mC-650_mX-350', 'TChipmSlepSnu_mC-800_mX-200', 'TChipmSlepSnu_mC-950_mX-200', 'TChipmSlepSnu_mC-300_mX-200', 'TChipmSlepSnu_mC-300_mX-225', 'TChipmSlepSnu_mC-350_mX-250', 'TChipmSlepSnu_mC-400_mX-275', 'TChipmSlepSnu_mC-450_mX-325', 'TChipmSlepSnu_mC-500_mX-325', 'TChipmSlepSnu_mC-700_mX-425', 'TChipmSlepSnu_mC-800_mX-450', 'TChipmSlepSnu_mC-900_mX-425', 'TChipmSlepSnu_mC-1000_mX-375', 'TChipmSlepSnu_mC-1100_mX-300', 'TChipmSlepSnu_mC-1150_mX-1' ]
     opt.tableSigset['T2tt']          = [ 'T2tt_mS-300_mX-213', 'T2tt_mS-300_mX-175', 'T2tt_mS-350_mX-263', 'T2tt_mS-350_mX-225', 'T2tt_mS-400_mX-275', 'T2tt_mS-300_mX-125', 'T2tt_mS-350_mX-175', 'T2tt_mS-400_mX-225', 'T2tt_mS-400_mX-313', 'T2tt_mS-475_mX-350', 'T2tt_mS-450_mX-275', 'T2tt_mS-450_mX-325', 'T2tt_mS-475_mX-388', 'T2tt_mS-450_mX-363', 'T2tt_mS-475_mX-300', 'T2tt_mS-475_mX-325', 'T2tt_mS-475_mX-375', 'T2tt_mS-500_mX-325', 'T2tt_mS-500_mX-350', 'T2tt_mS-500_mX-375', 'T2tt_mS-500_mX-400', 'T2tt_mS-500_mX-413', 'T2tt_mS-525_mX-350', 'T2tt_mS-525_mX-375', 'T2tt_mS-525_mX-400', 'T2tt_mS-525_mX-425', 'T2tt_mS-525_mX-438', 'T2tt_mS-550_mX-375', 'T2tt_mS-550_mX-400', 'T2tt_mS-550_mX-425', 'T2tt_mS-550_mX-450', 'T2tt_mS-550_mX-463' ]
-    opt.tableSigset['TChipmWW']      = [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-150_mX-1', 'TChipmWW_mC-200_mX-1', 'TChipmWW_mC-200_mX-25', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50' ]    
+    opt.tableSigset['TChipmWW']      = [ 'TChipmWW_mC-100_mX-1', 'TChipmWW_mC-150_mX-1', 'TChipmWW_mC-200_mX-1', 'TChipmWW_mC-200_mX-25', 'TChipmWW_mC-200_mX-50', 'TChipmWW_mC-300_mX-75', 'TChipmWW_mC-400_mX-50', 'TChipmWW_mC-350_mX-75' ]    
     opt.tableSigset['Studies']      = [ 'T2tt_mS-525_mX-350','T2tt_mS-525_mX-438','TChipmSlepSnu_mC-1150_mX-1','TChipmSlepSnu_mC-900_mX-475','EOYT2tt_mS-525_mX-350','EOYT2tt_mS-525_mX-438','EOYTChipmSlepSnu_mC-1150_mX-1','EOYTChipmSlepSnu_mC-900_mX-475' ]
+    opt.tableSigset['T2bW'] = [ 'T2bW_mS-500_mX-300', 'T2bW_mS-700_mX-350', 'T2bW_mS-750_mX-1' ]
 
     opt.signalSubsets['T2tt'] = [ 'T2tt_mS-150to800_dm-80to175' ]
     opt.signalSubsets['T2bW'] = ['T2bW_mS-200to600_mX-1to700', 'T2bW_mS-625to800_mX-1to700', 'T2bW_mS-825to1000_mX-1to700']
@@ -226,7 +227,7 @@ def mergeSignalToSM(opt):
             signaltag = tag.replace('Group','').replace('WWPol1a','').replace('SmtEU','')
 
             for sigset in getSignalList(opt, opt.sigset, tag):
-                print sigset
+
                 outputDir = commonTools.getShapeDirName(opt.shapedir, year, tag)
                 outputFile = outputDir                         + '/plots_' + tag       + '_SM-' + sigset + '.root'
                 smFile     = outputDir.replace(tag, smtag)     + '/plots_' + smtag     + '_SM.root' 
@@ -730,6 +731,8 @@ def mergeSearchRegionKinematics(opt):
             for variable in variables:
                 if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
 
+                    if 'MET_T1' in variables[variable]['name']: continue
+
                     shapeName = '_'.join([ variableString for variableString in variable.replace('nbjets','nbjets_').split('_') if not variableString.isdigit() ])
                     if shapeName not in mergedShapes:
                         mergedShapes[shapeName] = {}
@@ -741,15 +744,24 @@ def mergeSearchRegionKinematics(opt):
                         for nuisance in nuisances:
                             if nuisances[nuisance]['type']=='shape':
                                 if sample in nuisances[nuisance]['samples']:
-                                    for variation in [ 'Up', 'Down' ]:
-                                        histoList.append('_'.join([ 'histo', sample, nuisances[nuisance]['name']+variation ]))
+                                    if 'cuts' not in nuisances[nuisance] or cut in nuisances[nuisance]['cuts']:
+                                        for variation in [ 'Up', 'Down' ]:
+                                            histoList.append('_'.join([ 'histo', sample, nuisances[nuisance]['name']+variation ]))
 
                         for histo in histoList:
  
+                            histoName = '/'.join([ cut, variable, histo ])
+                            for jeuncert in [ 'jesTotal', 'jer', 'unclustEn' ]:
+                                if jeuncert in histo:
+                                   histoVariable = histo.replace('histo_','').replace(sample,variable)
+                                   if histoVariable in variables:
+                                       if 'cuts' not in variables[histoVariable] or cut in variables[histoVariable]['cuts']:
+                                           histoName = '/'.join([ cut, histoVariable, 'histo_'+sample ])
+
                             if histo not in mergedShapes[shapeName]:
-                                mergedShapes[shapeName][histo] = inputFile.Get('/'.join([ cut, variable, histo ]))
+                                mergedShapes[shapeName][histo] = inputFile.Get(histoName)
                             else:
-                                mergedShapes[shapeName][histo].Add(inputFile.Get('/'.join([ cut, variable, histo ])))
+                                mergedShapes[shapeName][histo].Add(inputFile.Get(histoName))
 
             for variable in mergedShapes:
 

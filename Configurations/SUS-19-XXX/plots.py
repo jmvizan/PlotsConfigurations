@@ -396,12 +396,14 @@ signalColor = 1 if (hasattr(opt, 'postFit') and opt.postFit=='n') else 880 # kVi
 LSP = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{0}}}#kern[-1.3]{#scale[0.85]{_{1}}}'
 CHR = '#lower[-0.12]{#tilde{#chi}}#lower[0.2]{#scale[0.85]{^{#pm}}}#kern[-1.3]{#scale[0.85]{_{1}}}'
 STP = '#tilde{t}'
+SLE = '#tilde{#font[12]{l}}'
 
 for massPoint in samples:
     if samples[massPoint]['isSignal']:
 
         massPointName = massPoint.replace(massPoint.replace('EOY','').split('_')[0],'')
         massPointName = massPointName.replace('_mS-', ' m_{'+STP+'}=').replace('_mC-', ' m_{'+CHR+'}=').replace('_mX-', ' m_{'+LSP+'}=')
+        if 'Slep' in opt.tag or 'Chargino' in opt.tag: massPointName = massPointName.replace(' m_{'+STP+'}=',' m_{'+SLE+'}=')
         massPointNameLatex = massPoint.replace('_mS-', ' \\invM{\\PSQtDo}=').replace('_mC-', ' \\invM{\\PSGcpmDo}=').replace('_mX-', ', \\invM{\\PSGczDo}=')
         #massPointNameLatex = massPointNameLatex.replace('TChipmSlepSnu', '\\PSGcpmDo\\PSGcpmDo, \\TChipmDecay,') 
         #massPointNameLatex = massPointNameLatex.replace('T2tt', '\\PSQtDo\\PASQtDo, \\PSQtDo\\to\\PQt\\PSGczDo,')

@@ -191,7 +191,8 @@ def limits(opt):
     opt.combineAction = 'limits'
     if 'toy' in opt.option.lower():
         opt.batchQueue = 'nextweek'
-        limitMethod = '-M HybridNew --LHCmode LHC-limits'
+        if 'btoy' in opt.option.lower(): limitMethod = '-M BayesianToyMC'
+        else: limitMethod = '-M HybridNew --LHCmode LHC-limits'
     else:
         limitRun = getLimitRun(opt.unblind) 
         limitMethod = ' '.join([ '-M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun ])
@@ -222,6 +223,7 @@ def mlfits(opt):
     opt.combineAction = 'mlfits'
     fitOptions = getFitOptions(opt.option.lower())
     opt.combineCommand = ' '.join(['combine -M FitDiagnostics', fitOptions, '--cminDefaultMinimizerStrategy 0	combinedDatacard.txt' ])
+    #opt.combineCommand = ' '.join(['combine -M GoodnessOfFit   combinedDatacard.txt' ])
     opt.combineOutDir = opt.mlfitdir
 
     runCombine(opt)

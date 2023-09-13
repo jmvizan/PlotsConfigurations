@@ -44,6 +44,10 @@ if '2018' in opt.tag :
     lumi_uncertainty_dos = '1.002'
     trigger_uncertainty  = '1.020'
 
+#if 'VetoHEM' in opt.tag:
+#    if 'Before' in opt.tag: opt.lumi *= 0.35225285
+#    else: opt.lumi *= (1.-0.35225285)
+
 recoFlag = '_UL'
 
 yeartag = '-'.join(yearstag.values())
@@ -551,13 +555,27 @@ if '2017' in yeartag and 'EENoise' in DataQualityCuts:
     #    #VetoEENoise = '(1. - '+VetoEENoise+')'
     #    VetoEENoise = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && Jet_pt>30. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
 
-elif '2018' in yeartag and 'HEM' in DataQualityCuts:
-    hemPtCut    = '20.' if 'HEM20' in DataQualityCuts else '30.' 
+elif '2018' in yeartag and 'HEM' in DataQualityCuts and 'VetoHEM' not in opt.tag:
+    hemPtCut    = '20.' if 'HEM20' in DataQualityCuts or 'UL20' in opt.tag else '30.' 
     VetoHEMele  = '(Sum$(Electron_pt>'+hemPtCut+' && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)==0)'
+    if 'UL20Ele' in opt.tag: hemPtCut = '30.'
     VetoHEMjet  = '(Sum$(Jet_pt>'+hemPtCut+' && Jet_eta>-3.2 && Jet_eta<-1.2 && Jet_phi>-1.77 && Jet_phi<-0.67)==0)'
+    if 'ULLow' in opt.tag:
+        VetoHEMele  = '(Sum$(Electron_pt>20 && Electron_pt<30 && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)==0)'
+        VetoHEMjet  = '(Sum$(Jet_pt>20 && Jet_pt<30 && Jet_eta>-3.2 && Jet_eta<-1.2 && Jet_phi>-1.77 && Jet_phi<-0.67)==0)'
+    if 'CleanVetoesUL' in opt.tag: VetoHEMjet = VetoHEMjet.replace('Jet_','CleanJet_')
     VetoHEM     = '('+VetoHEMele+' && '+VetoHEMjet+')'
     VetoHEMdata = '(run<319077 || '+VetoHEM+')'
     VetoHEMmc   = '('+VetoHEM+' + (1.-'+VetoHEM+')*0.35225285)'
+    if 'AntiVetoesUL' in opt.tag or 'AntiCleanVetoesUL' in opt.tag:
+        VetoHEMdata = '(run>=319077 && !('+VetoHEM+'))'
+        VetoHEMmc   = '((1.-'+VetoHEM+')*(1-0.35225285))'
+    if 'AntiEleVetoesUL' in opt.tag or 'AntiEleCleanVetoesUL' in opt.tag:
+        VetoHEMdata = '(run>=319077 && !('+VetoHEMele+'))'
+        VetoHEMmc   = '((1.-'+VetoHEMele+')*(1-0.35225285))'
+    if 'AntiJetVetoesUL' in opt.tag or 'AntiJetCleanVetoesUL' in opt.tag:
+        VetoHEMdata = '(run>=319077 && !('+VetoHEMjet+'))'
+        VetoHEMmc   = '((1.-'+VetoHEMjet+')*(1-0.35225285))'
 
 ### Trigger Efficiencies
 
@@ -1048,7 +1066,7 @@ for sample in samples:
     samples[sample]['suppressNegativeNuisances'] = ['all']
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
     samples[sample]['treeType']  = 'Backgrounds' 
-    if sample in [ 'ttbar', 'DY', 'ZZTo2L2Nu', 'ZZTo4L', 'VZ' ]:
+    if sample in [ 'ttbar', 'DY', 'ZZTo2L2Nu', 'ZZTo4L', 'VZ', 'WW' ]:
         samples[sample]['split'] = 'AsMuchAsPossible'
     elif 'BackSF' in opt.tag and sample in [ 'WZ', 'ttZ' ]:
         samples[sample]['split'] = 'Single'

@@ -3,7 +3,8 @@
 massZ = '91.1876'
 vetoZ = 'fabs(mll'+ctrltag+'-'+massZ+')>15.'
 Zcut  = 'fabs(mll'+ctrltag+'-'+massZ+')<ZCUT'
-SF    = LL+' && '+vetoZ  
+SF    = LL+' && '+vetoZ
+ZVeto = '(('+DF+') || ('+SF+'))' 
 
 NoJets = 'Alt$(CleanJet_pt[0],0)<' +jetPtCut
 HasJet = 'Alt$(CleanJet_pt[0],0)>='+jetPtCut
@@ -213,12 +214,60 @@ if 'METFix' in opt.tag:
     cuts['METFixEE_high_ee_Tag']  = { 'expr' : '('+OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight1tag }
     cuts['METFixEE_high_mm_Tag']  = { 'expr' : '('+OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight1tag }
     cuts['METFixEE_high_sf_Tag']  = { 'expr' : '('+OC+' && '+SF+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight1tag }
-    
+   
+if 'VetoHEM' in opt.tag:
+
+    hemruns, hemweight = 'run>=319077', '1.'
+    if 'Data' not in opt.sigset: hemruns, hemweight = 'run>=1', '(1.-0.35225285)'
+    if 'Before' in opt.tag:
+        hemruns, hemweight = 'run<319077', '1.'
+        if 'Data' not in opt.sigset: hemruns, hemweight = 'run>=1', '(0.35225285)'
+
+    channelCut = OC
+    if 'Zveto' in opt.tag:
+        channelCut += ' && '+ZVeto
+
+    VetoHEMele  = '(Sum$(Electron_pt>30. && Electron_eta>-3.0 && Electron_eta<-1.4 && Electron_phi>-1.57 && Electron_phi<-0.87)>0)'
+    VetoHEMjet  = '(Sum$(Jet_pt>30. && Jet_eta>-3.2 && Jet_eta<-1.2 && Jet_phi>-1.77 && Jet_phi<-0.67)>0)'
+    if 'Clean' in opt.tag: VetoHEMjet = VetoHEMjet.replace('Jet_', 'CleanJet_')
+    if 'Neat' in opt.tag: VetoHEMjet = '('+VetoHEMjet+' && '+'!('+VetoHEMele+'))'
+    VetoHEM     = '('+VetoHEMele+' || '+VetoHEMjet+')'    
+
+    hemweightjet, hemweightele = hemweight, hemweight
+    if 'Anti' in opt.tag:
+        hemruns, hemweight, hemweightjet, hemweightele = 'run>=1', '1.', '1.', '1.'
+        VetoHEMele = '(!('+VetoHEMele+'))'
+        VetoHEMjet = '(!('+VetoHEMjet+'))'
+        VetoHEM = '('+VetoHEMele+' && '+VetoHEMjet+')'      
+        if 'Data' in opt.sigset: VetoHEM = '(run<319077 || '+VetoHEM+')' 
+        else: 
+            hemweight    = '('+VetoHEM   +' + (1.-'+VetoHEM   +')*0.35225285)'
+            hemweightjet = '('+VetoHEMjet+' + (1.-'+VetoHEMjet+')*0.35225285)'            
+            hemweightele = '('+VetoHEMele+' + (1.-'+VetoHEMele+')*0.35225285)'
+            
+    if 'Data' not in opt.sigset and 'ExtraV1' in opt.tag: 
+        hemweight    += '*0.98110862' # trigger corrections for mkShapes (no Multi -> no aliases)
+        hemweightele += '*0.98110862'
+        hemweightjet += '*0.98110862'
+
+    cuts['HEMEle']  = { 'expr' : '('+hemruns+' && '+channelCut+' && '+VetoHEMele+')', 'weight' : hemweightele }
+    cuts['HEMjet']  = { 'expr' : '('+hemruns+' && '+channelCut+' && '+VetoHEMjet+')', 'weight' : hemweightjet }
+    cuts['HEM']     = { 'expr' : '('+hemruns+' && '+channelCut+' && '+VetoHEM+')', 'weight' : hemweight }
+ 
+    cuts['HEMEle_HighPtMiss']  = { 'expr' : '('+hemruns+' && '+channelCut+' && '+VetoHEMele+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : hemweightele }
+    cuts['HEMjet_HighPtMiss']  = { 'expr' : '('+hemruns+' && '+channelCut+' && '+VetoHEMjet+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : hemweightjet }
+    cuts['HEM_HighPtMiss']     = { 'expr' : '('+hemruns+' && '+channelCut+' && '+VetoHEM+'    && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140)', 'weight' : hemweight }
+
+    DY = OC + ' && ' + LL + ' && ' + Zcut.replace('ZCUT',  '15.')
+    cuts['HEMEle_Zpeak']  = { 'expr' : '('+hemruns+' && '+DY+' && '+VetoHEMele+' && ptmiss'+ctrltag+'>=0)', 'weight' : hemweightele }
+    cuts['HEMjet_Zpeak']  = { 'expr' : '('+hemruns+' && '+DY+' && '+VetoHEMjet+' && ptmiss'+ctrltag+'>=0)', 'weight' : hemweightjet }
+    cuts['HEM_Zpeak']     = { 'expr' : '('+hemruns+' && '+DY+' && '+VetoHEM+'    && ptmiss'+ctrltag+'>=0)', 'weight' : hemweight }
+
 if 'VetoNoiseEE' in opt.tag and not 'HTFCut' in opt.tag:
 
     channelCut = OC 
     if 'Zveto' in opt.tag:
-        channelCut += ' && ('+DF+' || '+SF+')'
+        channelCut += ' && '+ZVeto
  
     EENoiseVeto0 = '(Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     EENoiseVeto1 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
@@ -262,7 +311,7 @@ if 'VetoNoiseEE' in opt.tag and 'HTFCut' in opt.tag:
 
     channelCut = OC
     if 'Zveto' in opt.tag:
-        channelCut += ' && ('+DF+' || '+SF+')'
+        channelCut += ' && '+ZVeto
 
     EENoiseVeto0 = '(Sum$(abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
     EENoiseVeto1 = '(Sum$(Jet_pt*(1.-Jet_rawFactor)<50. && abs(Jet_eta)>2.650 && abs(Jet_eta)<3.139)>=1)'
@@ -317,14 +366,14 @@ if 'TopControlRegion' in opt.tag:
     cuts['Top_em'] = { 'expr' : '(' + OC+' && '+DF+' && ptmiss>=20)', 'weight' : btagWeight1tag }
     cuts['Top_ee'] = { 'expr' : '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=50)', 'weight' : btagWeight1tag }
     cuts['Top_mm'] = { 'expr' : '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=50)', 'weight' : btagWeight1tag }
-    cuts['Top_cr'] = { 'expr' : '(' + OC+' && (('+DF+') || ('+SF+'))  && ptmiss>=50  && CleanJet_pt[1]>=30.)', 'weight' : btagWeight1tag }
-    cuts['Top_hm'] = { 'expr' : '(' + OC+' && (('+DF+') || ('+SF+'))  && MET_significance>12  && CleanJet_pt[1]>=30. && '+dPhijet0ptmiss+'>0.64 && '+dPhijet1ptmiss+'>0.25)', 'weight' : btagWeight1tag }
+    cuts['Top_cr'] = { 'expr' : '(' + OC+' && '+ZVeto+'  && ptmiss>=50  && CleanJet_pt[1]>=30.)', 'weight' : btagWeight1tag }
+    cuts['Top_hm'] = { 'expr' : '(' + OC+' && '+ZVeto+'  && MET_significance>12  && CleanJet_pt[1]>=30. && '+dPhijet0ptmiss+'>0.64 && '+dPhijet1ptmiss+'>0.25)', 'weight' : btagWeight1tag }
 
 if 'HMControlRegion' in opt.tag:
 
     cuts['Top_em'] = { 'expr' : '(' + OC+' && '+DF+' && MET_significance>12  && CleanJet_pt[1]>=30. && '+dPhijet0ptmiss+'>0.64 && '+dPhijet1ptmiss+'>0.25)', 'weight' : btagWeight1tag }
     cuts['Top_sf'] = { 'expr' : '(' + OC+' && '+SF+' && MET_significance>12  && CleanJet_pt[1]>=30. && '+dPhijet0ptmiss+'>0.64 && '+dPhijet1ptmiss+'>0.25)', 'weight' : btagWeight1tag }
-    cuts['Top_hm'] = { 'expr' : '(' + OC+' && (('+DF+') || ('+SF+'))  && MET_significance>12  && CleanJet_pt[1]>=30. && '+dPhijet0ptmiss+'>0.64 && '+dPhijet1ptmiss+'>0.25)', 'weight' : btagWeight1tag }
+    cuts['Top_hm'] = { 'expr' : '(' + OC+' && '+ZVeto+' && MET_significance>12  && CleanJet_pt[1]>=30. && '+dPhijet0ptmiss+'>0.64 && '+dPhijet1ptmiss+'>0.25)', 'weight' : btagWeight1tag }
     
 if 'WWControlRegion' in opt.tag:
     if 'Latino' in opt.tag:
@@ -380,8 +429,9 @@ if 'HighPtMissControlRegion' in opt.tag or 'HighPtMissValidationRegion' in opt.t
 
     if not hasattr(opt, 'outputDirDatacard'):
 
-        cuts['VR1_em']   = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
-        cuts['VR1_sf']   = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+        cuts['VR1']      = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+        cuts['VR1_em']   = { 'expr' : OC+' && '+DF   +' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
+        cuts['VR1_sf']   = { 'expr' : OC+' && '+SF   +' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeightNoCut }
 
         cuts['VR1_Veto_em']  = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
         cuts['VR1_Veto_sf']  = { 'expr' : OC+' && '+SF+' && ptmiss'+ctrltag+'>=100 && ptmiss'+ctrltag+'<140', 'weight' : btagWeight0tag }
@@ -452,7 +502,7 @@ if 'TopValidationRegion' in opt.tag:
         cuts['VR1_Tag_em_mt2']    = { 'expr' : '(' + OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && mt2ll>100.         )', 'weight' : btagWeight1tag }
         cuts['VR1_Tag_mm_mt2']    = { 'expr' : '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.         )', 'weight' : btagWeight1tag }
         cuts['VR1_Tag_ee_mt2']    = { 'expr' : '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.         )', 'weight' : btagWeight1tag }
-        cuts['VR1_Tag_jets']      = { 'expr' : '(' + OC+' && ('+SF+' || '+DF+')  && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)', 'weight' : btagWeight1tag }
+        cuts['VR1_Tag_jets']      = { 'expr' : '(' + OC+' && '+ZVeto+' && ptmiss>=100 && ptmiss<140 && CleanJet_pt[1]>=30.)', 'weight' : btagWeight1tag }
         
 if 'WWValidationRegion' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
 
@@ -468,7 +518,7 @@ if 'WWValidationRegion' in opt.tag and 'WZtoWWValidationRegion' not in opt.tag:
         cuts['VR1_Veto_em_mt2']    = '(' + OC+' && '+DF+             ' && ptmiss>=100 && ptmiss<140 && mt2ll>100.)'
         cuts['VR1_Veto_mm_mt2']    = '(' + OC+' && '+MM+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.)'
         cuts['VR1_Veto_ee_mt2']    = '(' + OC+' && '+EE+' && '+vetoZ+' && ptmiss>=100 && ptmiss<140 && mt2ll>100.)'
-        cuts['VR1_Veto_0jet']      = '(' + OC+' && ('+SF+' || '+DF+')  && ptmiss>=100 && ptmiss<140 && '+NoJets+')'
+        cuts['VR1_Veto_0jet']      = '(' + OC+' && '+ZVeto+' && ptmiss>=100 && ptmiss<140 && '+NoJets+')'
 
 if 'SameSignValidationRegion' in opt.tag or 'SameSignInclusiveValidationRegion' in opt.tag:
 
@@ -642,6 +692,8 @@ if 'DYValidationRegion' in opt.tag and 'HighPtMissDY' not in opt.tag:
 
     DY = OC + ' && ' + LL + ' && ' + Zcut.replace('ZCUT',  '15.')
 
+    cuts['Zpeak']                       = { 'expr' : '(' + DY + ' && ptmiss>=0.)', 'weight' : btagWeight0tag }
+    cuts['Zpeak_ptmiss-100']            = { 'expr' : '(' + DY + ' && ptmiss>=100)', 'weight' : btagWeight0tag }
     cuts['Zpeak_ptmiss-100to140']       = { 'expr' : '(' + DY + ' && ptmiss>=100 && ptmiss<140)', 'weight' : btagWeight0tag }
     cuts['Zpeak_ptmiss-140']            = { 'expr' : '(' + DY + ' && ptmiss>=140)', 'weight' : btagWeight0tag }
     cuts['Zpeak_ptmiss-160']            = { 'expr' : '(' + DY + ' && ptmiss>=160)', 'weight' : btagWeight0tag }
@@ -880,7 +932,27 @@ if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):
 if 'SearchRegion' in opt.tag:
 
     if 'Kinematics' in opt.tag:
-        cuts['Search']        = { 'expr' : OC+' && ('+DF+' || '+SF+') && ptmiss'+ctrltag+'>=160', 'weight' : btagWeightNoCut }
+
+        if 'Slep' in opt.tag: ZVeto = SF
+
+        cuts['Search_noptmiss'] = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>=0.' , 'weight' : btagWeightNoCut }
+        cuts['Search_Veto_noptmiss'] = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>=0.' , 'weight' : btagWeight0tag }
+        cuts['Search_Tag_noptmiss'] = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>=0.' , 'weight' : btagWeight1tag }
+
+        ptmissCut = '140.' if 'TChipmWW' in opt.tag else '160.'
+
+        cuts['Search']          = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>='+ptmissCut, 'weight' : btagWeightNoCut }
+        cuts['Search_Veto']     = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>='+ptmissCut, 'weight' : btagWeight0tag }
+        cuts['Search_Tag']      = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>='+ptmissCut, 'weight' : btagWeight1tag }
+
+        if 'Slep' not in opt.tag and 'Chargino' not in opt.tag and 'TChipmWW' not in opt.tag:
+            cuts['Search_isrcut']   = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>=280', 'weight' : btagWeightNoCut }
+            cuts['Search_Veto_isrcut']   = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>=280', 'weight' : btagWeight0tag }
+            cuts['Search_Tag_isrcut']   = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>=280', 'weight' : btagWeight1tag }
+
+        else:
+            cuts['Search_NoTag']          = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>='+ptmissCut+' && '+HasJet, 'weight' : btagWeight0tag }
+            cuts['Search_NoJet']          = { 'expr' : OC+' && '+ZVeto+' && ptmiss'+ctrltag+'>='+ptmissCut+' && '+NoJets, 'weight' : btagWeightNoCut }
 
     else:
         cuts['Search_em']        = { 'expr' : OC+' && '+DF+' && ptmiss'+ctrltag+'>=160', 'weight' : btagWeightNoCut }
