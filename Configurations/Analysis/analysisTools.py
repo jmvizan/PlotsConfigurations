@@ -535,7 +535,7 @@ def exclusionPlot(opt, plotoption='2'):
 
     if len(tagList)>2: 
         print 'Comparison of more than two tags not supported'  
-        exit()
+        #exit()
 
     fitOption = 'Both' if opt.unblind else 'Blind'
 
@@ -546,8 +546,10 @@ def exclusionPlot(opt, plotoption='2'):
         opt2.tag = tag
         makeContours(opt2, plotoption, fitOption)
 
-    plotCommandList = [ '--years='+opt.year, '--tag='+tagList[0], '--sigset='+sigset, '--limitoption='+fitOption, '--plotoption='+plotoption ]
-    if len(tagList)>1: plotCommandList.append('--compareto='+tagList[1])
+    plotCommandList = [ '--years='+opt.year, '--tag='+tagList[0], '--sigset='+sigset, '--limitoption='+fitOption, '--plotoption='+plotoption+' --nomakehistos' ]
+    if len(tagList)>1: 
+        refTags = '-'.join([ tagList[x] for x in range(1,len(tagList)) ])
+        plotCommandList.append('--compareto='+refTags)
     if plotoption=='0': plotCommandList.append('--nofillempties')
 
     os.system('analyzeLimits.py '+' '.join(plotCommandList))

@@ -577,10 +577,15 @@ if 'WZValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag:
         cuts['WZtoWW_Zcut15']            = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag } 
         cuts['WZtoWW_Zcut10_ptmiss-100'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','100')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut15_ptmiss-100'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','100')+')', 'weight' : btagWeight0tag }
+        cuts['WZtoWW_Zcut15_ptmiss-100to220'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','100')+' && ptmiss'+ctrltag+'<220)', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut10_ptmiss-140'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','140')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut15_ptmiss-140'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','140')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut10_ptmiss-160'] = { 'expr' : '('+WZselection.replace('ZCUT','10.').replace('METCUT','160')+')', 'weight' : btagWeight0tag }
         cuts['WZtoWW_Zcut15_ptmiss-160'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','160')+')', 'weight' : btagWeight0tag }
+        cuts['WZtoWW_Zcut15_ptmiss-160to220'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','160')+' && ptmiss'+ctrltag+'<220)', 'weight' : btagWeight0tag }
+        cuts['WZtoWW_Zcut15_ptmiss-220'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','220')+')', 'weight' : btagWeight0tag }
+        cuts['WZtoWW_Zcut15_ptmiss-280'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','280')+')', 'weight' : btagWeight0tag }
+        cuts['WZtoWW_Zcut15_ptmiss-380'] = { 'expr' : '('+WZselection.replace('ZCUT','15.').replace('METCUT','380')+')', 'weight' : btagWeight0tag }
 
         #if 'TL' not in opt.tag and 'T3' not in opt.tag and 'TM' not in opt.tag:
         #    cuts['WZtoWW_ZcutNo']            = { 'expr' : '('+WZselection.replace('ZCUT','999.').replace('METCUT',  '0')+')', 'weight' : btagWeight0tag }

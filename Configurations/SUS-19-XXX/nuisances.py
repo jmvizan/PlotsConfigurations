@@ -305,7 +305,9 @@ if addMT2Shapes:
                     'type'  : 'shape',
                     'cuts'  : [ ]
             }
-            if '_WWcorr' in opt.tag: nuisances[nuisancekey]['correlatedName'] = 'WWtails'
+            if '_WWcorrSR' in opt.tag: nuisances[nuisancekey]['correlatedName'] = 'WWtails'+year.replace('noHIPM','').replace('HIPM','') 
+            elif '_WWcorrYear' in opt.tag: nuisances[nuisancekey]['correlatedName'] = 'WWtails_'+mt2llregion
+            elif '_WWcorr' in opt.tag: nuisances[nuisancekey]['correlatedName'] = 'WWtails'
 
             for cut in cuts.keys():
                 if mt2llregion in cut:

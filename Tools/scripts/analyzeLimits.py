@@ -1035,13 +1035,16 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
 
             if iobj>=3:
                 tagObj[iobj].SetLineColor(2)
-                
+            if iobj>=6:
+                tagObj[iobj].SetLineColor(418)
+ 
             tagObj[iobj].Draw(same)
             same = 'same'
             hname = tagObj[iobj].GetName()
             if "down" not in hname and "up" not in hname: 
                 #legend.AddEntry(tagObj[iobj],tags[ntag], 'l')
-                legeflag = '#font[50]{m}_{T2}(#font[12]{ll}) correction applied' if 'WWPol1a' in tags[ntag] else 'No #font[50]{m}_{T2}(#font[12]{ll}) correction applied'
+                #legeflag = '#font[50]{m}_{T2}(#font[12]{ll}) correction applied' if 'WWPol1a' in tags[ntag] else 'No #font[50]{m}_{T2}(#font[12]{ll}) correction applied'
+                legeflag = '#font[50]{m}_{T2}(#font[12]{ll}) correction uncertainties correlated across years' if 'WWcorrYear' in tags[ntag] else '#font[50]{m}_{T2}(#font[12]{ll}) correction uncertainties fully correlated' if 'WWcorr' in tags[ntag] else '#font[50]{m}_{T2}(#font[12]{ll}) correction uncertainties fully uncorrelated'
                 legend.AddEntry(tagObj[iobj],legeflag, 'l')
                 ntag+=1
         legend.Draw()
@@ -1171,7 +1174,9 @@ if __name__ == '__main__':
         if not skipCompareScan: makeMassScanContours(year, opt.compareto, opt.sigset, limitOptions[1], fileOption, opt.reMakeContours)
 
     if plotOption=='Histograms' or plotOption=='Contours':
-        plotLimits(year, [ opt.tag, opt.compareto ], opt.sigset, limitOptions, fileOption, plotOption, fillEmpties) 
+        tagstocompare = [ opt.tag ]
+        tagstocompare.extend(opt.compareto.split('-'))
+        plotLimits(year, tagstocompare, opt.sigset, limitOptions, fileOption, plotOption, fillEmpties) 
 
     if plotOption=='Final':
         makeExclusionPlot(year, opt.tag, opt.sigset, limitOptions, fileOption)
