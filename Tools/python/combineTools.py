@@ -91,7 +91,8 @@ def runCombine(opt):
 
     if not hasattr(opt, 'combineAction'):
         if 'limit' in opt.option: limits(opt)
-        elif 'fit' in opt.option: mlfits(opt)
+        elif 'goffit' in opt.option: goodnessOfFit(opt)
+        elif 'mlfits' in opt.option: mlfits(opt)
         elif 'impact' in opt.option: impactsPlots(opt)
         else: print 'Please, speficy if you want to compute limits, make ML fits, or produce impacts plots'
         exit()
@@ -218,12 +219,22 @@ def getFitOptions(options):
     if 'negsign' in options: optionList.append('--rMin -10')
     return ' '.join(optionList)
 
+def goodnessOfFit(opt):
+
+    opt.combineAction = 'goffit'
+    fitOptions = getFitOptions(opt.option.lower())
+    algo = 'AD' if 'AD' in opt.option else 'KS' if 'KS' in opt.option else 'saturated'
+    toy = '-t 100' if 'toy' in opt.option or 'toy' in opt.tag else '' 
+    opt.combineCommand = ' '.join(['combine -M GoodnessOfFit --algo='+algo+' '+toy+' combinedDatacard.txt' ])
+    opt.combineOutDir = opt.gofitdir
+
+    runCombine(opt)
+
 def mlfits(opt):
 
     opt.combineAction = 'mlfits'
     fitOptions = getFitOptions(opt.option.lower())
     opt.combineCommand = ' '.join(['combine -M FitDiagnostics', fitOptions, '--cminDefaultMinimizerStrategy 0	combinedDatacard.txt' ])
-    #opt.combineCommand = ' '.join(['combine -M GoodnessOfFit   combinedDatacard.txt' ])
     opt.combineOutDir = opt.mlfitdir
 
     runCombine(opt)

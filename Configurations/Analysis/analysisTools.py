@@ -365,6 +365,7 @@ def signalCombine(opt, action):
             opt2.sigset = smset+','.join(filesetMap[fileset])
 
             if action=='limits': combineTools.limits(opt2)
+            if action=='goodnessOfFit': combineTools.goodnessOfFit(opt2)
             if action=='mlfits': combineTools.mlfits(opt2)
             if action=='impactsPlots': combineTools.impactsPlots(opt2)
             if action=='postFitShapes': latinoTools.postFitShapes(opt2)
@@ -374,6 +375,10 @@ def signalCombine(opt, action):
 def signalLimits(opt):
 
     signalCombine(opt, 'limits')
+
+def signalGOF(opt):
+
+    signalCombine(opt, 'goodnessOfFit')
 
 def signalMLFits(opt):
 

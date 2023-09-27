@@ -25,6 +25,7 @@ if __name__ == '__main__':
     parser.add_option('--plotsdir'        , dest='plotsdir'        , help='Directory to store plots'       , default='./Plots')
     parser.add_option('--cardsdir'        , dest='cardsdir'        , help='Directory to store datacards'   , default='./Datacards')
     parser.add_option('--limitdir'        , dest='limitdir'        , help='Directory to store limits'      , default='./Limits')
+    parser.add_option('--gofitdir'        , dest='gofitdir'        , help='Directory to store GOF results' , default='./GoodnessOfFits')
     parser.add_option('--mlfitdir'        , dest='mlfitdir'        , help='Directory to store ML fits'     , default='./MaxLikelihoodFits')
     parser.add_option('--impactdir'       , dest='impactdir'       , help='Directory to store impacts'     , default='./Impacts')
     parser.add_option('--tabledir'        , dest='tabledir'        , help='Directory to store tables'      , default='./Tables')
