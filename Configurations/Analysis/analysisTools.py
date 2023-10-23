@@ -132,10 +132,10 @@ def mergeLightShapes(opt):
 
 def shapesForFit(opt):
 
-    if 'PtRel' in opt.tag: ptRel(opt)
+    if 'PtRel' in opt.tag: ptRelInput(opt)
     else: system8Input(opt) 
 
-def ptRel(opt):
+def ptRelInput(opt):
 
     print 'Please, write me!'
 
