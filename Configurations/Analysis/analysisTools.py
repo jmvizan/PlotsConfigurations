@@ -805,7 +805,7 @@ def ptHatWeights(opt):
                 xSec = float(genPars[0])
                 fEff = 1. if len(genPars)==1 else float(genPars[1])
             opt.qcdPtHatBins[ptHatBin]['weight'] = str(1000.*xSec*fEff/events.GetEntries())
-            print sample, opt.qcdPtHatBins[ptHatBin]['weight']
+
     print '\nqcdMuPtHatBins =', opt.qcdMuPtHatBins
     print '\nqcdPtHatBins =', opt.qcdPtHatBins, '\n'
 
