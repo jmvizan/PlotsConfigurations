@@ -20,7 +20,7 @@ if 'Summer22EE' in opt.campaign: opt.dataPileupFile = '/afs/cern.ch/work/s/scode
 elif 'Summer22' in opt.campaign: opt.dataPileupFile = '/afs/cern.ch/work/s/scodella/BTagging/CMSSW_10_6_28/src/LatinoAnalysis/NanoGardener/python/data/PUweights/2022/2022CD.root'
 
 fragTune = 'fragCP5BL'
-jetEnergyUncertaintyFile = 'Summer22EEPrompt22_V1_MC_Uncertainty_AK4PFPuppi.txt' if 'Summer22EE' in opt.campaign else 'Summer22Prompt22_V1_MC_Uncertainty_AK4PFPuppi.txt'
+jetEnergyUncertaintyFile = 'Summer22EEPrompt22_V1_MC_Uncertainty_AK4PFPuppi.txt' if 'Summer22EE' in opt.campaign else 'Winter22Run3_V2_MC_Uncertainty_AK4PFPuppi.txt'
 
 treePrefix = ''
 
