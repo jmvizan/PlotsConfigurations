@@ -130,7 +130,18 @@ def mergeLightShapes(opt):
         inputFile.Close()
         outputFile.Close()
 
+def shapesForFit(opt):
+
+    if 'PtRel' in opt.tag: ptRel(opt)
+    else: system8Input(opt) 
+
+def ptRel(opt):
+
+    print 'Please, write me!'
+
 def system8Input(opt):
+
+    print 'Please, complete me!'
 
     motherFile = commonTools.openShapeFile(opt.shapedir, opt.year, opt.tag.split('__')[0], 'SM', 'SM')
     
