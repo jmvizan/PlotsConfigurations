@@ -386,7 +386,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
     runPeriods = {}
     if 'Summer22EE' in opt.campaign:
-        #runPeriods['Run2022E'] = { 'subdir' : dataName + 'Run2022E-27Jun2023-v1'  }
+        runPeriods['Run2022E'] = { 'subdir' : dataName + 'Run2022E-27Jun2023-v1'  }
         runPeriods['Run2022F'] = { 'subdir' : dataName + 'Run2022F-PromptReco-v1' }
         runPeriods['Run2022G'] = { 'subdir' : dataName + 'Run2022F-PromptReco-v1' }
     elif 'Summer22' in opt.campaign:
