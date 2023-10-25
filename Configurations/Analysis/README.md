@@ -10,11 +10,16 @@ To install, try this
     cd CMSSW_10_6_28/src
     cmsenv
     git clone --branch 13TeV https://github.com/scodella/setup LatinosSetup
-    source LatinosSetup/SetupAnalysis.sh BTagPerf
+    ./LatinosSetup/SetupAnalysis.sh BTagPerf
+
+Copy the file LatinoAnalysis/Tools/python/userConfig_TEMPLATE.py to LatinoAnalysis/Tools/python/userConfig.py and edit it to reflect your local paths. This is needed for batch jobs submission.
+Copy the file /afs/cern.ch/work/s/scodella/public/BTagging/Run3/FunctionLibrary.h in LatinoAnalysis/MultiDraw/interface/
+Compile all from CMSSW_10_6_28/src.
 
 ## Production of weights for kinematic reweighting
 
-First step is the production of the raw histograms (aka shapes) for the kinematic variables:
+The scripts to derive the scale factors are in PlotsConfigurations/Configurations/Analysis. 
+The first step is the production of the raw histograms (aka shapes) for the kinematic variables:
 
     ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8Kinematics/PtRelKinematics
 
