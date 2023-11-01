@@ -13,7 +13,9 @@ To install, try this
     ./LatinosSetup/SetupAnalysis.sh BTagPerf
 
 Copy the file LatinoAnalysis/Tools/python/userConfig_TEMPLATE.py to LatinoAnalysis/Tools/python/userConfig.py and edit it to reflect your local paths. This is needed for batch jobs submission.
+
 Copy the file /afs/cern.ch/work/s/scodella/public/BTagging/Run3/FunctionLibrary.h in LatinoAnalysis/MultiDraw/interface/
+
 Compile all from CMSSW_10_6_28/src.
 
 ## Production of weights for kinematic reweighting
@@ -36,9 +38,9 @@ Now, we can produce the shapes with the weights applied ...
     ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt
     ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt
 
-... and ake some validation plot:
+... and make some validation plot:
 
-    ./runAnalysis.py --action=plots --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt
+    ./runAnalysis.py --action=plotKinematics --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt
 
 Finally, we can compute weights as a function of the jet eta on top of the one as a function of the jet pt ...
 
@@ -48,7 +50,7 @@ Finally, we can compute weights as a function of the jet eta on top of the one a
 
     ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta
     ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta
-    ./runAnalysis.py --action=plots --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta
+    ./runAnalysis.py --action=plotKinematics --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta
 
 ## Production of templates for PtRel/System8 fits
 
