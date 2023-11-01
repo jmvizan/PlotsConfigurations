@@ -35,8 +35,8 @@ Then weights as a function of the jet pt can be derived:
 
 Now, we can produce the shapes with the weights applied ...
 
-    ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt
-    ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt
+    ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt --sigset=MC
+    ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt --sigset=MC
 
 ... and make some validation plot:
 
@@ -48,8 +48,8 @@ Finally, we can compute weights as a function of the jet eta on top of the one a
 
 ... and try their effect:
 
-    ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta
-    ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta
+    ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta --sigset=MC
+    ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta --sigset=MC
     ./runAnalysis.py --action=plotKinematics --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta
 
 ## Production of templates for PtRel/System8 fits
