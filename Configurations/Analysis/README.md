@@ -42,15 +42,19 @@ Now, we can produce the shapes with the weights applied ...
 
     ./runAnalysis.py --action=plotKinematics --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt
 
-Finally, we can compute weights as a function of the jet eta on top of the one as a function of the jet pt ...
+Finally, we can compute weights as a function of the jet eta on top of the one as a function of the jet pt, but using a finer pt binning (ProdRun2) ...
 
-    ./runAnalysis.py --action=kinematicWeights --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt/PtRelKinematics.mujetpt --option=mujeteta
+    ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8KinematicsProdRun2.mujetpt/PtRelKinematicsProdRun2.mujetpt --sigset=MC
+    ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8KinematicsProdRun2.mujetpt/PtRelKinematicsProdRun2.mujetpt --sigset=MC
+    ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8KinematicsProdRun2/PtRelKinematicsProdRun2 --sigset=Data
+    ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8KinematicsProdRun2/PtRelKinematicsProdRun2 --sigset=Data
+    ./runAnalysis.py --action=kinematicWeights --year=CAMPAIGNNAME --tag=System8KinematicsProdRun2.mujetpt/PtRelKinematicsProdRun2.mujetpt --option=mujeteta
 
 ... and try their effect:
 
-    ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta --sigset=MC
-    ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta --sigset=MC
-    ./runAnalysis.py --action=plotKinematics --year=CAMPAIGNNAME --tag=System8Kinematics.mujetpt.mujeteta/PtRelKinematics.mujetpt.mujeteta
+    ./runAnalysis.py --action=shapes --year=CAMPAIGNNAME --tag=System8KinematicsProdRun2.mujetpt.mujeteta/PtRelKinematicsProdRun2.mujetpt.mujeteta --sigset=MC
+    ./runAnalysis.py --action=mergesingle --year=CAMPAIGNNAME --tag=System8KinematicsProdRun2.mujetpt.mujeteta/PtRelKinematicsProdRun2.mujetpt.mujeteta --sigset=MC
+    ./runAnalysis.py --action=plotKinematics --year=CAMPAIGNNAME --tag=System8KinematicsProdRun2.mujetpt.mujeteta/PtRelKinematicsProdRun2.mujetpt.mujeteta
 
 ## Production of templates for PtRel/System8 fits
 
