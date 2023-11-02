@@ -891,7 +891,7 @@ def getMassScanContours(outputFileName):
 
     for contour in outputContours:
         contour.Write()
-        if 'Observed' not in outputFileName:
+        if 'Observed' not in outputFileName and 'Both' not in outputFileName:
             x, y = array( 'd' ), array( 'd' )
             x.append(1.); y.append(1.)
             emptyContour = ROOT.TGraph(1, x, y) 
@@ -1042,10 +1042,10 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
             same = 'same'
             hname = tagObj[iobj].GetName()
             if "down" not in hname and "up" not in hname: 
-                #legend.AddEntry(tagObj[iobj],tags[ntag], 'l')
+                legend.AddEntry(tagObj[iobj],tags[ntag], 'l')
                 #legeflag = '#font[50]{m}_{T2}(#font[12]{ll}) correction applied' if 'WWPol1a' in tags[ntag] else 'No #font[50]{m}_{T2}(#font[12]{ll}) correction applied'
-                legeflag = '#font[50]{m}_{T2}(#font[12]{ll}) correction uncertainties correlated across years' if 'WWcorrYear' in tags[ntag] else '#font[50]{m}_{T2}(#font[12]{ll}) correction uncertainties fully correlated' if 'WWcorr' in tags[ntag] else '#font[50]{m}_{T2}(#font[12]{ll}) correction uncertainties fully uncorrelated'
-                legend.AddEntry(tagObj[iobj],legeflag, 'l')
+                #legeflag = '#font[50]{m}_{T2}(#font[12]{ll}) correction uncertainties correlated across years' if 'WWcorrYear' in tags[ntag] else '#font[50]{m}_{T2}(#font[12]{ll}) correction uncertainties fully correlated' if 'WWcorr' in tags[ntag] else '#font[50]{m}_{T2}(#font[12]{ll}) correction uncertainties fully uncorrelated'
+                #legend.AddEntry(tagObj[iobj],legeflag, 'l')
                 ntag+=1
         legend.Draw()
         #exit()
@@ -1055,7 +1055,7 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
     plotCanvas.Close()
 
 def makeExclusionPlot(year, tag, sigset, limitOptions, fileOption):
-
+    
     inputFileNames = [ getFileName('./Limits/' + year + '/' + tag + '/Histograms', 'massScan_' + tag + '_' + sigset + '_' + fileOption),
                        getFileName('./Limits/' + year + '/' + tag + '/Contours',   'massScan_' + tag + '_' + sigset + '_' + fileOption) ]
 
@@ -1082,12 +1082,12 @@ def makeExclusionPlot(year, tag, sigset, limitOptions, fileOption):
     cfgFile.write('HISTOGRAM '+ inputFileName.replace('//', '/Histograms/') + ' histo_X_' + limitOptions[1].lower() + '\n')
     cfgFile.write('EXPECTED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up graph_r_'+limitType+'_down kRed kOrange\n')
     cfgFile.write('OBSERVED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_observed graph_r_observed_up graph_r_observed_down kBlack kGray\n')
-    cfgFile.write('PRELIMINARY\n')
+    cfgFile.write('PRELIMINARY Preliminary\n')
     cfgFile.write('LUMI ' + str(lumi_i) + '\n')
     cfgFile.write('ENERGY 13\n\n')
 
     cfgFile.close()
-
+    os.system('cat Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg')
     outputDirectory = 'Plots/' + year + '/ExclusionPlots/'
     os.system('mkdir -p ' + outputDirectory)
     os.system('cp Plots/index.php ' + outputDirectory)
