@@ -171,10 +171,6 @@ if 'Templates' in opt.tag:
         systematicVariations.insert(1, 'AwayJetDown')
         systematicVariations.insert(1, 'AwayJetUp')
 
-    if 'JEU' in opt.tag and 'Data' in opt.sigset:
-        print 'No need to run JEU variations on data'
-        exit()
-
 applyBFragmentation = 1
 
 # muon kinematics selection
@@ -214,6 +210,7 @@ goodPV  = 'PV_chi2<100.' # No nPV so far in the trees
 
 # working points
 jetPt   = 'Jet_pT'
+if 'RawPt'   in opt.tag: jetPt = 'Jet_uncorrpt'
 if 'JEUDown' in opt.tag: jetPt = 'jetEnDown'
 elif 'JEUUp' in opt.tag: jetPt = 'jetEnUp'
 goodJetForDisc = '((JETIDX<nJet)*(Alt$('+jetPt+'[JETIDX],0.)>=30.)*(abs(Alt$(Jet_eta[JETIDX],5.))<'+maxJetEta+')*(Alt$(Jet_hadronFlavour[JETIDX],-1)==JETFLV)*(Alt$(Jet_tightID[JETIDX],0)==1))'
@@ -385,7 +382,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
     runPeriods = {}
     if 'Summer22EE' in opt.campaign:
-        runPeriods['Run2022E'] = { 'subdir' : dataName + 'Run2022E-27Jun2023-v1'  }
+        #runPeriods['Run2022E'] = { 'subdir' : dataName + 'Run2022E-27Jun2023-v1'  }
         runPeriods['Run2022F'] = { 'subdir' : dataName + 'Run2022F-PromptReco-v1' }
         runPeriods['Run2022G'] = { 'subdir' : dataName + 'Run2022F-PromptReco-v1' }
     elif 'Summer22' in opt.campaign:

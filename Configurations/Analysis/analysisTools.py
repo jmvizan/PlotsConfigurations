@@ -75,10 +75,16 @@ def bTagPerfShapes(opt, tag, action):
         elif 'sel' in opt.option and sel not in opt.option: continue  
 
         opt2 = copy.deepcopy(opt)
-        opt2.tag = tag+selection
-        if '.' in tag and 'Light' not in tag: opt2.sigset = 'MC'
-        if 'shapes' in action: latinoTools.shapes(opt2)
-        elif 'mergesingle' in action: latinoTools.mergesingle(opt2)
+        opt2.tag = tag.replace(tag.split('.')[0], tag.split('.')[0]+selection)
+
+        sigsets = [ 'MC', 'Data' ] if opt.sigset=='SM' else [ opt.sigset ]
+        for sigset in sigsets:
+
+            opt2.sigset = sigset
+            if sigset=='Data' and '.' in tag and 'Light' not in tag: opt2.tag = opt2.tag.split('.')[0]
+            if sigset=='Data' and 'JEU' in selection: continue
+            if 'shapes' in action: latinoTools.shapes(opt2)
+            elif 'mergesingle' in action: latinoTools.mergesingle(opt2)
 
 def makeShapes(opt):
 
@@ -795,7 +801,7 @@ def ptHatWeights(opt):
         events = ROOT.TChain(opt.treeName)
         for tree in opt.samples[sample]['name']: events.Add(tree.replace('#',''))
             
-        if 'QCDMu_' in sample:
+        if 'uQCDMu_' in sample:
             opt.qcdMuPtHatBins[ptHatBin]['events'] = str(events.GetEntries())
             if not 'xSec' in opt.qcdMuPtHatBins[ptHatBin]: 
                 xSec, fEff = getGeneratorParametersFromMCM('dataset_name=QCD_*'+ptHatBin+'_MuEnrichedPt5_*&prepid=BTV*'+opt.year+'G*')
