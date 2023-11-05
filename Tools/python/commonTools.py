@@ -28,6 +28,12 @@ def isGoodFile(filename, minSize=100000.):
     fileSize = os.path.getsize(filename)
     return fileSize>minSize
 
+def hasString(filename, string):
+
+    with open(filename) as myfile:
+        if string in myfile.read(): return True
+    return False
+
 def compile(opt):
   
     if 'base' in opt.option.lower(): directory = '$CMSSW_BASE/src/' 

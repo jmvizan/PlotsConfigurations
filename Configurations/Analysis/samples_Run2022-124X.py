@@ -390,15 +390,15 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
             runPeriods['Run2022C'] = { 'subdir' : dataName + 'Run2022C-27Jun2023-v2' }
             runPeriods['Run2022D'] = { 'subdir' : dataName + 'Run2022D-27Jun2023-v1' }
         else:
+            runPeriods['Run2022c'] = { 'subdir' : 'JetHT'  + 'Run2022C-27Jun2023-v2' }
             runPeriods['Run2022C'] = { 'subdir' : dataName + 'Run2022C-27Jun2023-v1' }
             runPeriods['Run2022D'] = { 'subdir' : dataName + 'Run2022D-27Jun2023-v2' }
 
     dataTrees = [ ]
     for runPeriod in runPeriods:
   
-        sampleName = ''
         dataDir = '/'.join([ directoryData, runPeriods[runPeriod]['subdir'], '' ]) 
-        dataTrees += getSampleFiles(dataDir,  sampleName, True, treePrefix, skipTreesCheck)
+        dataTrees += getSampleFiles(dataDir,  '', True, treePrefix, skipTreesCheck)
  
     if dataName=='BTagMu': dataName = 'DATA'
     samples[dataName]  = { 'name'      : dataTrees ,
