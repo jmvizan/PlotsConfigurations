@@ -14,6 +14,7 @@ def getCampaignParameters(opt):
     opt.tag = opt.year+opt.tag
 
     samples = {}
+
     if os.path.exists(commonTools.getCfgFileName(opt,'samples')):
         handle = open(commonTools.getCfgFileName(opt,'samples'),'r')
         exec(handle)
@@ -86,8 +87,8 @@ def bTagPerfShapes(opt, tag, action):
             if sigset=='MC' and 'Light' in opt.tag: opt2.batchQueue = 'testmatch'
             if 'shapes' in action: latinoTools.shapes(opt2)
             elif 'mergesingle' in action: latinoTools.mergesingle(opt2)
-            elif 'resubmitShapes' in action: doMissingShapes(opt2, 'resubmit')
-            elif 'recoverShapes' in action: doMissingShapes(opt2, 'recover')
+            elif 'resubmitShapes' in action: latinoTools.remakeMissingShapes(opt2, 'resubmit')
+            elif 'recoverShapes' in action: latinoTools.remakeMissingShapes(opt2, 'recover')
 
 def makeShapes(opt):
 
@@ -108,31 +109,6 @@ def recoverShapes(opt):
 
     for tag in opt.tag.split('-'):
         bTagPerfShapes(opt, tag, 'recoverShapes')
-
-def doMissingShapes(opt, method):
-
-    sampleShapeDir = '/'.join([ opt.shapedir, opt.year, opt.tag, 'AsMuchAsPossible' ])
-
-    for shFile in commonTools.getLogFileList(opt, 'sh'):
-
-        sample = shFile.split('/')[3]
-        if not commonTools.isGoodFile(sampleShapeDir+'/plots_'+opt.year+opt.tag+'_ALL_'+sample+'.root', 0):
-
-            missingShape = False
-            if commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
-            if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'RuntimeError'): missingShape = True          
-            if commonTools.isGoodFile(shFile.replace('.sh','.log'), 0) and commonTools.hasString(shFile.replace('.sh','.log'), 'EXCEED'): missingShape = True
-            if not commonTools.isGoodFile(shFile.replace('.sh','.jid'), 0) and not commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
-
-            if missingShape:
-
-                if method=='resubmit':
-                    for extensionToRemove in [ '.err', '.log', '.out', '.done', '.jid' ]:
-                        if commonTools.isGoodFile(shFile.replace('.sh',extensionToRemove), 0): os.system('rm '+shFile.replace('.sh',extensionToRemove))
-                    os.system('condor_submit '+shFile.replace('.sh','.jds')+' > ' +shFile.replace('.sh','.jid'))            
-  
-                elif method=='recover':
-                    os.system('cd '+commonTools.getLogDir(opt, opt.year, opt.tag)+'/'+sample+'/ ; ./'+shFile.split('/')[-1]+' ; cd - ')
 
 def mergeLightShapes(opt):
 

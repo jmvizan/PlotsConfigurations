@@ -99,6 +99,34 @@ def mergeall(opt):
         for tag in opt.tag.split('-'):
             mkShapesMulti(opt, year, tag, splits, 'mergeall')
 
+def remakeMissingShapes(opt, method='resubmit'):
+
+    sampleShapeDir = '/'.join([ opt.shapedir, opt.year, opt.tag, 'AsMuchAsPossible' ])
+
+    for shFile in commonTools.getLogFileList(opt, 'sh'):
+
+        sample = shFile.split('/')[3]
+        if not commonTools.isGoodFile(sampleShapeDir+'/plots_'+opt.year+opt.tag+'_ALL_'+sample+'.root', 0):
+
+            missingShape = False
+            if commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
+            if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'RuntimeError'): missingShape = True
+            if commonTools.isGoodFile(shFile.replace('.sh','.log'), 0) and commonTools.hasString(shFile.replace('.sh','.log'), 'EXCEED'): missingShape = True
+            if not commonTools.isGoodFile(shFile.replace('.sh','.jid'), 0) and not commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
+
+            if missingShape:
+
+                if method=='resubmit':
+                    for extensionToRemove in [ '.err', '.log', '.out', '.done', '.jid' ]:
+                        if commonTools.isGoodFile(shFile.replace('.sh',extensionToRemove), 0): os.system('rm '+shFile.replace('.sh',extensionToRemove))
+                    makeShapeCommand = 'condor_submit '+shFile.replace('.sh','.jds')+' > ' +shFile.replace('.sh','.jid')
+
+                elif method=='recover':
+                    makeShapeCommand = ' ; '.join([ 'cd '+commonTools.getLogDir(opt, opt.year, opt.tag)+'/'+sample+'/', './'+shFile.split('/')[-1], 'c - '  ])
+
+                if opt.dryRun: print makeShapeCommand
+                else: os.system(makeShapeCommand)
+
 ### Plots
 
 def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraOutDirFlag=''):
