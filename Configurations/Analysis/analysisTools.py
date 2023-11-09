@@ -86,7 +86,9 @@ def bTagPerfShapes(opt, tag, action):
             if sigset=='Data' and 'JEU' in selection: continue
             if sigset=='MC' and 'Light' in opt.tag: opt2.batchQueue = 'testmatch'
             if 'shapes' in action: latinoTools.shapes(opt2)
-            elif 'mergesingle' in action: latinoTools.mergesingle(opt2)
+            elif 'mergesingle' in action: 
+                latinoTools.mergesingle(opt2)
+                if 'Light' in opt2.tag: mergeLightShapes(opt2)
             elif 'resubmitShapes' in action: latinoTools.remakeMissingShapes(opt2, 'resubmit')
             elif 'recoverShapes' in action: latinoTools.remakeMissingShapes(opt2, 'recover')
 
@@ -118,7 +120,7 @@ def mergeLightShapes(opt):
 
     outtag = opt.tag.replace('Light', 'MergedLight')
 
-    samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, opt.year, opt.tag, opt.sigset, 'variables')
+    samples, cuts, variables, nuisances = commonTools.getDictionariesInLoop(opt.configuration, opt.year, opt.tag, opt.sigset, 'nuisances')
 
     for sample in samples:    
 
@@ -135,17 +137,32 @@ def mergeLightShapes(opt):
                 if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
 
                     shapeName = '_'.join([ variableString for variableString in variable.split('_') if not variableString.isdigit() ])
-                    if shapeName not in mergedShapes:
-                        mergedShapes[shapeName] = inputFile.Get('/'.join([ cut, variable, 'histo_'+sample ]))          
+                    if shapeName not in mergedShapes: mergedShapes[shapeName] = {}
+
+                    if 'histo_'+sample not in mergedShapes[shapeName]:
+                        mergedShapes[shapeName]['histo_'+sample] = inputFile.Get('/'.join([ cut, variable, 'histo_'+sample ]))          
                     else:
-                        mergedShapes[shapeName].Add(inputFile.Get('/'.join([ cut, variable, 'histo_'+sample ])))
+                        mergedShapes[shapeName]['histo_'+sample].Add(inputFile.Get('/'.join([ cut, variable, 'histo_'+sample ])))
             
+                    for nuisance in nuisances:
+                        if nuisance!='stat' and nuisances[nuisance]['type']=='shape':
+                            if 'cuts' not in nuisances[nuisance] or cut in nuisances[nuisance]['cuts']:
+                                if sample in nuisances[nuisance]['samples']:
+                                    for variation in [ 'Up', 'Down' ]:
+                                           
+                                        nuisanceHistoName = 'histo_'+sample+'_'+nuisances[nuisance]['name']+variation
+                                        if nuisanceHistoName not in mergedShapes[shapeName]:
+                                            mergedShapes[shapeName][nuisanceHistoName] = inputFile.Get('/'.join([ cut, variable, nuisanceHistoName ]))
+                                        else:
+                                            mergedShapes[shapeName][nuisanceHistoName].Add(inputFile.Get('/'.join([ cut, variable, nuisanceHistoName ])))
+
             for variable in mergedShapes:
                 
                 outputFile.mkdir(cut+'/'+variable)
                 outputFile.cd(cut+'/'+variable)
 
-                mergedShapes[variable].Write('histo_'+sample)
+                for histo in mergedShapes[variable]:
+                    mergedShapes[variable][histo].Write(histo)
 
         inputFile.Close()
         outputFile.Close()
@@ -157,7 +174,91 @@ def shapesForFit(opt):
 
 def ptRelInput(opt):
 
-    print 'Please, write me!'
+    ptRelTemplateFileName = './PtRelTools/Templates/PtRel_TemplatesAll_PS'+opt.year+'_KinEtaAfterPtBinsCentral_LowPtAwayTrgConf_Run2016Production.root'
+    if 'nolight' in opt.option: ptRelTemplateFileName = ptRelTemplateFileName.replace('TemplatesAll', 'Templates')
+
+    ptRelTemplateFile = ROOT.TFile(ptRelTemplateFileName, 'recreate')
+
+    samples, cuts, variables, nuisances = commonTools.getDictionaries(opt)
+
+    for datatype in [ 'MuEnriched', 'Inclusive' ]:
+        if datatype=='Inclusive' and 'nolight' in opt.option: continue
+        for sigset in [ 'MC', 'Data' ]:
+            for selection in opt.Selections:
+
+                sel = 'Central' if selection=='' else selection
+                fromCentral = False
+                if sigset=='Data' and 'JEU' in selection: fromCentral = True
+                if datatype=='Inclusive' and 'AwayJet' in selection: fromCentral = True
+
+                opt2 = copy.deepcopy(opt)
+                if not fromCentral: opt2.tag = opt.tag.replace(opt.tag.split('.')[0], opt.tag.split('.')[0]+selection)
+                if sigset=='Data' and datatype=='MuEnriched': opt2.tag = opt2.tag.split('.')[0]
+                if datatype=='Inclusive': opt2.tag = opt2.tag.replace('Templates','MergedLightTemplates').replace('mujet','lightjet')
+                opt2.sigset = sigset
+
+                samples, cuts, variables = commonTools.getDictionariesInLoop(opt2.configuration, opt2.year, opt2.tag, opt2.sigset, 'variables')            
+          
+                for sample in samples:
+
+                    if datatype=='Inclusive':
+                        if not commonTools.foundSampleShapeFile(opt2.shapedir, opt2.year, opt2.tag, sample) or opt.reset:
+                            opt2.tag = opt2.tag.replace('MergedLight','Light')
+                            mergeLightShapes(opt2) 
+                            opt2.tag = opt2.tag.replace('PtRelLight','PtRelMergedLight')
+
+                    inputTemplateFile = commonTools.openSampleShapeFile(opt2.shapedir, opt2.year, opt2.tag, sample)
+                    ptRelTemplateFile.cd()
+
+                    for cut in cuts:
+                        for variable in variables:
+                            if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
+ 
+                                histoName = '/'.join([ cut, variable, 'histo_' + sample ])
+                                template = inputTemplateFile.Get(histoName)
+
+                                dataset = 'BTagMu' if sample=='DATA' else 'QCDMu' if 'jets' in sample else sample.replace('MET','HT')
+                                tagCondition = 'Tag' if 'Pass' in variable else 'Untag'
+                                templateNameList = [ 'PtRel', dataset, cut.replace('to',''), 'anyEta', sel, variable.split('_')[1], tagCondition ]
+                                if sample=='bjets' or sample=='cjets': templateNameList.append(sample.replace('jets',''))
+                                elif sample=='ljets': templateNameList.append('lg')
+                                elif sample!='DATA': templateNameList.append('trk')
+                                templateName = '_'.join(templateNameList)
+
+                                if datatype=='MuEnriched':
+                                    template.SetName(templateName)
+                                    template.SetTitle(templateName)
+                                    template.Write()
+                          
+                                elif datatype=='Inclusive':
+                                    for btagWP in opt.btagWPs:
+                                        for btagCut in [ '_Tag', '_Untag' ]:
+                                            template.SetName(templateName.replace(variable.split('_')[1]+'_'+tagCondition,btagWP+btagCut))
+                                            template.SetTitle(templateName.replace(variable.split('_')[1]+'_'+tagCondition,btagWP+btagCut))
+                                            template.Write()
+
+                                if selection=='':
+                                    for nuisance in nuisances:
+                                        if nuisance!='stat' and nuisances[nuisance]['type']=='shape':
+                                            if 'cuts' not in nuisances[nuisance] or cut in nuisances[nuisance]['cuts']:
+                                                for variation in [ 'Up', 'Down' ]:
+
+                                                    if sample in nuisances[nuisance]['samples']:
+                                                        templateNuisance = inputTemplateFile.Get(histoName + '_' + nuisances[nuisance]['name'] + variation)
+                                                    else: templateNuisance = inputTemplateFile.Get(histoName)
+                                                    templateNuisanceName = templateName.replace('Central',nuisances[nuisance]['name'] + variation)
+
+                                                    if datatype=='MuEnriched':
+                                                        templateNuisance.SetName(templateNuisanceName)
+                                                        templateNuisance.SetTitle(templateNuisanceName)
+                                                        templateNuisance.Write()
+
+                                                    elif datatype=='Inclusive':
+                                                        for btagWP in opt.btagWPs:
+                                                            for btagCut in [ '_Tag', '_Untag' ]:
+                                                                templateNuisance.SetName(templateNuisanceName.replace(variable.split('_')[1]+'_'+tagCondition,btagWP+btagCut))
+                                                                templateNuisance.SetTitle(templateNuisanceName.replace(variable.split('_')[1]+'_'+tagCondition,btagWP+btagCut))
+                                                                templateNuisance.Write()
 
 def system8Input(opt):
 
@@ -213,6 +314,9 @@ def system8Input(opt):
                                         
                                         cutList = copy.deepcopy(selectionList)
                                         cutList.insert(0, ptbin)
+                                        cutName = '_'.join(cutList)
+                                        motherHisto = motherFile.Get('/'.join([ cutName, 'ptrel', 'histo_'+sample ]))
+
                                         cutName = '_'.join(cutList)
                                         motherHisto = motherFile.Get('/'.join([ cutName, 'ptrel', 'histo_'+sample ]))
 
@@ -372,7 +476,8 @@ def frameworkValidation(opt):
 def plotKinematics(opt):
 
     if not commonTools.foundShapeFiles(opt, True, False):
-        os.system('cp '+commonTools.getSampleShapeFileName(opt.shapedir, opt.year, opt.tag.split('.')[0], 'DATA')+' '+commonTools.getSampleShapeFileName(opt.shapedir, opt.year, opt.tag, 'DATA'))
+        if '.' in opt.tag:
+            os.system('cp '+commonTools.getSampleShapeFileName(opt.shapedir, opt.year, opt.tag.split('.')[0], 'DATA')+' '+commonTools.getSampleShapeFileName(opt.shapedir, opt.year, opt.tag, 'DATA'))
         latinoTools.mergeall(opt) 
 
     latinoTools.plots(opt)
