@@ -181,7 +181,7 @@ void BFragmentationWeightsReader::setValues() {
       bFragmentationWeight = 1.; // Jusr for safety. It will not be used!
     } else if (muJetIsB==1) {
 
-      double bFragmentationWeight = -1.;
+      bFragmentationWeight = -1.;
       if (bfsyst==0) bFragmentationWeight = this->GetBFragWeight(bFragmentationWeightsDownHisto, xB, genJetPt);
       if (bfsyst==1) bFragmentationWeight = this->GetBFragWeight(bFragmentationWeightsHisto,     xB, genJetPt);
       if (bfsyst==2) bFragmentationWeight = this->GetBFragWeight(bFragmentationWeightsUpHisto,   xB, genJetPt);
