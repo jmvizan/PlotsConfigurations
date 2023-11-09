@@ -124,6 +124,7 @@ def remakeMissingShapes(opt, method='resubmit'):
                 elif method=='recover':
                     makeShapeCommand = ' ; '.join([ 'cd '+commonTools.getLogDir(opt, opt.year, opt.tag)+'/'+sample+'/', './'+shFile.split('/')[-1], 'c - '  ])
 
+                print '  Remaking missing shape for', opt.year, opt.tag, sample
                 if opt.dryRun: print makeShapeCommand
                 else: os.system(makeShapeCommand)
 
