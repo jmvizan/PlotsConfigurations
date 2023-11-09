@@ -53,15 +53,17 @@ SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
 if 'cern' in SITE:
-    treeBaseDirMC   = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12/'
-    treeBaseDirData = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12/'
+    treeBaseDirMC   = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12'
+    treeBaseDirData = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12'
+    if 'modJECF' in opt.tag: treeBaseDirData += '_modJECF'
 else: print 'trees for', campaign, 'campaign available only at cern'
 
 ProductionMC   = opt.campaign
 ProductionData = opt.campaign
   
-directoryBkg  = treeBaseDirMC   + ProductionMC   + '/' 
-directoryData = treeBaseDirData + ProductionData + '/'
+directoryBkg  = '/'.join([ treeBaseDirMC,   ProductionMC  , '' ])
+directoryData = '/'.join([ treeBaseDirData, ProductionData, '' ])
+if 'modJECF' in opt.tag: directoryData = '/'.join([ treeBaseDirData, '' ])
 
 ### Campaign parameters
 
@@ -393,6 +395,8 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
             runPeriods['Run2022c'] = { 'subdir' : 'JetHT'  + 'Run2022C-27Jun2023-v2' }
             runPeriods['Run2022C'] = { 'subdir' : dataName + 'Run2022C-27Jun2023-v1' }
             runPeriods['Run2022D'] = { 'subdir' : dataName + 'Run2022D-27Jun2023-v2' }
+        if 'RunC' in opt.tag: del runPeriods['Run2022D']
+        if 'RunD' in opt.tag: del runPeriods['Run2022C']
 
     dataTrees = [ ]
     for runPeriod in runPeriods:
