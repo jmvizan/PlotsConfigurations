@@ -54,17 +54,42 @@ if 'Templates' in opt.tag:
         if 'ljets' in samples:
 
             # light to charm ratio
-            nuisances['lightCharmRatio'] = { 'name'  : 'lightCharmRatio',
-                                             'samples'  : { 'ljets' : '1.3' },
-                                             'type'  : 'lnN'
-                                            }
+            if 'ForFit' not in opt.tag:
+
+                nuisances['lightCharmRatio'] = { 'name'  : 'lightCharmRatio',
+                                                 'samples'  : { 'ljets' : '1.3', },
+                                                 'type'  : 'lnN'
+                                                }
+
+            elif '2D' in opt.tag: 
+
+                nuisances['lightCharmRatio'] = { 'name'  : 'lightCharmRatio',
+                                                 'samples'  : { 'ljets' : [ '1.', '1.' ] },
+                                                 'type'  : 'shape',
+                                                 'kind'  : 'weight'
+                                                }
 
         # rate parameters
-        if hasattr(opt, 'outputDirDatacard'):
+        if 'ForFit' in opt.tag:
+
+            if  'Central' in opt.tag and '_nojeu' not in opt.tag:
+
+                # JEU
+                nuisances['JEU']  = { 'name'  : 'JEU',
+                                      'samples'  : { },
+                                      'kind'  : 'weight',
+                                      'type'  : 'shape'
+                                     }
+
+                for sample in samples.keys():
+                    if not samples[sample]['isDATA']:
+                        nuisances['JEU']['samples'][sample] = [ 1., 1. ]
 
             for cut in cuts:
                 for sample in samples:
                     if not samples[sample]['isDATA']:
+
+                        if sample=='bjets' and '_nobRP' in opt.tag: continue
 
                         nuisances[sample+'_'+cut]  = { 'name'    : sample+'_'+cut,
                                                        'type'    : 'rateParam',
@@ -72,7 +97,7 @@ if 'Templates' in opt.tag:
                                                        'cuts'    : [ cut ]
                                                       }
 
-                        if 'AwayJet' not in cut or 'Pass' in cut or not samples[sample]['isSignal'] or '_NoAwayJetBond' in opt.tag:
+                        if 'AwayJet888' not in cut or 'Pass' in cut or not samples[sample]['isSignal'] or '_NoAwayJetBond' in opt.tag:
    
                             nuisances[sample+'_'+cut]['limits'] = '[0.01,20]'
 

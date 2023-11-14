@@ -94,19 +94,29 @@ elif opt.method+'Templates' in opt.tag:
 
     if opt.method=='PtRel':
 
-        for btagwp in bTagWorkingPoints:
-            for btagselection in [ 'Pass', 'Fail' ]:
+        if 'ForFit' in opt.tag:
 
-                variableName = '_'.join([ 'ptrel', btagwp, btagselection ])
-                discCut  = 'Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'['+muJetIdx+']>='+bTagWorkingPoints[btagwp]['cut']
-                if btagselection=='Fail': discCut = discCut.replace('>=', '<')
+            variables['ptrel'] = { 'name'  : muPtRel,
+                                   'range' : ptrelRange,
+                                   'xaxis' : '#mu-jet '+ptrel+gv,
+                                   'fold'  : overflow
+                                  }
 
-                variables[variableName] = { 'name'  : muPtRel,
-                                            'range' : ptrelRange,
-                                            'xaxis' : '#mu-jet '+ptrel+gv,
-                                            'weight': discCut,
-                                            'fold'  : overflow
-                                           }
+        else:
+
+            for btagwp in bTagWorkingPoints:
+                for btagselection in [ 'Pass', 'Fail' ]:
+
+                    variableName = '_'.join([ 'ptrel', btagwp, btagselection ])
+                    discCut  = 'Jet_'+bTagWorkingPoints[btagwp]['discriminant']+'['+muJetIdx+']>='+bTagWorkingPoints[btagwp]['cut']
+                    if btagselection=='Fail': discCut = discCut.replace('>=', '<')
+
+                    variables[variableName] = { 'name'  : muPtRel,
+                                                'range' : ptrelRange,
+                                                'xaxis' : '#mu-jet '+ptrel+gv,
+                                                'weight': discCut,
+                                                'fold'  : overflow
+                                               }
 
     elif opt.method=='System8':
 

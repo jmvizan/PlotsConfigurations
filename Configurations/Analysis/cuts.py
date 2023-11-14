@@ -96,6 +96,16 @@ if 'WorkingPoints' in opt.tag:
 
     cuts['QCD'] = { 'expr' : goodPV } 
 
+elif 'PtRelTemplates' in opt.tag and 'ForFit' in opt.tag:
+
+    for ptbin in jetPtBins:
+        for btagwp in bTagWorkingPoints:
+            for btagselection in [ 'Pass', 'Fail' ]:
+                for selection in systematicVariations:
+                    if 'JEU' not in selection:
+                        cutNameList = [ ptbin, btagwp, btagselection ] if selection=='' else [ ptbin, btagwp, btagselection, selection ]
+                        cuts['_'.join(cutNameList)] = { 'expr' : goodPV }
+
 else:
 
     for ptbin in jetPtBins:
