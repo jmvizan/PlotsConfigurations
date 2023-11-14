@@ -111,6 +111,7 @@ def remakeMissingShapes(opt, method='resubmit'):
             missingShape = False
             if commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'RuntimeError'): missingShape = True
+            if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'ImportError'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.log'), 0) and commonTools.hasString(shFile.replace('.sh','.log'), 'EXCEED'): missingShape = True
             if not commonTools.isGoodFile(shFile.replace('.sh','.jid'), 0) and not commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
 
@@ -139,7 +140,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     if fitoption=='':
         fileset = opt.fileset
         sample = '' if (sigset=='SM' or sigset=='') else sigset.split(':')[-1]+extraOutDirFlag
-        plotsDirList.extend([ tag, sample ])
+        plotsDirList.extend([ tag.split('___')[0].replace('__','/'), sample ])
         lumiYear = year
 
     else:
