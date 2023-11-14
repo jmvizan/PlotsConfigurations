@@ -34,6 +34,9 @@ isShape = hasattr(opt, 'doHadd')
 isFillShape = isShape and not opt.doHadd
 opt.isShape = isShape
 
+bIsSignal = opt.method=='PtRel' and not isPlot
+if hasattr(opt, 'action') and opt.action=='plotNuisances': bIsSignal = False
+
 if isFillShape and 'MergedLight' in opt.tag:
     print 'Cannot fill shapes for', opt.tag, 'directly from trees'
     exit()
@@ -71,6 +74,8 @@ if 'modJECF' in opt.tag: directoryData = '/'.join([ treeBaseDirData, '' ])
 minJetPt  =   20.
 maxJetPt  = 1400.
 maxJetEta = '2.5'
+minPlotPt =   20.
+maxPlotPt = 1000.
 
 campaignRunPeriod = { 'year' : '2022' }
 campaignRunPeriod['period']    = '2022EFG' if 'Summer22EE' in opt.campaign else '2022CD'
@@ -155,9 +160,9 @@ if 'JetPt' in opt.tag:
     ptBinToRemove = []
     for ptbin in jetPtBins:
         if 'JetPtVeto' in opt.tag:
-           if ptbin in opt.tag.split('JetPtVeto')[1].split('_')[0]:
+           if ptbin in 'Pt'+opt.tag.split('JetPtVeto')[1].split('_')[0]:
                ptBinToRemove.append(ptbin)
-        elif ptbin not in opt.tag.split('JetPt')[1].split('_')[0]:
+        elif ptbin not in 'Pt'+opt.tag.split('JetPt')[1].split('_')[0]:
            ptBinToRemove.append(ptbin)
     for ptbin in ptBinToRemove:
         del jetPtBins[ptbin]
@@ -168,12 +173,30 @@ systematicVariations = [ '' ]
 
 if 'Templates' in opt.tag:
     systematicVariations.extend([ 'MuPtUp', 'MuPtDown', 'MuDRUp', 'MuDRDown' ])
-    if 'Validation' not in opt.tag and ('SM' in opt.sigset or 'MC' in opt.sigset): systematicVariations.extend([ 'JEUUp', 'JEUDown' ])
+    if 'Validation' not in opt.tag and ('SM' in opt.sigset or 'MC' in opt.sigset) and 'ForFit' not in opt.tag: systematicVariations.extend([ 'JEUUp', 'JEUDown' ])
     if 'Light' not in opt.tag:
         systematicVariations.insert(1, 'AwayJetDown')
         systematicVariations.insert(1, 'AwayJetUp')
 
+if '_sel' in opt.tag:
+    selectionToRemove = []
+    for tagoption in opt.tag.split('_'):
+        if 'sel' in tagoption:
+            for selection in systematicVariations:
+               sel = 'Central' if selection=='' else selection
+               if 'veto' in tagoption:
+                   if sel in tagoption: selectionToRemove.append(selection)
+               elif sel not in tagoption: selectionToRemove.append(selection)
+    for selection in selectionToRemove:
+        systematicVariations.remove(selection)
+
 applyBFragmentation = 1
+
+# Template corrections
+
+templateTreatments = [ 'corr', 'nuis', 'syst' ]
+bTemplateCorrector = {}
+for btagWP in bTagWorkingPoints: bTemplateCorrector[btagWP] = 'ParTT' if 'DeepJet' in btagWP else 'DeepJetT'
 
 # muon kinematics selection
   
@@ -350,9 +373,9 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
             samples['QCDMu'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight               , 'isSignal' : 0 }
 
         elif opt.method+'Templates' in opt.tag:
-            samples['bjets'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetFromB, 'isSignal' : 1 }
+            samples['bjets'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetFromB, 'isSignal' : bIsSignal }
             if 'PtRel' in opt.method:
-                samples['cjets'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetFromC, 'isSignal' : 0 }
+                if '2D' not in opt.tag: samples['cjets'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetFromC, 'isSignal' : 0 }
                 samples['ljets'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetFromL, 'isSignal' : 0 }
             elif 'System8' in opt.method:
                 samples['light'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetNotFromB, 'isSignal' : 0 }
@@ -374,7 +397,6 @@ for sample in samples:
     samples[sample]['suppressZeroTreeNuisances'] = ['all']
     samples[sample]['split'] = 'AsMuchAsPossible'
     samples[sample]['JobsPerSample'] = 20*nPtHatBins if 'Light' in opt.tag else 8*nPtHatBins
-    if isPlot or opt.method!='PtRel': samples[sample]['isSignal']  = 0
 
 ### Data
 

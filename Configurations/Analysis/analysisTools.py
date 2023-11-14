@@ -22,9 +22,19 @@ def getCampaignParameters(opt):
 
     opt.tag = origTag
     if opt.year=='test': opt.year = opt.campaign
+    opt.minPlotPt = minPlotPt
+    opt.maxPlotPt = maxPlotPt
     opt.btagWPs = bTagWorkingPoints.keys()
     opt.ptBins = jetPtBins.keys()
-    opt.Selections = systematicVariations
+    opt.Selections = []
+    for selection in systematicVariations:
+        sel = 'Central' if selection=='' else selection
+        if 'vetosel' in opt.option:
+            if sel in opt.option: continue
+        elif 'sel' in opt.option and sel not in opt.option: continue
+        opt.Selections.append(selection)
+    opt.templateTreatments = templateTreatments
+    opt.bTemplateCorrector = bTemplateCorrector
 
     if opt.action=='ptHatWeights':
         opt.samples = samples
@@ -50,6 +60,7 @@ def setAnalysisDefaults(opt):
 
     opt.baseDir = os.getenv('PWD') 
     opt.treeName = 'btagana/ttree'
+    opt.unblind = True
 
     opt.dataConditionScript = '../../../LatinoAnalysis/NanoGardener/python/data/dataTakingConditionsAnalyzer.py'
     opt.combineLocation = '/afs/cern.ch/work/s/scodella/SUSY/CMSSW_10_2_14/src' 
@@ -71,9 +82,6 @@ def bTagPerfShapes(opt, tag, action):
     for selection in opt.Selections:
 
         sel = 'Central' if selection=='' else selection
-        if 'vetosel' in opt.option:
-            if sel in opt.option: continue
-        elif 'sel' in opt.option and sel not in opt.option: continue  
 
         opt2 = copy.deepcopy(opt)
         opt2.tag = tag.replace(tag.split('.')[0], tag.split('.')[0]+selection)
@@ -84,7 +92,7 @@ def bTagPerfShapes(opt, tag, action):
             opt2.sigset = sigset
             if sigset=='Data' and '.' in tag and 'Light' not in tag: opt2.tag = opt2.tag.split('.')[0]
             if sigset=='Data' and 'JEU' in selection: continue
-            if sigset=='MC' and 'Light' in opt.tag: opt2.batchQueue = 'testmatch'
+            if 'MC' in sigset and 'Light' in opt.tag: opt2.batchQueue = 'testmatch'
             if 'shapes' in action: latinoTools.shapes(opt2)
             elif 'mergesingle' in action: 
                 latinoTools.mergesingle(opt2)
@@ -174,10 +182,269 @@ def shapesForFit(opt):
 
 def ptRelInput(opt):
 
+    if 'ptreltools' in opt.option.lower(): 
+        ptRelInputForPtRelTools(opt)
+        return
+
+    doBCorrections, doLCorrections = False, False
+    templateTreatmentDict = {}
+    templateTreatmentFlag = ''
+
+    for treatment in opt.templateTreatments:
+        option = opt.option.lower()
+        if treatment in option:
+
+            templateTreatmentDict[treatment] = []
+            templateTreatmentFlag += treatment.capitalize()
+
+            samplesForTreatment = option.split(treatment)[-1]
+            for othertreatment in opt.templateTreatments: samplesForTreatment = samplesForTreatment.split(othertreatment)[0]
+
+            for sample in [ 'ljets', 'bjets' ]:
+               if sample.replace('jets','') in samplesForTreatment: 
+                   templateTreatmentDict[treatment].append(sample)
+                   templateTreatmentFlag += sample.replace('jets','').upper()
+                   if sample=='ljets': doLCorrections = True
+                   if sample=='bjets': doBCorrections = True
+
+            if len(templateTreatmentDict[treatment])==0: 
+                print 'Error: no sample found for template treatment', treatment
+                exit()
+
+    if opt.verbose: 
+        print 'Preparing fit templates with templateTreatmentFlag =', templateTreatmentFlag
+        print 'Reading templates'
+
+    outputTemplates = {}
+
+    for datatype in [ 'MuEnriched', 'Inclusive' ]:
+        if datatype=='Inclusive' and not doLCorrections: continue
+        for sigset in [ 'MC', 'Data' ]:
+            for selection in opt.Selections:
+
+                sel = 'Central' if selection=='' else selection
+                if sigset=='Data' and 'JEU' in selection: continue
+                if datatype=='Inclusive' and 'AwayJet' in selection: continue
+
+                opt2 = copy.deepcopy(opt)
+                opt2.tag = opt.tag.replace(opt.tag.split('.')[0], opt.tag.split('.')[0]+selection)
+                if sigset=='Data' and datatype=='MuEnriched': opt2.tag = opt2.tag.split('.')[0]
+                if datatype=='Inclusive': opt2.tag = opt2.tag.replace('Templates','MergedLightTemplates').replace('mujet','lightjet')
+                opt2.sigset = sigset
+
+                samples, cuts, variables, nuisances = commonTools.getDictionaries(opt2)
+
+                for sample in samples:
+
+                    if opt.verbose: print '     selection', sel, ' and sample', sample
+
+                    if datatype=='Inclusive':
+                        if not commonTools.foundSampleShapeFile(opt2.shapedir, opt2.year, opt2.tag, sample) or opt.reset:
+                            opt2.tag = opt2.tag.replace('MergedLight','Light')
+                            mergeLightShapes(opt2)
+                            opt2.tag = opt2.tag.replace('PtRelLight','PtRelMergedLight')
+
+                    inputTemplateFile = commonTools.openSampleShapeFile(opt2.shapedir, opt2.year, opt2.tag, sample)
+
+                    for ptBin in opt.ptBins:
+                        for btagWP in opt.btagWPs:
+                            for btagCut in [ 'Pass', 'Fail' ]:
+
+                                cutName = '_'.join([ ptBin, btagWP, btagCut ]) if selection=='' or 'JEU' in selection else '_'.join([ ptBin, btagWP, btagCut, selection ])
+                                if cutName not in outputTemplates: outputTemplates[cutName] = {}
+
+                                variable = '_'.join([ 'ptrel', btagWP, btagCut ]) if datatype!='Inclusive' else '_'.join([ 'ptrel', ptBin ])
+                                histoName = '/'.join([ ptBin, variable, 'histo_' + sample ])
+                                template = copy.deepcopy(inputTemplateFile.Get(histoName))
+
+                                if 'JEU' in selection:
+                                    template.SetName('_'.join([ 'histo', sample, selection]))
+                                    template.SetTitle('_'.join([ 'histo', sample, selection]))
+                                else:
+                                    sampleToSave = sample.replace('MET','').replace('HT','')
+                                    template.SetName('_'.join([ 'histo', sampleToSave ]))
+                                    template.SetTitle('_'.join([ 'histo', sampleToSave ]))
+                                outputTemplates[cutName][template.GetName().split('/')[-1]] = template
+
+                                if 'JEU' not in selection:
+                                    for nuisance in nuisances:
+                                        if nuisance!='stat' and nuisances[nuisance]['type']=='shape':
+                                            if 'cuts' not in nuisances[nuisance] or ptBin in nuisances[nuisance]['cuts']:
+                                                if sample in nuisances[nuisance]['samples']:
+                                                    for variation in [ 'Up', 'Down' ]:
+
+                                                        templateNuisance = copy.deepcopy(inputTemplateFile.Get(histoName + '_' + nuisances[nuisance]['name'] + variation))
+                                                        outputTemplates[cutName][templateNuisance.GetName().split('/')[-1]] = templateNuisance
+
+                                        elif nuisance!='stat' and nuisances[nuisance]['type']=='lnN':
+                                            if '2D' in opt.option and ('ljets' in nuisances[nuisance]['samples'] or 'cjets' in nuisances[nuisance]['samples']):
+                                                if sample=='ljets' or sample=='cjets':
+                                                    for variation in [ 'Up', 'Down' ]:
+
+                                                        centralTemplate = copy.deepcopy(inputTemplateFile.Get(histoName))
+                                                        if sample in nuisances[nuisance]['samples']:
+                                                            if variation=='Up': centralTemplate.Scale(float(nuisances[nuisance]['samples'][sample]))
+                                                            else: centralTemplate.Scale(2.-float(nuisances[nuisance]['samples'][sample]))
+                                                        centralTemplate.SetName('_'.join([ 'histo', sample, nuisances[nuisance]['name']+variation]))
+                                                        centralTemplate.SetTitle('_'.join([ 'histo', sample, nuisances[nuisance]['name']+variation]))
+                                                        outputTemplates[cutName][centralTemplate.GetName().split('/')[-1]] = centralTemplate
+
+    if opt.verbose: print 'Normalizing templates'
+
+    cutNameList = outputTemplates.keys()
+
+    for cutName in cutNameList:
+        
+        errorDataYields = ROOT.double()
+        dataYields = outputTemplates[cutName]['histo_DATA'].IntegralAndError(-1,-1,errorDataYields) 
+        dataPS = pow(dataYields/errorDataYields, 2)/dataYields
+
+        if doLCorrections:
+            jetCutName = cutName if 'histo_Jet' in outputTemplates[cutName] else '_'.join([ cutName.split('_')[x] for x in range(3) ])
+            errorJetYields = ROOT.double()
+            jetYields = outputTemplates[jetCutName]['histo_Jet'].IntegralAndError(-1,-1,errorJetYields)
+            jetPS = pow(jetYields/errorJetYields, 2)/jetYields
+
+        for template in outputTemplates[cutName]:
+            if 'histo_Jet' in template: 
+                outputTemplates[cutName][template].Scale(jetPS)
+            elif 'histo_QCD' in template:
+                qcdYields = outputTemplates[cutName][template].Integral(-1,-1)
+                outputTemplates[cutName][template].Scale(jetPS*jetYields/qcdYields)
+            else:
+                outputTemplates[cutName][template].Scale(dataPS)
+
+    if opt.verbose: print 'Computing corrections'
+
+    for cutName in cutNameList:
+
+        if doLCorrections: 
+            outputTemplates[cutName+'_CorrL'] = {}
+            jetCutName = cutName if 'histo_Jet' in outputTemplates[cutName] else '_'.join([ cutName.split('_')[x] for x in range(3) ])
+            qcdCutName = cutName if 'histo_QCD' in outputTemplates[cutName] else '_'.join([ cutName.split('_')[x] for x in range(3) ])
+            jetHisto = copy.deepcopy(outputTemplates[jetCutName]['histo_Jet'])
+            for template in outputTemplates[cutName].keys():
+                if 'histo_ljets' in template:
+
+                    correctedHisto = copy.deepcopy(outputTemplates[cutName][template])
+
+                    if template.replace('_ljets','_QCD') in outputTemplates[qcdCutName]:
+                        qcdHisto = copy.deepcopy(outputTemplates[qcdCutName][template.replace('_ljets','_QCD')])
+                    else: qcdHisto = copy.deepcopy(outputTemplates[qcdCutName]['histo_QCD'])
+
+                    correctedHisto.Multiply(jetHisto)
+                    correctedHisto.Divide(qcdHisto)   
+                    outputTemplates[cutName+'_CorrL'][template] = correctedHisto
+
+        if doBCorrections:
+            outputTemplates[cutName+'_CorrB'] = {}
+            cutNameCorrector = cutName.replace(cutName.split('_')[1],opt.bTemplateCorrector[cutName.split('_')[1]])
+            dataHisto = copy.deepcopy(outputTemplates[cutNameCorrector]['histo_DATA'])
+            dataYields = dataHisto.Integral(-1,-1)
+            for template in outputTemplates[cutName].keys():
+                if 'histo_bjets' in template:
+
+                    correctedHisto = copy.deepcopy(outputTemplates[cutName][template])
+
+                    bHisto = copy.deepcopy(outputTemplates[cutNameCorrector][template])
+
+                    if template.replace('_bjets','_cjets') in outputTemplates[cutNameCorrector]:
+                        cHisto = copy.deepcopy(outputTemplates[cutNameCorrector][template.replace('_bjets','_cjets')])
+                    else: cHisto = copy.deepcopy(outputTemplates[cutNameCorrector]['histo_cjets'])
+ 
+                    if template.replace('_bjets','_ljets') in outputTemplates[cutNameCorrector]:
+                        lHisto = copy.deepcopy(outputTemplates[cutNameCorrector][template.replace('_bjets','_ljets')])
+                    else: lHisto = copy.deepcopy(outputTemplates[cutNameCorrector]['histo_ljets'])
+                   
+                    mcYields = bHisto.Integral(-1,-1) + cHisto.Integral(-1,-1) + lHisto.Integral(-1,-1)
+                    bHisto.Scale(dataYields/mcYields); cHisto.Scale(dataYields/mcYields); lHisto.Scale(dataYields/mcYields);
+                    dataHisto.Add(cHisto,-1); dataHisto.Add(lHisto,-1);
+
+                    correctedHisto.Multiply(dataHisto)
+                    correctedHisto.Divide(bHisto)
+                    outputTemplates[cutName+'_CorrB'][template] = correctedHisto
+
+        if '2D' in opt.option:
+            for template in outputTemplates[cutName].keys():
+                if 'ljets' in template:
+                    outputTemplates[cutName][template].Add(outputTemplates[cutName][template.replace('ljets','cjets')])
+                    if doLCorrections: outputTemplates[cutName+'_CorrL'][template].Add(outputTemplates[cutName][template.replace('ljets','cjets')])
+
+    if opt.verbose: print 'Saving templates', cutName
+
+    outtag = opt.tag.replace(opt.tag.split('.')[0], opt.tag.split('.')[0]+'ForFit')
+    if '2D' in opt.option: outtag = outtag.replace('Templates', 'Templates2D')
+    outtag = outtag.replace('Templates', 'Templates'+templateTreatmentFlag)
+    ptRelTemplateFile = commonTools.openShapeFile(opt.shapedir, opt.year, outtag, opt.sigset, opt.fileset, 'recreate')
+
+    for cutName in cutNameList:
+
+        if opt.verbose: print '     Saving templates for cut', cutName, '\n'
+
+        ptRelTemplateFile.mkdir(cutName)
+        ptRelTemplateFile.mkdir(cutName+'/ptrel')
+        ptRelTemplateFile.cd(cutName+'/ptrel')
+
+        sampleCutName = { 'DATA' : '' }
+        if '2D' not in opt.option: sampleCutName['cjets'] = ''
+        sampleCutName['ljets'] = '_CorrL' if 'corr' in templateTreatmentDict and 'ljets' in templateTreatmentDict['corr'] else ''
+        sampleCutName['bjets'] = '_CorrB' if 'corr' in templateTreatmentDict and 'bjets' in templateTreatmentDict['corr'] else ''
+
+        for template in outputTemplates[cutName].keys():
+            sample = template.split('_')[1]
+            if sample in sampleCutName:
+                if opt.verbose: print '        ', cutName, sample, sampleCutName[sample], template
+                outputTemplates[cutName+sampleCutName[sample]][template].Write()
+
+        if 'nuis' in templateTreatmentDict:
+            for nuisSample in templateTreatmentDict['nuis']:
+
+                correctionFlag = '_Corr'+nuisSample.replace('jets','').upper()
+                nominalHisto = copy.deepcopy(outputTemplates[cutName]['histo_'+nuisSample])
+                correctedHisto = copy.deepcopy(outputTemplates[cutName+correctionFlag]['histo_'+nuisSample])
+
+                if sampleCutName[nuisSample]=='':
+                    nominalHisto.SetName('histo_'+nuisSample+correctionFlag+'Down')
+                    nominalHisto.SetTitle('histo_'+nuisSample+correctionFlag+'Down')
+                    correctedHisto.SetName('histo_'+nuisSample+correctionFlag+'Up')
+                    correctedHisto.SetTitle('histo_'+nuisSample+correctionFlag+'Up')
+                else:
+                    nominalHisto.SetName('histo_'+nuisSample+correctionFlag+'Up')
+                    nominalHisto.SetTitle('histo_'+nuisSample+correctionFlag+'Up')
+                    correctedHisto.SetName('histo_'+nuisSample+correctionFlag+'Down')
+                    correctedHisto.SetTitle('histo_'+nuisSample+correctionFlag+'Down')
+
+                if opt.verbose: print '        ', cutName, nuisSample, correctionFlag, nominalHisto.GetName(), correctedHisto.GetName()
+                nominalHisto.Write()
+                correctedHisto.Write()
+
+        if opt.verbose: print '\n'
+
+        if 'syst' in templateTreatmentDict and len(cutName.split('_'))==3:
+            for systSample in templateTreatmentDict['syst']:
+            
+                systCutName = cutName+'_Syst'+systSample.replace('jets','').upper()
+                ptRelTemplateFile.mkdir(systCutName)
+                ptRelTemplateFile.mkdir(systCutName+'/ptrel')
+                ptRelTemplateFile.cd(systCutName+'/ptrel')
+
+                sampleSystCutName = copy.deepcopy(sampleCutName)
+                sampleSystCutName[systSample] = '_Corr'+systSample.replace('jets','').upper() if sampleCutName[systSample]=='' else ''
+
+                for template in outputTemplates[cutName].keys():
+                    sample = template.split('_')[1]
+                    if sample in sampleSystCutName:
+                        if opt.verbose: print '        ', systCutName, sample, sampleSystCutName[sample], template
+                        outputTemplates[cutName+sampleSystCutName[sample]][template].Write()
+
+        if opt.verbose: print '\n\n'
+
+def ptRelInputForPtRelTools(opt):
+
     ptRelTemplateFileName = './PtRelTools/Templates/PtRel_TemplatesAll_PS'+opt.year+'_KinEtaAfterPtBinsCentral_LowPtAwayTrgConf_Run2016Production.root'
     if 'nolight' in opt.option: ptRelTemplateFileName = ptRelTemplateFileName.replace('TemplatesAll', 'Templates')
 
-    ptRelTemplateFile = ROOT.TFile(ptRelTemplateFileName, 'recreate')
+    ptRelTemplateFile = commonTools.openRootFile(ptRelTemplateFileName, 'recreate')
 
     samples, cuts, variables, nuisances = commonTools.getDictionaries(opt)
 
@@ -482,40 +749,34 @@ def plotKinematics(opt):
 
     latinoTools.plots(opt)
 
+def plotTemplates(opt):
+
+    bTagPerfAnalysis(opt, 'prefitplots')
+
 ### Fits and postfit plots
 
 def bTagPerfAnalysis(opt, action):
 
-    rawTag = opt.tag.split('__')[0]
+    for selection in opt.Selections:
+        sel = 'Central' if selection=='' else selection
+        for btagWP in opt.btagWPs:
+            for ptbin in opt.ptBins:
 
-    for btagWP in opt.btagWPs:
-        for ptbin in opt.ptBins:
+                opt2 = copy.deepcopy(opt)
+                opt2.tag = '_'.join([ opt.tag.split('__')[0], '_btag'+btagWP, '___Jet'+ptbin, '___sel'+sel ])
 
-            opt.tag = '_'.join([ rawTag, '_btag'+btagWP, '___'+ptbin ])
-
-            if action=='datacards':
-                combineTools.writeDatacards(opt)
-
-            elif action=='ptrelfit': 
-                combineTools.mlfits(opt)
-
-            elif action=='system8fit':
-                runSystem8Fit(opt)
-
-            elif action=='getsystem8results':
-                 getSystem8FitResults(opt)
-
-            elif 'Results' in opt.tag:
-                getPtRelFitResults(opt)
-
-            elif commonTools.goodCombineFit(opt, opt.year, opt.tag, '', 'PostFitS'):
-             
-                if action=='postfitshapes':  latinoTools.postFitShapes(opt) 
-                elif action=='postfitplots': latinoTools.postFitPlots(opt)
-                elif action=='getptrelresults': getPtRelFitResults(opt)
-
-            elif action=='checkfit':
-                print 'Failed fit for campaign='+opt.year+', WP='+btagWP+', bin='+ptbin
+                if action=='prefitplots': latinoTools.plots(opt2)
+                elif action=='datacards': combineTools.writeDatacards(opt2)
+                elif action=='ptrelfit': combineTools.mlfits(opt2)
+                elif action=='system8fit': runSystem8Fit(opt2)
+                elif action=='getsystem8results': getSystem8FitResults(opt2)
+                elif 'Results' in opt.tag: getPtRelFitResults(opt2)
+                elif action=='prefitplots': latinoTools.postFitPlots(opt2)
+                elif commonTools.goodCombineFit(opt, opt2.year, opt2.tag, '', 'PostFitS'):  
+                    if action=='postfitshapes':  latinoTools.postFitShapes(opt2) 
+                    elif action=='postfitplots': latinoTools.postFitPlots(opt2)
+                    elif action=='getptrelresults': getPtRelFitResults(opt2, opt)
+                elif action=='checkfit' or opt.verbose: print 'Failed fit for campaign='+opt2.year+', WP='+btagWP+', bin='+ptbin
 
 def ptRelDatacards(opt):
 
@@ -523,13 +784,18 @@ def ptRelDatacards(opt):
  
 def ptRelFits(opt):
 
-    opt.batchQueue = 'nextweek'
-    opt.option += 'resetskipbonly'
+    #opt.batchQueue = 'nextweek'
+    opt.option += 'skipbonly'
     bTagPerfAnalysis(opt, 'ptrelfit')
 
 def ptRelFitCheck(opt):
 
     bTagPerfAnalysis(opt, 'checkfit')
+
+def ptRelPreFitPlots(opt):
+
+    opt.option += 'prefit'
+    bTagPerfAnalysis(opt, 'prefitplots')
 
 def ptRelPostFitShapes(opt):
 
@@ -561,10 +827,10 @@ def efficiencyError(P, F, eP, eF, correlation):
 
 def getPtRelEfficiency(opt, inputFile, fileType, btagWP, ptbin, systematic):
 
-    cut = '_'.join([ btagWP, ptbin, systematic, 'BTAGSTATUS' ]).replace('_Central','')
+    cut = '_'.join([ ptbin, btagWP, 'BTAGSTATUS', systematic ]).replace('_Central','')
 
     if fileType=='shapes': histoPath = cut+'/ptrel/histo_bjets'
-    else: histoPath = 'shapes_fit_s/'+cut+'/bjets'
+    else: histoPath = 'shapes_fit_s/'+cut+'/total_signal'
 
     histoPass = inputFile.Get(histoPath.replace('BTAGSTATUS','Pass'))
     histoFail = inputFile.Get(histoPath.replace('BTAGSTATUS','Fail'))
@@ -572,6 +838,9 @@ def getPtRelEfficiency(opt, inputFile, fileType, btagWP, ptbin, systematic):
     errorPassYield, errorFailYield = ROOT.double(), ROOT.double()
     passYield = histoPass.IntegralAndError(-1,-1,errorPassYield)
     failYield = histoFail.IntegralAndError(-1,-1,errorFailYield)
+
+    if opt.verbose and fileType=='fit' and (errorPassYield==0. or errorFailYield==0.): 
+        print'Warning: missing erros in ML fit for', btagWP, ptbin, systematic
 
     efficiency = passYield/(passYield+failYield)
 
@@ -584,63 +853,61 @@ def getPtRelEfficiency(opt, inputFile, fileType, btagWP, ptbin, systematic):
 
         if errorPassYield*errorFailYield!=0:
             correlation = (pow(errorTotalYield,2)-pow(errorPassYield,2)-pow(errorFailYield,2))/(2*errorPassYield*errorFailYield)
-     
-    return efficiency, efficiencyError(passYield, failYield, errorPassYield, errorFailYield, correlation)
 
-def readOldPtRelFitResultsFromTables(opt, btagWP, ptbin):
+    return efficiency, efficiencyError(passYield, failYield, errorPassYield, errorFailYield, correlation), passYield+failYield
 
-    systematic = 'Central'
+def readOldPtRelFitResultsFromTables(opt, optOrig, btagWP, ptbin, systematic):
 
     tableName = '/afs/cern.ch/work/s/scodella/BTagging/CodeDevelopment/CMSSW_10_2_11/src/RecoBTag/PerformanceMeasurements/test/PtRelTools/Tables/PtRelFit_'+btagWP+'_anyEta_'+ptbin.replace('to','')+'_'+systematic+'_PSRun2017UL17_KinEtaAfterPtBinsCentral_LowPtAwayTrgConf_Run2016Production.txt'
-
-    if btagWP not in opt.bTagPerfResults: opt.bTagPerfResults[btagWP] = {}
-    if systematic not in opt.bTagPerfResults[btagWP]: opt.bTagPerfResults[btagWP][systematic] = {}
-
-    opt.bTagPerfResults[btagWP][systematic][ptbin] = {}
 
     tableFile = open(tableName, 'r')
     lines = tableFile.readlines()
     for line in lines:
         if 'Efficiency MC' in line:
-            opt.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMC']             = float(line.split(' = ')[1].split(' +/- ')[0])
-            opt.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMCUncertainty']  = float(line.split(' +/- ')[1].split('\n')[0])
+            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMC']             = float(line.split(' = ')[1].split(' +/- ')[0])
+            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMCUncertainty']  = float(line.split(' +/- ')[1].split('\n')[0])
         elif 'Eff. data' in line:
-            opt.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFit']            = float(line.split(' = ')[1].split(' +/- ')[0])
-            opt.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFitUncertainty'] = float(line.split(' +/- ')[1].split(' (')[0])
+            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFit']            = float(line.split(' = ')[1].split(' +/- ')[0])
+            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFitUncertainty'] = float(line.split(' +/- ')[1].split(' (')[0])
         elif 'Scale factor' in line:
-            opt.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactor']              = float(line.split(' = ')[1].split(' +/- ')[0])
-            opt.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactorUncertainty']   = float(line.split(' +/- ')[1].split('\n')[0])
+            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactor']              = float(line.split(' = ')[1].split(' +/- ')[0])
+            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactorUncertainty']   = float(line.split(' +/- ')[1].split('\n')[0])
 
-def getPtRelFitResults(opt):
+def getPtRelFitResults(opt, optOrig):
 
     btagWP = opt.tag.split('_btag')[1].split('_')[0]
-    ptbin = 'Pt'+opt.tag.split('_Pt')[1].split('_')[0]
+    ptbin = 'Pt'+opt.tag.split('_JetPt')[1].split('_')[0]
+    systematic = opt.tag.split('_sel')[1].split('_')[0]
+   
+    if btagWP not in optOrig.bTagPerfResults: optOrig.bTagPerfResults[btagWP] = {}
+    if systematic not in optOrig.bTagPerfResults[btagWP]: optOrig.bTagPerfResults[btagWP][systematic] = {}
+    optOrig.bTagPerfResults[btagWP][systematic][ptbin] = {}
 
-    if 'Results' in opt.tag:
-        readOldPtRelFitResultsFromTables(opt, btagWP, ptbin)
+    if 'ptreltools' in opt.option.lower():
+        readOldPtRelFitResultsFromTables(opt, optOrig, btagWP, ptbin, systematic)
         return
 
     motherFile = commonTools.openShapeFile(opt.shapedir, opt.year, opt.tag.split('_')[0], 'SM', 'SM')
     fitFile = commonTools.openCombineFitFile(opt, '', opt.year, opt.tag)
-
-    for systematic in opt.Selections:
  
-        efficiencyMC,  uncertaintyMC  = getPtRelEfficiency(opt, motherFile, 'shapes', btagWP, ptbin, systematic)
-        efficiencyFit, uncertaintyFit = getPtRelEfficiency(opt, fitFile,    'fit',    btagWP, ptbin, systematic)
+    efficiencyMC,  uncertaintyMC,  yieldsMC  = getPtRelEfficiency(opt, motherFile, 'shapes', btagWP, ptbin, systematic)
+    efficiencyFit, uncertaintyFit, yieldsFit = getPtRelEfficiency(opt, fitFile,    'fit',    btagWP, ptbin, systematic)
 
-        scaleFactor = efficiencyFit/efficiencyMC
-        scaleFactorUncertainty = scaleFactor*math.sqrt(pow(uncertaintyFit/efficiencyFit,2)+pow(uncertaintyMC/efficiencyMC,2))
+    if efficiencyFit>0.999 or (efficiencyFit>0.99 and efficiencyFit/efficiencyMC>1.1) or (efficiencyFit>0.98 and efficiencyFit/efficiencyMC>1.5): 
+        efficiencyFit, uncertaintyFit = 0.01, math.sqrt(efficiencyMC*(1.-efficiencyMC)/yieldsFit)
+    elif uncertaintyFit==0.:
+        uncertaintyFit = math.sqrt(efficiencyFit*(1.-efficiencyFit)/yieldsFit)
 
-        if btagWP not in opt.bTagPerfResults: opt.bTagPerfResults[btagWP] = {}
-        if systematic not in opt.bTagPerfResults[btagWP]: opt.bTagPerfResults[btagWP][systematic] = {}
+    scaleFactor = efficiencyFit/efficiencyMC
+    scaleFactorUncertainty = scaleFactor*math.sqrt(pow(uncertaintyFit/efficiencyFit,2)+pow(uncertaintyMC/efficiencyMC,2))
 
-        opt.bTagPerfResults[btagWP][systematic][ptbin] = {}
-        opt.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMC']             = efficiencyMC
-        opt.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMCUncertainty']  = uncertaintyMC
-        opt.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFit']            = efficiencyFit
-        opt.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFitUncertainty'] = uncertaintyFit
-        opt.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactor']              = scaleFactor
-        opt.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactorUncertainty']   = scaleFactorUncertainty
+    optOrig.bTagPerfResults[btagWP][systematic][ptbin] = {}
+    optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMC']             = efficiencyMC
+    optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMCUncertainty']  = uncertaintyMC
+    optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFit']            = efficiencyFit
+    optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFitUncertainty'] = uncertaintyFit
+    optOrig.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactor']              = scaleFactor
+    optOrig.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactorUncertainty']   = scaleFactorUncertainty
 
     motherFile.Close()
     fitFile.Close()
@@ -680,6 +947,7 @@ def fillBTagPerfHistogram(opt, result, btagWP, systematic):
         bTagPerfHisto.SetBinError(ib, opt.bTagPerfResults[btagWP][systematic][ptbin][result+'Uncertainty'])
 
     bTagPerfHisto.SetXTitle('#mu-jet #font[50]{p}_{T} [GeV]')
+    bTagPerfHisto.GetXaxis().SetRangeUser(opt.minPlotPt, opt.maxPlotPt)
 
     if 'efficiency' in result: 
         bTagPerfHisto.SetYTitle('b-tag Efficiency #epsilon_{b}')
@@ -694,60 +962,189 @@ def fillBTagPerfHistogram(opt, result, btagWP, systematic):
 
 def makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos, resultToPlot):
 
-    ySize, ylow = 700, 0.52
+    ySize, ylow = 800, 0.52
  
-    if resultToPlot!='both':
-        ySize, ylow = 350, 0.03
+    if resultToPlot!='performance':
+        ySize, ylow = 400, 0.03
 
-    canvas = commonTools.bookCanvas('canvas', 700, ySize)
+    canvas = commonTools.bookCanvas('canvas', 1200, ySize)
     canvas.cd()
 
     pad = []
     pad.append(commonTools.bookPad('pad0', 0.02, ylow, 0.98, 0.98))
+    if opt.maxPlotPt>=300.: pad[0].SetLogx()
     pad[0].Draw()
 
-    if resultToPlot=='both': 
+    if resultToPlot=='performance': 
         pad.append(commonTools.bookPad('pad1', 0.02, 0.03, 0.98, 0.49))
+        if opt.maxPlotPt>=300.: pad[1].SetLogx()
         pad[1].Draw()
 
     for result in [ 'efficiency', 'scalefactor' ]:
-        if result==resultToPlot or resultToPlot=='both':
+        if result==resultToPlot or resultToPlot=='performance':
 
-            if result=='scalefactor' and resultToPlot=='both': pad[1].cd()
+            if result=='scalefactor' and resultToPlot=='performance': pad[1].cd()
             else: pad[0].cd()
 
             drawOption = 'p'
             markerColor =  1
             for tag in bTagPerfHistos:
                 markerStyle = 20
-                for systematic in bTagPerfHistos[tag]:
+                for systematic in opt.Selections: #bTagPerfHistos[tag]:
+                    if systematic=='': systematic = 'Central'
                     styleOffset = 0
                     for btaghisto in [ 'efficiencyFit', 'efficiencyMC', 'scaleFactor' ]:
                         if result in btaghisto.lower():
+
+                            if systematic=='FinalSystematics': 
+                                bTagPerfHistos[tag][systematic][btaghisto].SetFillStyle(3005);
+                                bTagPerfHistos[tag][systematic][btaghisto].SetFillColor(2);
+                                drawOption = 'pe2'
 
                             bTagPerfHistos[tag][systematic][btaghisto].SetMarkerStyle(markerStyle+styleOffset)
                             bTagPerfHistos[tag][systematic][btaghisto].SetMarkerColor(markerColor)                
                             bTagPerfHistos[tag][systematic][btaghisto].Draw(drawOption)
                             drawOption = 'psame'
-          
                             styleOffset = 4
-                    markerStyle += 1
-                markerColor +=1
+
+                    if systematic!='FinalSystematics':
+                        markerStyle += 1
+                        markerColor += 1
 
     tagFlag = '-'.join(bTagPerfHistos.keys())
-    systematicFlag = '-'.join(bTagPerfHistos[bTagPerfHistos.keys()[0]].keys())
-     
-    outputDir = '/'.join([ opt.plotsdir, opt.year, opt.method+'Results', tagFlag+'_'+systematicFlag ]) 
+    if 'DepOn' in opt.option or 'Final' in opt.option:
+        systematicFlag = opt.option
+    else: 
+        systematicFlag = '-'.join(bTagPerfHistos[bTagPerfHistos.keys()[0]].keys())
+
+    outputDir = '/'.join([ opt.plotsdir, opt.year, opt.method+'Results', tagFlag, resultToPlot ]) 
     os.system('mkdir -p '+outputDir+' ; cp ../../index.php '+opt.plotsdir)
     commonTools.copyIndexForPlots(opt.plotsdir, outputDir)
 
-    canvas.Print(outputDir+'/'+btagWP+'.png')
+    canvas.Print(outputDir+'/'+btagWP+'_'+systematicFlag+'.png')
 
-def plotBTagPerformance(opt, resultToPlot='both', action='plot'):
+def computeFinalScaleFactors(opt):
+
+    systematics = []
+    for systematic in opt.Selections:
+        if 'Up' in systematic: systematics.append(systematic.replace('Up',''))
+
+    for btagWP in opt.btagWPs:
+
+        opt.bTagPerfResults[btagWP]['Final'] = {}
+        opt.bTagPerfResults[btagWP]['FinalSystematics'] = {}
+        wpSF = opt.bTagPerfResults[btagWP]
+
+        for ptbin in opt.ptBins:
+
+            centralSF = wpSF['Central'][ptbin]['scaleFactor']
+            centralSFerror = wpSF['Central'][ptbin]['scaleFactorUncertainty']
+
+            systSF, systSFerror = {}, {}
+            for systematic in systematics:
+                systSF[systematic], systSFerror[systematic] = {}, {}
+                sfUp, sfDown = 'Up', 'Down'
+                if wpSF[systematic+'Up'][ptbin]['scaleFactor']<wpSF[systematic+'Down'][ptbin]['scaleFactor']:
+                    sfUp, sfDown = 'Down', 'Up'
+                systSF[systematic]['Up'] = wpSF[systematic+sfUp][ptbin]['scaleFactor']
+                systSF[systematic]['Down'] = wpSF[systematic+sfDown][ptbin]['scaleFactor']
+                systSFerror[systematic]['Up'] = wpSF[systematic+sfUp][ptbin]['scaleFactorUncertainty']
+                systSFerror[systematic]['Down'] = wpSF[systematic+sfDown][ptbin]['scaleFactorUncertainty']
+
+            goodCentral = False
+
+            if centralSF>0.1 and wpSF['Central'][ptbin]['efficiencyFit']>0.01:
+                for systematic in systematics:
+                    if centralSF>=systSF[systematic]['Down'] and centralSF<=systSF[systematic]['Up']:
+                        goodCentral = True
+
+            if goodCentral: finalScaleFactor, finalScaleFactorUncertainty = centralSF, centralSFerror
+            else: 
+               
+                finalScaleFactor, finalScaleFactorUncertainty, scaleFactorSystematicUncertainty = -1., -1., -1.
+
+                scaleFactorList, scaleFactorUncertaintyList = [], []
+                if centralSF>0.1 and wpSF['Central'][ptbin]['efficiencyFit']>0.01:
+                    scaleFactorList = [ centralSF ]
+                    scaleFactorUncertaintyList = [ centralSFerror ]
+                for systematic in systematics:
+                    for variation in [ 'Up', 'Down' ]:
+                        if wpSF[systematic+variation][ptbin]['scaleFactor']>0.1 and wpSF[systematic+variation][ptbin]['efficiencyFit']>0.01: 
+                            scaleFactorList.append(wpSF[systematic+variation][ptbin]['scaleFactor'])
+                            scaleFactorUncertaintyList.append(wpSF[systematic+variation][ptbin]['scaleFactorUncertainty'])
+
+                hasOutliers = True
+                while len(scaleFactorList)>0 and hasOutliers:
+                    
+                    finalScaleFactor = sum(scaleFactorList)/len(scaleFactorList)
+                    finalScaleFactorUncertainty = sum(scaleFactorUncertaintyList)/len(scaleFactorUncertaintyList)
+                    standardDeviaton = 0.
+                    for sfValue in scaleFactorList: standardDeviaton += pow(sfValue-finalScaleFactor, 2)
+                    standardDeviaton = math.sqrt(standardDeviaton/len(scaleFactorList))
+
+                    scaleFactorToRemove = []
+                    for sfValue in scaleFactorList:
+                        if abs(sfValue-finalScaleFactor)>2.*standardDeviaton: scaleFactorToRemove.append(sfValue)
+                    for sfValue in scaleFactorToRemove: 
+                        scaleFactorList.remove(sfValue)
+                    hasOutliers = len(scaleFactorToRemove)>0
+
+            if finalScaleFactor>0.:
+               
+                systematicUncertainties = []
+     
+                for systematic in systematics:
+
+                    systematicVariations = []
+
+                    for variation in [ 'Up', 'Down' ]:
+                        if wpSF[systematic+variation][ptbin]['scaleFactor']>0.1 and wpSF[systematic+variation][ptbin]['efficiencyFit']>0.01:
+                            if wpSF[systematic+variation][ptbin]['scaleFactorUncertainty']<0.1 and abs(wpSF[systematic+variation][ptbin]['scaleFactor']-finalScaleFactor)<0.2:
+                                systematicVariations.append(abs(wpSF[systematic+variation][ptbin]['scaleFactor']-finalScaleFactor))
+
+                    if len(systematicVariations)==0: systematicUncertainties.append(0.05*finalScaleFactor) # Bho?
+                    elif len(systematicVariations)==1: systematicUncertainties.append(systematicVariations[0]) 
+                    else: systematicUncertainties.append((systematicVariations[0]+systematicVariations[1])/2.)
+
+                scaleFactorSystematicUncertainty = 0.
+                for systematic in systematicUncertainties: scaleFactorSystematicUncertainty += pow(systematic,2)
+                scaleFactorSystematicUncertainty = math.sqrt(scaleFactorSystematicUncertainty)
+
+            opt.bTagPerfResults[btagWP]['Final'][ptbin] = {}
+            opt.bTagPerfResults[btagWP]['Final'][ptbin]['scaleFactor'] = finalScaleFactor
+            opt.bTagPerfResults[btagWP]['Final'][ptbin]['scaleFactorUncertainty'] = finalScaleFactorUncertainty
+            opt.bTagPerfResults[btagWP]['FinalSystematics'][ptbin] = {}
+            opt.bTagPerfResults[btagWP]['FinalSystematics'][ptbin]['scaleFactor'] = finalScaleFactor
+            opt.bTagPerfResults[btagWP]['FinalSystematics'][ptbin]['scaleFactorUncertainty'] = scaleFactorSystematicUncertainty
+
+        for systematic in systematics:
+            del opt.bTagPerfResults[btagWP][systematic+'Up']
+            del opt.bTagPerfResults[btagWP][systematic+'Down']
+
+def getSelectedSystematic(opt):
+
+    systematicToCompare = [ ]
+
+    for selection in opt.Selections:
+        if selection!='' and selection.replace('Up','').replace('Down','') in opt.option:
+            if selection.replace('Up','').replace('Down','') not in systematicToCompare:
+                systematicToCompare.append(selection.replace('Up','').replace('Down',''))
+
+    if len(systematicToCompare)!=1:
+        print 'Please, specify in option the systematic to select (provided option was', opt.option, ')'
+        return ''
+
+    return systematicToCompare[0]
+
+def plotBTagPerformance(opt, resultToPlot='performance', action='plot'):
+
+    if 'DepOn' in opt.option:
+        if getSelectedSystematic(opt)=='': return
+        opt.Selections = [ '', getSelectedSystematic(opt)+'Up', getSelectedSystematic(opt)+'Down' ]
 
     bTagPerfHistos = {}
     for btagWP in opt.btagWPs: bTagPerfHistos[btagWP] = {}
-
+    
     opt2 = copy.deepcopy(opt)
 
     for tag in opt.tag.split('-'):
@@ -756,24 +1153,33 @@ def plotBTagPerformance(opt, resultToPlot='both', action='plot'):
         opt2.tag = rawTag
         getBTagPerfResults(opt2)
 
+        if action=='finalplot':
+            computeFinalScaleFactors(opt2)
+
         for btagWP in opt2.bTagPerfResults:
             bTagPerfHistos[btagWP][rawTag] = {} 
+
             for systematic in opt2.bTagPerfResults[btagWP]:
                 bTagPerfHistos[btagWP][rawTag][systematic] = {}
 
-                if action=='plot':
+                if 'plot' in action:
                     for result in [ 'efficiencyMC', 'efficiencyFit', 'scaleFactor' ]:
-                        if resultToPlot in result.lower() or resultToPlot=='both':
+                        if resultToPlot in result.lower() or resultToPlot=='performance':
                             bTagPerfHistos[btagWP][rawTag][systematic][result] = fillBTagPerfHistogram(opt2, result, btagWP, systematic)
 
                 else:
-                    print '#####', btagWP, rawTag, systematic
+                    print '\n#####', btagWP, rawTag, systematic
                     bTagPerfShort = opt2.bTagPerfResults[btagWP][systematic]
                     for ptbin in bTagPerfShort.keys():
-                        print '     ', ptbin, bTagPerfShort[ptbin]['efficiencyMC'], bTagPerfShort[ptbin]['efficiencyFit'], bTagPerfShort[ptbin]['scaleFactor']
-
+                        print '     ', ptbin, bTagPerfShort[ptbin]['efficiencyMC'], bTagPerfShort[ptbin]['efficiencyFit'], bTagPerfShort[ptbin]['scaleFactor'], bTagPerfShort[ptbin]['scaleFactorUncertainty']
+                    print ''
                         
-    if action=='plot':
+    if 'plot' in action:
+
+        if action=='finalplot':
+            opt.Selections = [ 'FinalSystematics', 'Final', 'Central' ] if 'central' in opt.optionlower() else [ 'FinalSystematics', 'Final' ]
+            opt.option = 'FinalCompared' if 'Central' in opt.Selections else 'Final'
+
         for btagWP in opt.btagWPs:
             makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos[btagWP], resultToPlot)
 
@@ -787,7 +1193,23 @@ def plotBTagEfficiencies(opt):
 
 def plotBTagScaleFactors(opt):
 
-    plotBTagPerformance(opt, resultToPlot='scalefactor')
+    plotBTagPerformance(opt, resultToPlot='scalefactor') 
+
+def analyzeBTagScaleFactorSytematics(opt):
+
+    resultToPlot = 'performance' if 'performance' in opt.option else 'efficiency' if 'efficiency' in opt.option else 'scalefactor'
+
+    opt.origSelections = opt.Selections
+
+    for systematic in opt.Selections: 
+        if 'Up' in systematic:
+            opt.option = 'DepOn' + systematic.replace('Up','')
+            plotBTagPerformance(opt, resultToPlot)
+            opt.Selections = opt.origSelections
+
+def plotFinalBTagScaleFactors(opt):
+
+    plotBTagPerformance(opt, action='finalplot', resultToPlot='scalefactor')
 
 ### Store scale factores
 
