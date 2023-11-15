@@ -69,14 +69,15 @@ if 'Templates' in opt.tag:
                                                  'kind'  : 'weight'
                                                 }
 
-        # rate parameters
+        # nuisances for PtRel fits
         if 'ForFit' in opt.tag:
 
-            if  'Central' in opt.tag and '_nojeu' not in opt.tag:
+            # JEU
+            if  '_nojeu' not in opt.tag:
 
-                # JEU
                 nuisances['JEU']  = { 'name'  : 'JEU',
                                       'samples'  : { },
+                                      'cuts'  : [],
                                       'kind'  : 'weight',
                                       'type'  : 'shape'
                                      }
@@ -85,6 +86,20 @@ if 'Templates' in opt.tag:
                     if not samples[sample]['isDATA']:
                         nuisances['JEU']['samples'][sample] = [ 1., 1. ]
 
+                for cut in cuts:
+                    if len(cut.split('_'))==3 or (len(cut.split('_'))==4 and 'Corr' in cut.split('_')[3]):
+                        nuisances['JEU']['cuts'].append(cut)
+
+            # template corrections
+            for nuisance in templateCorrectionNuisances:
+
+                nuisances[nuisance]  = { 'name'  : nuisance,
+                                         'samples'  : { templateCorrectionNuisances[nuisance] : [ 1., 1. ] },
+                                         'kind'  : 'weight',
+                                         'type'  : 'shape'
+                                        }
+
+            # rate parameters
             for cut in cuts:
                 for sample in samples:
                     if not samples[sample]['isDATA']:

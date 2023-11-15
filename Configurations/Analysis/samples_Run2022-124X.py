@@ -175,8 +175,29 @@ if 'Templates' in opt.tag:
     systematicVariations.extend([ 'MuPtUp', 'MuPtDown', 'MuDRUp', 'MuDRDown' ])
     if 'Validation' not in opt.tag and ('SM' in opt.sigset or 'MC' in opt.sigset) and 'ForFit' not in opt.tag: systematicVariations.extend([ 'JEUUp', 'JEUDown' ])
     if 'Light' not in opt.tag:
-        systematicVariations.insert(1, 'AwayJetDown')
         systematicVariations.insert(1, 'AwayJetUp')
+        systematicVariations.insert(1, 'AwayJetDown')
+
+applyBFragmentation = 1
+
+# Template corrections
+
+templateTreatments = [ 'corr', 'nuis', 'syst' ]
+bTemplateCorrector = {}
+for btagWP in bTagWorkingPoints: bTemplateCorrector[btagWP] = 'ParTT' if 'DeepJet' in btagWP else 'DeepJetT'
+
+if 'ForFit' in opt.tag:
+    
+   templateTreatmentFlag = opt.tag.split('Templates')[1].split('2D')[0].split('ForFit')[0]
+
+   templateCorrectionNuisances = {}   
+   if 'Nuis' in templateTreatmentFlag:
+       for flavour in templateTreatmentFlag.split('Nuis')[1].split('Syst')[0]:
+           templateCorrectionNuisances['Corr'+flavour] = flavour.lower()+'jets'
+
+   if 'Syst' in templateTreatmentFlag:
+       for flavour in templateTreatmentFlag.split('Syst')[1]:
+           systematicVariations.append('Corr'+flavour) 
 
 if '_sel' in opt.tag:
     selectionToRemove = []
@@ -189,14 +210,6 @@ if '_sel' in opt.tag:
                elif sel not in tagoption: selectionToRemove.append(selection)
     for selection in selectionToRemove:
         systematicVariations.remove(selection)
-
-applyBFragmentation = 1
-
-# Template corrections
-
-templateTreatments = [ 'corr', 'nuis', 'syst' ]
-bTemplateCorrector = {}
-for btagWP in bTagWorkingPoints: bTemplateCorrector[btagWP] = 'ParTT' if 'DeepJet' in btagWP else 'DeepJetT'
 
 # muon kinematics selection
   
