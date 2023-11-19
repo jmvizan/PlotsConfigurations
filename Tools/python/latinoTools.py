@@ -482,8 +482,9 @@ def submitJobs(opt, jobName, jobTag, targetList, splitBatch, jobSplit, nThreads)
     jobs = batchJobs(jobName,jobTag,['ALL'],targetList.keys(),splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
     jobs.nThreads = nThreads
 
-    for signal in targetList:
+    for signal in targetList: 
         jobs.Add('ALL', signal, targetList[signal])
 
-    jobs.Sub(opt.batchQueue,opt.IiheWallTime,True)
+    if not opt.dryRun:
+        jobs.Sub(opt.batchQueue,opt.IiheWallTime,True)
 

@@ -11,7 +11,7 @@ nuisances['stat']  = { 'type'          : 'auto', # Use the following if you want
 if 'Templates' in opt.tag:
 
     # pileup
-    if 'NoPU' not in opt.tag and 'Validation' not in opt.tag:
+    if 'pileup' in systematicNuisances:
         nuisances['pileup']  = { 'name'  : 'pileup',
                                  'samples'  : { },
                                  'kind'  : 'weight',
@@ -26,14 +26,15 @@ if 'Templates' in opt.tag:
     if 'bjets' in samples:
 
         # gluon splitting
-        nuisances['gluonsplitting']  = { 'name'  : 'gluonSplitting',
-                                         'samples'  : { 'bjets' : [ '1.5*'+isGluonSplitting+'+(!('+isGluonSplitting+'))', '0.5*'+isGluonSplitting+'+(!('+isGluonSplitting+'))' ] },
-                                         'kind'  : 'weight',
-                                         'type'  : 'shape'
-                                        }
+        if 'gluonSplitting' in systematicNuisances:
+            nuisances['gluonSplitting']  = { 'name'  : 'gluonSplitting',
+                                             'samples'  : { 'bjets' : [ '1.5*'+isGluonSplitting+'+(!('+isGluonSplitting+'))', '0.5*'+isGluonSplitting+'+(!('+isGluonSplitting+'))' ] },
+                                             'kind'  : 'weight',
+                                             'type'  : 'shape'
+                                            }
 
         # b hadron fragmentation
-        if applyBFragmentation>=1:
+        if 'bfragmentation' in systematicNuisances:
             nuisances['bfragmentation']  = { 'name'  : 'bfragmentation',
                                              'samples'  : { 'bjets' : [ 'bHadronWeight[2]/bHadronWeight[1]', 'bHadronWeight[0]/bHadronWeight[1]' ] },
                                              'kind'  : 'weight',
@@ -41,17 +42,18 @@ if 'Templates' in opt.tag:
                                             }
 
         # b semileptonic decays' br
-        nuisances['bdecay']  = { 'name'  : 'bdecay',
-                                 'samples'  : { 'bjets' : [ 'bHadronWeight[4]', 'bHadronWeight[3]' ] },
-                                 'kind'  : 'weight',
-                                 'type'  : 'shape'
-                                }
+        if 'bdecay' in systematicNuisances:
+            nuisances['bdecay']  = { 'name'  : 'bdecay',
+                                     'samples'  : { 'bjets' : [ 'bHadronWeight[4]', 'bHadronWeight[3]' ] },
+                                     'kind'  : 'weight',
+                                     'type'  : 'shape'
+                                    }
 
     # ptrel specific nuisances
     if 'PtRel' in opt.method:
 
         # light specific nuisances
-        if 'ljets' in samples:
+        if 'ljets' in samples and 'lightCharmRatio' in systematicNuisances:
 
             # light to charm ratio
             if 'ForFit' not in opt.tag:
@@ -87,7 +89,7 @@ if 'Templates' in opt.tag:
                         nuisances['JEU']['samples'][sample] = [ 1., 1. ]
 
                 for cut in cuts:
-                    if len(cut.split('_'))==3 or (len(cut.split('_'))==4 and 'Corr' in cut.split('_')[3]):
+                    if len(cut.split('_'))==3 or (len(cut.split('_'))==4 and ('Corr' in cut.split('_')[3] or cut.split('_')[3].replace('Up','').replace('Down','') in systematicNuisances)):
                         nuisances['JEU']['cuts'].append(cut)
 
             # template corrections
@@ -99,6 +101,16 @@ if 'Templates' in opt.tag:
                                          'type'  : 'shape'
                                         }
 
+            # decouple nuisances in simultaneous fits to all selections 
+            if '_mergedSelections' in opt.tag and '_nuisSelections' in opt.tag:
+                for selection in systematicVariations:
+                    nuisance = selection.replace('Up','').replace('Down','')
+                    if nuisance in nuisances and nuisance in systematicNuisances:
+                        nuisances[nuisance]['cuts'] = []
+                        for cut in cuts:
+                            if nuisance not in cut:
+                                nuisances[nuisance]['cuts'].append(cut)
+                        
             # rate parameters
             for cut in cuts:
                 for sample in samples:

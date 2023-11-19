@@ -3,6 +3,7 @@ import subprocess
 import math
 import string
 from LatinoAnalysis.Tools.commonTools import *
+from collections import OrderedDict
 
 ### Generals
 
@@ -43,14 +44,10 @@ if isFillShape and 'MergedLight' in opt.tag:
 
 ### Directories
 
-skipTreesCheck = False if isShape or 'WorkingPoints' not in opt.tag else True
+skipTreesCheck = False if isShape or 'PtHatWeights' in opt.tag else True
 
-if not isDatacardOrPlot and 'WorkingPoints' not in opt.tag: 
-    if skipTreesCheck:
-        print 'Error: it is not allowed to fill shapes and skipping trees check!'
-        exit()
-    if opt.sigset=='SM' and hasattr(opt, 'doHadd') and not opt.doHadd:
-        print 'Error: SM cannot be used when filling the shapes. Use Data and MC separately instead' 
+if opt.sigset=='SM' and isFillShape:
+    print 'Error: SM cannot be used when filling the shapes. Use Data and MC separately instead' 
 
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
@@ -93,7 +90,12 @@ triggerInfos = { 'BTagMu_AK4DiJet20_Mu5'  : { 'jetPtRange' : [  '20.',   '50.' ]
                  'BTagMu_AK4Jet300_Mu5'   : { 'jetPtRange' : [ '320.', '1400.' ], 'ptAwayJet' : '30.', 'ptTriggerEmulation' :   '0.', 'jetTrigger' : 'PFJet260', 'idx' : '37', 'idxJetTrigger' : '5' },
                 }
 
-# b-tagging algorithms
+# b-tagging algorithms and working points
+
+bTagAlgorithms = [ 'DeepJet', 'ParticleNet', 'ParT' ]
+workingPointName = [ 'Loose', 'Medium', 'Tight', 'VeryTight', 'VeryVeryTight' ]
+workingPointLimit = [ 0.1, 0.01, 0.001, 0.0005, 0.0001 ]
+
 if opt.campaign=='Summer22':
     bTagWorkingPoints = {'DeepJetT': {'cut': '0.7183', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetVT': {'cut': '0.7862', 'discriminant': 'PNetBDisc'}, 'ParTL': {'cut': '0.0849', 'discriminant': 'ParTBDisc'}, 'ParticleNetM': {'cut': '0.245', 'discriminant': 'PNetBDisc'}, 'ParticleNetL': {'cut': '0.047', 'discriminant': 'PNetBDisc'}, 'ParTM': {'cut': '0.4319', 'discriminant': 'ParTBDisc'}, 'ParTT': {'cut': '0.8482', 'discriminant': 'ParTBDisc'}, 'ParticleNetT': {'cut': '0.6734', 'discriminant': 'PNetBDisc'}, 'DeepJetM': {'cut': '0.3086', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.0583', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetVVT': {'cut': '0.961', 'discriminant': 'PNetBDisc'}, 'ParTVVT': {'cut': '0.9874', 'discriminant': 'ParTBDisc'}, 'ParTVT': {'cut': '0.9151', 'discriminant': 'ParTBDisc'}, 'DeepJetVVT': {'cut': '0.9512', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetVT': {'cut': '0.8111', 'discriminant': 'DeepFlavourBDisc'}}
     btagAwayJetTagger, btagAwayJetDiscriminant = 'JBP', 'Bprob'
@@ -169,16 +171,49 @@ if 'JetPt' in opt.tag:
 
 # systematics
 
+csvSystematics = OrderedDict()
+csvSystematics['central'] = 'Final'
+for variation in [ 'Up', 'Down' ]:
+    csvSystematics[variation.lower()]                   = 'Final'+variation
+    csvSystematics[variation.lower()+'_statistic']      = 'Statistics'+variation
+    csvSystematics[variation.lower()+'_jetaway']        = 'AwayJet'+variation
+    csvSystematics[variation.lower()+'_mupt']           = 'MuPt'+variation
+    csvSystematics[variation.lower()+'_mudr']           = 'MuDR'+variation
+    csvSystematics[variation.lower()+'_jes']            = 'JEU'+variation
+    csvSystematics[variation.lower()+'_pileup']         = 'pileup'+variation
+    csvSystematics[variation.lower()+'_gluonsplitting'] = 'gluonSplitting'+variation
+    csvSystematics[variation.lower()+'_bfragmentation'] = 'bfragmentation'+variation
+    csvSystematics[variation.lower()+'_bdecays']        = 'bdecays'+variation
+    csvSystematics[variation.lower()+'_btempcorr']      = 'CorrB'+variation
+    csvSystematics[variation.lower()+'_cjets']          = 'cjets'+variation
+    csvSystematics[variation.lower()+'_l2c']            = 'lightCharmRatio'+variation
+    csvSystematics[variation.lower()+'_ltempcorr']      = 'CorrL'+variation
+
 systematicVariations = [ '' ]
 
 if 'Templates' in opt.tag:
     systematicVariations.extend([ 'MuPtUp', 'MuPtDown', 'MuDRUp', 'MuDRDown' ])
-    if 'Validation' not in opt.tag and ('SM' in opt.sigset or 'MC' in opt.sigset) and 'ForFit' not in opt.tag: systematicVariations.extend([ 'JEUUp', 'JEUDown' ])
+    if ('Validation' not in opt.tag and ('SM' in opt.sigset or 'MC' in opt.sigset) and ('ForFit' not in opt.tag or '_nuisSelections' in opt.tag)) or '_selJEU' in opt.tag: 
+        systematicVariations.extend([ 'JEUUp', 'JEUDown' ])
     if 'Light' not in opt.tag:
-        systematicVariations.insert(1, 'AwayJetUp')
         systematicVariations.insert(1, 'AwayJetDown')
+        systematicVariations.insert(1, 'AwayJetUp')
+
+systematicNuisances = []
 
 applyBFragmentation = 1
+
+if 'NoPU' not in opt.tag and 'Validation' not in opt.tag: systematicNuisances.append('pileup')
+systematicNuisances.append('gluonSplitting')
+if applyBFragmentation>=1: systematicNuisances.append('bfragmentation')
+systematicNuisances.append('bdecay')
+if opt.method=='PtRel': systematicNuisances.append('lightCharmRatio')
+
+if 'PtRelTemplates' in opt.tag and 'ForFit' in opt.tag and '_nuisSelections' in opt.tag: 
+    if '_noselrefit' in opt.tag or '_norefit' in opt.tag: systematicVariations = [ 'JEUUp', 'JEUDown' ]
+    for nuisance in systematicNuisances:
+        systematicVariations.append(nuisance+'Up')
+        systematicVariations.append(nuisance+'Down')
 
 # Template corrections
 
@@ -186,7 +221,7 @@ templateTreatments = [ 'corr', 'nuis', 'syst' ]
 bTemplateCorrector = {}
 for btagWP in bTagWorkingPoints: bTemplateCorrector[btagWP] = 'ParTT' if 'DeepJet' in btagWP else 'DeepJetT'
 
-if 'ForFit' in opt.tag:
+if 'PtRelTemplates' in opt.tag and 'ForFit' in opt.tag:
     
    templateTreatmentFlag = opt.tag.split('Templates')[1].split('2D')[0].split('ForFit')[0]
 
@@ -195,7 +230,7 @@ if 'ForFit' in opt.tag:
        for flavour in templateTreatmentFlag.split('Nuis')[1].split('Syst')[0]:
            templateCorrectionNuisances['Corr'+flavour] = flavour.lower()+'jets'
 
-   if 'Syst' in templateTreatmentFlag:
+   if 'Syst' in templateTreatmentFlag and 'nocorrrefit' not in opt.tag and 'norefit' not in opt.tag:
        for flavour in templateTreatmentFlag.split('Syst')[1]:
            systematicVariations.append('Corr'+flavour) 
 
@@ -208,6 +243,9 @@ if '_sel' in opt.tag:
                if 'veto' in tagoption:
                    if sel in tagoption: selectionToRemove.append(selection)
                elif sel not in tagoption: selectionToRemove.append(selection)
+            for nuisance in systematicNuisances:
+                for variation in [ 'Up', 'Down' ]:
+                    if nuisance+variation in tagoption: systematicVariations.append(nuisance+variation)
     for selection in selectionToRemove:
         systematicVariations.remove(selection)
 

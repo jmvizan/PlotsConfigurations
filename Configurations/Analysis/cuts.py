@@ -102,9 +102,8 @@ elif 'PtRelTemplates' in opt.tag and 'ForFit' in opt.tag:
         for btagwp in bTagWorkingPoints:
             for btagselection in [ 'Pass', 'Fail' ]:
                 for selection in systematicVariations:
-                    if 'JEU' not in selection:
-                        cutNameList = [ ptbin, btagwp, btagselection ] if selection=='' else [ ptbin, btagwp, btagselection, selection ]
-                        cuts['_'.join(cutNameList)] = { 'expr' : goodPV }
+                    cutNameList = [ ptbin, btagwp, btagselection ] if selection=='' else [ ptbin, btagwp, btagselection, selection ]
+                    cuts['_'.join(cutNameList)] = { 'expr' : goodPV }
 
 else:
 
