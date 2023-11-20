@@ -894,8 +894,7 @@ def bTagPerfAnalysis(opt, action):
                         opt2.tag = '-'.join(fitTagList)
                         combineTools.mlfits(opt2)
                 elif action=='system8fit': runSystem8Fit(opt2)
-                elif action=='getsystem8results': getSystem8FitResults(opt2)
-                elif action=='getptrelresults': getPtRelFitResults(opt2, opt)
+                elif action=='getbtagperffitresults': getBTagPerfFitResults(opt2, opt)
                 elif 'prefit' in action or 'postfit' in action:
                     if commonTools.isGoodFile(commonTools.getCombineOutputFileName(opt2, '', '', opt2.tag, 'mlfits'), 6000.):
                         if action=='prefitplots': latinoTools.postFitPlots(opt2)
@@ -949,6 +948,27 @@ def runSystem8Fit(opt):
 
 ### Efficiencies and scale factors
 
+def readOldPtRelFitResultsFromTables(opt, btagWP, ptbin, systematic):
+
+    efficiencyMC, uncertaintyMC, efficiencyFit, uncertaintyFit, scaleFactor, scaleFactorUncertainty = -1., -1., -1., -1., -1., -1.
+
+    tableName = '/afs/cern.ch/work/s/scodella/BTagging/CodeDevelopment/CMSSW_10_2_11/src/RecoBTag/PerformanceMeasurements/test/PtRelTools/Tables/PtRelFit_'+btagWP+'_anyEta_'+ptbin.replace('to','')+'_'+systematic+'_PSRun2017UL17_KinEtaAfterPtBinsCentral_LowPtAwayTrgConf_Run2016Production.txt'
+
+    tableFile = open(tableName, 'r')
+    lines = tableFile.readlines()
+    for line in lines:
+        if 'Efficiency MC' in line:
+            efficiencyMC  = float(line.split(' = ')[1].split(' +/- ')[0])
+            uncertaintyMC = float(line.split(' +/- ')[1].split('\n')[0])
+        elif 'Eff. data' in line:
+            efficiencyFit  = float(line.split(' = ')[1].split(' +/- ')[0])
+            uncertaintyFit = float(line.split(' +/- ')[1].split(' (')[0])
+        elif 'Scale factor' in line:
+            scaleFactor = float(line.split(' = ')[1].split(' +/- ')[0])
+            scaleFactorUncertainty = float(line.split(' +/- ')[1].split('\n')[0])
+
+    return efficiencyMC, uncertaintyMC, efficiencyFit, uncertaintyFit, scaleFactor, scaleFactorUncertainty
+
 def efficiencyError(P, F, eP, eF, correlation):
 
     T = P + F
@@ -988,24 +1008,40 @@ def getPtRelEfficiency(opt, inputFile, fileType, btagWP, ptbin, systematic):
 
     return efficiency, efficiencyError(passYield, failYield, errorPassYield, errorFailYield, correlation), passYield+failYield
 
-def readOldPtRelFitResultsFromTables(opt, optOrig, btagWP, ptbin, systematic):
+def getPtRelFitResults(opt, btagWP, ptbin, systematic):
 
-    tableName = '/afs/cern.ch/work/s/scodella/BTagging/CodeDevelopment/CMSSW_10_2_11/src/RecoBTag/PerformanceMeasurements/test/PtRelTools/Tables/PtRelFit_'+btagWP+'_anyEta_'+ptbin.replace('to','')+'_'+systematic+'_PSRun2017UL17_KinEtaAfterPtBinsCentral_LowPtAwayTrgConf_Run2016Production.txt'
+    if commonTools.isGoodFile(commonTools.getCombineOutputFileName(opt, '', '', opt.tag, 'mlfits'), 6000.):
+        if commonTools.goodCombineFit(opt, opt.year, opt.tag, '', 'PostFitS'):
 
-    tableFile = open(tableName, 'r')
-    lines = tableFile.readlines()
-    for line in lines:
-        if 'Efficiency MC' in line:
-            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMC']             = float(line.split(' = ')[1].split(' +/- ')[0])
-            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMCUncertainty']  = float(line.split(' +/- ')[1].split('\n')[0])
-        elif 'Eff. data' in line:
-            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFit']            = float(line.split(' = ')[1].split(' +/- ')[0])
-            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyFitUncertainty'] = float(line.split(' +/- ')[1].split(' (')[0])
-        elif 'Scale factor' in line:
-            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactor']              = float(line.split(' = ')[1].split(' +/- ')[0])
-            optOrig.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactorUncertainty']   = float(line.split(' +/- ')[1].split('\n')[0])
+            motherFile = commonTools.openShapeFile(opt.shapedir, opt.year, opt.tag.split('_')[0], 'SM', 'SM')
+            fitFile = commonTools.openCombineFitFile(opt, '', opt.year, opt.tag)
 
-def getPtRelFitResults(opt, optOrig):
+            efficiencyMC,  uncertaintyMC,  yieldsMC  = getPtRelEfficiency(opt, motherFile, 'shapes', btagWP, ptbin, systematic)
+            efficiencyFit, uncertaintyFit, yieldsFit = getPtRelEfficiency(opt, fitFile,    'fit',    btagWP, ptbin, systematic)
+
+            if efficiencyFit>0.999 or (efficiencyFit>0.99 and efficiencyFit/efficiencyMC>1.1) or (efficiencyFit>0.98 and efficiencyFit/efficiencyMC>1.5):
+                efficiencyFit, uncertaintyFit = 0.01, math.sqrt(efficiencyMC*(1.-efficiencyMC)/yieldsFit)
+            elif uncertaintyFit==0.:
+                uncertaintyFit = math.sqrt(efficiencyFit*(1.-efficiencyFit)/yieldsFit)
+
+            scaleFactor = efficiencyFit/efficiencyMC
+            scaleFactorUncertainty = scaleFactor*math.sqrt(pow(uncertaintyFit/efficiencyFit,2)+pow(uncertaintyMC/efficiencyMC,2))
+
+            motherFile.Close()
+            fitFile.Close()
+
+            return efficiencyMC, uncertaintyMC, efficiencyFit, uncertaintyFit, scaleFactor, scaleFactorUncertainty
+
+        elif opt.verbose: '  Warning: failed fit for campaign='+opt.year+', WP='+btagWP+', bin='+ptbin
+    elif opt.verbose: print 'Warning: input ML fit file', commonTools.getCombineOutputFileName(opt, '', '', opt.tag, 'mlfits'), 'not found'
+
+    return -1., -1., -1., -1., -1., -1.
+
+def getSystem8FitResults(opt, btagWP, ptbin, systematic):
+
+    print 'Please, write me if useful'
+
+def getBTagPerfFitResults(opt, optOrig):
 
     btagWP = opt.tag.split('_btag')[1].split('_')[0] 
     ptbinList = [ 'Pt'+opt.tag.split('_JetPt')[1].split('_')[0] ] if '_JetPt' in opt.tag else opt.ptBins 
@@ -1020,33 +1056,13 @@ def getPtRelFitResults(opt, optOrig):
             optOrig.bTagPerfResults[btagWP][systematic][ptbin] = {}
 
             if 'ptreltools' in opt.option.lower():
-                readOldPtRelFitResultsFromTables(opt, optOrig, btagWP, ptbin, systematic)
-                return
+                efficiencyMC, uncertaintyMC, efficiencyFit, uncertaintyFit, scaleFactor, scaleFactorUncertainty = readOldPtRelFitResultsFromTables(opt, btagWP, ptbin, systematic)
 
-            efficiencyMC, uncertaintyMC, efficiencyFit, uncertaintyFit, scaleFactor, scaleFactorUncertainty = -1., -1., -1., -1., -1., -1.
+            elif opt.method=='PtRel':
+                efficiencyMC, uncertaintyMC, efficiencyFit, uncertaintyFit, scaleFactor, scaleFactorUncertainty = getPtRelFitResults(opt, btagWP, ptbin, systematic)
 
-            if commonTools.isGoodFile(commonTools.getCombineOutputFileName(opt, '', '', opt.tag, 'mlfits'), 6000.):
-                if commonTools.goodCombineFit(opt, opt.year, opt.tag, '', 'PostFitS'):
-
-                    motherFile = commonTools.openShapeFile(opt.shapedir, opt.year, opt.tag.split('_')[0], 'SM', 'SM')
-                    fitFile = commonTools.openCombineFitFile(opt, '', opt.year, opt.tag)
- 
-                    efficiencyMC,  uncertaintyMC,  yieldsMC  = getPtRelEfficiency(opt, motherFile, 'shapes', btagWP, ptbin, systematic)
-                    efficiencyFit, uncertaintyFit, yieldsFit = getPtRelEfficiency(opt, fitFile,    'fit',    btagWP, ptbin, systematic)
-
-                    if efficiencyFit>0.999 or (efficiencyFit>0.99 and efficiencyFit/efficiencyMC>1.1) or (efficiencyFit>0.98 and efficiencyFit/efficiencyMC>1.5): 
-                        efficiencyFit, uncertaintyFit = 0.01, math.sqrt(efficiencyMC*(1.-efficiencyMC)/yieldsFit)
-                    elif uncertaintyFit==0.:
-                        uncertaintyFit = math.sqrt(efficiencyFit*(1.-efficiencyFit)/yieldsFit)
-
-                    scaleFactor = efficiencyFit/efficiencyMC
-                    scaleFactorUncertainty = scaleFactor*math.sqrt(pow(uncertaintyFit/efficiencyFit,2)+pow(uncertaintyMC/efficiencyMC,2))
-
-                    motherFile.Close()
-                    fitFile.Close()
-
-                elif opt.verbose: '  Warning: failed fit for campaign='+opt.year+', WP='+btagWP+', bin='+ptbin
-            elif opt.verbose: print 'Warning: input ML fit file', commonTools.getCombineOutputFileName(opt, '', '', opt.tag, 'mlfits'), 'not found'
+            elif opt.method=='System8':
+                efficiencyMC, uncertaintyMC, efficiencyFit, uncertaintyFit, scaleFactor, scaleFactorUncertainty = getSystem8FitResults(opt, btagWP, ptbin, systematic)
 
             optOrig.bTagPerfResults[btagWP][systematic][ptbin] = {}
             optOrig.bTagPerfResults[btagWP][systematic][ptbin]['efficiencyMC']             = efficiencyMC
@@ -1056,14 +1072,10 @@ def getPtRelFitResults(opt, optOrig):
             optOrig.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactor']              = scaleFactor
             optOrig.bTagPerfResults[btagWP][systematic][ptbin]['scaleFactorUncertainty']   = scaleFactorUncertainty
 
-def getSystem8FitResults(opt):
-
-    print 'please, write me if useful'
-
 def getBTagPerfResults(opt):
 
     opt.bTagPerfResults = {}
-    bTagPerfAnalysis(opt, 'get'+opt.method.lower()+'results')
+    bTagPerfAnalysis(opt, 'getbtagperffitresults')
 
 ### Plots for efficiencies and scale factors
 
@@ -1099,8 +1111,8 @@ def fillBTagPerfHistogram(opt, result, btagWP, bTagPerfSystematicResults):
         bTagPerfHisto.SetMaximum(1.1)
     else: 
         bTagPerfHisto.SetYTitle(btagWP+' Data/Sim. SF_{b}')
-        bTagPerfHisto.SetMinimum(0.7)
-        bTagPerfHisto.SetMaximum(1.3)
+        bTagPerfHisto.SetMinimum(0.6)
+        bTagPerfHisto.SetMaximum(1.4)
 
     return bTagPerfHisto
 
@@ -1130,6 +1142,11 @@ def makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos, resultToPlot):
             if result=='scalefactor' and resultToPlot=='performance': pad[1].cd()
             else: pad[0].cd()
 
+            legend = ROOT.TLegend(0.20,0.73,0.63,0.91);
+            legend.SetHeader(btagWP) 
+            legend.SetLineColor(0)
+            legend.SetShadowColor(0)
+
             drawOption = 'p'
             markerColor =  1
             for tag in bTagPerfHistos:
@@ -1144,6 +1161,10 @@ def makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos, resultToPlot):
                                 bTagPerfHistos[tag][systematic][btaghisto].SetFillColor(2);
                                 drawOption = 'pe2'
 
+                            if systematic=='Final':
+                                legend.AddEntry(bTagPerfHistos[tag][systematic][btaghisto], 'Scale factors', 'p')
+                                legend.AddEntry(bTagPerfHistos[tag][systematic+'Systematics'][btaghisto], 'Scale factor uncertainty', 'f')
+
                             bTagPerfHistos[tag][systematic][btaghisto].SetMarkerStyle(markerStyle+styleOffset)
                             bTagPerfHistos[tag][systematic][btaghisto].SetMarkerColor(markerColor)                
                             bTagPerfHistos[tag][systematic][btaghisto].Draw(drawOption)
@@ -1153,6 +1174,8 @@ def makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos, resultToPlot):
                     if systematic!='FinalSystematics':
                         markerStyle += 1
                         markerColor += 1
+
+            legend.Draw()
 
     tagFlag = '-'.join(bTagPerfHistos.keys())
     if 'DepOn' in opt.option or 'Final' in opt.option:
@@ -1361,19 +1384,19 @@ def plotBTagPerformance(opt, resultToPlot='performance', action='plot'):
         opt.option = 'FinalCompared' if len(opt.Selections)>2 else 'Final' 
     elif opt.Selections[0]=='': opt.Selections[0] = 'Central'
 
-    bTagPerfHistos = {}
     for btagWP in opt.btagWPs:
-        bTagPerfHistos[btagWP] = {}
+
+        bTagPerfHistos = {}
+
         for tag in opt.bTagPerfResults:
-            bTagPerfHistos[btagWP][tag] = {}
+            bTagPerfHistos[tag] = {}
             for systematic in opt.Selections:
-                bTagPerfHistos[btagWP][tag][systematic] = {}
+                bTagPerfHistos[tag][systematic] = {}
                 for result in [ 'efficiencyMC', 'efficiencyFit', 'scaleFactor' ]:
                     if resultToPlot in result.lower() or resultToPlot=='performance':
-                        bTagPerfHistos[btagWP][tag][systematic][result] = fillBTagPerfHistogram(opt, result, btagWP, opt.bTagPerfResults[tag][btagWP][systematic])
+                        bTagPerfHistos[tag][systematic][result] = fillBTagPerfHistogram(opt, result, btagWP, opt.bTagPerfResults[tag][btagWP][systematic])
 
-    for btagWP in opt.btagWPs:
-        makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos[btagWP], resultToPlot)
+        makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos, resultToPlot)
 
 def plotBTagEfficiencies(opt):
  

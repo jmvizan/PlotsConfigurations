@@ -209,7 +209,7 @@ if applyBFragmentation>=1: systematicNuisances.append('bfragmentation')
 systematicNuisances.append('bdecay')
 if opt.method=='PtRel': systematicNuisances.append('lightCharmRatio')
 
-if 'PtRelTemplates' in opt.tag and 'ForFit' in opt.tag and '_nuisSelections' in opt.tag: 
+if 'Templates' in opt.tag and 'ForFit' in opt.tag and '_nuisSelections' in opt.tag: 
     if '_noselrefit' in opt.tag or '_norefit' in opt.tag: systematicVariations = [ 'JEUUp', 'JEUDown' ]
     for nuisance in systematicNuisances:
         systematicVariations.append(nuisance+'Up')
