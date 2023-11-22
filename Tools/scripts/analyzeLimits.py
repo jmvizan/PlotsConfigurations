@@ -985,12 +985,14 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
         
         if tags[1]!='':
             if opt.tag == opt.compareto :
-                legend.AddEntry(tagObj[1],"ratio "+tags[0]+" #frac{"+tagObj[0].GetName().split('_')[-1]+"}{"+tagObj[1].GetName().split('_')[-1]+"}", '')
+                legend.AddEntry(tagObj[1],"ratio "+tags[0]+" #frac{"+tagObj[1].GetName().split('_')[-1]+"}{"+tagObj[0].GetName().split('_')[-1]+"}", '')
+                tagObj[1].Divide(tagObj[0])
+                tagObj[0] = tagObj[1]
             else:
                 legend.AddEntry(tagObj[1],"ratio  #frac{"+tags[0]+"}{"+tags[1]+"}", '')
-            tagObj[0].Divide(tagObj[1])
-            tagObj[0].SetMinimum(0.99)
-            tagObj[0].SetMaximum(1.01)
+                tagObj[0].Divide(tagObj[1])
+            tagObj[0].SetMinimum(0.00)
+            tagObj[0].SetMaximum(2.00)
         else:
             legend.AddEntry(tagObj[0],tags[0], '')
             tagObj[0].SetMinimum(0)

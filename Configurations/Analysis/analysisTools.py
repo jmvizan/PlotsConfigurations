@@ -540,9 +540,13 @@ def exclusionPlot(opt, plotoption='2'):
 
     if len(tagList)>2: 
         print 'Comparison of more than two tags not supported'  
-        #exit()
+        exit()
 
-    fitOption = 'Both' if opt.unblind else 'Blind'
+    fitOption = 'Blind'
+    if opt.unblind:
+        fitOption = 'Both'
+        if plotoption!='2' and (len(tagList)==1 or tagList[0]!=tagList[1]):
+            fitOption = 'Expected' if 'expected' in opt.option.lower() else 'Observed'
 
     sigset = ','.join(getSignalList(opt, opt.sigset, tagList[0]))
  
