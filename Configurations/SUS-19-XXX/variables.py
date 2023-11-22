@@ -1552,6 +1552,14 @@ if 'SearchRegionKinematics' in opt.tag:
                                                'CRbins' : [1, 4]
                                              }
 
+    
+    if 'Stop' in opt.tag:
+        variables['dPhiMinlepptmiss'] = {  'name'  : dPhiMinlepptmiss,    #   variable name
+                                           'range' : (  64,    0.,  3.2), #   variable range
+                                           'xaxis' : dphiminlepptmiss,    #   x axis name
+                                           'fold'  : overflow             #   fold overflow
+                                        }
+
     variables['ptmiss']  = {  'name'  : 'ptmiss',                #   variable name
                               'range' : (  20,    0.,  400.),    #   variable range
                               'xaxis' : met + gv,                #   x axis name

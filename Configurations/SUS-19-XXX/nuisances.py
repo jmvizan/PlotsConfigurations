@@ -637,7 +637,7 @@ if hasattr(opt, 'outputDirDatacard'):
 
 nuisanceToRemove = [ ]
 
-for nuisance in nuisances:
+for nuisance in nuisances.keys():
 
     if 'cuts' in nuisances[nuisance]:
         if len(nuisances[nuisance]['cuts'])==0:
@@ -659,8 +659,76 @@ for nuisance in nuisances:
         if nuisance not in nuisanceToRemove and 'type' in nuisances[nuisance] and nuisances[nuisance]['type']=='lnN':
             nuisanceToRemove.append(nuisance)
 
+    if '_DYsplit' in opt.tag:
+        if 'normDY' in nuisance:
+            nuisanceToRemove.append(nuisance)
+            for mt2llregion in mt2llRegions:
+                nuisances[nuisance+'_'+mt2llregion] = {}
+                for key in nuisances[nuisance]:
+                    nuisances[nuisance+'_'+mt2llregion][key] = nuisances[nuisance][key] 
+                nuisances[nuisance+'_'+mt2llregion]['name'] = nuisances[nuisance+'_'+mt2llregion]['name'].replace(nuisance,nuisance+'_'+mt2llregion)
+                cutToAdd = []
+                for cut in nuisances[nuisance+'_'+mt2llregion]['cuts']:
+                    if mt2llregion in cut or mt2llregion.replace('SR','CR') in cut: cutToAdd.append(cut)
+                nuisances[nuisance+'_'+mt2llregion]['cuts'] = cutToAdd  
+
+    if '_SplitSR' in opt.tag and 'qqqq' not in opt.tag:
+        if '_SR' not in nuisance and nuisance!='stat' and nuisances[nuisance]['type']!='rateParam':
+            if 'btag' in nuisance and '_SplitSRnobtag' in opt.tag: continue
+            if 'lepIdIso' in nuisance and '_SplitSRnoidiso' in opt.tag: continue
+            if 'qq' in opt.tag:
+                qqList = opt.tag.split('qq')[1].split('.')
+                skipThis = True
+                for qqnuis in qqList:
+                    if qqnuis in nuisance: skipThis = False
+                    elif qqnuis=='normX' and 'norm' in nuisance and 'normDY' not in nuisance: skipThis = False
+                if skipThis: continue
+            if 'cuts' not in nuisances[nuisance]: nuisances[nuisance]['cuts'] = cuts.keys()
+            nuisanceToRemove.append(nuisance)
+            for mt2llregion in mt2llRegions:
+                nuisances[nuisance+'_'+mt2llregion] = {}
+                for key in nuisances[nuisance]:
+                    nuisances[nuisance+'_'+mt2llregion][key] = nuisances[nuisance][key]
+                nuisances[nuisance+'_'+mt2llregion]['name'] = nuisances[nuisance+'_'+mt2llregion]['name'] + '_' + mt2llregion
+                cutToAdd = []
+                for cut in nuisances[nuisance+'_'+mt2llregion]['cuts']:
+                    if mt2llregion in cut or mt2llregion.replace('SR','CR') in cut: cutToAdd.append(cut)
+                nuisances[nuisance+'_'+mt2llregion]['cuts'] = cutToAdd
+
+    if '_SplitFlav' in opt.tag and 'qqqq' not in opt.tag:
+        if '_em' not in nuisance and '_sf' not in nuisance and nuisance!='stat' and 'CR' not in nuisance:
+            if 'btag' in nuisance and 'nobtag' in opt.tag: continue
+            if 'lepIdIso' in nuisance and 'noidiso' in opt.tag: continue
+            if 'Smooth' in nuisance and 'nojeu' in opt.tag: continue
+            if 'normDY' in nuisance and 'nody' in opt.tag: continue
+            if 'Topnorm' in nuisance and 'notopnorm' in opt.tag: continue
+            if 'WWnorm' in nuisance and 'nowwnorm' in opt.tag: continue
+            if 'qq' in opt.tag:
+                qqList = opt.tag.split('qq')[1].split('.')
+                skipThis = True
+                for qqnuis in qqList:
+                    if qqnuis in nuisance: skipThis = False
+                    elif qqnuis=='normX' and 'norm' in nuisance and 'normDY' not in nuisance: skipThis = False
+                if skipThis: continue
+            if 'norm' in nuisance and 'nonorm' in opt.tag: continue
+            if 'nolep' in opt.tag and 'lep' in nuisance: continue
+            if 'IdIsoFS' in nuisance and 'noidisofs' in opt.tag: continue
+            if 'cuts' not in nuisances[nuisance]: nuisances[nuisance]['cuts'] = cuts.keys()
+            nuisanceToRemove.append(nuisance)
+            for flav in [ 'em', 'sf']:
+                nuisances[nuisance+'__'+flav] = {}
+                for key in nuisances[nuisance]:
+                    nuisances[nuisance+'__'+flav][key] = nuisances[nuisance][key]
+                nuisances[nuisance+'__'+flav]['name'] = nuisances[nuisance+'__'+flav]['name'] + '__' + flav
+                if 'correlatedName' in nuisances[nuisance+'__'+flav]:
+                    nuisances[nuisance+'__'+flav]['correlatedName'] = nuisances[nuisance+'__'+flav]['correlatedName'] + '__' + flav
+                cutToAdd = []
+                for cut in nuisances[nuisance+'__'+flav]['cuts']:
+                    if flav in cut or 'CR' in cut: cutToAdd.append(cut)
+                nuisances[nuisance+'__'+flav]['cuts'] = cutToAdd
+
 for nuisance in nuisanceToRemove:
-    del nuisances[nuisance]
+    if nuisance in nuisances: del nuisances[nuisance]
 
 ### Nasty tricks ...
 

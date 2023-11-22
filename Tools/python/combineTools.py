@@ -207,8 +207,8 @@ def getFitOptions(options):
 
     optionList = []
     if 'noshapes' not in options: 
-        optionList.extend([ '--saveShapes', '--saveWithUncertainties', '--saveOverallShapes' ])
-        if 'asimov' in options: optionList.extend([ '--numToysForShapes 200', '--plots' ])
+        optionList.extend([ '--saveShapes', '--saveWithUncertainties', '--saveOverallShapes', '--plots' ])
+        if 'asimov' in options: optionList.extend([ '--numToysForShapes 200' ])
     if 'skipbonly' in options: optionList.append('--skipBOnlyFit')
     if 'asimov' in options:
         if 'asimovb' in options: optionList.append('-t -1 --expectSignal  0')

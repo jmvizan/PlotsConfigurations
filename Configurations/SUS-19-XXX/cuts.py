@@ -748,6 +748,10 @@ if 'SignalRegion' in opt.tag:
         if 'TChipmWWSignalRegions' in opt.tag:
             ptmiss_cuts['SR1'] = ptmiss_cuts['SR1'].replace('ptmiss>=160', 'ptmiss>=140')
 
+    if 'DDA' in opt.tag:
+        for srbin in ptmiss_cuts:
+            ptmiss_cuts[srbin] = ptmiss_cuts[srbin] + ' && ' + dPhiMinlepptmiss+'>0.1'
+
     SRlist = ptmiss_cuts.keys()
     for sr in SRlist:
         if '_no'+sr in opt.tag:
@@ -859,6 +863,16 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
 
     for cut in crcuts:
         cuts[cut] = crcuts[cut]
+
+# Select flavour channels
+
+if '_Flav' in opt.tag:
+    flavourCut2ToRemove = []
+    for cut in cuts:
+        if '_em' in cut and '_FlavEM' not in opt.tag: flavourCut2ToRemove.append(cut)
+        if '_sf' in cut and '_FlavSF' not in opt.tag: flavourCut2ToRemove.append(cut)
+    for cut in flavourCut2ToRemove:
+        del cuts[cut]
 
 # For FastSim pTmiss
 if isShape and 'Fast' in opt.tag:
