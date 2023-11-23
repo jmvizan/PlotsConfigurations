@@ -1108,8 +1108,8 @@ def makeExclusionPlot(year, tag, sigset, limitOptions, fileOption):
     if lumi>100: lumi_i=int(round(lumi, 0))
     else:        lumi_i=round(lumi, 1)
     cfgFile.write('HISTOGRAM '+ inputFileName.replace('//', '/Histograms/') + ' histo_X_' + limitOptions[1].lower() + '\n')
-    cfgFile.write('EXPECTED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up graph_r_'+limitType+'_down kRed kOrange\n')
-    if opt.add2sigma: cfgFile.write('EXPECTED2 ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up2 graph_r_'+limitType+'_down2 kRed kOrange\n') 
+    add2sigma = '1' if opt.add2sigma else '0'
+    cfgFile.write('EXPECTED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up graph_r_'+limitType+'_down kRed kOrange '+add2sigma+' graph_r_'+limitType+'_up2 graph_r_'+limitType+'_down2\n')
     cfgFile.write('OBSERVED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_observed graph_r_observed_up graph_r_observed_down kBlack kGray\n')
     cfgFile.write('PRELIMINARY Preliminary\n')
     cfgFile.write('LUMI ' + str(lumi_i) + '\n')
