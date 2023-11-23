@@ -560,6 +560,7 @@ def exclusionPlot(opt, plotoption='2'):
         refTags = '-'.join([ tagList[x] for x in range(1,len(tagList)) ])
         plotCommandList.append('--compareto='+refTags)
     if plotoption=='0': plotCommandList.append('--nofillempties')
+    if '2sigma' in opt.option.lower(): plotCommandList.append('--add2sigma')
 
     os.system('analyzeLimits.py '+' '.join(plotCommandList))
 

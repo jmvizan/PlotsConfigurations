@@ -724,7 +724,11 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
                                 massPointLimits['histo_r_'+limitType+'_up'] = roundBin(inputTree.limit)
                             elif round(inputTree.quantileExpected, 2)==0.16:
                                 massPointLimits['histo_r_'+limitType+'_down'] = roundBin(inputTree.limit)
-
+                            elif round(inputTree.quantileExpected, 3)==0.975:
+                                massPointLimits['histo_r_'+limitType+'_up2'] = roundBin(inputTree.limit)
+                            elif round(inputTree.quantileExpected, 3)==0.025:
+                                massPointLimits['histo_r_'+limitType+'_down2'] = roundBin(inputTree.limit)
+                                
                         massPoints[massPoint]['limits'] = massPointLimits
                     
                     inputFile.Close()
@@ -918,6 +922,7 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
 
     # Get the objects
     tagObj = [ ] 
+    tagObjName = [ ]
 
     for i_tag,tag in enumerate(tags):
 
@@ -945,9 +950,14 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
                         if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
                             continue
                     else:
+                        if i_tag>0 or 'observed' in obj.GetName(): obj.SetLineColor(2)
+                        if '_up2' in obj.GetName() or '_down2' in obj.GetName():
+                            if not opt.add2sigma: continue
+                            obj.SetLineStyle(4)
                         if '_up' in obj.GetName() or '_down' in obj.GetName() or '_X' in obj.GetName():
                             obj.SetLineStyle(2)
 
+                    tagObjName.append(obj.GetName())
                     tagObj.append(obj)
 
     # Draw comparison
@@ -1033,12 +1043,28 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
         #exit()
         same = ''
         ntag = 0
-        for iobj in range(len(tagObj)):
 
-            if iobj>=3:
-                tagObj[iobj].SetLineColor(2)
-            if iobj>=6:
-                tagObj[iobj].SetLineColor(418)
+        cDone = 'None'
+        if 'graph_r_expected_down2' in tagObjName: 
+            iobj = tagObjName.index('graph_r_expected_down2')
+            tagObj[iobj].Draw(same)
+            same = 'same'
+            cDone = 'graph_r_expected_down2'
+        elif 'graph_r_expected_down' in tagObjName:
+            iobj = tagObjName.index('graph_r_expected_down')
+            tagObj[iobj].Draw(same)
+            same = 'same'
+            cDone = 'graph_r_expected_down'
+
+        for obj in sorted(tagObjName):
+
+            if obj==cDone: continue
+
+            iobj = tagObjName.index(obj)
+            #if iobj>=3:
+            #    tagObj[iobj].SetLineColor(2)
+            #if iobj>=6:
+            #    tagObj[iobj].SetLineColor(418)
  
             tagObj[iobj].Draw(same)
             same = 'same'
@@ -1083,6 +1109,7 @@ def makeExclusionPlot(year, tag, sigset, limitOptions, fileOption):
     else:        lumi_i=round(lumi, 1)
     cfgFile.write('HISTOGRAM '+ inputFileName.replace('//', '/Histograms/') + ' histo_X_' + limitOptions[1].lower() + '\n')
     cfgFile.write('EXPECTED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up graph_r_'+limitType+'_down kRed kOrange\n')
+    if opt.add2sigma: cfgFile.write('EXPECTED2 ' + inputFileName.replace('//', '/Contours/') + ' graph_r_'+limitType+' graph_r_'+limitType+'_up2 graph_r_'+limitType+'_down2 kRed kOrange\n') 
     cfgFile.write('OBSERVED ' + inputFileName.replace('//', '/Contours/') + ' graph_r_observed graph_r_observed_up graph_r_observed_down kBlack kGray\n')
     cfgFile.write('PRELIMINARY Preliminary\n')
     cfgFile.write('LUMI ' + str(lumi_i) + '\n')
@@ -1116,6 +1143,7 @@ if __name__ == '__main__':
     parser.add_option('--compareto'     , dest='compareto'     , help='Reference tag used for comparison'           , default='')
     parser.add_option('--plotoption'    , dest='plotOption'    , help='-1 None, 0 Histograms, 1 Contours, 2 Final'  , default='-1')
     parser.add_option('--fileoption'    , dest='fileOption'    , help='in case input file different to both/blind'  , default='Both')
+    parser.add_option('--add2sigma'     , dest='add2sigma'     , help='Remake limit contours'                       , default=False, action='store_true')
     (opt, args) = parser.parse_args()
 
     if opt.years=='-1' or opt.years=='all' or opt.years=='All':
