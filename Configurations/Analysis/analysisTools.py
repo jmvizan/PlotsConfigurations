@@ -555,7 +555,9 @@ def exclusionPlot(opt, plotoption='2'):
         opt2.tag = tag
         makeContours(opt2, plotoption, fitOption)
 
-    plotCommandList = [ '--years='+opt.year, '--tag='+tagList[0], '--sigset='+sigset, '--limitoption='+fitOption, '--plotoption='+plotoption+' --nomakehistos' ]
+    plotCommandList = [ '--years='+opt.year, '--tag='+tagList[0], '--sigset='+sigset, '--limitoption='+fitOption, '--plotoption='+plotoption, '--limitdir='+opt.limitdir ]
+    if opt.reset: plotCommandList.extend([ '--remakehistos', '--remakecontours' ])
+    else: plotCommandList.append('--nomakehistos')
     if len(tagList)>1: 
         refTags = '-'.join([ tagList[x] for x in range(1,len(tagList)) ])
         plotCommandList.append('--compareto='+refTags)

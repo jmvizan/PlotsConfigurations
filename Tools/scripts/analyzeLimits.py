@@ -677,7 +677,7 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
     massPoints = { }
     massLimits = { 'X' : { 'min' : 999999., 'max' : -1. }, 'Y' : { 'min' : 999999., 'max' : -1. } }
 
-    inputDirectory = './Limits/'+year+'/'+tag+'/' 
+    inputDirectory = opt.limitdir+'/'+year+'/'+tag+'/' 
     
     limitType = 'blind' if (limitOption=='Blind') else 'expected'
     for model in signalMassPoints.signalMassPoints:
@@ -1093,10 +1093,10 @@ def makeExclusionPlot(year, tag, sigset, limitOptions, fileOption):
             exit() 
 
     cfgFileName = sigset + '_' + tag + '_' + limitOptions[1]
-    cfgFile = open('Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg', 'w')
+    cfgFile = open('./Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg', 'w')
 
     limitType = 'blind' if (limitOption=='Blind') else 'expected' 
-    inputFileName = 'Limits/' + year + '/' + tag + '//massScan_' + tag + '_' + sigset + '_' + fileOption + '.root'
+    inputFileName = './Limits/' + year + '/' + tag + '//massScan_' + tag + '_' + sigset + '_' + fileOption + '.root'
 
     lumi = 0.
     if '2016' in year:
@@ -1116,13 +1116,13 @@ def makeExclusionPlot(year, tag, sigset, limitOptions, fileOption):
     cfgFile.write('ENERGY 13\n\n')
 
     cfgFile.close()
-    os.system('cat Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg')
+    os.system('cat '+ './Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg')
     outputDirectory = 'Plots/' + year + '/ExclusionPlots/'
     os.system('mkdir -p ' + outputDirectory)
     os.system('cp Plots/index.php ' + outputDirectory)
     workingDirectory = 'cd ../../../../../CMSSW_8_1_0/src; eval `scramv1 runtime -sh`; cd - ;'
-    os.system(workingDirectory + 'python ../../../PlotsSMS/python/makeSMSplots.py Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg ' + outputDirectory + cfgFileName) 
-    os.system('rm Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg')
+    os.system(workingDirectory + 'python ../../../PlotsSMS/python/makeSMSplots.py ./Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg ' + outputDirectory + cfgFileName) 
+    os.system('rm ./Limits/' + year + '/' + tag + '/' + cfgFileName + '.cfg')
 
 if __name__ == '__main__':
 
@@ -1144,6 +1144,7 @@ if __name__ == '__main__':
     parser.add_option('--plotoption'    , dest='plotOption'    , help='-1 None, 0 Histograms, 1 Contours, 2 Final'  , default='-1')
     parser.add_option('--fileoption'    , dest='fileOption'    , help='in case input file different to both/blind'  , default='Both')
     parser.add_option('--add2sigma'     , dest='add2sigma'     , help='Remake limit contours'                       , default=False, action='store_true')
+    parser.add_option('--limitdir'      , dest='limitdir'      , help='Input limits directory'                      , default='./Limits')
     (opt, args) = parser.parse_args()
 
     if opt.years=='-1' or opt.years=='all' or opt.years=='All':
