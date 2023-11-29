@@ -921,9 +921,6 @@ def pileupWeights(opt, dataFile = '', simulationFile = '', outputFile = ''):
         else:
             os.system('mkdir -p '+outputDir)
             outputFile = outputDir+'pileupWeights_'+dataFile.split('/')[-1]
-    
-    if opt.debug:
-        print 'dataFile:', dataFile, 'simulationFile:', simulationFile, 'plotFile:', plotFile, 'outputFile:', outputFile
            
     dataRoot = openRootFile(dataFile+'.root')
     simulationRoot = openRootFile(simulationFile+'.root')   
@@ -942,7 +939,11 @@ def pileupWeights(opt, dataFile = '', simulationFile = '', outputFile = ''):
             plotFile = opt.option.split('plotFile:')[-1].split(':')[0].replace('.png','')
         else:
             plotFile = dataFile.split('/')[-1]
-            
+    else: plotFile = 'None'
+       
+    if opt.debug:
+        print 'dataFile:', dataFile, 'simulationFile:', simulationFile, 'plotFile:', plotFile, 'outputFile:', outputFile
+ 
     for pileup in [ 'pileup', 'pileup_minus', 'pileup_plus' ]:
 
         dataPileup = dataRoot.Get(pileup)
