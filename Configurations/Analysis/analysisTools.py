@@ -22,12 +22,14 @@ def getCampaignParameters(opt):
 
     opt.tag = origTag
     if opt.year=='test': opt.year = opt.campaign
+
     opt.minPlotPt = minPlotPt
     opt.maxPlotPt = maxPlotPt
     opt.maxJetEta = float(maxJetEta)
     opt.bTagAlgorithms = bTagAlgorithms
     opt.btagWPs = bTagWorkingPoints.keys()
     opt.ptBins = jetPtBins.keys()
+
     opt.Selections = []
     for selection in systematicVariations:
         sel = 'Central' if selection=='' else selection

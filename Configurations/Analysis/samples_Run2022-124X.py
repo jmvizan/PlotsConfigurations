@@ -8,9 +8,6 @@ from collections import OrderedDict
 ### Generals
 
 opt.campaign = 'Summer22'
-#if 'Summer22v11' in opt.tag: opt.campaign = 'Summer22v11'
-#elif 'Summer22EEv11' in opt.tag: opt.campaign = 'Summer22EEv11'
-#elif 'Summer22EE' in opt.tag: opt.campaign = 'Summer22EE'
 if 'Summer22EE' in opt.tag: opt.campaign = 'Summer22EE'
 
 opt.CME = '13.6'
@@ -53,9 +50,8 @@ SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
 
 if 'cern' in SITE:
-    treeBaseDirMC   = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12'
-    treeBaseDirData = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12'
-    if 'modJECF' in opt.tag: treeBaseDirData += '_modJECF'
+    treeBaseDirMC   = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12_fixPuppi'
+    treeBaseDirData = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12_fixPuppi'
 else: print 'trees for', campaign, 'campaign available only at cern'
 
 ProductionMC   = opt.campaign
@@ -63,7 +59,6 @@ ProductionData = opt.campaign
   
 directoryBkg  = '/'.join([ treeBaseDirMC,   ProductionMC  , '' ])
 directoryData = '/'.join([ treeBaseDirData, ProductionData, '' ])
-if 'modJECF' in opt.tag: directoryData = '/'.join([ treeBaseDirData, '' ])
 
 ### Campaign parameters
 
@@ -106,17 +101,7 @@ elif opt.campaign=='Summer22EE':
     btagAwayJetTagger, btagAwayJetDiscriminant = 'JBP', 'Bprob'
     btagAwayJetVariations = { 'AwayJetTag' : '3.057',  'AwayJetDown' : '1.492' , 'AwayJetUp' : '5.481' }
 
-#elif opt.campaign=='Summer22v11':
-#    bTagWorkingPoints = {'DeepJetM': {'cut': '0.303', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetT': {'cut': '0.7559', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetVVT': {'cut': '0.9659', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetVT': {'cut': '0.8531', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.0474', 'discriminant': 'DeepFlavourBDisc'}}
-#    btagAwayJetTagger, btagAwayJetDiscriminant = 'JBP', 'Bprob'
-#    btagAwayJetVariations = { 'AwayJetTag' : '2.866',  'AwayJetDown' : '1.397' , 'AwayJetUp' : '5.196' }
-#
-#elif opt.campaign=='Summer22EEv11':
-#    bTagWorkingPoints = {'DeepJetM': {'cut': '0.3179', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetT': {'cut': '0.7696', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetVVT': {'cut': '0.9683', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetVT': {'cut': '0.8594', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.0492', 'discriminant': 'DeepFlavourBDisc'}}
-#    btagAwayJetTagger, btagAwayJetDiscriminant = 'JBP', 'Bprob'
-#    btagAwayJetVariations = { 'AwayJetTag' : '3.057',  'AwayJetDown' : '1.492' , 'AwayJetUp' : '5.481' }
-
-if 'WorkingPoints' in opt.tag: # and 'v11' not in opt.campaign:
+if 'WorkingPoints' in opt.tag:
     bTagWorkingPoints[btagAwayJetTagger+'L'] = {'cut': btagAwayJetVariations['AwayJetDown'], 'discriminant': btagAwayJetDiscriminant}
     bTagWorkingPoints[btagAwayJetTagger+'M'] = {'cut': btagAwayJetVariations['AwayJetTag'] , 'discriminant': btagAwayJetDiscriminant}
     bTagWorkingPoints[btagAwayJetTagger+'T'] = {'cut': btagAwayJetVariations['AwayJetUp']  , 'discriminant': btagAwayJetDiscriminant}
@@ -275,7 +260,7 @@ else:
 # kinematic weights setting
 kinematicWeightsMap = { 'QCDMu'  : [ 'QCDMu', 'bjets', 'cjets', 'ljets', 'light' ],
                         'QCD'    : [ 'QCD' ],
-                        'JetMET' : [ 'JetMET' ]
+                        'JET'    : [ 'JET' ]
                        }
 
 ### Complex variables
@@ -377,7 +362,8 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
 
     if opt.campaign=='Summer22':
         qcdMuPtHatBins = {'80to120': {'ext': '', 'xSec': '2536000*0.03807', 'events': '25037792', 'weight': '3.85599177435'}, '170to300': {'ext': '', 'xSec': '114200*0.06781', 'events': '36140731', 'weight': '0.214270762813'}, '300to470': {'ext': '', 'xSec': '7678*0.09136', 'events': '30002342', 'weight': '0.0233802441156'}, '600to800': {'ext': '', 'xSec': '180.6*0.1176', 'events': '19989674', 'weight': '0.00106247655665'}, '800to1000': {'ext': '', 'xSec': '30.89*0.1278', 'events': '39062066', 'weight': '0.000101063318054'}, '120to170': {'ext': '', 'xSec': '444900*0.05214', 'events': '18849346', 'weight': '1.23065733952'}, '50to80': {'ext': '', 'xSec': '15710000*0.0221', 'events': '40249032', 'weight': '8.62607080836'}, '30to50': {'ext': '', 'xSec': '114100000*0.01303', 'events': '30177962', 'weight': '49.2651889481'}, '470to600': {'ext': '', 'xSec': '630.3*0.1062', 'events': '17697354', 'weight': '0.00378236543158'}, '15to20': {'ext': '', 'xSec': '907100000*0.0032', 'events': '4529335', 'weight': '640.871121257'}, '20to30': {'ext': '', 'xSec': '420500000*0.00599', 'events': '29845469', 'weight': '84.3945524863'}, '1000': {'ext': '', 'xSec': '9.935*0.1341', 'events': '14214939', 'weight': '9.37241798927e-05'}}
-        qcdPtHatBins = {'80to120': {'ext': '', 'xSec': '2762530*1', 'events': '30322655', 'weight': '91.1044893661'}, '170to300': {'ext': '', 'xSec': '19204300', 'events': '29279427', 'weight': '655.897398539'}, '300to470': {'ext': '', 'xSec': '7823', 'events': '57643751', 'weight': '0.135712889329'}, '600to800': {'ext': '', 'xSec': '186.9', 'events': '69239419', 'weight': '0.00269932940945'}, '1000to1400': {'ext': '', 'xSec': '9.4183', 'events': '20179760', 'weight': '0.000466720119565'}, '800to1000': {'ext': '', 'xSec': '32.293', 'events': '40198975', 'weight': '0.000803328940601'}, '120to170': {'ext': '', 'xSec': '471100', 'events': '30337885', 'weight': '15.5284391117'}, '1400to1800': {'ext': '', 'xSec': '0.84265', 'events': '5996606', 'weight': '0.0001405211548'}, '1800to2400': {'ext': '', 'xSec': '0.114943', 'events': '3269659', 'weight': '3.51544304773e-05'}, '470to600': {'ext': '', 'xSec': '648.2', 'events': '27946458', 'weight': '0.0231943525723'}, '3200': {'ext': '', 'xSec': '0.000165445', 'events': '720008', 'weight': '2.29782169087e-07'}, '50to80': {'ext': '', 'xSec': '19204300', 'events': '19859107', 'weight': '967.027369358'}, '30to50': {'ext': '', 'xSec': '114100000', 'events': '1189766', 'weight': '95901.2108263'}, '2400to3200': {'ext': '', 'xSec': '0.00682981', 'events': '1991557', 'weight': '3.42938213669e-06'}, '15to30': {'ext': '', 'xSec': '1327600000', 'events': '1149000', 'weight': '1155439.51262'}}
+        qcdPtHatBins = {'80to120': {'ext': '', 'xSec': '2762530*1', 'events': '29962336', 'weight': '92.2000874698'}, '170to300': {'ext': '', 'xSec': '19204300', 'events': '28753694', 'weight': '667.889837041'}, '300to470': {'ext': '', 'xSec': '7823', 'events': '56915763', 'weight': '0.137448741573'}, '600to800': {'ext': '', 'xSec': '186.9', 'events': '65874236', 'weight': '0.0028372245562'}, '1000to1400': {'ext': '', 'xSec': '9.4183', 'events': '20214043', 'weight': '0.000465928562633'}, '800to1000': {'ext': '', 'xSec': '32.293', 'events': '40661892', 'weight': '0.000794183408878'}, '120to170': {'ext': '', 'xSec': '471100', 'events': '29386831', 'weight': '16.0309902078'}, '1400to1800': {'ext': '', 'xSec': '0.84265', 'events': '6220780', 'weight': '0.000135457289922'}, '1800to2400': {'ext': '', 'xSec': '0.114943', 'events': '2796944', 'weight': '4.1095924695e-05'}, '2400to3200': {'ext': '', 'xSec': '0.00682981', 'events': '1874178', 'weight': '3.64416293436e-06'}, '3200': {'ext': '', 'xSec': '0.000165445', 'events': '100000', 'weight': '1.65445e-06'}, '50to80': {'ext': '', 'xSec': '19204300', 'events': '19963206', 'weight': '961.984763369'}, '30to50': {'ext': '', 'xSec': '114100000', 'events': '3883200', 'weight': '29382.9831067'}, '470to600': {'ext': '', 'xSec': '648.2', 'events': '26594326', 'weight': '0.0243736201474'}, '15to30': {'ext': '', 'xSec': '1327600000', 'events': '1149000', 'weight': '1155439.51262'}}
+        del qcdPtHatBins ['15to30']
  
     elif opt.campaign=='Summer22EE':
         qcdMuPtHatBins = {'80to120': {'ext': '', 'xSec': '2536000*0.03807', 'events': '87607597', 'weight': '1.10202223672'}, '170to300': {'ext': '', 'xSec': '114200*0.06781', 'events': '108082012', 'weight': '0.0716483886329'}, '300to470': {'ext': '', 'xSec': '7678*0.09136', 'events': '103244272', 'weight': '0.0067941985198'}, '600to800': {'ext': '', 'xSec': '180.6*0.1176', 'events': '73223619', 'weight': '0.000290050673404'}, '800to1000': {'ext': '', 'xSec': '30.89*0.1278', 'events': '126511164', 'weight': '3.12046927337e-05'}, '120to170': {'ext': '', 'xSec': '444900*0.05214', 'events': '70757973', 'weight': '0.327837062263'}, '50to80': {'ext': '', 'xSec': '15710000*0.0221', 'events': '40955399', 'weight': '8.47729502037'}, '30to50': {'ext': '', 'xSec': '114100000*0.01303', 'events': '102915690', 'weight': '14.446028589'}, '470to600': {'ext': '', 'xSec': '630.3*0.1062', 'events': '72085714', 'weight': '0.000928587042919'}, '15to20': {'ext': '', 'xSec': '907100000*0.0032', 'events': '16191725', 'weight': '179.271819402'}, '20to30': {'ext': '', 'xSec': '420500000*0.00599', 'events': '97331894', 'weight': '25.8784135034'}, '1000': {'ext': '', 'xSec': '9.935*0.1341', 'events': '47539649', 'weight': '2.80246810405e-05'}}
@@ -453,21 +439,21 @@ for sample in samples:
 
 if 'SM' in opt.sigset or 'Data' in opt.sigset:
 
-    dataName = 'BTagMu' if opt.method+'Kinematics' in opt.tag or opt.method+'Templates' in opt.tag or 'DataKinematics' in opt.tag else 'JetMET'
+    dataSetName = 'BTagMu' if 'Light' not in opt.tag else 'JetMET'
 
     runPeriods = {}
     if 'Summer22EE' in opt.campaign:
-        #runPeriods['Run2022E'] = { 'subdir' : dataName + 'Run2022E-27Jun2023-v1'  }
-        runPeriods['Run2022F'] = { 'subdir' : dataName + 'Run2022F-PromptReco-v1' }
-        runPeriods['Run2022G'] = { 'subdir' : dataName + 'Run2022F-PromptReco-v1' }
+        runPeriods['Run2022E'] = { 'subdir' : dataSetName + 'Run2022E-27Jun2023-v1'  }
+        runPeriods['Run2022F'] = { 'subdir' : dataSetName + 'Run2022F-PromptReco-v1' }
+        runPeriods['Run2022G'] = { 'subdir' : dataSetName + 'Run2022F-PromptReco-v1' }
     elif 'Summer22' in opt.campaign:
-        if dataName=='BTagMu':
-            runPeriods['Run2022C'] = { 'subdir' : dataName + 'Run2022C-27Jun2023-v2' }
-            runPeriods['Run2022D'] = { 'subdir' : dataName + 'Run2022D-27Jun2023-v1' }
+        if dataSetName=='BTagMu':
+            runPeriods['Run2022C'] = { 'subdir' : dataSetName + 'Run2022C-22Sep2023-v1' }
+            runPeriods['Run2022D'] = { 'subdir' : dataSetName + 'Run2022D-22Sep2023-v1' }
         else:
-            runPeriods['Run2022c'] = { 'subdir' : 'JetHT'  + 'Run2022C-27Jun2023-v2' }
-            runPeriods['Run2022C'] = { 'subdir' : dataName + 'Run2022C-27Jun2023-v1' }
-            runPeriods['Run2022D'] = { 'subdir' : dataName + 'Run2022D-27Jun2023-v2' }
+            runPeriods['Run2022c'] = { 'subdir' : 'JetHT'     + 'Run2022C-22Sep2023-v1' }
+            runPeriods['Run2022C'] = { 'subdir' : dataSetName + 'Run2022C-22Sep2023-v1' }
+            runPeriods['Run2022D'] = { 'subdir' : dataSetName + 'Run2022D-22Sep2023-v1' }
         if 'RunC' in opt.tag: del runPeriods['Run2022D']
         if 'RunD' in opt.tag: del runPeriods['Run2022C']
 
@@ -477,7 +463,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
         dataDir = '/'.join([ directoryData, runPeriods[runPeriod]['subdir'], '' ]) 
         dataTrees += getSampleFiles(dataDir,  '', True, treePrefix, skipTreesCheck)
  
-    if dataName=='BTagMu': dataName = 'DATA'
+    dataName = 'DATA' if dataSetName=='BTagMu' else 'JET'
     samples[dataName]  = { 'name'      : dataTrees ,
                            'weight'    : '1.' ,
                            'isData'    : ['all'] ,
