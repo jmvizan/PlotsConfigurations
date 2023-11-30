@@ -63,11 +63,11 @@ elif opt.method+'Kinematics' in opt.tag:
                                      'fold'  : overflow
                                     }
 
-    #variables['PV']              = { 'name'  : '' # Missing
-    #                                 'range' : (50, 0., 50.),
-    #                                 'xaxis' : 'nPV',
-    #                                 'fold'  : overflow
-    #                                }
+    variables['PV']              = { 'name'  : 'npvsGood',
+                                     'range' : (50, 0., 50.),
+                                     'xaxis' : 'number of good PVs',
+                                     'fold'  : overflow
+                                    }
 
     for cut in cuts:
 
