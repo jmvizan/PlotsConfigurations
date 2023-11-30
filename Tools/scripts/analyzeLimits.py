@@ -432,7 +432,7 @@ def fillEmptyBins(sigset, histo):
                 else:
                     xb += 1; yb += 1
         
-        # ... then fill grid holes 
+        # ... then fill grid holes
         nIterations = 4 if binWidth==5. else 0
         for iter in range(nIterations):
             for xb in range(1, histo.GetNbinsX()+1):
@@ -469,8 +469,8 @@ def fillEmptyBins(sigset, histo):
                             histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xi, yb, xf, yb))
 
                         elif iter==3 and massX-massY>=100. and yb<=5 and xb>histo.GetNbinsX()-5: # Far away corner, not much important
-                            limitR = histo.SetBinContent(xb-1, yb)
-                            limitS = histo.SetBinContent(xb, yb+5)/histo.SetBinContent(xb-1, yb+5)
+                            limitR = histo.GetBinContent(xb-1, yb)
+                            limitS = histo.GetBinContent(xb, yb+5)/histo.GetBinContent(xb-1, yb+5)
                             histo.SetBinContent(xb, yb, limitR*limitS)
 
         # Fill massY<0 bins
@@ -808,8 +808,8 @@ def makeMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
             fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillemptybins, outputFileName)
 
 def getMassScanContour(outputFileName, histo):
-    
-    if not 'TChipmWW' in outputFileName:
+
+    if not 'TChipmWW' in outputFileName or 'observed_up' in histo.GetName():
         histo.Smooth(1, "k3a");
 
     x, y, z = array( 'd' ), array( 'd' ), array( 'd' )
