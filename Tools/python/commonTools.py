@@ -28,6 +28,12 @@ def isGoodFile(filename, minSize=100000.):
     fileSize = os.path.getsize(filename)
     return fileSize>minSize
 
+def hasString(filename, string):
+
+    with open(filename) as myfile:
+        if string in myfile.read(): return True
+    return False
+
 def compile(opt):
   
     if 'base' in opt.option.lower(): directory = '$CMSSW_BASE/src/' 
@@ -918,9 +924,6 @@ def pileupWeights(opt, dataFile = '', simulationFile = '', outputFile = ''):
         else:
             os.system('mkdir -p '+outputDir)
             outputFile = outputDir+'pileupWeights_'+dataFile.split('/')[-1]
-    
-    if opt.debug:
-        print 'dataFile:', dataFile, 'simulationFile:', simulationFile, 'plotFile:', plotFile, 'outputFile:', outputFile
            
     dataRoot = openRootFile(dataFile+'.root')
     simulationRoot = openRootFile(simulationFile+'.root')   
@@ -939,7 +942,11 @@ def pileupWeights(opt, dataFile = '', simulationFile = '', outputFile = ''):
             plotFile = opt.option.split('plotFile:')[-1].split(':')[0].replace('.png','')
         else:
             plotFile = dataFile.split('/')[-1]
-            
+    else: plotFile = 'None'
+       
+    if opt.debug:
+        print 'dataFile:', dataFile, 'simulationFile:', simulationFile, 'plotFile:', plotFile, 'outputFile:', outputFile
+ 
     for pileup in [ 'pileup', 'pileup_minus', 'pileup_plus' ]:
 
         dataPileup = dataRoot.Get(pileup)
