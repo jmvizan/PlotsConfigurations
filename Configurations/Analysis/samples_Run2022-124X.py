@@ -260,7 +260,7 @@ else:
 # kinematic weights setting
 kinematicWeightsMap = { 'QCDMu'  : [ 'QCDMu', 'bjets', 'cjets', 'ljets', 'light' ],
                         'QCD'    : [ 'QCD' ],
-                        'JET'    : [ 'JET' ]
+                        'Jet'    : [ 'Jet' ]
                        }
 
 ### Complex variables
@@ -463,7 +463,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
         dataDir = '/'.join([ directoryData, runPeriods[runPeriod]['subdir'], '' ]) 
         dataTrees += getSampleFiles(dataDir,  '', True, treePrefix, skipTreesCheck)
  
-    dataName = 'DATA' if dataSetName=='BTagMu' else 'JET'
+    dataName = 'DATA' if dataSetName=='BTagMu' else 'Jet'
     samples[dataName]  = { 'name'      : dataTrees ,
                            'weight'    : '1.' ,
                            'isData'    : ['all'] ,
