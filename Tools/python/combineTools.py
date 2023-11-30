@@ -91,7 +91,8 @@ def runCombine(opt):
 
     if not hasattr(opt, 'combineAction'):
         if 'limit' in opt.option: limits(opt)
-        elif 'fit' in opt.option: mlfits(opt)
+        elif 'goffit' in opt.option: goodnessOfFit(opt)
+        elif 'mlfits' in opt.option: mlfits(opt)
         elif 'impact' in opt.option: impactsPlots(opt)
         else: print 'Please, speficy if you want to compute limits, make ML fits, or produce impacts plots'
         exit()
@@ -211,7 +212,8 @@ def limits(opt):
     opt.combineAction = 'limits'
     if 'toy' in opt.option.lower():
         opt.batchQueue = 'nextweek'
-        limitMethod = '-M HybridNew --LHCmode LHC-limits'
+        if 'btoy' in opt.option.lower(): limitMethod = '-M BayesianToyMC'
+        else: limitMethod = '-M HybridNew --LHCmode LHC-limits'
     else:
         limitRun = getLimitRun(opt.unblind) 
         limitMethod = ' '.join([ '-M AsymptoticLimits', '--run '+limitRun.lower(), '-n _'+limitRun ])
@@ -225,8 +227,8 @@ def getFitOptions(options):
 
     optionList = []
     if 'noshapes' not in options: 
-        optionList.extend([ '--saveShapes', '--saveWithUncertainties', '--saveOverallShapes' ])
-        if 'asimov' in options: optionList.extend([ '--numToysForShapes 200', '--plots' ])
+        optionList.extend([ '--saveShapes', '--saveWithUncertainties', '--saveOverallShapes', '--plots' ])
+        if 'asimov' in options: optionList.extend([ '--numToysForShapes 200' ])
     if 'skipbonly' in options: optionList.append('--skipBOnlyFit')
     if 'asimov' in options:
         if 'asimovb' in options: optionList.append('-t -1 --expectSignal  0')
@@ -236,6 +238,17 @@ def getFitOptions(options):
     if 'autob'   in options: optionList.append('--autoBoundsPOIs="*"')
     if 'negsign' in options: optionList.append('--rMin -10')
     return ' '.join(optionList)
+
+def goodnessOfFit(opt):
+
+    opt.combineAction = 'goffit'
+    fitOptions = getFitOptions(opt.option.lower())
+    algo = 'AD' if 'AD' in opt.option else 'KS' if 'KS' in opt.option else 'saturated'
+    toy = '-t 100' if 'toy' in opt.option or 'toy' in opt.tag else '' 
+    opt.combineCommand = ' '.join(['combine -M GoodnessOfFit --algo='+algo+' '+toy+' combinedDatacard.txt' ])
+    opt.combineOutDir = opt.gofitdir
+
+    runCombine(opt)
 
 def mlfits(opt):
 

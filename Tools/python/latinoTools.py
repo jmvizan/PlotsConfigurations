@@ -11,7 +11,8 @@ def mkShapesMulti(opt, year, tag, splits, action):
 
     mainDir = '/'.join([ opt.shapedir, year, tag ])
 
-    shapeMultiCommand = 'mkShapesMulti.py --pycfg='+opt.configuration+' --treeName='+opt.treeName+' --tag='+year+tag+' --sigset=SIGSET'
+    shapeScript = 'mkShapesMulti.py' if 'mkshape' not in opt.option.lower() else 'mkShapes.py'
+    shapeMultiCommand = shapeScript+' --pycfg='+opt.configuration+' --treeName='+opt.treeName+' --tag='+year+tag+' --sigset=SIGSET'
     if 'shapes' in action:
         if not opt.interactive: shapeMultiCommand += ' --doBatch=True --batchQueue='+opt.batchQueue
         if opt.dryRun: shapeMultiCommand += ' --dry-run '
@@ -28,7 +29,7 @@ def mkShapesMulti(opt, year, tag, splits, action):
  
             if 'merge' in action:
 
-                sampleFlag = '_SIGSET' #if 'worker' in commonTools.getBranch() else '' 
+                sampleFlag = '_SIGSET' if 'mkshape' not in opt.option.lower() else '' #if 'worker' in commonTools.getBranch() else '' 
                 outputDir = mainDir if 'mergeall' in action else mainDir+'/Samples'
                 splitCommand += ' ; mkdir -p '+outputDir+' ; mv '+splitDir+'/plots_'+year+tag+sampleFlag+'.root '+outputDir
                 if 'mergesingle' in action: splitCommand += '/plots_'+year+tag+'_ALL_SAMPLE.root'
@@ -247,7 +248,8 @@ def plotNuisances(opt):
 def mergedPlots(opt):
 
     inputNuisances = commonTools.getCfgFileName(opt, 'nuisances') if 'nonuisance' not in opt.option else 'None'
-    fileset = commonTools.setFileset(opt.fileset, opt.sigset).replace('_','')
+    fileset = commonTools.setFileset(opt.fileset, opt.sigset)
+    if fileset[0]=='_': fileset = fileset[1:]
 
     for tag in opt.tag.split('-'):
 
