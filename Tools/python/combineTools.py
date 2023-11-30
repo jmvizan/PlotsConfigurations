@@ -9,7 +9,7 @@ def submitCombineJobs(opt, jobName, jobTag, combineJobs):
     nThreads = 1
     splitBatch =  'Targets'
     jobSplit = True if opt.sigset!='' and opt.sigset!='SM' else False
-
+    
     latinoTools.submitJobs(opt, jobName, jobTag, combineJobs, splitBatch, jobSplit, nThreads)
 
 def getLimitRun(unblind):
@@ -116,17 +116,20 @@ def runCombine(opt):
 
     opt2.fileset, baseSigset = latinoTools.getPerSignalSigset(opt.fileset, opt.sigset) 
 
-    samples = commonTools.getSamples(opt)
+    #samples = commonTools.getSamples(opt)
 
     yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
 
     for year in yearList:
+        combineJobs = { }
         for tag in opt.tag.split('-'):
 
             outtag = commonTools.getTagForDatacards(tag, opt.sigset)+commonTools.getCombineOptionFlag(opt.option)
             opt2.year, opt2.tag = year, outtag
             #datacardList = getDatacardList(opt2)
-            combineJobs = { } 
+            #combineJobs = { } 
+
+            samples = commonTools.getSamples(opt2)
 
             if not opt.interactive: 
                 commonTools.cleanLogs(opt2)
@@ -170,13 +173,30 @@ def runCombine(opt):
                     if opt.debug: print signalCombineCommand
                     elif opt.interactive: os.system(signalCombineCommand)
                     else:
-                        combineJobs[sample] = signalCombineCommand
+                        if outtag.split('__')[0] not in combineJobs:
+                            combineJobs[outtag.split('__')[0]] = {}
+                        combineJobs[outtag.split('__')[0]][sample+outtag.replace(outtag.split('__')[0],'')] = signalCombineCommand
 
-            if not opt.debug and not opt.interactive:
-                if len(combineJobs.keys())>0: 
-                    submitCombineJobs(opt, opt.combineAction, year+outtag, combineJobs)
-                else:
-                    print 'Nothing left to submit for tag', outtag, 'in year', year
+        if not opt.debug and not opt.interactive:
+            if len(combineJobs.keys())>0: 
+                for tag in  combineJobs:
+                    if len(combineJobs[tag].keys())>0:
+                        combineJobsForTag = {}
+                        subJobsList = {}
+                        for tagSample in combineJobs[tag]:
+                            subTag = tagSample.split('____')[0]
+                            if subTag not in combineJobsForTag: 
+                                combineJobsForTag[subTag] = combineJobs[tag][tagSample] 
+                                subJobsList[subTag] = tagSample.replace(subTag+'____','')
+                            else: 
+                                combineJobsForTag[subTag] += '\n'+combineJobs[tag][tagSample]
+                                subJobsList[subTag] += '-'+tagSample.replace(subTag+'____','')
+                        #for subTag in combineJobsForTag.keys(): combineJobsForTag[subTag+'____'+subJobsList[subTag]] = combineJobsForTag.pop(subTag)
+                        submitCombineJobs(opt, opt.combineAction, year+tag, combineJobsForTag)
+                    else:
+                        print 'Nothing left to submit for tag', tag, 'in year', year
+            else:
+                print 'Nothing left to submit for tag list', opt.tag, 'in year', year
 
 def writeDatacards(opt):
 
