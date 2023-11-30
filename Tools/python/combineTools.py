@@ -116,7 +116,7 @@ def runCombine(opt):
 
     opt2.fileset, baseSigset = latinoTools.getPerSignalSigset(opt.fileset, opt.sigset) 
 
-    #samples = commonTools.getSamples(opt) # no base
+    #samples = commonTools.getSamples(opt)
 
     yearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
 
@@ -129,7 +129,7 @@ def runCombine(opt):
             #datacardList = getDatacardList(opt2)
             #combineJobs = { } 
 
-            samples = commonTools.getSamples(opt2) # no base
+            samples = commonTools.getSamples(opt2)
 
             if not opt.interactive: 
                 commonTools.cleanLogs(opt2)
