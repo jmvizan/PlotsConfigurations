@@ -66,7 +66,14 @@ Shapes can be merged by
 
     ./runAnalysis.py --action=mergeShapes --year=CAMPAIGNNAME --tag=System8Templates.mujetpt.mujeteta/PtRelTemplates.mujetpt.mujeteta
 
-Finally, the format of the shapes need to be converted to the input format for the System8/PtRel fits (at least till the fit itself is integrated in the framework): 
+If some shapes were missing, they can be recovered by doing:
+  
+    ./runAnalysis.py --action=resubmitShapes --year=CAMPAIGNNAME --tag=System8Templates.mujetpt.mujeteta/PtRelTemplatesMuPtDown.mujetpt.mujeteta
+
+Finally, the format of the shapes need to be converted to the input format for the System8/PtRel fits: 
 
     ./runAnalysis.py --action=shapesForFit --year=CAMPAIGNNAME --tag=System8Templates.mujetpt.mujeteta/PtRelTemplates.mujetpt.mujeteta # To be complete
+
+## Fits and scale factors
+
 
