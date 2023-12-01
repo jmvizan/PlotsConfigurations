@@ -113,6 +113,7 @@ def remakeMissingShapes(opt, method='resubmit'):
             if commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'RuntimeError'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'ImportError'): missingShape = True
+            if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'Segmentation fault'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.log'), 0) and commonTools.hasString(shFile.replace('.sh','.log'), 'EXCEED'): missingShape = True
             if not commonTools.isGoodFile(shFile.replace('.sh','.jid'), 0) and not commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
 
