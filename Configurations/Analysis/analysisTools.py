@@ -1599,7 +1599,7 @@ def ptHatWeights(opt):
         events = ROOT.TChain(opt.treeName)
         for tree in opt.samples[sample]['name']: events.Add(tree.replace('#',''))
             
-        if 'uQCDMu_' in sample:
+        if 'QCDMu_' in sample:
             opt.qcdMuPtHatBins[ptHatBin]['events'] = str(events.GetEntries())
             if not 'xSec' in opt.qcdMuPtHatBins[ptHatBin]: 
                 xSec, fEff = getGeneratorParametersFromMCM('dataset_name=QCD_*'+ptHatBin+'_MuEnrichedPt5_*&prepid=BTV*'+opt.year+'G*')
