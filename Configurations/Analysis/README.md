@@ -1,4 +1,4 @@
-## Installation of the code
+:::Installation of the code
 
 The code used is documented here:
 
@@ -6,17 +6,15 @@ The code used is documented here:
 
 To install, try this
 
-    cmsrel CMSSW_10_6_28 # Not really the latest for Run3, but it's standalone ...
-    cd CMSSW_10_6_28/src
+    cmsrel CMSSW_13_3_1
+    cd CMSSW_13_3_1/src
     cmsenv
-    git clone --branch 13TeV https://github.com/scodella/setup LatinosSetup
+    git clone --branch 13.6TeV https://github.com/scodella/setup LatinosSetup
     ./LatinosSetup/SetupAnalysis.sh BTagPerf
 
 Copy the file LatinoAnalysis/Tools/python/userConfig_TEMPLATE.py to LatinoAnalysis/Tools/python/userConfig.py and edit it to reflect your local paths. This is needed for batch jobs submission.
 
-Copy the file /afs/cern.ch/work/s/scodella/public/BTagging/Run3/FunctionLibrary.h in LatinoAnalysis/MultiDraw/interface/
-
-Compile all from CMSSW_10_6_28/src.
+Compile all from CMSSW_13_3_1/src.
 
 ## Production of weights for kinematic reweighting
 
