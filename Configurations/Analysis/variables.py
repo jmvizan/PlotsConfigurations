@@ -18,7 +18,9 @@ else: ## mkShapeMulti
     underflow = 1
 
 jetEtaBins = ( int(2*float(maxJetEta)/0.1) , -float(maxJetEta), float(maxJetEta) )
-jetEta2DBins = [ -float(maxJetEta)+edge*0.1 for edge in range(int(2*float(maxJetEta)/0.1)+1) ]
+# This does not work in python3
+#jetEta2DBins = [ -float(maxJetEta)+edge*0.1 for edge in range(int(2*float(maxJetEta)/0.1)+1) ]
+jetEta2DBins = [ edge*0.1 for edge in range(int(-float(maxJetEta)/0.1), int(float(maxJetEta)/0.1)+1) ]
 
 if 'WorkingPoints' in opt.tag:
 

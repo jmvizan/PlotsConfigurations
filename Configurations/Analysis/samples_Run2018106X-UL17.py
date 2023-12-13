@@ -21,10 +21,10 @@ skipTreesCheck = False
 
 if not isDatacardOrPlot: 
     if skipTreesCheck:
-        print 'Error: it is not allowed to fill shapes and skipping trees check!'
+        print('Error: it is not allowed to fill shapes and skipping trees check!')
         exit()
     if opt.sigset=='SM' and hasattr(opt, 'doHadd') and not opt.doHadd:
-        print 'Error: SM cannot be used when filling the shapes. Use Data and MC separately instead' 
+        print('Error: SM cannot be used when filling the shapes. Use Data and MC separately instead') 
 
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
@@ -32,7 +32,7 @@ if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'ce
 if 'cern' in SITE:
     treeBaseDirMC   = '/eos/cms/store/group/phys_btag/performance/Nano/'
     treeBaseDirData = '/eos/cms/store/group/phys_btag/performance/Nano/'
-else: print 'trees for', campaign, 'available only at cern'
+else: print('trees for', campaign, 'available only at cern')
 
 ProductionMC   = 'Summer20UL17_106X_nAODv9_Full2017v8/btvperfMC__btvperfWeights/'
 ProductionData = 'Run2017_106X_nAODv9_Full2017v8/btvperfData__hadd/'
@@ -207,7 +207,7 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
 
     if 'PtRelKinematics' in opt.tag or 'PtRelLightTemplates' in opt.tag:
 
-        print 'Trees for light template corrections not yet available'
+        print('Trees for light template corrections not yet available')
 
 # Common MC keys
 

@@ -12,7 +12,7 @@ if 'Light' not in opt.tag:
     aliases['muonJetFinder'] = { 'linesToAdd': [ includePath, '.L '+aliasDir+'/muonJetFinder.cc+' ],
                                  'class': 'MuonJetFinder',
                                  'args': ( 5., 999. ),
-                                 'samples': samples.keys()
+                                 'samples': list(samples.keys())
                                 }
 
 ## Pileup
@@ -99,7 +99,7 @@ if 'Light' in opt.tag:
   aliases['TrkInc_jetIdx'] = { 'linesToAdd': [ includePath, '.L '+aliasDir+'/inclusiveTrackAssociator.cc+' ],
                                'class': 'InclusiveTrackAssociator',
                                'args': ( 5., 999. ),
-                               'samples': samples.keys()
+                               'samples': list(samples.keys())
                               }
 
 ## Kinematic weights

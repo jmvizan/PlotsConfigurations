@@ -12,60 +12,18 @@ def getCampaignParameters(opt):
 
     origTag = opt.tag
     opt.tag = opt.year+opt.tag
+    opt.getCampaignParameters = True
 
     samples = {}
 
     if os.path.exists(commonTools.getCfgFileName(opt,'samples')):
         handle = open(commonTools.getCfgFileName(opt,'samples'),'r')
-        exec(handle)
+        exec(handle.read())
         handle.close()
 
     opt.tag = origTag
     if opt.year=='test': opt.year = opt.campaign
-
-    opt.minPlotPt = minPlotPt
-    opt.maxPlotPt = maxPlotPt
-    opt.maxJetEta = float(maxJetEta)
-    opt.bTagAlgorithms = bTagAlgorithms
-    opt.btagWPs = bTagWorkingPoints.keys()
-    opt.ptBins = jetPtBins.keys()
-
-    opt.Selections = []
-    for selection in systematicVariations:
-        sel = 'Central' if selection=='' else selection
-        if 'vetosel' in opt.option:
-            if sel in opt.option: continue
-        elif 'sel' in opt.option and sel not in opt.option: continue
-        opt.Selections.append(selection)
-    opt.systematicNuisances = systematicNuisances
-
-    if opt.action=='ptHatWeights':
-        opt.samples = samples
-        opt.qcdMuPtHatBins = qcdMuPtHatBins
-        opt.qcdPtHatBins = qcdPtHatBins 
-
-    elif opt.action=='workingPoints':
-        opt.workingPointName = workingPointName
-        opt.workingPointLimit = workingPointLimit
-        opt.samples = samples
-        opt.nJetMax = nJetMax
-        opt.bTagWorkingPoints = bTagWorkingPoints
-
-    elif opt.action=='frameworkValidation':
-        opt.samples = samples.keys()        
-        opt.triggerInfos = triggerInfos
-
-    elif opt.action=='kinematicWeights':
-        opt.jetPtBins = jetPtBins
-        opt.minJetPt  = minJetPt 
-        opt.maxJetPt  = maxJetPt
-
-    elif opt.action=='ptRelInput' or opt.action=='shapesForFit':
-        opt.templateTreatments = templateTreatments
-        opt.bTemplateCorrector = bTemplateCorrector
-
-    elif opt.action=='storeBTagScaleFactors':
-        opt.csvSystematics = csvSystematics
+    opt.getCampaignParameters = False
 
 def setAnalysisDefaults(opt):
 
@@ -134,7 +92,7 @@ def recoverShapes(opt):
 def mergeLightShapes(opt):
 
     if 'PtRelLight' not in opt.tag:
-        print 'Please choose a tag (PtRelLightKinematics or PtRelLightTemplates)'
+        print('Please choose a tag (PtRelLightKinematics or PtRelLightTemplates)')
         exit()
 
     outtag = opt.tag.replace('Light', 'MergedLight')
@@ -219,12 +177,12 @@ def ptRelInput(opt):
                    if sample=='bjets': doBCorrections = True
 
             if len(templateTreatmentDict[treatment])==0: 
-                print 'Error: no sample found for template treatment', treatment
+                print('Error: no sample found for template treatment', treatment)
                 exit()
 
     if opt.verbose: 
-        print 'Preparing fit templates with templateTreatmentFlag =', templateTreatmentFlag
-        print 'Reading templates'
+        print('Preparing fit templates with templateTreatmentFlag =', templateTreatmentFlag)
+        print('Reading templates')
 
     outputTemplates = {}
 
@@ -247,7 +205,7 @@ def ptRelInput(opt):
 
                 for sample in samples:
 
-                    if opt.verbose: print '     selection', sel, ' and sample', sample
+                    if opt.verbose: print('     selection', sel, ' and sample', sample)
 
                     if datatype=='Inclusive':
                         if not commonTools.foundSampleShapeFile(opt2.shapedir, opt2.year, opt2.tag, sample) or opt.reset:
@@ -268,9 +226,8 @@ def ptRelInput(opt):
                                 histoName = '/'.join([ ptBin, variable, 'histo_' + sample ])
                                 template = copy.deepcopy(inputTemplateFile.Get(histoName))
 
-                                sampleToSave = sample.replace('MET','').replace('HT','')
-                                template.SetName('_'.join([ 'histo', sampleToSave ]))
-                                template.SetTitle('_'.join([ 'histo', sampleToSave ]))
+                                template.SetName('_'.join([ 'histo', sample ]))
+                                template.SetTitle('_'.join([ 'histo', sample ]))
                                 outputTemplates[cutName][template.GetName().split('/')[-1]] = template
 
                                 if 'JEU' in selection:
@@ -301,9 +258,9 @@ def ptRelInput(opt):
                                                     centralTemplate.SetTitle('_'.join([ 'histo', sample, nuisances[nuisance]['name']+variation]))
                                                     outputTemplates[cutName][centralTemplate.GetName().split('/')[-1]] = centralTemplate
 
-    if opt.verbose: print 'Normalizing templates'
+    if opt.verbose: print('Normalizing templates')
 
-    cutNameList = outputTemplates.keys()
+    cutNameList = list(outputTemplates.keys())
 
     for cutName in cutNameList:
         
@@ -327,7 +284,7 @@ def ptRelInput(opt):
             else:
                 outputTemplates[cutName][template].Scale(dataPS)
 
-    if opt.verbose: print 'Computing corrections'
+    if opt.verbose: print('Computing corrections')
 
     for cutName in cutNameList:
 
@@ -336,7 +293,7 @@ def ptRelInput(opt):
             jetCutName = cutName if 'histo_Jet' in outputTemplates[cutName] else '_'.join([ cutName.split('_')[x] for x in range(3) ])
             qcdCutName = cutName if 'histo_QCD' in outputTemplates[cutName] else '_'.join([ cutName.split('_')[x] for x in range(3) ])
             jetHisto = copy.deepcopy(outputTemplates[jetCutName]['histo_Jet'])
-            for template in outputTemplates[cutName].keys():
+            for template in list(outputTemplates[cutName].keys()):
                 if 'histo_ljets' in template:
 
                     correctedHisto = copy.deepcopy(outputTemplates[cutName][template])
@@ -352,7 +309,7 @@ def ptRelInput(opt):
         if doBCorrections:
             outputTemplates[cutName+'_CorrB'] = {}
             cutNameCorrector = cutName.replace(cutName.split('_')[1],opt.bTemplateCorrector[cutName.split('_')[1]]).replace('Fail','Pass')
-            for template in outputTemplates[cutName].keys():
+            for template in list(outputTemplates[cutName].keys()):
                 if 'histo_bjets' in template:
 
                     dataHisto = copy.deepcopy(outputTemplates[cutNameCorrector]['histo_DATA'])
@@ -380,15 +337,15 @@ def ptRelInput(opt):
 
     if '2D' in opt.option:
 
-        if opt.verbose: print 'Merging light and c templates'
+        if opt.verbose: print('Merging light and c templates')
 
         for cutName in cutNameList:
-            for template in outputTemplates[cutName].keys():
+            for template in list(outputTemplates[cutName].keys()):
                 if 'ljets' in template:
                     outputTemplates[cutName][template].Add(outputTemplates[cutName][template.replace('ljets','cjets')])
                     if doLCorrections: outputTemplates[cutName+'_CorrL'][template].Add(outputTemplates[cutName][template.replace('ljets','cjets')])
 
-    if opt.verbose: print 'Saving templates', cutName
+    if opt.verbose: print('Saving templates', cutName)
 
     outtag = opt.tag.replace(opt.tag.split('.')[0], opt.tag.split('.')[0]+'ForFit')
     if '2D' in opt.option: outtag = outtag.replace('Templates', 'Templates2D')
@@ -397,7 +354,7 @@ def ptRelInput(opt):
 
     for cutName in cutNameList:
 
-        if opt.verbose: print '     Saving templates for cut', cutName, '\n'
+        if opt.verbose: print('     Saving templates for cut', cutName, '\n')
 
         ptRelTemplateFile.mkdir(cutName)
         ptRelTemplateFile.mkdir(cutName+'/ptrel')
@@ -408,13 +365,13 @@ def ptRelInput(opt):
         sampleCutName['ljets'] = '_CorrL' if 'corr' in templateTreatmentDict and 'ljets' in templateTreatmentDict['corr'] else ''
         sampleCutName['bjets'] = '_CorrB' if 'corr' in templateTreatmentDict and 'bjets' in templateTreatmentDict['corr'] else ''
 
-        for template in outputTemplates[cutName].keys():
+        for template in list(outputTemplates[cutName].keys()):
             sample = template.split('_')[1]
             if sample in sampleCutName:
-                if opt.verbose: print '        ', cutName, sample, sampleCutName[sample], template
+                if opt.verbose: print('        ', cutName, sample, sampleCutName[sample], template)
                 outputTemplates[cutName+sampleCutName[sample]][template].Write()
 
-        if opt.verbose: print '\n'
+        if opt.verbose: print('\n')
 
         nuisCutNameList = [ cutName ]
         if 'syst' in templateTreatmentDict and len(cutName.split('_'))==3:
@@ -428,14 +385,14 @@ def ptRelInput(opt):
                 sampleSystCutName = copy.deepcopy(sampleCutName)
                 sampleSystCutName[systSample] = '_Corr'+systSample.replace('jets','').upper() if sampleCutName[systSample]=='' else ''
 
-                for template in outputTemplates[cutName].keys():
+                for template in list(outputTemplates[cutName].keys()):
                     sample = template.split('_')[1]
                     if sample in sampleSystCutName:
-                        if opt.verbose: print '        ', systCutName, sample, sampleSystCutName[sample], template
+                        if opt.verbose: print('        ', systCutName, sample, sampleSystCutName[sample], template)
                         outputTemplates[cutName+sampleSystCutName[sample]][template].Write()
 
                 nuisCutNameList.append(systCutName)
-                if opt.verbose: print '\n'
+                if opt.verbose: print('\n')
 
         if 'nuis' in templateTreatmentDict:
             for nuisSample in templateTreatmentDict['nuis']:
@@ -457,15 +414,15 @@ def ptRelInput(opt):
 
                 for nuisCutName in nuisCutNameList:
                     ptRelTemplateFile.cd(nuisCutName+'/ptrel')
-                    if opt.verbose: print '        ', cutName, nuisSample, correctionFlag, nominalHisto.GetName(), correctedHisto.GetName(), '->', nuisCutName
+                    if opt.verbose: print('        ', cutName, nuisSample, correctionFlag, nominalHisto.GetName(), correctedHisto.GetName(), '->', nuisCutName)
                     nominalHisto.Write()
                     correctedHisto.Write()
 
-        if opt.verbose: print '\n'
+        if opt.verbose: print('\n')
 
         if len(cutName.split('_'))==3:
             doneNuisance = []
-            for nuisTemplate in outputTemplates[cutName].keys():
+            for nuisTemplate in list(outputTemplates[cutName].keys()):
                 if len(nuisTemplate.split('_'))>2:
 
                     nuisance = nuisTemplate.replace('histo_'+nuisTemplate.split('_')[1]+'_','')
@@ -478,17 +435,17 @@ def ptRelInput(opt):
 
                     for sample in sampleCutName:
 
-                        if '_'.join([ 'histo', sample, nuisance ]) in outputTemplates[cutName+sampleCutName[sample]].keys():
+                        if '_'.join([ 'histo', sample, nuisance ]) in list(outputTemplates[cutName+sampleCutName[sample]].keys()):
 
                             nuisanceHisto = copy.deepcopy(outputTemplates[cutName+sampleCutName[sample]]['_'.join([ 'histo', sample, nuisance ])])
                             nuisanceHisto.Write()
-                            if opt.verbose: print '        ', cutName+'_'+nuisance, sampleCutName[sample], '_'.join([ 'histo', sample, nuisance ]), nuisanceHisto.GetName()
+                            if opt.verbose: print('        ', cutName+'_'+nuisance, sampleCutName[sample], '_'.join([ 'histo', sample, nuisance ]), nuisanceHisto.GetName())
 
                             centralTemplate = copy.deepcopy(nuisanceHisto)
                             centralTemplate.SetName('histo_'+sample)
                             centralTemplate.SetTitle('histo_'+sample)
                             centralTemplate.Write()
-                            if opt.verbose: print '        ', cutName+'_'+nuisance, sampleCutName[sample], '_'.join([ 'histo', sample, nuisance ]), centralTemplate.GetName()
+                            if opt.verbose: print('        ', cutName+'_'+nuisance, sampleCutName[sample], '_'.join([ 'histo', sample, nuisance ]), centralTemplate.GetName())
 
                             nuisanceCorrections = [ 1. ]
                             originalCentralTemplate = copy.deepcopy(outputTemplates[cutName+sampleCutName[sample]]['histo_'+sample])
@@ -496,7 +453,7 @@ def ptRelInput(opt):
                                 if originalCentralTemplate.GetBinContent(ib)>0.: nuisanceCorrections.append(nuisanceHisto.GetBinContent(ib)/originalCentralTemplate.GetBinContent(ib))
                                 else: nuisanceCorrections.append(1.)
 
-                            for template in outputTemplates[cutName+sampleCutName[sample]].keys():                           
+                            for template in list(outputTemplates[cutName+sampleCutName[sample]].keys()):                           
                                 if template.split('_')[1]==sample and nuisance not in template and template!='histo_'+sample:
                                     templateCut = cutName+template.replace('histo_'+sample,'')+sampleCutName[sample]
                                     if templateCut in outputTemplates and '_'.join([ 'histo', sample, nuisance ]) in outputTemplates[templateCut]:
@@ -504,7 +461,7 @@ def ptRelInput(opt):
                                         templateHisto.SetName(template)
                                         templateHisto.SetTitle(template)
                                         templateHisto.Write()
-                                        if opt.verbose: print '        ', cutName+'_'+nuisance, templateCut, '_'.join([ 'histo', sample, nuisance ]), templateHisto.GetName()
+                                        if opt.verbose: print('        ', cutName+'_'+nuisance, templateCut, '_'.join([ 'histo', sample, nuisance ]), templateHisto.GetName())
                                     else:
                                         templateHisto = copy.deepcopy(outputTemplates[cutName+sampleCutName[sample]][template])
                                         correctionStatus = ''
@@ -513,20 +470,20 @@ def ptRelInput(opt):
                                                 templateHisto.SetBinContent(ib, templateHisto.GetBinContent(ib)*nuisanceCorrections[ib])
                                             correctionStatus = 'corrected'
                                         templateHisto.Write()
-                                        if opt.verbose: print '        ', cutName+'_'+nuisance, sampleCutName[sample], template, templateHisto.GetName(), correctionStatus 
+                                        if opt.verbose: print('        ', cutName+'_'+nuisance, sampleCutName[sample], template, templateHisto.GetName(), correctionStatus) 
 
                         else:
-                            for template in outputTemplates[cutName+sampleCutName[sample]].keys():
+                            for template in list(outputTemplates[cutName+sampleCutName[sample]].keys()):
                                 if template.split('_')[1]==sample:
                                     templateHisto = copy.deepcopy(outputTemplates[cutName+sampleCutName[sample]][template])
                                     templateHisto.Write()
-                                    if opt.verbose: print '        ', cutName+'_'+nuisance, sampleCutName[sample], template, templateHisto.GetName()  
+                                    if opt.verbose: print('        ', cutName+'_'+nuisance, sampleCutName[sample], template, templateHisto.GetName())  
 
                         if 'nuis' in templateTreatmentDict:
                             if sample in templateTreatmentDict['nuis']:
 
                                 correctionFlag = '_Corr'+sample.replace('jets','').upper()
-                                nuisanceFlag = '_'+nuisance if '_'.join([ 'histo', sample, nuisance ]) in outputTemplates[cutName+sampleCutName[sample]].keys() else ''
+                                nuisanceFlag = '_'+nuisance if '_'.join([ 'histo', sample, nuisance ]) in list(outputTemplates[cutName+sampleCutName[sample]].keys()) else ''
                                 nominalHisto = copy.deepcopy(outputTemplates[cutName]['histo_'+sample+nuisanceFlag])
                                 correctedHisto = copy.deepcopy(outputTemplates[cutName+correctionFlag]['histo_'+sample+nuisanceFlag])
 
@@ -543,12 +500,12 @@ def ptRelInput(opt):
 
                                 nominalHisto.Write()
                                 correctedHisto.Write()
-                                if opt.verbose: print '        ', cutName+'_'+nuisance, sampleCutName[sample], sample, correctionFlag, nominalHisto.GetName(), correctedHisto.GetName(), '->', cutName+'_'+nuisance 
+                                if opt.verbose: print('        ', cutName+'_'+nuisance, sampleCutName[sample], sample, correctionFlag, nominalHisto.GetName(), correctedHisto.GetName(), '->', cutName+'_'+nuisance) 
 
-                    if opt.verbose: print '        ', 'done', cutName, nuisance, '\n'
+                    if opt.verbose: print('        ', 'done', cutName, nuisance, '\n')
                     doneNuisance.append(nuisance)
 
-        if opt.verbose: print '\n\n'
+        if opt.verbose: print('\n\n')
 
 def ptRelInputForPtRelTools(opt):
 
@@ -640,7 +597,7 @@ def ptRelInputForPtRelTools(opt):
 
 def system8Input(opt):
 
-    print 'Please, complete me!'
+    print('Please, complete me!')
 
     motherFile = commonTools.openShapeFile(opt.shapedir, opt.year, opt.tag.split('__')[0], 'SM', 'SM')
     
@@ -653,7 +610,7 @@ def system8Input(opt):
                     'QCD'  : { 'lepton_in_jet' : [ 'n_pT'   , 'ntag_pT'   , 'p_pT'   , 'ptag_pT'    ],
                                'MCTruth'       : [ 'n_pT_b' , 'ntag_pT_b' , 'p_pT_b' , 'ptag_pT_b', 'n_pT_cl', 'ntag_pT_cl', 'p_pT_cl', 'ptag_pT_cl' ] } }
 
-    for dataset in templateMap.keys():
+    for dataset in list(templateMap.keys()):
         for btagWPcut in cuts:
             if btagWPcut.count('_')==2 and 'Up' not in btagWPcut.split('_')[-1] and 'Down' not in btagWPcut.split('_')[-1]:
                 btagWP = btagWPcut.split('_')[2]
@@ -730,7 +687,7 @@ def system8Input(opt):
 def frameworkValidation(opt):
 
     if 'JEU' in opt.tag:
-        print 'frameworkValidation: JEU in PtRelTools not up-to-date, exiting'
+        print('frameworkValidation: JEU in PtRelTools not up-to-date, exiting')
         exit()
 
     if 'Light' in opt.tag and 'Merged' not in opt.tag:
@@ -754,7 +711,7 @@ def frameworkValidation(opt):
     for key in histoToCompare:
         if key in opt.tag: keyTag = key
     if keyTag=='': 
-        print 'frameworkValidation: invalid keyTag, exiting'
+        print('frameworkValidation: invalid keyTag, exiting')
         exit()
 
     selection = 'Central'
@@ -824,7 +781,7 @@ def frameworkValidation(opt):
                     histos[0].SetBinContent(histos[0].GetNbinsX(), lastBin0)
 
                     if abs(histos[1].Integral()/histos[0].Integral()-1.)>0.00003 or opt.verbose:
-                        print 'Events', sample, ptbin, histokey, wp, histos[0].Integral(), histos[1].Integral(), histos[1].Integral()/histos[0].Integral()-1.
+                        print('Events', sample, ptbin, histokey, wp, histos[0].Integral(), histos[1].Integral(), histos[1].Integral()/histos[0].Integral()-1.)
 
                     if 'events' in opt.option: continue
  
@@ -833,13 +790,13 @@ def frameworkValidation(opt):
                             rbin = float(histos[0].GetNbinsX())/float(histos[1].GetNbinsX())
                             if rbin==int(rbin): histos[0].Rebin(int(rbin))
                             elif opt.verbose: 
-                                print 'Binning not comparable:', ptbin, histokey, wp, histos[0].GetNbinsX(), histos[1].GetNbinsX()
+                                print('Binning not comparable:', ptbin, histokey, wp, histos[0].GetNbinsX(), histos[1].GetNbinsX())
                                 continue
                         elif histos[1].GetNbinsX()>histos[0].GetNbinsX():
                             rbin = float(histos[1].GetNbinsX())/float(histos[0].GetNbinsX())
                             if rbin==int(rbin): histos[1].Rebin(int(rbin))
                             elif opt.verbose: 
-                                print 'Binning not comparable:', ptbin, histokey, wp, histos[0].GetNbinsX(), histos[1].GetNbinsX()
+                                print('Binning not comparable:', ptbin, histokey, wp, histos[0].GetNbinsX(), histos[1].GetNbinsX())
                                 continue
 
                     binoffset = int(ptbin.split('Pt')[1].split('to')[0]) if 'jetpt' in histokey else 0
@@ -847,13 +804,13 @@ def frameworkValidation(opt):
                     for ib in range(1, histos[1].GetNbinsX()+1):
                         if histos[0].GetBinContent(ib+binoffset)>0.:
                             if abs(histos[1].GetBinContent(ib)/histos[0].GetBinContent(ib+binoffset)-1.)>0.00003 and (opt.verbose or abs(histos[1].GetBinContent(ib)-histos[0].GetBinContent(ib+binoffset))>1):
-                                print 'Shapes', sample, ptbin, histokey, wp, histos[1].GetBinLowEdge(ib), histos[0].GetBinContent(ib+binoffset), histos[1].GetBinContent(ib), histos[1].GetBinContent(ib)/histos[0].GetBinContent(ib+binoffset)-1.
+                                print('Shapes', sample, ptbin, histokey, wp, histos[1].GetBinLowEdge(ib), histos[0].GetBinContent(ib+binoffset), histos[1].GetBinContent(ib), histos[1].GetBinContent(ib)/histos[0].GetBinContent(ib+binoffset)-1.)
 
 ### Prefit plots
 
 def plotKinematics(opt):
 
-    if not commonTools.foundShapeFiles(opt, True, False):
+    if not commonTools.foundShapeFiles(opt, True, False) or opt.reset:
         if '.' in opt.tag:
             os.system('cp '+commonTools.getSampleShapeFileName(opt.shapedir, opt.year, opt.tag.split('.')[0], 'DATA')+' '+commonTools.getSampleShapeFileName(opt.shapedir, opt.year, opt.tag, 'DATA'))
         latinoTools.mergeall(opt) 
@@ -903,13 +860,13 @@ def bTagPerfAnalysis(opt, action):
                         elif commonTools.goodCombineFit(opt2, opt2.year, opt2.tag, '', 'PostFitS'):  
                             if action=='postfitshapes':  latinoTools.postFitShapes(opt2) 
                             elif action=='postfitplots': latinoTools.postFitPlots(opt2)
-                        elif opt.verbose: print 'Warning: failed fit for campaign='+opt2.year+', WP='+btagWP+', bin='+ptbin
-                    elif opt.verbose: print 'Warning: input ML fit file', commonTools.getCombineOutputFileName(opt2), '', '', opt2.tag, 'mlfits', 'not found' 
+                        elif opt.verbose: print('Warning: failed fit for campaign='+opt2.year+', WP='+btagWP+', bin='+ptbin)
+                    elif opt.verbose: print('Warning: input ML fit file', commonTools.getCombineOutputFileName(opt2), '', '', opt2.tag, 'mlfits', 'not found') 
                 elif action=='checkfit': 
                     if not commonTools.isGoodFile(commonTools.getCombineOutputFileName(opt, '', '', opt.tag, 'mlfits'), 6000.):
-                        print 'Input ML fit file', commonTools.getCombineOutputFileName(opt, '', '', opt.tag, 'mlfits'), 'not found'
+                        print('Input ML fit file', commonTools.getCombineOutputFileName(opt, '', '', opt.tag, 'mlfits'), 'not found')
                     elif not commonTools.goodCombineFit(opt, opt2.year, opt2.tag, '', 'PostFitS'):
-                        print 'Failed fit for campaign='+opt2.year+', WP='+btagWP+', bin='+ptbin
+                        print('Failed fit for campaign='+opt2.year+', WP='+btagWP+', bin='+ptbin)
 
 def ptRelDatacards(opt):
 
@@ -946,7 +903,7 @@ def system8Fits(opt):
 
 def runSystem8Fit(opt):
 
-    print 'please, write me if useful'
+    print('please, write me if useful')
 
 ### Efficiencies and scale factors
 
@@ -994,7 +951,7 @@ def getPtRelEfficiency(opt, inputFile, fileType, btagWP, ptbin, systematic):
     failYield = histoFail.IntegralAndError(-1,-1,errorFailYield)
 
     if opt.verbose and fileType=='fit' and (errorPassYield==0. or errorFailYield==0.): 
-        print '    Warning: missing erros in ML fit for', btagWP, ptbin, systematic
+        print('    Warning: missing erros in ML fit for', btagWP, ptbin, systematic)
 
     efficiency = passYield/(passYield+failYield)
 
@@ -1035,13 +992,13 @@ def getPtRelFitResults(opt, btagWP, ptbin, systematic):
             return efficiencyMC, uncertaintyMC, efficiencyFit, uncertaintyFit, scaleFactor, scaleFactorUncertainty
 
         elif opt.verbose: '  Warning: failed fit for campaign='+opt.year+', WP='+btagWP+', bin='+ptbin
-    elif opt.verbose: print 'Warning: input ML fit file', commonTools.getCombineOutputFileName(opt, '', '', opt.tag, 'mlfits'), 'not found'
+    elif opt.verbose: print('Warning: input ML fit file', commonTools.getCombineOutputFileName(opt, '', '', opt.tag, 'mlfits'), 'not found')
 
     return -1., -1., -1., -1., -1., -1.
 
 def getSystem8FitResults(opt, btagWP, ptbin, systematic):
 
-    print 'Please, write me if useful'
+    print('Please, write me if useful')
 
 def getBTagPerfFitResults(opt, optOrig):
 
@@ -1179,11 +1136,11 @@ def makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos, resultToPlot):
 
             legend.Draw()
 
-    tagFlag = '-'.join(bTagPerfHistos.keys())
+    tagFlag = '-'.join(list(bTagPerfHistos.keys()))
     if 'DepOn' in opt.option or 'Final' in opt.option:
         systematicFlag = opt.option
     else: 
-        systematicFlag = '-'.join(bTagPerfHistos[bTagPerfHistos.keys()[0]].keys())
+        systematicFlag = '-'.join(list(bTagPerfHistos[list(bTagPerfHistos.keys())[0]].keys()))
 
     outputDir = '/'.join([ opt.plotsdir, opt.year, opt.method+'Results', tagFlag, resultToPlot ]) 
     os.system('mkdir -p '+outputDir+' ; cp ../../index.php '+opt.plotsdir)
@@ -1240,7 +1197,7 @@ def computeFinalScaleFactors(opt):
                 finalScaleFactor, finalScaleFactorUncertainty, scaleFactorSystematicUncertainty = -1., -1., -1.
 
                 scaleFactorList, scaleFactorUncertaintyList = [], []
-                for systematic in wpSF.keys():
+                for systematic in list(wpSF.keys()):
                     if systematic=='Central' or systematic.replace('Up','').replace('Down','') in selections:
                         if wpSF[systematic][ptbin]['scaleFactor']>0.1 and wpSF[systematic][ptbin]['efficiencyFit']>0.01: 
                             scaleFactorList.append(wpSF[systematic][ptbin]['scaleFactor'])
@@ -1264,7 +1221,7 @@ def computeFinalScaleFactors(opt):
 
             if finalScaleFactor>0.: 
 
-                if opt.verbose: print '####', btagWP, ptbin
+                if opt.verbose: print('####', btagWP, ptbin)
 
                 scaleFactorSystematicUncertainty = pow(finalScaleFactorUncertainty,2)    
 
@@ -1278,16 +1235,16 @@ def computeFinalScaleFactors(opt):
                                 if wpSF[systematic+variation][ptbin]['scaleFactorUncertainty']<0.1 and abs(wpSF[systematic+variation][ptbin]['scaleFactor']-finalScaleFactor)<0.2:
                                     systematicVariations[variation] = wpSF[systematic+variation][ptbin]['scaleFactor']-finalScaleFactor
 
-                    if len(systematicVariations.keys())==2:
+                    if len(list(systematicVariations.keys()))==2:
                         if max(abs(systematicVariations['Up']),abs(systematicVariations['Down']))>0.1:
                             if min(abs(systematicVariations['Up']),abs(systematicVariations['Down']))>0.02:
                                 if abs(systematicVariations['Up'])>abs(systematicVariations['Down']): del systematicVariations['Up']
                                 else: del systematicVariations['Down']
 
-                    if len(systematicVariations.keys())==0: 
+                    if len(list(systematicVariations.keys()))==0: 
                         systematicUncertainty = 0.05*finalScaleFactor # Bho?
-                    elif len(systematicVariations.keys())==1: 
-                        for variation in systematicVariations.keys():
+                    elif len(list(systematicVariations.keys()))==1: 
+                        for variation in list(systematicVariations.keys()):
                              systematicUncertainty = systematicVariations[variation] if variation!='Down' else -systematicVariations[variation]
                     else: 
                         systematicUncertainty = (abs(systematicVariations['Up'])+abs(systematicVariations['Down']))/2.
@@ -1301,7 +1258,7 @@ def computeFinalScaleFactors(opt):
                         if ptbin not in opt.bTagPerfResults[btagWP][systematic+variation]:
                             opt.bTagPerfResults[btagWP][systematic+variation][ptbin] = {} 
 
-                    if opt.verbose: print '    ', systematic, systematicUncertainty
+                    if opt.verbose: print('    ', systematic, systematicUncertainty)
 
                     opt.bTagPerfResults[btagWP][systematic+'Up'][ptbin]['scaleFactor'] = finalScaleFactor + systematicUncertainty
                     opt.bTagPerfResults[btagWP][systematic+'Down'][ptbin]['scaleFactor'] = finalScaleFactor - systematicUncertainty
@@ -1310,7 +1267,7 @@ def computeFinalScaleFactors(opt):
 
                 scaleFactorSystematicUncertainty = math.sqrt(scaleFactorSystematicUncertainty)
 
-                if opt.verbose: print '     Total', scaleFactorSystematicUncertainty, '\n\n'    
+                if opt.verbose: print('     Total', scaleFactorSystematicUncertainty, '\n\n')    
 
             opt.bTagPerfResults[btagWP]['Final'][ptbin] = {}
             opt.bTagPerfResults[btagWP]['Final'][ptbin]['scaleFactor'] = finalScaleFactor
@@ -1365,13 +1322,13 @@ def printBTagPerformance(opt):
 
     for btagWP in opt.btagWPs:
         for ptbin in opt.ptBins:
-            print '####', btagWP, ptbin
+            print('####', btagWP, ptbin)
             for tag in opt.bTagPerfResults:    
                 for systematic in opt.Selections:
                     syst = systematic if systematic!='' else 'Central'
                     bTagPerfShort = opt.bTagPerfResults[tag][btagWP][syst]
-                    print '    ', tag, syst, bTagPerfShort[ptbin]['efficiencyMC'], bTagPerfShort[ptbin]['efficiencyFit'], bTagPerfShort[ptbin]['scaleFactor'], bTagPerfShort[ptbin]['scaleFactorUncertainty']
-                print ''
+                    print('    ', tag, syst, bTagPerfShort[ptbin]['efficiencyMC'], bTagPerfShort[ptbin]['efficiencyFit'], bTagPerfShort[ptbin]['scaleFactor'], bTagPerfShort[ptbin]['scaleFactorUncertainty'])
+                print('')
 
 def plotBTagPerformance(opt, resultToPlot='performance', action='plot'):
 
@@ -1486,14 +1443,14 @@ def workingPoints(opt):
         if not opt.samples[sample]['isDATA']: wpSamples.append(sample)
 
     if len(wpSamples)!=1: 
-        print 'workingPoints error: too many samples selected ->', wpSamples
+        print('workingPoints error: too many samples selected ->', wpSamples)
         exit()
 
     inputFile = ROOT.TFile.Open('/'.join([ opt.shapedir, opt.year, opt.tag.split('_')[0], 'Samples', 'plots_'+opt.year+opt.tag.split('_')[0]+'_ALL_'+wpSamples[0]+'.root' ]), 'read')
 
     discriminantDone = []
 
-    for btagwp in opt.bTagWorkingPoints.keys():
+    for btagwp in list(opt.bTagWorkingPoints.keys()):
         if opt.bTagWorkingPoints[btagwp]['discriminant'] not in discriminantDone:
 
             bJetDisc = inputFile.Get('QCD/Jet_'+opt.bTagWorkingPoints[btagwp]['discriminant']+'_5_0/histo_'+wpSamples[0])
@@ -1504,7 +1461,7 @@ def workingPoints(opt):
                 lJetDisc.Add(inputFile.Get('QCD/Jet_'+opt.bTagWorkingPoints[btagwp]['discriminant']+'_0_'+str(ijet)+'/histo_'+wpSamples[0]))
 
             if 'noprint' not in opt.option:
-                print '\n\nWorking Points for', btagwp[:-1]
+                print('\n\nWorking Points for', btagwp[:-1])
 
             #opt.workingPointName = [ 'Loose', 'Medium', 'Tight', 'VeryTight', 'VeryVeryTight' ]
             #opt.workingPointLimit = [ 0.1, 0.01, 0.001, 0.0005, 0.0001 ]
@@ -1519,9 +1476,9 @@ def workingPoints(opt):
             integralBottomJets = bJetDisc.Integral(0, bJetDisc.GetNbinsX())
  
             if 'csv' in opt.option:
-                print '   ', btagwp[:-1],
+                print('   ', btagwp[:-1], end=' ')
             elif 'yml' in opt.option:
-                print btagwp[:-1]+':'
+                print(btagwp[:-1]+':')
 
             for wp in range(len(opt.workingPointName)):
 
@@ -1539,21 +1496,21 @@ def workingPoints(opt):
                         binAtWorkingPoint = ib
 
                 if 'noprint' not in opt.option:
-                    print '   ', opt.workingPointName[wp], 'working point:', lJetDisc.GetBinLowEdge(binAtWorkingPoint), '(', lJetDisc.GetBinLowEdge(binAtWorkingPoint-1), ',', lJetDisc.GetBinLowEdge(binAtWorkingPoint+1), ')'
-                    print '        MistagRate:', lJetDisc.Integral(binAtWorkingPoint, lJetDisc.GetNbinsX())/integralLightJets, '(', lJetDisc.Integral(binAtWorkingPoint-1, lJetDisc.GetNbinsX())/integralLightJets, ', ', lJetDisc.Integral(binAtWorkingPoint+1, lJetDisc.GetNbinsX())/integralLightJets, ') over', integralLightJets
-                    print '        Efficiency:', bJetDisc.Integral(binAtWorkingPoint, bJetDisc.GetNbinsX())/integralBottomJets, '(', bJetDisc.Integral(binAtWorkingPoint-1, bJetDisc.GetNbinsX())/integralBottomJets, ', ', bJetDisc.Integral(binAtWorkingPoint+1, bJetDisc.GetNbinsX())/integralBottomJets, ') over', integralBottomJets
+                    print('   ', opt.workingPointName[wp], 'working point:', lJetDisc.GetBinLowEdge(binAtWorkingPoint), '(', lJetDisc.GetBinLowEdge(binAtWorkingPoint-1), ',', lJetDisc.GetBinLowEdge(binAtWorkingPoint+1), ')')
+                    print('        MistagRate:', lJetDisc.Integral(binAtWorkingPoint, lJetDisc.GetNbinsX())/integralLightJets, '(', lJetDisc.Integral(binAtWorkingPoint-1, lJetDisc.GetNbinsX())/integralLightJets, ', ', lJetDisc.Integral(binAtWorkingPoint+1, lJetDisc.GetNbinsX())/integralLightJets, ') over', integralLightJets)
+                    print('        Efficiency:', bJetDisc.Integral(binAtWorkingPoint, bJetDisc.GetNbinsX())/integralBottomJets, '(', bJetDisc.Integral(binAtWorkingPoint-1, bJetDisc.GetNbinsX())/integralBottomJets, ', ', bJetDisc.Integral(binAtWorkingPoint+1, bJetDisc.GetNbinsX())/integralBottomJets, ') over', integralBottomJets)
 
                     binOldWorkingPoint = lJetDisc.FindBin(oldWorkingPoint[wp])
-                    print '        OldWorkingPoint', oldWorkingPoint[wp], lJetDisc.Integral(binOldWorkingPoint, lJetDisc.GetNbinsX())/integralLightJets, bJetDisc.Integral(binOldWorkingPoint, lJetDisc.GetNbinsX())/integralBottomJets, '\n'
+                    print('        OldWorkingPoint', oldWorkingPoint[wp], lJetDisc.Integral(binOldWorkingPoint, lJetDisc.GetNbinsX())/integralLightJets, bJetDisc.Integral(binOldWorkingPoint, lJetDisc.GetNbinsX())/integralBottomJets, '\n')
 
                 elif 'csv' in opt.option:
-                    print lJetDisc.GetBinLowEdge(binAtWorkingPoint), 
-                    print round((100.*bJetDisc.Integral(binAtWorkingPoint, bJetDisc.GetNbinsX())/integralBottomJets),1),
-                    print round((100.*lJetDisc.Integral(binAtWorkingPoint, lJetDisc.GetNbinsX())/integralLightJets),1 if opt.workingPointName[wp]=='Loose' else 2), 
+                    print(lJetDisc.GetBinLowEdge(binAtWorkingPoint), end=' ') 
+                    print(round((100.*bJetDisc.Integral(binAtWorkingPoint, bJetDisc.GetNbinsX())/integralBottomJets),1), end=' ')
+                    print(round((100.*lJetDisc.Integral(binAtWorkingPoint, lJetDisc.GetNbinsX())/integralLightJets),1 if opt.workingPointName[wp]=='Loose' else 2), end=' ') 
                 elif 'yml' in opt.option:
-                    print '   ',wpflag+':'
-                    print '       ', 'eff:', round((100.*bJetDisc.Integral(binAtWorkingPoint, bJetDisc.GetNbinsX())/integralBottomJets),1)
-                    print '       ', 'wp:', lJetDisc.GetBinLowEdge(binAtWorkingPoint) 
+                    print('   ',wpflag+':')
+                    print('       ', 'eff:', round((100.*bJetDisc.Integral(binAtWorkingPoint, bJetDisc.GetNbinsX())/integralBottomJets),1))
+                    print('       ', 'wp:', lJetDisc.GetBinLowEdge(binAtWorkingPoint)) 
 
 
                 if btagwp[:-1]+wpflag not in opt.bTagWorkingPoints:
@@ -1562,12 +1519,12 @@ def workingPoints(opt):
 
                 opt.bTagWorkingPoints[btagwp[:-1]+wpflag]['cut'] = str(lJetDisc.GetBinLowEdge(binAtWorkingPoint))
 
-            if 'csv' in opt.option: print ''
+            if 'csv' in opt.option: print('')
 
             discriminantDone.append(opt.bTagWorkingPoints[btagwp]['discriminant'])
 
     if 'noprint' not in opt.option:
-        print '\n\nbTagWorkingPoints =', opt.bTagWorkingPoints, '\n\n' 
+        print('\n\nbTagWorkingPoints =', opt.bTagWorkingPoints, '\n\n') 
 
 ### Analysis specific weights, efficiencies, scale factors, etc.
 
@@ -1587,8 +1544,8 @@ def getGeneratorParametersFromMCM(mcm_query):
             nValidRequests += 1
 
     if nValidRequests==1: return [ xSec, fEff ]
-    elif nValidRequests==0: print 'No request for', mcm_query, 'query found in McM'
-    else: print 'Too many requests for', mcm_query, 'query found in McM'
+    elif nValidRequests==0: print('No request for', mcm_query, 'query found in McM')
+    else: print('Too many requests for', mcm_query, 'query found in McM')
     return [ -1., -1. ]
 
 def ptHatWeights(opt):
@@ -1609,6 +1566,7 @@ def ptHatWeights(opt):
                 xSec = float(genPars[0])
                 fEff = 1. if len(genPars)==1 else float(genPars[1])
             opt.qcdMuPtHatBins[ptHatBin]['weight'] = str(1000.*xSec*fEff/events.GetEntries())
+            print('\nqcdMuPtHatBins =', opt.qcdMuPtHatBins)
 
         elif 'QCD_' in sample:
             opt.qcdPtHatBins[ptHatBin]['events'] = str(events.GetEntries())
@@ -1620,9 +1578,7 @@ def ptHatWeights(opt):
                 xSec = float(genPars[0])
                 fEff = 1. if len(genPars)==1 else float(genPars[1])
             opt.qcdPtHatBins[ptHatBin]['weight'] = str(1000.*xSec*fEff/events.GetEntries())
-
-    print '\nqcdMuPtHatBins =', opt.qcdMuPtHatBins
-    print '\nqcdPtHatBins =', opt.qcdPtHatBins, '\n'
+            print('\nqcdPtHatBins =', opt.qcdPtHatBins, '\n')
 
 def triggerPrescales(opt):
 
@@ -1637,7 +1593,7 @@ def triggerPrescales(opt):
         samples = {}
         if os.path.exists(commonTools.getCfgFileName(opt,'samples')):
             handle = open(commonTools.getCfgFileName(opt,'samples'),'r')
-            exec(handle)
+            exec(handle.read())
             handle.close()
 
         commandList = [ opt.dataConditionScript ]
@@ -1655,17 +1611,17 @@ def triggerPrescales(opt):
                 else:
                     mergeJobs[campaign+'_'+hltpath] = commonTools.cdWorkDir(opt)+' '.join(commandList)+' --hltPaths=HLT_'+hltpath
 
-    if len(mergeJobs.keys())>0:
+    if len(list(mergeJobs.keys()))>0:
             latinoTools.submitJobs(opt, 'prescales', campaign+'Prescales', mergeJobs, 'Targets', True, 1)
 
 def kinematicWeights(opt):
 
     if 'jetpteta' in opt.option.lower():
-        print 'kinematicWeights in 2D not supported yet'
+        print('kinematicWeights in 2D not supported yet')
         exit()
 
     if 'jetpt' not in opt.option.lower() and 'jeteta' not in opt.option.lower():
-        print 'kinematicWeights only supported for jetpt and jeteta'
+        print('kinematicWeights only supported for jetpt and jeteta')
         exit()
 
     jetPtEdges = []
@@ -1695,7 +1651,7 @@ def kinematicWeights(opt):
         if variable.split('_')[0] in opt.option.lower(): kinematicVariable = variable.split('_')[0]
 
     if kinematicVariable=='': 
-        print 'kinematicWeights: no valid variable found for', opt.option.lower()
+        print('kinematicWeights: no valid variable found for', opt.option.lower())
         exit()
 
     if 'jetpt' in kinematicVariable:
@@ -1705,7 +1661,7 @@ def kinematicWeights(opt):
         xBins = [ jetPtEdges ]
         yBins = ( int((2.*opt.maxJetEta)/0.1), -opt.maxJetEta, opt.maxJetEta )
     else:
-        print 'Error in kinematicWeights: no function variable chosen for corrections'
+        print('Error in kinematicWeights: no function variable chosen for corrections')
         exit()
 
     for back in backgrounds:
@@ -1757,8 +1713,6 @@ def kinematicWeights(opt):
                             ptfit = ROOT.TF1('ptfit', 'pol3', minPtFit, maxPtFit)
                             dataHisto.Fit('ptfit')
 
-                        binx, biny, binz = ROOT.Long(), ROOT.Long(), ROOT.Long()
-
                         ptval  = float(opt.jetPtBins[cut][0]) + 0.1
                         etaval = weightsHisto.GetYaxis().GetBinCenter(1)
 
@@ -1775,7 +1729,7 @@ def kinematicWeights(opt):
                             weightsHisto.SetBinContent(weightsHisto.FindBin(ptval, etaval), weight)
 
                             if opt.verbose:
-                                print back, cut, ptval, etaval, weight
+                                print(back, cut, ptval, etaval, weight)
 
         inputFile.Close()
 

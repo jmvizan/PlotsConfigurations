@@ -36,7 +36,7 @@ bIsSignal = opt.method=='PtRel' and not isPlot
 if hasattr(opt, 'action') and opt.action=='plotNuisances': bIsSignal = False
 
 if isFillShape and 'MergedLight' in opt.tag:
-    print 'Cannot fill shapes for', opt.tag, 'directly from trees'
+    print('Cannot fill shapes for', opt.tag, 'directly from trees')
     exit()
 
 ### Directories
@@ -44,7 +44,7 @@ if isFillShape and 'MergedLight' in opt.tag:
 skipTreesCheck = False if isShape or 'PtHatWeights' in opt.tag else True
 
 if opt.sigset=='SM' and isFillShape:
-    print 'Error: SM cannot be used when filling the shapes. Use Data and MC separately instead' 
+    print('Error: SM cannot be used when filling the shapes. Use Data and MC separately instead') 
 
 SITE=os.uname()[1]
 if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'cern'
@@ -52,7 +52,7 @@ if 'cern' not in SITE and 'ifca' not in SITE and 'cloud' not in SITE: SITE = 'ce
 if 'cern' in SITE:
     treeBaseDirMC   = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12_fixPuppi'
     treeBaseDirData = '/eos/cms/store/group/phys_btag/milee/BTA_addPFMuons_NanoV12_fixPuppi'
-else: print 'trees for', campaign, 'campaign available only at cern'
+else: print('trees for', campaign, 'campaign available only at cern')
 
 ProductionMC   = opt.campaign
 ProductionData = opt.campaign
@@ -88,16 +88,16 @@ triggerInfos = { 'BTagMu_AK4DiJet20_Mu5'  : { 'jetPtRange' : [  '20.',   '50.' ]
 # b-tagging algorithms and working points
 
 bTagAlgorithms = [ 'DeepJet', 'ParticleNet', 'ParT' ]
-workingPointName = [ 'Loose', 'Medium', 'Tight', 'VeryTight', 'VeryVeryTight' ]
+workingPointName = [ 'Loose', 'Medium', 'Tight', 'eXtraTight', 'eXtraeXtraTight' ]
 workingPointLimit = [ 0.1, 0.01, 0.001, 0.0005, 0.0001 ]
 
 if opt.campaign=='Summer22':
-    bTagWorkingPoints = {'DeepJetT': {'cut': '0.7183', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetVT': {'cut': '0.7862', 'discriminant': 'PNetBDisc'}, 'ParTL': {'cut': '0.0849', 'discriminant': 'ParTBDisc'}, 'ParticleNetM': {'cut': '0.245', 'discriminant': 'PNetBDisc'}, 'ParticleNetL': {'cut': '0.047', 'discriminant': 'PNetBDisc'}, 'ParTM': {'cut': '0.4319', 'discriminant': 'ParTBDisc'}, 'ParTT': {'cut': '0.8482', 'discriminant': 'ParTBDisc'}, 'ParticleNetT': {'cut': '0.6734', 'discriminant': 'PNetBDisc'}, 'DeepJetM': {'cut': '0.3086', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.0583', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetVVT': {'cut': '0.961', 'discriminant': 'PNetBDisc'}, 'ParTVVT': {'cut': '0.9874', 'discriminant': 'ParTBDisc'}, 'ParTVT': {'cut': '0.9151', 'discriminant': 'ParTBDisc'}, 'DeepJetVVT': {'cut': '0.9512', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetVT': {'cut': '0.8111', 'discriminant': 'DeepFlavourBDisc'}}
+    bTagWorkingPoints = {'DeepJetT': {'cut': '0.7183', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetXT': {'cut': '0.7862', 'discriminant': 'PNetBDisc'}, 'ParTL': {'cut': '0.0849', 'discriminant': 'ParTBDisc'}, 'ParticleNetM': {'cut': '0.245', 'discriminant': 'PNetBDisc'}, 'ParticleNetL': {'cut': '0.047', 'discriminant': 'PNetBDisc'}, 'ParTM': {'cut': '0.4319', 'discriminant': 'ParTBDisc'}, 'ParTT': {'cut': '0.8482', 'discriminant': 'ParTBDisc'}, 'ParticleNetT': {'cut': '0.6734', 'discriminant': 'PNetBDisc'}, 'DeepJetM': {'cut': '0.3086', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.0583', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetXXT': {'cut': '0.961', 'discriminant': 'PNetBDisc'}, 'ParTXXT': {'cut': '0.9874', 'discriminant': 'ParTBDisc'}, 'ParTXT': {'cut': '0.9151', 'discriminant': 'ParTBDisc'}, 'DeepJetXXT': {'cut': '0.9512', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetXT': {'cut': '0.8111', 'discriminant': 'DeepFlavourBDisc'}}
     btagAwayJetTagger, btagAwayJetDiscriminant = 'JBP', 'Bprob'
     btagAwayJetVariations = { 'AwayJetTag' : '2.866',  'AwayJetDown' : '1.397' , 'AwayJetUp' : '5.196' }
 
 elif opt.campaign=='Summer22EE':
-    bTagWorkingPoints = {'DeepJetT': {'cut': '0.73', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetVT': {'cut': '0.8033', 'discriminant': 'PNetBDisc'}, 'ParTL': {'cut': '0.0897', 'discriminant': 'ParTBDisc'}, 'ParticleNetM': {'cut': '0.2605', 'discriminant': 'PNetBDisc'}, 'ParticleNetL': {'cut': '0.0499', 'discriminant': 'PNetBDisc'}, 'ParTM': {'cut': '0.451', 'discriminant': 'ParTBDisc'}, 'ParTT': {'cut': '0.8604', 'discriminant': 'ParTBDisc'}, 'ParticleNetT': {'cut': '0.6915', 'discriminant': 'PNetBDisc'}, 'DeepJetM': {'cut': '0.3196', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.0614', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetVVT': {'cut': '0.9664', 'discriminant': 'PNetBDisc'}, 'ParTVVT': {'cut': '0.9893', 'discriminant': 'ParTBDisc'}, 'ParTVT': {'cut': '0.9234', 'discriminant': 'ParTBDisc'}, 'DeepJetVVT': {'cut': '0.9542', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetVT': {'cut': '0.8184', 'discriminant': 'DeepFlavourBDisc'}}
+    bTagWorkingPoints = {'DeepJetT': {'cut': '0.73', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetXT': {'cut': '0.8033', 'discriminant': 'PNetBDisc'}, 'ParTL': {'cut': '0.0897', 'discriminant': 'ParTBDisc'}, 'ParticleNetM': {'cut': '0.2605', 'discriminant': 'PNetBDisc'}, 'ParticleNetL': {'cut': '0.0499', 'discriminant': 'PNetBDisc'}, 'ParTM': {'cut': '0.451', 'discriminant': 'ParTBDisc'}, 'ParTT': {'cut': '0.8604', 'discriminant': 'ParTBDisc'}, 'ParticleNetT': {'cut': '0.6915', 'discriminant': 'PNetBDisc'}, 'DeepJetM': {'cut': '0.3196', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetL': {'cut': '0.0614', 'discriminant': 'DeepFlavourBDisc'}, 'ParticleNetXXT': {'cut': '0.9664', 'discriminant': 'PNetBDisc'}, 'ParTXXT': {'cut': '0.9893', 'discriminant': 'ParTBDisc'}, 'ParTXT': {'cut': '0.9234', 'discriminant': 'ParTBDisc'}, 'DeepJetXXT': {'cut': '0.9542', 'discriminant': 'DeepFlavourBDisc'}, 'DeepJetXT': {'cut': '0.8184', 'discriminant': 'DeepFlavourBDisc'}}
     btagAwayJetTagger, btagAwayJetDiscriminant = 'JBP', 'Bprob'
     btagAwayJetVariations = { 'AwayJetTag' : '3.057',  'AwayJetDown' : '1.492' , 'AwayJetUp' : '5.481' }
 
@@ -278,7 +278,14 @@ goodJetForDisc = '((JETIDX<nJet)*(Alt$('+jetPt+'[JETIDX],0.)>=30.)*(abs(Alt$(Jet
 jetDisc = '(999999.*(!('+goodJetForDisc+')) + '+goodJetForDisc+'*(Alt$(Jet_BTAGDISC[JETIDX],999999.)))'
 
 # kinematic weights
-jetKinematicWeight = '*'.join([ 'Alt$('+x+'[JETIDX],1.)' for x in opt.tag.split('.') if opt.method not in x ]) if '.' in opt.tag else '1.'
+jetKinematicWeight = '1.'
+if '.' in opt.tag:
+    jetKinematicWeightList = []
+    for x in opt.tag.split('.'):
+        if opt.method not in x: jetKinematicWeightList.append('Alt$('+x+'[JETIDX],1.)')
+    jetKinematicWeight = '*'.join(jetKinematicWeightList)
+# This does not work in python3
+#jetKinematicWeight = '*'.join([ 'Alt$('+x+'[JETIDX],1.)' for x in opt.tag.split('.') if opt.method not in x ]) if '.' in opt.tag else '1.'
 
 # mu-jet
 jetSel      = 'Jet_tightID==1 && abs(Jet_eta)<='+maxJetEta+' && '+jetPt+'>='+str(minJetPt)
@@ -366,17 +373,17 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
  
     elif opt.campaign=='Summer22EE':
         qcdMuPtHatBins = {'80to120': {'ext': '', 'xSec': '2536000*0.03807', 'events': '86940145', 'weight': '1.11048261997'}, '170to300': {'ext': '', 'xSec': '114200*0.06781', 'events': '107479889', 'weight': '0.0720497766796'}, '300to470': {'ext': '', 'xSec': '7678*0.09136', 'events': '101648281', 'weight': '0.00690087498873'}, '600to800': {'ext': '', 'xSec': '180.6*0.1176', 'events': '72565100', 'weight': '0.000292682846162'}, '800to1000': {'ext': '', 'xSec': '30.89*0.1278', 'events': '128437072', 'weight': '3.07367797983e-05'}, '120to170': {'ext': '', 'xSec': '444900*0.05214', 'events': '70443255', 'weight': '0.329301733715'}, '50to80': {'ext': '', 'xSec': '15710000*0.0221', 'events': '39483803', 'weight': '8.79325124786'}, '30to50': {'ext': '', 'xSec': '114100000*0.01303', 'events': '101098844', 'weight': '14.7056379794'}, '470to600': {'ext': '', 'xSec': '630.3*0.1062', 'events': '71197091', 'weight': '0.000940176895711'}, '15to20': {'ext': '', 'xSec': '907100000*0.0032', 'events': '16043927', 'weight': '180.923286425'}, '20to30': {'ext': '', 'xSec': '420500000*0.00599', 'events': '75762116', 'weight': '33.2461015212'}, '1000': {'ext': '', 'xSec': '9.935*0.1341', 'events': '45503506', 'weight': '2.92786999753e-05'}}
-        qcdPtHatBins = {'80to120': {'ext': '', 'xSec': '2762530*1', 'events': '28629379', 'weight': '96.4928369561'}, '170to300': {'ext': '', 'xSec': '19204300', 'events': '31822560', 'weight': '603.480675345'}, '300to470': {'ext': '', 'xSec': '7823', 'events': '64232868', 'weight': '0.121791229998'}, '600to800': {'ext': '', 'xSec': '186.9', 'events': '65786966', 'weight': '0.00284098828938'}, '1000to1400': {'ext': '', 'xSec': '9.4183', 'events': '23752788', 'weight': '0.000396513453494'}, '800to1000': {'ext': '', 'xSec': '32.293', 'events': '43945702', 'weight': '0.000734838642468'}, '120to170': {'ext': '', 'xSec': '471100', 'events': '30613647', 'weight': '15.3885618398'}, '1400to1800': {'ext': '', 'xSec': '0.84265', 'events': '8317538', 'weight': '0.000101310027078'}, '1800to2400': {'ext': '', 'xSec': '0.114943', 'events': '4484970', 'weight': '2.56284880389e-05'}, '2400to3200': {'ext': '', 'xSec': '0.00682981', 'events': '2389431', 'weight': '2.85834158844e-06'}, '3200': {'ext': '', 'xSec': '0.000165445', 'events': '1241939', 'weight': '1.33215077391e-07'}, '50to80': {'ext': '', 'xSec': '19204300', 'events': '19392712', 'weight': '990.284391373'}, '30to50': {'ext': '', 'xSec': '114100000', 'events': '4844273', 'weight': '23553.5858528'}, '470to600': {'ext': '', 'xSec': '648.2', 'events': '29381124', 'weight': '0.0220617836132'}, '15to30': {'ext': '', 'xSec': '1327600000', 'events': '4491551', 'weight': '295577.184808'}}
+        qcdPtHatBins = {'80to120': {'ext': '', 'xSec': '2762530*1', 'events': '28629379', 'weight': '96.49283695605133'}, '170to300': {'ext': '', 'xSec': '19204300', 'events': '31822560', 'weight': '603.4806753447868'}, '300to470': {'ext': '', 'xSec': '7823', 'events': '64232868', 'weight': '0.12179122999770149'}, '600to800': {'ext': '', 'xSec': '186.9', 'events': '65747546', 'weight': '0.002842691649662483'}, '1000to1400': {'ext': '', 'xSec': '9.4183', 'events': '23710401', 'weight': '0.00039722229919266237'}, '800to1000': {'ext': '', 'xSec': '32.293', 'events': '43945702', 'weight': '0.0007348386424683806'}, '120to170': {'ext': '', 'xSec': '471100', 'events': '30572539', 'weight': '15.409253382586249'}, '1400to1800': {'ext': '', 'xSec': '0.84265', 'events': '8317538', 'weight': '0.0001013100270777242'}, '1800to2400': {'ext': '', 'xSec': '0.114943', 'events': '4484970', 'weight': '2.5628488038938946e-05'}, '2400to3200': {'ext': '', 'xSec': '0.00682981', 'events': '2389431', 'weight': '2.858341588436745e-06'}, '3200': {'ext': '', 'xSec': '0.000165445', 'events': '1241939', 'weight': '1.332150773910796e-07'}, '50to80': {'ext': '', 'xSec': '19204300', 'events': '19392712', 'weight': '990.284391373419'}, '30to50': {'ext': '', 'xSec': '114100000', 'events': '4802915', 'weight': '23756.40626577818'}, '470to600': {'ext': '', 'xSec': '648.2', 'events': '29381124', 'weight': '0.02206178361317967'}, '15to30': {'ext': '', 'xSec': '1327600000', 'events': '4491551', 'weight': '295577.1848076533'}}
 
     if 'Validation' in opt.tag:
-        for pthatbin in qcdMuPtHatBins.keys():
+        for pthatbin in list(qcdMuPtHatBins.keys()):
             if pthatbin!='80to120': del qcdMuPtHatBins[pthatbin]
-        for pthatbin in qcdPtHatBins.keys():
+        for pthatbin in list(qcdPtHatBins.keys()):
             if pthatbin!='80to120': del qcdPtHatBins[pthatbin]
 
     if 'WorkingPoints' in opt.tag or 'PtHatWeights' in opt.tag or 'Light' in opt.tag:
 
-        nPtHatBins = len(qcdPtHatBins.keys())        
+        nPtHatBins = len(list(qcdPtHatBins.keys()))        
 
         qcdTrees = []
         for pth in qcdPtHatBins:
@@ -397,7 +404,7 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
 
     if 'PtHatWeights' in opt.tag or opt.method+'Kinematics' in opt.tag or 'DataKinematics' in opt.tag or opt.method+'Templates' in opt.tag:
 
-        nPtHatBins = len(qcdMuPtHatBins.keys())
+        nPtHatBins = len(list(qcdMuPtHatBins.keys()))
 
         qcdMuTrees = []
         for pth in qcdMuPtHatBins:
@@ -476,7 +483,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
                            'isDATA'    : 1 ,
                            'isFastsim' : 0 ,
                            'split'     : 'AsMuchAsPossible',
-                           'JobsPerSample' : 20*len(runPeriods.keys()) if 'Light' in opt.tag else 8*len(runPeriods.keys())
+                           'JobsPerSample' : 20*len(list(runPeriods.keys())) if 'Light' in opt.tag else 8*len(list(runPeriods.keys()))
                           }
      
 ### Files per job
@@ -519,5 +526,50 @@ if 'cern' in SITE:
         for ifile in range(len(samples[sample]['name'])):
             samples[sample]['name'][ifile] = samples[sample]['name'][ifile].replace('root://eoscms.cern.ch/', '')
 
+### getCampaignParameters for python3
 
+if hasattr(opt, 'getCampaignParameters') and opt.getCampaignParameters:
+
+    opt.minPlotPt = minPlotPt
+    opt.maxPlotPt = maxPlotPt
+    opt.maxJetEta = float(maxJetEta)
+    opt.bTagAlgorithms = bTagAlgorithms
+    opt.btagWPs = list(bTagWorkingPoints.keys())
+    opt.ptBins = list(jetPtBins.keys())
+
+    opt.Selections = []
+    for selection in systematicVariations:
+        sel = 'Central' if selection=='' else selection
+        if 'vetosel' in opt.option:
+            if sel in opt.option: continue
+        elif 'sel' in opt.option and sel not in opt.option: continue
+        opt.Selections.append(selection)
+    opt.systematicNuisances = systematicNuisances
+
+    if opt.action=='ptHatWeights':
+        opt.samples = samples
+        opt.qcdMuPtHatBins = qcdMuPtHatBins
+        opt.qcdPtHatBins = qcdPtHatBins
+
+    elif opt.action=='workingPoints':
+        opt.workingPointName = workingPointName
+        opt.workingPointLimit = workingPointLimit
+        opt.samples = samples
+        opt.nJetMax = nJetMax
+        opt.bTagWorkingPoints = bTagWorkingPoints
+ 
+    elif opt.action=='frameworkValidation':                     
+        opt.samples = list(samples.keys())
+        opt.triggerInfos = triggerInfos                                                                                                                                                                              
+    elif opt.action=='kinematicWeights': 
+        opt.jetPtBins = jetPtBins         
+        opt.minJetPt  = minJetPt
+        opt.maxJetPt  = maxJetPt
+
+    elif opt.action=='ptRelInput' or opt.action=='shapesForFit':
+        opt.templateTreatments = templateTreatments
+        opt.bTemplateCorrector = bTemplateCorrector
+
+    elif opt.action=='storeBTagScaleFactors':
+        opt.csvSystematics = csvSystematics
 

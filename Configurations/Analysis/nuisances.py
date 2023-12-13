@@ -18,7 +18,7 @@ if 'Templates' in opt.tag:
                                  'type'  : 'shape'
                                 }
 
-        for sample in samples.keys():
+        for sample in list(samples.keys()):
             if not samples[sample]['isDATA']:
                 nuisances['pileup']['samples'][sample] = [ 'pileupWeight[2]/pileupWeight[1]', 'pileupWeight[0]/pileupWeight[1]' ]
 
@@ -84,7 +84,7 @@ if 'Templates' in opt.tag:
                                       'type'  : 'shape'
                                      }
 
-                for sample in samples.keys():
+                for sample in list(samples.keys()):
                     if not samples[sample]['isDATA']:
                         nuisances['JEU']['samples'][sample] = [ 1., 1. ]
 
