@@ -2,7 +2,7 @@
 
 The code used is documented here:
 
-    https://github.com/scodella/setup/blob/13TeV/SetupAnalysis.sh
+    https://github.com/scodella/setup/blob/13.6TeV/SetupAnalysis.sh
 
 To install, try this
 
