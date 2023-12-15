@@ -327,7 +327,10 @@ if 'PtRel' in opt.method:
 
 elif 'System8' in opt.method: # Not sure System8 does really this
     #awayJetCut = 'Sum$('+jetSel+' && '+jetPt+'>=AWAYJETPTCUT && '+awayDeltaR+'>0.05 && Jet_'+btagAwayJetDiscriminant+'>=-999999.)>=1'
-    awayJetCand = [ '('+str(ijet)+'<nJet && Alt$(Jet_tightID['+str(ijet)+'],0)==1 && abs(Alt$(Jet_eta['+str(ijet)+'],5.))<='+maxJetEta+' && '+str(ijet)+'!='+muJetIdx+' && Alt$('+jetPt+'['+str(ijet)+'],0.)>=AWAYJETPTCUT && Alt$(Jet_'+btagAwayJetDiscriminant+'['+str(ijet)+'],-9999999.)>=-999999. && Sum$('+jetSel+' && '+jetPt+'!='+muJetPt+' && '+jetPt+'>'+jetPt+'['+str(ijet)+'])==0)' for ijet in range(5) ]
+    #awayJetCand = [ '('+str(ijet)+'<nJet && Alt$(Jet_tightID['+str(ijet)+'],0)==1 && abs(Alt$(Jet_eta['+str(ijet)+'],5.))<='+maxJetEta+' && '+str(ijet)+'!='+muJetIdx+' && Alt$('+jetPt+'['+str(ijet)+'],0.)>=AWAYJETPTCUT && Alt$(Jet_'+btagAwayJetDiscriminant+'['+str(ijet)+'],-9999999.)>=-999999. && Sum$('+jetSel+' && '+jetPt+'!='+muJetPt+' && '+jetPt+'>'+jetPt+'['+str(ijet)+'])==0)' for ijet in range(5) ]
+    awayJetCand = []
+    for ijet in range(5):
+        awayJetCand.append( '('+str(ijet)+'<nJet && Alt$(Jet_tightID['+str(ijet)+'],0)==1 && abs(Alt$(Jet_eta['+str(ijet)+'],5.))<='+maxJetEta+' && '+str(ijet)+'!='+muJetIdx+' && Alt$('+jetPt+'['+str(ijet)+'],0.)>=AWAYJETPTCUT && Alt$(Jet_'+btagAwayJetDiscriminant+'['+str(ijet)+'],-9999999.)>=-999999. && Sum$('+jetSel+' && '+jetPt+'!='+muJetPt+' && '+jetPt+'>'+jetPt+'['+str(ijet)+'])==0)' )
     awayJetCut = '('+' || '.join(awayJetCand )+')'   
 
 # trigger
