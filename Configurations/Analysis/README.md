@@ -1,4 +1,4 @@
-Installation of the code
+## Installation of the code
 
 The code used is documented here:
 
