@@ -320,9 +320,9 @@ def getScaleFactorFromCanvas(fileName, canvasName, dataName, signalName, binNumb
                         if histo.GetName()==signalName:
                             signal, signalStatError = getYieldsFromHistogram(histo, binNumber)
 
-    if data==-1. or dataError==-1.: print 'getScaleFactorFromCanvas: data yields not found' 
-    elif signal==-1. or signalStatError==-1.: print 'getScaleFactorFromCanvas: signal yields not found'
-    elif mc==-1. or mcError==-1.: print 'getScaleFactorFromCanvas: mc yields not found'
+    if data==-1. or dataError==-1.: print('getScaleFactorFromCanvas: data yields not found') 
+    elif signal==-1. or signalStatError==-1.: print('getScaleFactorFromCanvas: signal yields not found')
+    elif mc==-1. or mcError==-1.: print('getScaleFactorFromCanvas: mc yields not found')
     elif signal>0.:
         bkg = mc - signal
         #bkgError = bkg*mcError/mc # some assumptions here
@@ -339,7 +339,7 @@ def getScaleFactorFromCanvas(fileName, canvasName, dataName, signalName, binNumb
 if __name__ == '__main__':
 
     for year in years.split(','):
-        print '\t\tYEAR:'+year+'\n'
+        print('\t\tYEAR:'+year+'\n')
         normBackgrounds = {}
 
         if 'WWmt2' in backgroundProcess:
@@ -393,7 +393,7 @@ if __name__ == '__main__':
                     mt2llGraph.SetPointError(ib-1, centerBins[ib-1]-searchBins[ib-1], searchBins[ib]-centerBins[ib-1], scaleFactorErrorLow, scaleFactorErrorHigh)
 
             for sample in bkgInfo['samples']:
-                print '\t\tnormBackgrounds[\''+sample+'\'] = '+json.dumps(normBackgrounds[sample]).replace('"','\'')
+                print('\t\tnormBackgrounds[\''+sample+'\'] = '+json.dumps(normBackgrounds[sample]).replace('"','\''))
         
         if 'WWmt2' in backgroundProcess:
             ROOT.gStyle.SetOptStat(ROOT.kFALSE)
@@ -420,7 +420,7 @@ if __name__ == '__main__':
                 slopeDo  = mt2llFun.GetParameter(1)-mt2llFun.GetParError(1)
                 #offsetDo = mt2llFun.GetParameter(0)+mt2llFun.GetParError(0)
                 offsetDo = 1. - slopeDo*x1
-                print x1, mt2llFun.GetParameter(0), mt2llFun.GetParameter(1), offsetUp, slopeUp, offsetDo, slopeDo
+                print(x1, mt2llFun.GetParameter(0), mt2llFun.GetParameter(1), offsetUp, slopeUp, offsetDo, slopeDo)
                 fitC  = ROOT.TLine(minMT2Fit, mt2llFun.GetParameter(0)+minMT2Fit*mt2llFun.GetParameter(1), 500., mt2llFun.GetParameter(0)+500.*mt2llFun.GetParameter(1))
                 fitUp = ROOT.TLine(minMT2Fit, offsetUp+minMT2Fit*slopeUp, 500., offsetUp+500.*slopeUp)
                 fitDo = ROOT.TLine(minMT2Fit, offsetDo+minMT2Fit*slopeDo, 500., offsetDo+500.*slopeDo)
@@ -440,7 +440,7 @@ if __name__ == '__main__':
                 slopeDo  = mt2llFun.GetParameter(1)-mt2llFun.GetParError(1)
                 #offsetDo = mt2llFun.GetParameter(0)+mt2llFun.GetParError(0)
                 offsetDo = 1. - slopeDo*x1
-                print x1, mt2llFun.GetParameter(0), mt2llFun.GetParameter(1), offsetUp, slopeUp, offsetDo, slopeDo
+                print(x1, mt2llFun.GetParameter(0), mt2llFun.GetParameter(1), offsetUp, slopeUp, offsetDo, slopeDo)
                 fitA  = ROOT.TLine(minMT2Fit, mt2llFun.GetParameter(0)+minMT2Fit*mt2llFun.GetParameter(1), 500., mt2llFun.GetParameter(0)+500.*mt2llFun.GetParameter(1))
                 fitA.SetLineColor(4); fitA.SetLineWidth(2); fitA.Draw(); fitC.Draw();
                 fitUpA = ROOT.TLine(minMT2Fit, offsetUp+minMT2Fit*slopeUp, 500., offsetUp+500.*slopeUp)

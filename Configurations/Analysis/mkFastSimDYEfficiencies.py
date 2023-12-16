@@ -28,7 +28,7 @@ def getLeptonMass(pdgId) :
     elif abs(pdgId)==13 :
         return 0.105658
     else:
-        print 'mt2llProducer: WARNING: unsupported lepton pdgId'
+        print('mt2llProducer: WARNING: unsupported lepton pdgId')
         return -1
 
 def isTightMuon(muon):
@@ -112,7 +112,7 @@ if __name__ == '__main__':
                   '2018'       : { 'fastsim' : eosusr+'Spring21UL18FS_106X_nAODv9_Full2018v8/'+stepName+'/'+treeNameFast,
                                    'fullsim' : eosusr+'Summer20UL18_106X_nAODv9_Full2018v8/'+stepName+'/'+treeNameFull,    } , }
     else:
-        print 'Error: campaign', campaign, 'is not supported'
+        print(('Error: campaign', campaign, 'is not supported'))
         exit()
 
 
@@ -149,9 +149,9 @@ if __name__ == '__main__':
         os.system('mkdir -p '+outputDir)
 
         histos = { }
-        print prodset
+        print(prodset)
         for sim in prodset.split('-'):
-            print years[year][sim]
+            print((years[year][sim]))
             events = ROOT.TChain('Events') 
             if maxentries<0 or maxentries>=10:
                 jobFlag = ''
@@ -161,7 +161,7 @@ if __name__ == '__main__':
                 nTrees = int(len(glob.glob(years[year][sim])))
                 nParts = int(math.ceil(nTrees/10.))
                 for part in range(maxentries*nParts, min((maxentries+1)*nParts, nTrees)):
-                    print 'Adding ', years[year][sim].replace('*',str(part))
+                    print(('Adding ', years[year][sim].replace('*',str(part))))
                     events.Add(years[year][sim].replace('*',str(part))) 
 
             histos[sim] = { }
@@ -180,11 +180,11 @@ if __name__ == '__main__':
                 mx = float(sample.split('_')[2].split('-')[-1])
 
             nentries = events.GetEntries()            
-            print maxentries, nentries
+            print((maxentries, nentries))
             if maxentries>=10 and maxentries<nentries:
                 nentries = maxentries
 
-            print year, sim, sample, nentries 
+            print((year, sim, sample, nentries)) 
             for entry in range(nentries):
 
                 events.GetEntry(entry)

@@ -98,7 +98,7 @@ def setAnalysisDefaults(opt):
                 if signal.split('_')[0] in opt.sigset:
                     opt.sigset = opt.sigset
  
-    if opt.verbose: print opt.year, opt.tag, opt.sigset
+    if opt.verbose: print((opt.year, opt.tag, opt.sigset))
 
 ### Shapes
 
@@ -150,10 +150,10 @@ def signalShapes(opt, action='shapes'):
                         mergeCommandList.append('./runAnalysis.py --action=mergeall --year='+year+' --tag='+tag+' --sigset='+signal)
                         mergeJobs[year][tag][signal] = '\n'.join(mergeCommandList) 
 
-    if len(mergeJobs.keys())>0:
+    if len(list(mergeJobs.keys()))>0:
         for year in mergeJobs:
             for tag in mergeJobs[year]:
-                if len(mergeJobs[year][tag].keys())>0:
+                if len(list(mergeJobs[year][tag].keys()))>0:
                     latinoTools.submitJobs(opt, 'mergesig', year+tag, mergeJobs[year][tag], 'Targets', True, 1)
 
 def checkSignalJobs(opt):
@@ -298,7 +298,7 @@ def mergeFitCR(opt):
                 foundFilesToMerge = True
                 for fileToMerge in filesToMerge:
                     if not commonTools.isGoodFile(fileToMerge):
-                        print 'mergeFitCR error: input file', fileToMerge, 'not found or corrupted' 
+                        print(('mergeFitCR error: input file', fileToMerge, 'not found or corrupted')) 
                         foundFilesToMerge = False
 
                 if foundFilesToMerge:
@@ -450,7 +450,7 @@ def printLimits(opt):
                 tag += tags
                 outputDir = '/'.join([ opt.limitdir, opt.year, tag, signal ])
                 if not commonTools.isGoodFile(outputDir+'/higgsCombine_Both.AsymptoticLimits.mH120.root', 6000.):
-                    if opt.debug: print outputDir+'/higgsCombine_Both.AsymptoticLimits.mH120.root'
+                    if opt.debug: print((outputDir+'/higgsCombine_Both.AsymptoticLimits.mH120.root'))
                     continue
                 inputFile =  commonTools.openRootFile(outputDir+'/higgsCombine_Both.AsymptoticLimits.mH120.root')
 
@@ -458,7 +458,7 @@ def printLimits(opt):
                 else: limitResult[tagopt] = []
 
                 for event in inputFile.limit:
-                    if opt.debug: print tagopt, event.limit
+                    if opt.debug: print((tagopt, event.limit))
                     if tagopt=='': limitResult['central'].append(event.limit)
                     else: limitResult[tagopt].append(event.limit)
 
@@ -466,7 +466,7 @@ def printLimits(opt):
         signalResult = []
         if 'central' not in limitResult: continue
         availableResultList = [ 'central' ]
-        if len(limitResult.keys())==1: printSignal = True
+        if len(list(limitResult.keys()))==1: printSignal = True
         for evt in range(len(limitResult['central'])):
             resultList = [ str(limitResult['central'][evt]) ]
             for tags in [ '', 'WWTails', 'WWHighs', 'WWPol1a', 'SmtEU' ]:
@@ -483,10 +483,10 @@ def printLimits(opt):
         availableResult = ' '.join(availableResultList)
 
         if printSignal:
-            print '####', signal
-            print '    ', availableResult
+            print(('####', signal))
+            print(('    ', availableResult))
             for evt in range(len(signalResult)):
-                print signalResult[evt]
+                print((signalResult[evt]))
             if len(signalResult)==6:
                 ccc = []
                 obs = signalResult[5].split(' ')
@@ -508,8 +508,8 @@ def printLimits(opt):
                         ccc.append(1.+(float(obs[rr])-float(pus[rr]))/(float(pds[rr])-float(pus[rr])))
                     elif float(obs[rr])>float(pds[rr]):
                         ccc.append(+2.5)
-                print ccc
-            print '\n\n'
+                print(ccc)
+            print('\n\n')
 
 def makeContours(opt, plotoption='2', fitOption='Blind'):
 
@@ -539,7 +539,7 @@ def exclusionPlot(opt, plotoption='2'):
     tagList = opt.tag.split('-')
 
     if len(tagList)>2: 
-        print 'Comparison of more than two tags not supported'  
+        print('Comparison of more than two tags not supported')  
         exit()
 
     fitOption = 'Blind'
@@ -644,7 +644,7 @@ def splitSignalMassPoints(opt, massPointForSubset=100):
             baseSignal = signal.split('_')[0]
             signalSubsets[baseSignal] = [ ]  
 
-            if opt.verbose: print 'Splitting mass points for', baseSignal          
+            if opt.verbose: print(('Splitting mass points for', baseSignal))          
 
             massPoints = getMassPointList(signal)
 
@@ -678,7 +678,7 @@ def splitSignalMassPoints(opt, massPointForSubset=100):
                         break
 
     for signal in signalSubsets:
-        print 'signalSubsets[\''+signal+'\'] = '+repr(signalSubsets[signal])+'\n'               
+        print(('signalSubsets[\''+signal+'\'] = '+repr(signalSubsets[signal])+'\n'))               
 
 def getMassPointList(signal):
 
@@ -710,7 +710,7 @@ def makeFastSimLeptonEfficiencies(opt):
                     for part in range(10): mergeJobs[reco+'_'+sample+'_'+str(part)] = ' '.join([ cdWorkDir, './mkFastSimDYEfficienciesJobs.py', year, reco, sample , str(part) ])
                 else:
                     mergeJobs[reco+'_'+sample] = ' '.join([ cdWorkDir, './mkFastSimDYEfficienciesJobs.py', year, reco, sample , '-1' ])      
-        if len(mergeJobs.keys())>0:
+        if len(list(mergeJobs.keys()))>0:
             latinoTools.submitJobs(opt, 'fastsimlep', year+'EfficiencyJobs', mergeJobs, 'Targets', True, 1) 
 
 def plotFastSimLeptonEfficiencies(opt):
@@ -727,7 +727,7 @@ def plotFastSimLeptonEfficiencies(opt):
 def mergeSearchRegionKinematics(opt):
 
     if 'SearchRegionKinematics' not in opt.tag:
-        print 'Please choose a tag with SearchRegionKinematics'
+        print('Please choose a tag with SearchRegionKinematics')
         exit()
 
     for year in opt.year.split('-'):

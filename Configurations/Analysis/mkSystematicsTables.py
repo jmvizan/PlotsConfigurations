@@ -34,7 +34,7 @@ def getShapes(systematic, cuts, variables, samples, systSamples, inputFile):
                     fitvariable = variable
 
             if fitvariable==None:
-                print 'mkSystematicsTables: fit variable not found for cut', cut
+                print('mkSystematicsTables: fit variable not found for cut', cut)
                 exit()
 
             folder = inputFile.Get(cut+'/'+fitvariable)
@@ -53,7 +53,7 @@ def getShapes(systematic, cuts, variables, samples, systSamples, inputFile):
                             else: lnNweight = 2. - float(systSamples[sample])
                         thisShape.Add(folder.Get('histo_'+sample), lnNweight)
                     else:
-                        print 'Warning: missing shapes for sample', sample, 'in cut', cut+'/'+fitvariable
+                        print('Warning: missing shapes for sample', sample, 'in cut', cut+'/'+fitvariable)
 
             shapesList.append(thisShape)
 
@@ -186,7 +186,7 @@ if __name__ == '__main__':
             systematics['stat'] = { }
 
         for centralShape in centralShapes:
-            if centralShape.GetBinContent(centralShape.GetNbinsX()+1)!=0.: print 'HORROR'
+            if centralShape.GetBinContent(centralShape.GetNbinsX()+1)!=0.: print('HORROR')
             if centralShape.Integral()==0.: continue
             if opt.debugcut!='XXX' and opt.debugcut not in centralShape.GetName(): continue
             if opt.debugsyst!='XXX' and opt.debugsyst not in 'stat': continue
@@ -260,17 +260,17 @@ if __name__ == '__main__':
 
                 if printDebug:
 
-                    print systematic, cut
-                    print 'Integral', centralShape.Integral(), upShape.Integral(), doShape.Integral()
-                    print 'Entries', centralShape.GetEntries(), upShape.GetEntries(), doShape.GetEntries()
+                    print(systematic, cut)
+                    print('Integral', centralShape.Integral(), upShape.Integral(), doShape.Integral())
+                    print('Entries', centralShape.GetEntries(), upShape.GetEntries(), doShape.GetEntries())
                     for ib in range(centralShape.GetNbinsX()):
                         if centralShape.GetBinContent(ib+1)>0.:
                             if abs(upShape.GetBinContent(ib+1)/centralShape.GetBinContent(ib+1)-1.)>0.5 or abs(doShape.GetBinContent(ib+1)/centralShape.GetBinContent(ib+1)-1.)>0.5:
-                                print ib+1, 'yields   ', centralShape.GetBinContent(ib+1), upShape.GetBinContent(ib+1), doShape.GetBinContent(ib+1)
-                                print ib+1, 'error    ', centralShape.GetBinError(ib+1), upShape.GetBinError(ib+1), doShape.GetBinError(ib+1)
-                                print ib+1, 'rel. err.', str(100.*abs(upShape.GetBinContent(ib+1)/centralShape.GetBinContent(ib+1)-1.))+'%', str(100.*abs(doShape.GetBinContent(ib+1)/centralShape.GetBinContent(ib+1)-1.))+'%'
+                                print(ib+1, 'yields   ', centralShape.GetBinContent(ib+1), upShape.GetBinContent(ib+1), doShape.GetBinContent(ib+1))
+                                print(ib+1, 'error    ', centralShape.GetBinError(ib+1), upShape.GetBinError(ib+1), doShape.GetBinError(ib+1))
+                                print(ib+1, 'rel. err.', str(100.*abs(upShape.GetBinContent(ib+1)/centralShape.GetBinContent(ib+1)-1.))+'%', str(100.*abs(doShape.GetBinContent(ib+1)/centralShape.GetBinContent(ib+1)-1.))+'%')
                         elif upShape.GetBinContent(ib+1)>0. or doShape.GetBinContent(ib+1)>0.:
-                                print '>>>      ', centralShape.GetBinContent(ib+1), upShape.GetBinContent(ib+1), doShape.GetBinContent(ib+1)
+                                print('>>>      ', centralShape.GetBinContent(ib+1), upShape.GetBinContent(ib+1), doShape.GetBinContent(ib+1))
 
                 systUp = 100.*abs(upShape.Integral() - centralShape.Integral())/centralShape.Integral()
                 systDo = 100.*abs(doShape.Integral() - centralShape.Integral())/centralShape.Integral()                   
@@ -347,17 +347,17 @@ if __name__ == '__main__':
  
     for systematic in systematics:
         if systematic.split('_')[0] not in systematicDictionary:
-            print 'Error:', systematic.split('_')[0], 'not in dictionary'
+            print('Error:', systematic.split('_')[0], 'not in dictionary')
             exit()
 
     yieldHeader, shapeHeader = 'Change in yields', 'Change in \\mtll shape' 
-    if len(systematicColumns.keys())>1:
+    if len(list(systematicColumns.keys()))>1:
         yieldHeader, shapeHeader = 'Yields', '\\mtll shape'
 
     table  = '\\begin{table}[hbt]\\centering\n'
     table += '  \\topcaption{\\label{tab:syst_'+yearset+'_'+opt.samples+'_'+opt.tablelevel+'} Sizes of systematic uncertainties in the predicted yields for '+opt.samples+' processes. The first column shows the range of the uncertainties in the global background normalization across the different SRs. The second column quantifies the effect on the \\mtll shape. This is computedSizes of systematic uncertainties in the predicted yields for SM processes. The first by taking the maximum variation across the \\mtll bins (after renormalizing for the global change of all the distribution) in each SR. The range of this variation across the SRs is given.}\n'
     table += '  \\cmsTable {\n'
-    table += '    \\begin{tabular}{l'+'cc'*len(systematicColumns.keys())+'}\n'
+    table += '    \\begin{tabular}{l'+'cc'*len(list(systematicColumns.keys()))+'}\n'
     table += '    \\hline\n'
     table += '    \multirow{2}{*}{Source of uncertainty}'
     for column in sorted(systematicColumns):
@@ -379,7 +379,7 @@ if __name__ == '__main__':
         for systematic in systematicInDictionaryList:
 
             if len(systematicInDictionaryList)>1:
-                print 'Warning: systematic legend to be completed in case of split uncertainty'
+                print('Warning: systematic legend to be completed in case of split uncertainty')
 
             table += '    '+systematicDictionary[systematicInDictionary]
 
@@ -406,7 +406,7 @@ if __name__ == '__main__':
     table += '  }\n'
     table += '\\end{table}\n'
 
-    print table
+    print(table)
 
 
 

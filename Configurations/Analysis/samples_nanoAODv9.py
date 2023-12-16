@@ -50,7 +50,7 @@ if '2018' in opt.tag :
 
 recoFlag = '_UL'
 
-yeartag = '-'.join(yearstag.values())
+yeartag = '-'.join(list(yearstag.values()))
 
 nuis_jer_whole  = False if 'JRW' not in opt.tag else True
 nuis_lumi_split = True
@@ -65,7 +65,7 @@ isShapeOrPlot = isShape or hasattr(opt, 'postFit') or hasattr(opt, 'skipLNN')
 isShapeOrDatacardOrPlot = isShape or isDatacardOrPlot
 
 if isShapeOrPlot:
-    print 'Value of lumi set to', opt.lumi
+    print('Value of lumi set to', opt.lumi)
 
 ### Directories
 
@@ -76,7 +76,7 @@ if 'SignalStudies' in opt.tag and not isFillShape:
 elif ('S2tt' in opt.sigset and 'T2tt' in opt.sigset) or ('TChipm' in opt.sigset and 'SChipm' in opt.sigset):
     skipTreesCheck = True
 elif isShape and skipTreesCheck:
-    print 'Error: it is not allowed to fill shapes and skipping trees check!'
+    print('Error: it is not allowed to fill shapes and skipping trees check!')
     exit()
 
 metnom, metsmr = 'Smear', 'Nomin'
@@ -169,7 +169,7 @@ if 'LeptonL2TRate' in opt.tag:
         del leptonL2TRateTriggers['JetHT']['ElectronDiJet80']
         del leptonL2TRateTriggers['JetHT']['ElectronDiJetXX']
 
-    jethtcutlist = leptonL2TRateTriggers['JetHT'].keys()
+    jethtcutlist = list(leptonL2TRateTriggers['JetHT'].keys())
     for jethtcut in jethtcutlist:
         leptonL2TRateTriggers['JetHT'][jethtcut.replace('Electron','Muon')] = leptonL2TRateTriggers['JetHT'][jethtcut]
             
@@ -221,7 +221,7 @@ if 'LeptonL2TRate' in opt.tag:
     for yearkey in effectiveTriggerLuminosity:
         effectiveTriggerLuminosity[yearkey]['SingleMuonAllPt'] = '('+effectiveTriggerLuminosity[yearkey]['SingleMuonLowPt']+'*(Lepton_pt[0]<25.)+'+effectiveTriggerLuminosity[yearkey]['SingleMuonHighPt']+'*(Lepton_pt[0]>=25.))'
         effeLumiJetXXX, effeLumiDiJetXX = '(', '('
-        for jethttrig in leptonL2TRateTriggers['JetHT'].keys():
+        for jethttrig in list(leptonL2TRateTriggers['JetHT'].keys()):
             if 'Electron' in jethttrig and 'JetXX' not in jethttrig:
                 jethttrigweight = leptonL2TRateTriggers['JetHT'][jethttrig]+'*('+effectiveTriggerLuminosity[yearkey]['JetHT'+jethttrig]+') + '
                 if 'ElectronJet' in jethttrig: effeLumiJetXXX += jethttrigweight
@@ -229,7 +229,7 @@ if 'LeptonL2TRate' in opt.tag:
         effeLumiJetXXX += ')'; effeLumiDiJetXX += ')'
         effectiveTriggerLuminosity[yearkey]['JetHTElectronJetXXX'] = effeLumiJetXXX.replace(') + )', ') )')
         effectiveTriggerLuminosity[yearkey]['JetHTElectronDiJetXX'] = effeLumiDiJetXX.replace(') + )', ') )')
-        pdtrglist = effectiveTriggerLuminosity[yearkey].keys()
+        pdtrglist = list(effectiveTriggerLuminosity[yearkey].keys())
         for pdtrg in pdtrglist:
             if 'JetHTElectron' in pdtrg:
                 effectiveTriggerLuminosity[yearkey][pdtrg.replace('Electron', 'Muon')]  = effectiveTriggerLuminosity[yearkey][pdtrg]
@@ -243,7 +243,7 @@ treeNuisances = { }
 SmtEU = ''
 if 'SmtEU' in opt.tag:
     if isShape: 
-        print 'Cannot use SmtEU while filling or merging shapes'
+        print('Cannot use SmtEU while filling or merging shapes')
         exit()
     SmtEU = 'Smooth'
 if metnom=='Nomin':
@@ -459,7 +459,7 @@ if 'pt30' in opt.tag: btagWeight1tag += '_Pt30'
 btagWeight0tag = '(1.-'+btagWeight1tag+')'
 if 'TrigBTag' in opt.tag:
     if 'HighPtMissControlRegion' not in opt.tag and 'HighPtMissValidationRegion' not in opt.tag:
-        print 'TrigBTag option only implemented for HighPtMissControlRegion and HighPtMissValidationRegion tags' 
+        print('TrigBTag option only implemented for HighPtMissControlRegion and HighPtMissValidationRegion tags') 
         exit()
     btagWeightNoCut = 'triggerWeight'
     btagWeight1tag += '*triggerWeightBTag'
@@ -1105,7 +1105,7 @@ if 'SM' in opt.sigset or 'Data' in opt.sigset:
 elif 'MET' in opt.sigset:
 
     if 'cern' in SITE: 
-        print 'MET datasets not available on lxplus, please use gridui' 
+        print('MET datasets not available on lxplus, please use gridui') 
 
     metTriggers = ''
     if '2016' in yeartag:
@@ -1127,7 +1127,7 @@ elif 'MET' in opt.sigset:
     directoryMET = directoryData#.split('__hadd')[0]+'__hadd/'
     if 'TriggerLatino' in opt.tag: 
         directoryMET = directoryMET.replace('DATASusy', 'DATALatino')
-        print 'Trees for latino working points not available yet in nAODv9'
+        print('Trees for latino working points not available yet in nAODv9')
         exit()
 
     for Run in DataRun :
@@ -1186,7 +1186,7 @@ elif 'LeptonL2TRate' in opt.tag and 'Single' in opt.sigset:
 
             dataName = DataSet if DataSet!='EGamma' else 'SingleElectron'
 
-            if dataName not in leptonL2TRateTriggers.keys(): continue
+            if dataName not in list(leptonL2TRateTriggers.keys()): continue
 
             samples[dataName]  = { 'name': [ ] ,
                                    'weight' : METFilters_Data+'*'+VetoHEMdata+'*'+VetoEENoise,
@@ -1294,7 +1294,7 @@ if 'cern' in SITE and not skipTreesCheck:
 
 if 'Group' in opt.tag and ('SM' in opt.sigset or 'Backgrounds' in opt.sigset):
     if isShape:
-        print 'Error: should not use Group string in tag name'
+        print('Error: should not use Group string in tag name')
         exit()
     minorBkgList = []
     for minorBkg in [ 'Higgs', 'VVV', 'VZ', 'ttW', 'ttSemilep' ]:
@@ -1302,7 +1302,7 @@ if 'Group' in opt.tag and ('SM' in opt.sigset or 'Backgrounds' in opt.sigset):
             minorBkgList.append(minorBkg)
     if len(minorBkgList)>=1:
         samples['minor'] = {}
-        for key in samples[minorBkgList[0]].keys():
+        for key in list(samples[minorBkgList[0]].keys()):
             samples['minor'][key] = samples[minorBkgList[0]][key]
         for minorBkg in minorBkgList:
             del samples[minorBkg]

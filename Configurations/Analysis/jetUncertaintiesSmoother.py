@@ -107,7 +107,7 @@ def mergeShapeBins(shape, shapeUp, shapeDo, lastBin, keepSix = True):
     binsToMerge = getBinsToMerge(shape, lastBin, keepSix)
     lastBinAfterMerging = lastBin
     for rangeToMerge in binsToMerge:
-        print '   ---> Merging', rangeToMerge
+        print(('   ---> Merging', rangeToMerge))
         if lastBinAfterMerging>=rangeToMerge[0] and lastBinAfterMerging<=rangeToMerge[1]: lastBinAfterMerging = rangeToMerge[0]
         for nshp in range(3):
             mergeBins(shape[nshp], rangeToMerge[0], rangeToMerge[1])
@@ -217,7 +217,7 @@ if __name__ == '__main__':
         inputFile     = ROOT.TFile(inputFileName.replace('Merge',''), 'READ') 
         outputFileName = inputFileName.replace('VetoesUL','SmtEUVetoesUL')
         if outputFileName==inputFileName or 'SmtEU' not in outputFileName: 
-            print 'Wrong output file name'
+            print('Wrong output file name')
             exit()
         if not debug:
             os.system('mkdir -p '+outputFileName.split('/plots_')[0]+' ; cp '+inputFileName+' '+outputFileName)
@@ -237,7 +237,7 @@ if __name__ == '__main__':
 
                     keepDY = True if (source=='jesTotal' or opt.keepdy) else False
 
-                    if opt.verbose or debug: print binmet, binjet, source
+                    if opt.verbose or debug: print((binmet, binjet, source))
                     sampleShape, sampleShpUp, sampleShpDo = [], [], []
                     dyShape, dyShpUp, dyShpDo = [], [], []
                     gotFirst = [ False, False, False, False, False ]
@@ -321,14 +321,14 @@ if __name__ == '__main__':
                                                 sampleShpDo[nshp].Add(tempShpDo)
 
                     if not gotFirst[0] or not gotFirst[1] or not gotFirst[2] or not gotFirst[3] or not gotFirst[4]:
-                        print 'missing shapes'
+                        print('missing shapes')
 
                     else:
                             
                         if opt.verbose:
-                            print '   Raw number of events'
+                            print('   Raw number of events')
                             for ib in range(1, sampleShape[3].GetNbinsX()+1):
-                                print '      ', ib, sampleShape[0].GetBinContent(ib), sampleShape[1].GetBinContent(ib), sampleShape[2].GetBinContent(ib), sampleShape[3].GetBinContent(ib)
+                                print(('      ', ib, sampleShape[0].GetBinContent(ib), sampleShape[1].GetBinContent(ib), sampleShape[2].GetBinContent(ib), sampleShape[3].GetBinContent(ib)))
                         LastBin = sampleShape[3].GetNbinsX()
                         if 'Merge' in tag:
                             if binmet=='SR1': LastBin = 7
@@ -346,7 +346,7 @@ if __name__ == '__main__':
                             keepSix = True
                             if 'Stop' in opt.tag and opt.year=='2018' and binmet=='SR4' and source=='jesTotal':
                                 keepSix = False
-                                print '   ---> Allow to merge bin 6 for', binmet, binjet, source
+                                print(('   ---> Allow to merge bin 6 for', binmet, binjet, source))
                             sampleShape, sampleShpUp, sampleShpDo, LastBinAfterMerging = mergeShapeBins(sampleShape, sampleShpUp, sampleShpDo, LastBin, keepSix)
                         for nshp in range(5):
                             sampleShpUp[nshp].Add(sampleShape[nshp],-1)
@@ -364,12 +364,12 @@ if __name__ == '__main__':
                                 dyShpDo[nshp].Scale(100.)
 
                         if opt.verbose:
-                            print '   Up uncertainties in sideband regions'
+                            print('   Up uncertainties in sideband regions')
                             for ib in range(1, LastBin+1):
-                                print '      ', ib, sampleShpUp[0].GetBinContent(ib), 100.*sampleShape[0].GetBinError(ib)/sampleShape[0].GetBinContent(ib), '   ', sampleShpUp[1].GetBinContent(ib), 100.*sampleShape[1].GetBinError(ib)/sampleShape[1].GetBinContent(ib), '   ', sampleShpUp[2].GetBinContent(ib), 100.*sampleShape[2].GetBinError(ib)/sampleShape[2].GetBinContent(ib)
-                            print '   Down uncertainties in sideband regions'
+                                print(('      ', ib, sampleShpUp[0].GetBinContent(ib), 100.*sampleShape[0].GetBinError(ib)/sampleShape[0].GetBinContent(ib), '   ', sampleShpUp[1].GetBinContent(ib), 100.*sampleShape[1].GetBinError(ib)/sampleShape[1].GetBinContent(ib), '   ', sampleShpUp[2].GetBinContent(ib), 100.*sampleShape[2].GetBinError(ib)/sampleShape[2].GetBinContent(ib)))
+                            print('   Down uncertainties in sideband regions')
                             for ib in range(1, LastBin+1):
-                                print '      ', ib, sampleShpDo[0].GetBinContent(ib), 100.*sampleShape[0].GetBinError(ib)/sampleShape[0].GetBinContent(ib), '   ', sampleShpDo[1].GetBinContent(ib), 100.*sampleShape[1].GetBinError(ib)/sampleShape[1].GetBinContent(ib), '   ', sampleShpDo[2].GetBinContent(ib), 100.*sampleShape[2].GetBinError(ib)/sampleShape[2].GetBinContent(ib)
+                                print(('      ', ib, sampleShpDo[0].GetBinContent(ib), 100.*sampleShape[0].GetBinError(ib)/sampleShape[0].GetBinContent(ib), '   ', sampleShpDo[1].GetBinContent(ib), 100.*sampleShape[1].GetBinError(ib)/sampleShape[1].GetBinContent(ib), '   ', sampleShpDo[2].GetBinContent(ib), 100.*sampleShape[2].GetBinError(ib)/sampleShape[2].GetBinContent(ib)))
 
                         sampleShpUp[1].Multiply(sampleShpUp[2])
                         sampleShpUp[1].Divide(sampleShpUp[0])
@@ -443,19 +443,19 @@ if __name__ == '__main__':
                                         upFix, doFix = 0., 0.
                                         if abs(sampleShpUp[2].GetBinContent(ib)/sampleShpUp[2].GetBinContent(ib-1))<100.:
                                             upFix = abs(sampleShpUp[1].GetBinContent(ib-1)*sampleShpUp[2].GetBinContent(ib)/sampleShpUp[2].GetBinContent(ib-1)) 
-                                        else: print '      ---> huge up spike translation', abs(sampleShpUp[2].GetBinContent(ib)/sampleShpUp[2].GetBinContent(ib-1)), binmet, binjet, ib, source, 'Up'
+                                        else: print(('      ---> huge up spike translation', abs(sampleShpUp[2].GetBinContent(ib)/sampleShpUp[2].GetBinContent(ib-1)), binmet, binjet, ib, source, 'Up'))
                                         if abs(sampleShpDo[2].GetBinContent(ib)/sampleShpDo[2].GetBinContent(ib-1))<100.:
                                             doFix = abs(sampleShpDo[1].GetBinContent(ib-1)*sampleShpDo[2].GetBinContent(ib)/sampleShpDo[2].GetBinContent(ib-1))
-                                        else: print '      ---> huge up spike translation', abs(sampleShpDo[2].GetBinContent(ib)/sampleShpDo[2].GetBinContent(ib-1)), binmet, binjet, ib, source, 'Down'
+                                        else: print(('      ---> huge up spike translation', abs(sampleShpDo[2].GetBinContent(ib)/sampleShpDo[2].GetBinContent(ib-1)), binmet, binjet, ib, source, 'Down'))
                                         if upFix!=0. or doFix!=0.:
                                             uncTrn = max(upFix, doFix)
                                             uncRaw = max(abs(sampleShpUp[3].GetBinContent(ib)), abs(sampleShpDo[3].GetBinContent(ib)), abs(sampleShpUp[4].GetBinContent(ib)), abs(sampleShpUp[4].GetBinContent(ib)))
                                             uncFix = min(uncTrn,uncRaw)
                                             sampleShpUp[1].SetBinContent(ib, uncFix*getSign(sampleShpUp[1].GetBinContent(ib)))
                                             sampleShpDo[1].SetBinContent(ib, uncFix*getSign(sampleShpDo[1].GetBinContent(ib)))
-                                        else: print '      ---> Still there!'
+                                        else: print('      ---> Still there!')
                                         #print '   ---> New spike strategy for', binmet, binjet, ib, source
-                                    else: print '      ---> Still there!'
+                                    else: print('      ---> Still there!')
   
                         if not opt.consistenoff:
                             for ib in range(1, LastBinAfterMerging+1):
@@ -502,11 +502,11 @@ if __name__ == '__main__':
 
 
                             if opt.verbose or debug:
-                                print '   Final predictions', binflv
+                                print(('   Final predictions', binflv))
                                 orig = 3 if binflv=='em' else 4 
                                 for ib in range(1, LastBin+1):
                                     if sampleShape[orig].GetBinContent(ib)!=0.:
-                                        print '      ', ib,  sampleShpUp[orig].GetBinContent(ib), sampleShpUp[1].GetBinContent(ib), sampleShpUp[1].GetBinError(ib), '            ', sampleShpDo[orig].GetBinContent(ib), sampleShpDo[1].GetBinContent(ib), sampleShpDo[1].GetBinError(ib), '            ', 100.*sampleShape[orig].GetBinError(ib)/sampleShape[orig].GetBinContent(ib) 
+                                        print(('      ', ib,  sampleShpUp[orig].GetBinContent(ib), sampleShpUp[1].GetBinContent(ib), sampleShpUp[1].GetBinError(ib), '            ', sampleShpDo[orig].GetBinContent(ib), sampleShpDo[1].GetBinContent(ib), sampleShpDo[1].GetBinError(ib), '            ', 100.*sampleShape[orig].GetBinError(ib)/sampleShape[orig].GetBinContent(ib))) 
 
                             
                             if not keepDY:
@@ -516,27 +516,27 @@ if __name__ == '__main__':
                                     if opt.verbose:
                                         for ib in range(1, LastBin+1):
                                             if dyShape[orig].GetBinContent(ib)==0. and (dyShpUp[orig].GetBinContent(ib)!=0. or dyShpDo[orig].GetBinContent(ib)!=0.):
-                                                print '   ---> DY1: ', ib, binmet, binjet, source, dyShape[orig].GetBinContent(ib),'+/-',dyShape[orig].GetBinError(ib), dyShpUp[orig].GetBinContent(ib),'+/-',dyShpUp[orig].GetBinError(ib), dyShpDo[orig].GetBinContent(ib),'+/-',dyShpDo[orig].GetBinError(ib)
-                                                print '            ', ib, dyShape[orig].GetBinContent(ib),'+/-',dyShape[orig].GetBinError(ib), dyShpUp[orig].GetBinContent(ib),'+/-',dyShpUp[orig].GetBinError(ib), dyShpDo[orig].GetBinContent(ib),'+/-',dyShpDo[orig].GetBinError(ib)
-                                                print '            ', ib, dyShape[1].GetBinContent(ib), dyShape[0].GetBinContent(ib), dyShape[2].GetBinContent(ib)
-                                                print '            ', ib, dyShape[orig].GetEntries(), dyShape[orig].Integral(), dyShape[orig].Integral()/dyShape[orig].GetEntries()
+                                                print(('   ---> DY1: ', ib, binmet, binjet, source, dyShape[orig].GetBinContent(ib),'+/-',dyShape[orig].GetBinError(ib), dyShpUp[orig].GetBinContent(ib),'+/-',dyShpUp[orig].GetBinError(ib), dyShpDo[orig].GetBinContent(ib),'+/-',dyShpDo[orig].GetBinError(ib)))
+                                                print(('            ', ib, dyShape[orig].GetBinContent(ib),'+/-',dyShape[orig].GetBinError(ib), dyShpUp[orig].GetBinContent(ib),'+/-',dyShpUp[orig].GetBinError(ib), dyShpDo[orig].GetBinContent(ib),'+/-',dyShpDo[orig].GetBinError(ib)))
+                                                print(('            ', ib, dyShape[1].GetBinContent(ib), dyShape[0].GetBinContent(ib), dyShape[2].GetBinContent(ib)))
+                                                print(('            ', ib, dyShape[orig].GetEntries(), dyShape[orig].Integral(), dyShape[orig].Integral()/dyShape[orig].GetEntries()))
                                                 if dyShpUp[orig].GetBinContent(ib)!=0.:
                                                     dyShpUp[orig].SetBinContent(ib,(dyShape[orig].Integral()/dyShape[orig].GetEntries())/pow(dyShpUp[orig].GetBinError(ib)/dyShpUp[orig].GetBinContent(ib),2))
                                                 if dyShpDo[orig].GetBinContent(ib)!=0.:
                                                     dyShpDo[orig].SetBinContent(ib,(dyShape[orig].Integral()/dyShape[orig].GetEntries())/pow(dyShpDo[orig].GetBinError(ib)/dyShpDo[orig].GetBinContent(ib),2))
                                             if dyShape[orig].GetBinContent(ib)!=0.: 
                                                 if  abs(dyShape[orig].GetBinError(ib)/dyShape[orig].GetBinContent(ib))>0.1:
-                                                    print '   ---> DY2: ', ib, binmet, binjet, source, dyShape[orig].GetBinContent(ib),'+/-',dyShape[orig].GetBinError(ib), dyShpUp[orig].GetBinContent(ib),'+/-',dyShpUp[orig].GetBinError(ib), dyShpDo[orig].GetBinContent(ib),'+/-',dyShpDo[orig].GetBinError(ib)
-                                                    if dyShpUp[orig].GetBinError(ib)!=0. and dyShpDo[orig].GetBinError(ib)!=0.: print '             ', ib, binmet, binjet, source, (dyShpUp[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib))/dyShpUp[orig].GetBinError(ib), ' ', (dyShpDo[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib))/dyShpDo[orig].GetBinError(ib) 
+                                                    print(('   ---> DY2: ', ib, binmet, binjet, source, dyShape[orig].GetBinContent(ib),'+/-',dyShape[orig].GetBinError(ib), dyShpUp[orig].GetBinContent(ib),'+/-',dyShpUp[orig].GetBinError(ib), dyShpDo[orig].GetBinContent(ib),'+/-',dyShpDo[orig].GetBinError(ib)))
+                                                    if dyShpUp[orig].GetBinError(ib)!=0. and dyShpDo[orig].GetBinError(ib)!=0.: print(('             ', ib, binmet, binjet, source, (dyShpUp[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib))/dyShpUp[orig].GetBinError(ib), ' ', (dyShpDo[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib))/dyShpDo[orig].GetBinError(ib))) 
                                                 if dyShape[orig].GetBinError(ib)==dyShape[orig].GetBinContent(ib) and dyShape[orig].GetBinContent(ib)<0.05:
                                                     dyShpUp[orig].SetBinContent(ib, dyShape[orig].GetBinContent(ib)); dyShpDo[orig].SetBinContent(ib, dyShape[orig].GetBinContent(ib))
                                 if opt.verbose: 
-                                    print '      DY'
+                                    print('      DY')
                                     for ib in range(1, LastBin+1):
-                                        print '      ', ib, dyShape[orig].GetBinContent(ib), dyShpUp[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib), dyShpDo[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)
+                                        print(('      ', ib, dyShape[orig].GetBinContent(ib), dyShpUp[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib), dyShpDo[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)))
                                     for ib in range(1, LastBin+1):
-                                        print '      ', ib, 'Up', 100.*((dyShpUp[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[orig].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((dyShpUp[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpUp[1].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpUp[2].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 't',sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib)
-                                        print '         Do', 100.*((dyShpDo[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[orig].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((dyShpDo[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpDo[1].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpDo[2].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib)))
+                                        print(('      ', ib, 'Up', 100.*((dyShpUp[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[orig].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((dyShpUp[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpUp[1].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpUp[2].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 't',sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib)))
+                                        print(('         Do', 100.*((dyShpDo[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[orig].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((dyShpDo[orig].GetBinContent(ib)-dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpDo[1].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpDo[2].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib)))))
 
                                 avgWgt = dyShape[orig].Integral()/dyShape[orig].GetEntries()
                                 for ib in range(1, LastBin+1):
@@ -606,11 +606,11 @@ if __name__ == '__main__':
                                             isDYInv = True
 
                                         if opt.verbose and (isLargeAss or largeWeight or isDYInv):
-                                            if isLargeAss: print '   ---> DY large assymetry'
-                                            if largeWeight: print '   ---> DY large weight'
-                                            if isDYInv: print '   ---> DY inverted'
-                                            print '      ', ib, 'Up', sampleShpUp[1].GetBinContent(ib), 100.*((dyShpUp[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpUp[1].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpUp[2].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib)))   
-                                            print '         Do',      sampleShpDo[1].GetBinContent(ib), 100.*((dyShpDo[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpDo[1].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpDo[2].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib)))
+                                            if isLargeAss: print('   ---> DY large assymetry')
+                                            if largeWeight: print('   ---> DY large weight')
+                                            if isDYInv: print('   ---> DY inverted')
+                                            print(('      ', ib, 'Up', sampleShpUp[1].GetBinContent(ib), 100.*((dyShpUp[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpUp[1].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpUp[2].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpUp[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib)))))   
+                                            print(('         Do',      sampleShpDo[1].GetBinContent(ib), 100.*((dyShpDo[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpDo[1].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib))), 100.*((0.01*dyShpDo[2].GetBinContent(ib)*dyShape[orig].GetBinContent(ib)+0.01*sampleShpDo[1].GetBinContent(ib)*sampleShape[orig].GetBinContent(ib))/(sampleShape[orig].GetBinContent(ib)+dyShape[orig].GetBinContent(ib)))))
 
                             if not debug:
                                 for sample in samples:
@@ -636,7 +636,7 @@ if __name__ == '__main__':
                                             tempName = shapeDir+'/histo_'+sample
                                             sampleTemp = outputFile.Get(tempName)
                                             sampleTemp.SetDirectory(0)
-                                            if sampleTemp.GetNbinsX()!=LastBin: print 'Wrong binning: input =', LastBin, ' output =', sampleTemp.GetNbinsX() 
+                                            if sampleTemp.GetNbinsX()!=LastBin: print(('Wrong binning: input =', LastBin, ' output =', sampleTemp.GetNbinsX())) 
                                             for ib in range(1, LastBin+1):
                                                 corr = sampleShpUp[1].GetBinContent(ib) if variation=='Up' else sampleShpDo[1].GetBinContent(ib)
                                                 bincon = sampleTemp.GetBinContent(ib)

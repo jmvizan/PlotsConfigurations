@@ -24,7 +24,7 @@ if __name__ == '__main__':
     (opt, args) = parser.parse_args()
   
     if 'PseudoDATA' not in opt.sigset:
-        print 'Error: please include \'Pseudo\' flag in the sigset'
+        print('Error: please include \'Pseudo\' flag in the sigset')
         exit()
 
     outsigset = opt.sigset
@@ -34,7 +34,7 @@ if __name__ == '__main__':
     elif opt.reftag!=inputtag:
         for x in outsigset.split('-'):
             if x=='PseudoDATA':
-                print 'Error: please add a string to \'PseudoDATA\' to charactherize the input tag used to build the data'
+                print('Error: please add a string to \'PseudoDATA\' to charactherize the input tag used to build the data')
                 exit()
     if opt.refsigset==None: opt.refsigset = opt.sigset
 
@@ -42,7 +42,7 @@ if __name__ == '__main__':
 
     for year in opt.year.split():
 
-        if opt.verbose: print 'Building', year, 'pseudo-data for', inputtag, opt.sigset, 'from', opt.reftag, opt.refsigset
+        if opt.verbose: print('Building', year, 'pseudo-data for', inputtag, opt.sigset, 'from', opt.reftag, opt.refsigset)
 
         opt.tag = year + inputtag
 
@@ -68,14 +68,14 @@ if __name__ == '__main__':
             exec(handle)
             handle.close()
 
-        if opt.verbose: print '      Merging background shapes'        
+        if opt.verbose: print('      Merging background shapes')        
 
         for cut in cuts:
             for variable in variables:
                 if 'cuts' not in variables[variable] or cut in variables[variable]['cuts']:
 
                     inputDir = '/'.join([ cut, variable ])
-                    if opt.verbose: print '            ', inputDir
+                    if opt.verbose: print('            ', inputDir)
 
                     for sample in samples:
                         if not samples[sample]['isDATA'] and not samples[sample]['isSignal']:
@@ -92,7 +92,7 @@ if __name__ == '__main__':
         os.system('cp '+outputFileName.replace(outsigset, opt.sigset)+' '+outputFileName)
         outputFile = ROOT.TFile(outputFileName, 'update')
    
-        if opt.verbose: print '      Saving pseudo-data shapes'
+        if opt.verbose: print('      Saving pseudo-data shapes')
  
         for outDir in dataShapes:
 

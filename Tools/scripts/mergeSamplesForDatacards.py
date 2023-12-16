@@ -61,7 +61,7 @@ if __name__ == '__main__':
 
     inputFileName = '/'.join([ opt.inputDir, opt.year, tag ])+outFileName.replace(opt.outputtag, tag)
     if not os.path.isfile(inputFileName): 
-        print 'Error in mergeDataTakingPeriodShapes: input file', inputFileName, 'not found' 
+        print('Error in mergeDataTakingPeriodShapes: input file', inputFileName, 'not found') 
         exit()
     inputFile = ROOT.TFile(inputFileName, 'READ')
 
@@ -89,7 +89,7 @@ if __name__ == '__main__':
                 folderName = cutName + '/' + variableName
                 outFile.mkdir(folderName)
 
-                if opt.verbose: print '################################', folderName
+                if opt.verbose: print('################################', folderName)
 
                 inDir = inputFile.Get(folderName)
 
@@ -100,12 +100,12 @@ if __name__ == '__main__':
 
                         if nuisance!='stat':
                             if 'type' not in nuisances[nuisance]:
-                                print 'Warning: nuisance without type -> ', nuisance
+                                print('Warning: nuisance without type -> ', nuisance)
                                 continue
                             if nuisances[nuisance]['type']=='lnN': continue
                             if nuisances[nuisance]['type']=='rateParam': continue
                             if nuisances[nuisance]['type']!='shape':
-                                print 'Warning: unknown nuisance type -> ', nuisances[nuisance]['type']
+                                print('Warning: unknown nuisance type -> ', nuisances[nuisance]['type'])
                                 continue
 
                         nuisanceInGroup = False 
@@ -134,7 +134,7 @@ if __name__ == '__main__':
                                     else:
 
                                         if sample in nuisances[nuisance]['samples'] or nuisance=='stat':
-                                            print 'Warning: nuisance', nuisance, 'for sample', sample, 'not in input shape file for', cutName
+                                            print('Warning: nuisance', nuisance, 'for sample', sample, 'not in input shape file for', cutName)
 
                                         if inDir.GetListOfKeys().Contains(shapeName):
                                             tmpHisto = inDir.Get(shapeName)
@@ -142,7 +142,7 @@ if __name__ == '__main__':
 
                                         else:
                                             if sample not in missingSampleList:
-                                                print 'Warning:', sample, 'not in input shape file for', cutName, 'in', opt.year, 'year!'
+                                                print('Warning:', sample, 'not in input shape file for', cutName, 'in', opt.year, 'year!')
                                                 missingSampleList.append(sample)
                                             skipHisto = True
                                             skipGroup = True

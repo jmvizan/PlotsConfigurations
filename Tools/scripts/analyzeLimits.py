@@ -83,11 +83,11 @@ def fillEmptyBins(sigset, histo):
                     binStep = int(massXStep/25.)
                     
                     if massX%massXStep==0 and massY%massYStep==0:
-                        if massX==850 :print massX, massY, massYStep, massXStep, binStep
+                        if massX==850 :print(massX, massY, massYStep, massXStep, binStep)
                         if histo.GetBinContent(xb, yb)==0:
                             if xb<=binStep and massX-massY<90.:
 
-                                print 'fillEmptyBins: T2bW singularity to be studied at mS-',massX, 'mX-',massY
+                                print('fillEmptyBins: T2bW singularity to be studied at mS-',massX, 'mX-',massY)
                                 while histo.GetBinContent(xb, yb)==0. and xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
                                     xb += binStep; yb += binStep
 
@@ -103,7 +103,7 @@ def fillEmptyBins(sigset, histo):
                                 
                                     xbi, ybi  = xb-binStep, yb-binStep
                                     if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
-                                        print 'fillEmptyBins: T2bW singularity to be better studied at mS-',massX, 'mX-',massY
+                                        print('fillEmptyBins: T2bW singularity to be better studied at mS-',massX, 'mX-',massY)
                                         xbf, ybf = xbi, ybi 
 
                                     stepLimit = (histo.GetBinContent(xbf, ybf) - histo.GetBinContent(xbi, ybi))/holeLenght
@@ -114,7 +114,7 @@ def fillEmptyBins(sigset, histo):
                                 else:
 
                                     if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
-                                        print 'fillEmptyBins: T2bW singularity to be studied at mS-',massX, 'mX-',massY
+                                        print('fillEmptyBins: T2bW singularity to be studied at mS-',massX, 'mX-',massY)
                                             
                                     else:
                                             
@@ -195,7 +195,7 @@ def fillEmptyBins(sigset, histo):
 
                             if xb<=binStep and massX-massY<90.:
 
-                                print 'fillEmptyBins: T2tt singularity to be studied at mS-',massX, 'mX-',massY
+                                print('fillEmptyBins: T2tt singularity to be studied at mS-',massX, 'mX-',massY)
                                 while histo.GetBinContent(xb, yb)==0. and xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
                                     xb += binStep; yb += binStep
 
@@ -211,7 +211,7 @@ def fillEmptyBins(sigset, histo):
                                 
                                     xbi, ybi  = xb-binStep, yb-binStep
                                     if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
-                                        print 'fillEmptyBins: T2tt singularity to be better studied at mS-',massX, 'mX-',massY
+                                        print('fillEmptyBins: T2tt singularity to be better studied at mS-',massX, 'mX-',massY)
                                         xbf, ybf = xbi, ybi 
 
                                     stepLimit = (histo.GetBinContent(xbf, ybf) - histo.GetBinContent(xbi, ybi))/holeLenght
@@ -222,7 +222,7 @@ def fillEmptyBins(sigset, histo):
                                 else:
 
                                     if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
-                                        print 'fillEmptyBins: T2tt singularity to be studied at mS-',massX, 'mX-',massY
+                                        print('fillEmptyBins: T2tt singularity to be studied at mS-',massX, 'mX-',massY)
                                             
                                     else:
                                             
@@ -305,7 +305,7 @@ def fillEmptyBins(sigset, histo):
 
                             if xb<=binStep:
 
-                                print 'fillEmptyBins: TChipmSlepSnu type-1 singularity to be studied at mC-',massX, 'mX-',massY
+                                print('fillEmptyBins: TChipmSlepSnu type-1 singularity to be studied at mC-',massX, 'mX-',massY)
                                 while histo.GetBinContent(xb, yb)==0. and xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
                                     xb += binStep; yb += binStep
 
@@ -321,7 +321,7 @@ def fillEmptyBins(sigset, histo):
                                 
                                     xbi, ybi  = xb-binStep, yb-binStep
                                     if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
-                                        print 'fillEmptyBins: TChipmSlepSnu type-2 singularity to be better studied at mC-',massX, 'mX-',massY
+                                        print('fillEmptyBins: TChipmSlepSnu type-2 singularity to be better studied at mC-',massX, 'mX-',massY)
                                         xbf, ybf = xbi, ybi 
 
                                     stepLimit = (histo.GetBinContent(xbf, ybf) - histo.GetBinContent(xbi, ybi))/holeLenght
@@ -332,7 +332,7 @@ def fillEmptyBins(sigset, histo):
                                 else:
 
                                     if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
-                                        print 'fillEmptyBins: TChipmSlepSnu type-3 singularity to be studied at mC-',massX, 'mX-',massY
+                                        print('fillEmptyBins: TChipmSlepSnu type-3 singularity to be studied at mC-',massX, 'mX-',massY)
                                             
                                     else:
                                             
@@ -386,7 +386,7 @@ def fillEmptyBins(sigset, histo):
 
                             elif xb<=binStep:
 
-                                print 'fillEmptyBins: TChipmWW type-1 singularity to be studied at mC-',massX, 'mX-',massY
+                                print('fillEmptyBins: TChipmWW type-1 singularity to be studied at mC-',massX, 'mX-',massY)
                                 while histo.GetBinContent(xb, yb)==0. and xb<=histo.GetNbinsX() and yb<=histo.GetNbinsY():
                                     xb += binStep; yb += binStep
 
@@ -402,7 +402,7 @@ def fillEmptyBins(sigset, histo):
                                 
                                     xbi, ybi  = xb-binStep, yb-binStep
                                     if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
-                                        print 'fillEmptyBins: TChipmWW type-2 singularity to be better studied at mC-',massX, 'mX-',massY
+                                        print('fillEmptyBins: TChipmWW type-2 singularity to be better studied at mC-',massX, 'mX-',massY)
                                         xbf, ybf = xbi, ybi 
 
                                     stepLimit = (histo.GetBinContent(xbf, ybf) - histo.GetBinContent(xbi, ybi))/holeLenght
@@ -413,7 +413,7 @@ def fillEmptyBins(sigset, histo):
                                 else:
 
                                     if xbf>histo.GetNbinsX() or ybf>histo.GetNbinsY():
-                                        print 'fillEmptyBins: TChipmWW type-3 singularity to be studied at mC-',massX, 'mX-',massY
+                                        print('fillEmptyBins: TChipmWW type-3 singularity to be studied at mC-',massX, 'mX-',massY)
                                             
                                     else:
                                             
@@ -465,7 +465,7 @@ def fillEmptyBins(sigset, histo):
                             xi = histo.GetXaxis().FindBin(massXref+offDiagonal)
                             xf = histo.GetXaxis().FindBin(massXref) + 5
                             if xi==xf:
-                                print '-->', massX, massY, xi, xf
+                                print('-->', massX, massY, xi, xf)
                             histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xi, yb, xf, yb))
 
                         elif iter==3 and massX-massY>=100. and yb<=5 and xb>histo.GetNbinsX()-5: # Far away corner, not much important
@@ -506,7 +506,7 @@ def fillEmptyBins(sigset, histo):
                                 
                             if yb==1 or massX-massY==dMmin:
 
-                                print 'fillEmptyBins: TSlepSlep type-1 singularity to be studied at mC-',massX, 'mX-',massY
+                                print('fillEmptyBins: TSlepSlep type-1 singularity to be studied at mC-',massX, 'mX-',massY)
                                 while histo.GetBinContent(xb, yb)==0. and yb<=histo.GetNbinsY():
                                     yb += binYStep
 
@@ -519,7 +519,7 @@ def fillEmptyBins(sigset, histo):
                                     ybf += binYStep
 
                                 if ybf>histo.GetNbinsY():
-                                    print 'fillEmptyBins: TSlepSlep type-2 singularity to be better studied at mC-',massX, 'mX-',massY
+                                    print('fillEmptyBins: TSlepSlep type-2 singularity to be better studied at mC-',massX, 'mX-',massY)
                                     yb = ybf
                                     
                                 else:
@@ -581,7 +581,7 @@ def fillEmptyBins(sigset, histo):
                                 histo.SetBinContent(xb, yb, takeLinearInterpolation(histo, xb, yb, xr, yb, xf, yb))
 
     else:
-        print 'Warning: strategy for filling empty bins not available for model', model
+        print('Warning: strategy for filling empty bins not available for model', model)
 
 def getCrossSectionUncertainty(susyProcess, isusyMass, variation):
     
@@ -600,10 +600,10 @@ def getCrossSection(susyProcess, susyModel, susyMass):
     
     isusyMass = int(susyMass)
         
-    if str(isusyMass) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
+    if str(isusyMass) in list(SUSYCrossSections[susyProcess]['massPoints'].keys()) :
         
         susyXsec = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['value'])
-        if isusyMass==500.: print susyXsec, convBR
+        if isusyMass==500.: print(susyXsec, convBR)
         return [ convBR*susyXsec,
                  convBR*(susyXsec+getCrossSectionUncertainty(susyProcess, isusyMass, 'Up')),
                  convBR*(susyXsec-getCrossSectionUncertainty(susyProcess, isusyMass, 'Down')) ]
@@ -635,7 +635,7 @@ def getCrossSection(susyProcess, susyModel, susyMass):
                 isusyMass1 =  900
                 isusyMass2 = 1000
 
-        if str(isusyMass1) in SUSYCrossSections[susyProcess]['massPoints'].keys() and str(isusyMass2) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
+        if str(isusyMass1) in list(SUSYCrossSections[susyProcess]['massPoints'].keys()) and str(isusyMass2) in list(SUSYCrossSections[susyProcess]['massPoints'].keys()) :
 
             susyXsec1 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass1)]['value'])
             susyXsec2 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass2)]['value'])
@@ -651,7 +651,7 @@ def getCrossSection(susyProcess, susyModel, susyMass):
             
             return [convBR*susyXsec, convBR*susyXsec*(1.+susyXsecRelUncUp), convBR*susyXsec*(1.-susyXsecRelUncDown)]
 
-    print 'getCrossSection ERROR: cross section not available for', susyProcess, 'at mass =', susyMass, ', exiting'
+    print('getCrossSection ERROR: cross section not available for', susyProcess, 'at mass =', susyMass, ', exiting')
     exit()
 
 maxMassY = -1.
@@ -682,14 +682,14 @@ def fillMassScanHistograms(year, tag, sigset, limitOption, fileOption, fillempty
     limitType = 'blind' if (limitOption=='Blind') else 'expected'
     for model in signalMassPoints.signalMassPoints:
         if model in sigset:
-            if model in modelHistogramSettings.keys():
+            if model in list(modelHistogramSettings.keys()):
                 histogramSettings = modelHistogramSettings[model]
                 for process in SUSYCrossSections:
                     if model in SUSYCrossSections[process]['susyModels']:
                         susyModel = model
                         susyProcess = process
             else:
-                print 'Error: histogram setting for model', model, 'not available, exiting'
+                print('Error: histogram setting for model', model, 'not available, exiting')
                 exit()
             
             for massPoint in sorted(signalMassPoints.signalMassPoints[model]):
@@ -869,7 +869,7 @@ def getMassScanContours(outputFileName):
     inputFileName = outputFileName.replace('Contours', 'Histograms')
 
     if not fileExist(inputFileName):
-        print 'getMassScanContours: input file', inputFileName, 'not found, exiting'
+        print('getMassScanContours: input file', inputFileName, 'not found, exiting')
         exit()
 
     inputFile = ROOT.TFile(inputFileName, 'READ')
@@ -913,7 +913,7 @@ def makeMassScanContours(year, tag, sigset, limitOption, fileOption, reMakeConto
 def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemptybins):
                  
     if plotOption!='Histograms' and plotOption!='Contours':
-        print 'plotLimits error: unkown option', plotOption, 'for limit comparison'
+        print('plotLimits error: unkown option', plotOption, 'for limit comparison')
         exit()
 
     emptyBinsOption = ''			
@@ -932,7 +932,7 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
         tagFileName = getFileName('./Limits/' + year + '/' + tag + '/' + plotOption, 'massScan_' + tag + '_' + sigset + '_' + fileOption + emptyBinsOption)
 
         if not fileExist(tagFileName):
-            print 'Error: input file', tagFileName, 'not found'
+            print('Error: input file', tagFileName, 'not found')
             exit()
             
         tagFile      = ROOT.TFile(tagFileName, 'READ')
@@ -996,7 +996,7 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
 
         if opt.dosignificance:
             if limitOptions[0]+'_vs_'+limitOptions[1] not in plotName:
-                print 'Please choose comparison option to plot significance'
+                print('Please choose comparison option to plot significance')
                 exit()
             if 'histo_r_expected' in tagObjName and 'histo_r_observed' in tagObjName:
                 plotName = plotName.replace(limOptnm,'significance')
@@ -1024,7 +1024,7 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
                                 tagObj[iobs].SetBinContent(bx,by,2.+(tagObj[iobs].GetBinContent(bx,by)-tagObj[iexpm2].GetBinContent(bx,by))/(tagObj[iexpm2].GetBinContent(bx,by)-tagObj[iexpm1].GetBinContent(bx,by)))
                 tagObj[0] = tagObj[iobs]
             else:
-                print 'Missing histograms for significance plots'
+                print('Missing histograms for significance plots')
                 exit()
  
         if tags[1]!='' and not opt.dosignificance:
@@ -1072,7 +1072,7 @@ def plotLimits(year, tags, sigset, limitOptions, fileOption, plotOption, fillemp
     elif plotOption=='Contours':
 
         legend = ROOT.TLegend(0.12,0.8,0.55,0.88);
-        print legend.GetMargin()
+        print(legend.GetMargin())
         legend.SetMargin(0.1)
         #exit()
         same = ''
@@ -1123,7 +1123,7 @@ def makeExclusionPlot(year, tag, sigset, limitOptions, fileOption):
 
     for inputfilename in inputFileNames:
         if not fileExist(inputfilename):
-            print 'makeExclusionPlot: input file', inputfilename, 'not found, exiting' 
+            print('makeExclusionPlot: input file', inputfilename, 'not found, exiting') 
             exit() 
 
     cfgFileName = sigset + '_' + tag + '_' + limitOptions[1]

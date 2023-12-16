@@ -14,7 +14,7 @@ def getLeptonMass(pdgId) :
         elif abs(pdgId)==13 :
             return 0.105658
         else :
-            print 'mt2llProducer: WARNING: unsupported lepton pdgId'
+            print('mt2llProducer: WARNING: unsupported lepton pdgId')
             return -1
 
 Zmass = 91.1876

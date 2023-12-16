@@ -153,7 +153,7 @@ def makeHistoCopy(inputHisto, binsToRemove='', fillOutputHisto=True, invertAxis=
     return outputHisto
 
 def riseError(message):
-    print message
+    print(message)
     exit()
 
 ##Main body of the analysis

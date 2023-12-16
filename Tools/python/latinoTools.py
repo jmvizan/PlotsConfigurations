@@ -2,7 +2,7 @@ import os
 import glob
 import copy
 import math
-import commonTools
+from . import commonTools
 from LatinoAnalysis.Tools.batchTools import *
 
 ### Shapes
@@ -72,8 +72,8 @@ def getSplits(opt, year, tag, action):
 def shapes(opt):
 
     if '_' in opt.tag:
-        print 'Error in shapes: one of the selecteg tags contains an \'_\'.' 
-        print '                 Please use \'_\' only to set datacard options.'
+        print('Error in shapes: one of the selecteg tags contains an \'_\'.') 
+        print('                 Please use \'_\' only to set datacard options.')
         exit()
 
     if not opt.interactive: opt.batchQueue = commonTools.batchQueue(opt, opt.batchQueue)
@@ -121,7 +121,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
         signal = '' 
         if sigset!='SM' and sigset!='':
             signal = sigset
-	    for ismp in range(len(sigset.split('_')[0].split('-'))-1):
+            for ismp in range(len(sigset.split('_')[0].split('-'))-1):
                 signal = signal.replace(sigset.split('_')[0].split('-')[ismp]+'-','')
         plotsDirList.extend([ tag.split('___')[0].replace('__','/'), fitoption, signal, yearInFit ])
         if 'PostFitS' in fitoption: plotAsExotics = False
@@ -323,7 +323,7 @@ def postFitPlots(opt, makePlots=True):
     elif 'postfits' in opt.option.lower(): fitoption = 'PostFitS'
 
     if fitoption=='':
-        print 'plotsPostFit error: please choose a fit option (prefit, postfitb, postfits)'
+        print('plotsPostFit error: please choose a fit option (prefit, postfitb, postfits)')
         exit()
 
     fittedYearList = opt.year.split('-') if 'split' in opt.option else [ opt.year ]
@@ -350,7 +350,7 @@ def postFitPlots(opt, makePlots=True):
                 if signals[signal]['isSignal']:
 
                     if not commonTools.goodCombineFit(opt, fittedYear, combinetag, signal, fitoption):
-                        print 'Warning in postFitPlots: no good fit for year='+fittedYear+', tag='+tag+', signal='+signal+', fitoption='+fitoption
+                        print('Warning in postFitPlots: no good fit for year='+fittedYear+', tag='+tag+', signal='+signal+', fitoption='+fitoption)
 
                     sigset = opt.sigset if opt.sigset=='' or opt.sigset=='SM' else 'SM-'+signal if 'SM' in opt.sigset else signal
 
@@ -367,7 +367,7 @@ def postFitPlots(opt, makePlots=True):
                             os.system('mkdir -p '+commonTools.getShapeDirName(opt.shapedir, fittedYear, tag, fityearoption))
 
                             samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, tag, sigset, 'variables')
-                            datacardNameStructure = getDatacardNameStructure(len(fittedYear.split('-'))>1, len(cuts.keys())>1, len(variables.keys())>1)
+                            datacardNameStructure = getDatacardNameStructure(len(fittedYear.split('-'))>1, len(list(cuts.keys()))>1, len(list(variables.keys()))>1)
 
                             if len(yearInFitList)>1 and year==fittedYear:
                                 mlfitDir = commonTools.mergeDirPaths(os.getenv('PWD'), commonTools.getSignalDir(opt, opt.year, combinetag, signal, 'mlfitdir'))
@@ -468,7 +468,7 @@ def submitJobs(opt, jobName, jobTag, targetList, splitBatch, jobSplit, nThreads)
 
     opt.batchQueue = commonTools.batchQueue(opt, opt.batchQueue)
 
-    jobs = batchJobs(jobName,jobTag,['ALL'],targetList.keys(),splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
+    jobs = batchJobs(jobName,jobTag,['ALL'],list(targetList.keys()),splitBatch,'',JOB_DIR_SPLIT_READY=jobSplit)
     jobs.nThreads = nThreads
 
     for signal in targetList:

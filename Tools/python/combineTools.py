@@ -1,7 +1,7 @@
 import os
 import copy
-import commonTools
-import latinoTools
+from . import commonTools
+from . import latinoTools
 from LatinoAnalysis.Tools.batchTools import *
 
 def submitCombineJobs(opt, jobName, jobTag, combineJobs):
@@ -41,7 +41,7 @@ def getDatacardList(opt, signal):
         inputDatacardDir = commonTools.mergeDirPaths(opt.baseDir, commonTools.getSignalDir(opt, year, opt.tag, signal, 'cardsdir'))
         samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, year, opt.tag, 'SM', 'variables', opt.combineAction)
 
-        datacardNameStructure = latinoTools.getDatacardNameStructure(addYearToDatacardName, len(cuts.keys())>1, len(variables.keys())>1)
+        datacardNameStructure = latinoTools.getDatacardNameStructure(addYearToDatacardName, len(list(cuts.keys()))>1, len(list(variables.keys()))>1)
         datacardNameStructure = datacardNameStructure.replace('year', year)
 
         for cut in cuts:
@@ -94,7 +94,7 @@ def runCombine(opt):
         elif 'goffit' in opt.option: goodnessOfFit(opt)
         elif 'mlfits' in opt.option: mlfits(opt)
         elif 'impact' in opt.option: impactsPlots(opt)
-        else: print 'Please, speficy if you want to compute limits, make ML fits, or produce impacts plots'
+        else: print('Please, speficy if you want to compute limits, make ML fits, or produce impacts plots')
         exit()
 
     opt.logprocess = opt.combineAction
@@ -167,16 +167,16 @@ def runCombine(opt):
 
                     signalCombineCommand = combineCommand.replace('MASSPOINT', sample)
 
-                    if opt.debug: print signalCombineCommand
+                    if opt.debug: print(signalCombineCommand)
                     elif opt.interactive: os.system(signalCombineCommand)
                     else:
                         combineJobs[sample] = signalCombineCommand
 
             if not opt.debug and not opt.interactive:
-                if len(combineJobs.keys())>0: 
+                if len(list(combineJobs.keys()))>0: 
                     submitCombineJobs(opt, opt.combineAction, year+outtag, combineJobs)
                 else:
-                    print 'Nothing left to submit for tag', outtag, 'in year', year
+                    print('Nothing left to submit for tag', outtag, 'in year', year)
 
 def writeDatacards(opt):
 

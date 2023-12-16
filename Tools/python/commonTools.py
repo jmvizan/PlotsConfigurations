@@ -153,7 +153,7 @@ def getCfgFileName(opt, cfgName):
     processOutput, processError = process.communicate()
 
     if not processOutput: 
-        print 'getCfgFileName error: '+cfgName+' File line not found in '+opt.configuration
+        print('getCfgFileName error: '+cfgName+' File line not found in '+opt.configuration)
         exit() 
 
     return processOutput.split('=')[1].replace(' ','').replace('\'','').split('.')[0]+'.py'
@@ -178,7 +178,7 @@ def getDictionaries(optOrig, lastDictionary='nuisances'):
             exec(handle)
             handle.close()
         else:
-            print '    Error: sample cfg file', dictionaryCfg, 'not found'
+            print('    Error: sample cfg file', dictionaryCfg, 'not found')
             exit()
 
     optOrig.lumi = opt.lumi
@@ -264,7 +264,7 @@ def mergeDirPaths(baseDir, subDir):
         baseDir = baseDir.replace('/'+baseDir.split('/')[-1], '')
         subDir = subDir[3:]
     if baseDir!='' and subDir[0]!='.' and subDir[0]!='/': return baseDir+'/'+subDir 
-    print 'Error: something pathological in mergeDirName:',  baseDirOriginal, subDirOriginal, '->', baseDir, subDir
+    print('Error: something pathological in mergeDirName:',  baseDirOriginal, subDirOriginal, '->', baseDir, subDir)
  
 ### Tools to check or clean logs, shapes, plots, datacards and jobs
 
@@ -432,19 +432,19 @@ def purgeDatacards(opt):
 def showQueue(opt):
 
     if 'ifca' in os.uname()[1] or 'cloud' in os.uname()[1]: 
-        print '\nAvailable queues in slurm:\n cms_main = 24 hours\n cms_med  = 8 hours\n cms_high = 3 hours\n'
+        print('\nAvailable queues in slurm:\n cms_main = 24 hours\n cms_med  = 8 hours\n cms_high = 3 hours\n')
     else: #cern 
-        print '\nAvailable queues in condor:\n espresso     = 20 minutes\n microcentury = 1 hour\n longlunch    = 2 hours\n workday      = 8 hours\n tomorrow     = 1 day\n testmatch    = 3 days\n nextweek     = 1 week\n'
+        print('\nAvailable queues in condor:\n espresso     = 20 minutes\n microcentury = 1 hour\n longlunch    = 2 hours\n workday      = 8 hours\n tomorrow     = 1 day\n testmatch    = 3 days\n nextweek     = 1 week\n')
 
 def batchQueue(opt, batchQueue):
 
     if 'ifca' in os.uname()[1] or 'cloud' in os.uname()[1]:
         if batchQueue not in [ 'cms_main', 'cms_med', 'cms_high' ]: 
-            if opt.verbose: print 'Batch queue', batchQueue, 'not available in gridui. Setting it to cms_high'
+            if opt.verbose: print('Batch queue', batchQueue, 'not available in gridui. Setting it to cms_high')
             return 'cms_high'
     else: # cern
         if batchQueue not in ['espresso', 'microcentury', 'longlunch', 'workday', 'tomorrow', 'testmatch', 'nextweek' ]:
-            if opt.verbose: print 'Batch queue', batchQueue, 'not available in lxplus. Setting it to workday'
+            if opt.verbose: print('Batch queue', batchQueue, 'not available in lxplus. Setting it to workday')
             return 'workday'
 
     return batchQueue
@@ -456,8 +456,8 @@ def checkProxy(opt):
     out, err = proc.communicate()
 
     if 'Proxy not found' in err :
-        print 'WARNING: No GRID proxy -> Get one first with:'
-        print 'voms-proxy-init -voms cms -rfc --valid 168:0'
+        print('WARNING: No GRID proxy -> Get one first with:')
+        print('voms-proxy-init -voms cms -rfc --valid 168:0')
         exit()
 
     timeLeft = 0
@@ -465,8 +465,8 @@ def checkProxy(opt):
         if 'timeleft' in line : timeLeft = int(line.split(':')[1])
 
     if timeLeft < 24 :
-        print 'WARNING: Your proxy is only valid for ',str(timeLeft),' hours -> Renew it with:'
-        print 'voms-proxy-init -voms cms -rfc --valid 168:0'
+        print('WARNING: Your proxy is only valid for ',str(timeLeft),' hours -> Renew it with:')
+        print('voms-proxy-init -voms cms -rfc --valid 168:0')
         exit()
 
 def getProcessIdList(opt):
@@ -510,7 +510,7 @@ def getProcessIdList(opt):
                 if processOutput:
 
                     processId = processOutput.replace('Submitted batch job','').split('\n')[0].split('.')[0]
-                    if processId not in processIdList.keys(): 
+                    if processId not in list(processIdList.keys()): 
                         processIdList[processId] = { 'logprocess' : logprocess, 'year' : yearJob, 'tag' : tagJob, 'samples' : [] }
                     if sample not in processIdList[processId]['samples']: processIdList[processId]['samples'].append(sample)    
 
@@ -522,27 +522,27 @@ def checkJobs(opt):
 
     processIdList = getProcessIdList(opt) 
 
-    if len(processIdList.keys())==0:
+    if len(list(processIdList.keys()))==0:
         logprocessInfo = 'logprocess='+opt.logprocess+', ' if opt.logprocess!='*' else ''
-        print 'No job running for '+logprocessInfo+'year='+opt.year+', tag='+opt.tag+', sigset='+opt.sigset
+        print('No job running for '+logprocessInfo+'year='+opt.year+', tag='+opt.tag+', sigset='+opt.sigset)
         return
 
     process=subprocess.Popen(checkCommand, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
     processOutput, processError = process.communicate()
 
-    if processError: print processError
+    if processError: print(processError)
     
     jobInfoList = [ 'year', 'tag' ]
     if '*' in opt.logprocess: jobInfoList.insert(0, 'logprocess') 
 
     if processOutput:
         for processLine in processOutput.split('\n'):
-            if 'JOB' in processLine: print processLine
+            if 'JOB' in processLine: print(processLine)
             else:
                 for processId in processIdList:
                     if processId in processLine:
                         jobInfos = ', '.join([ x+'='+processIdList[processId][x] for x in jobInfoList ])
-                        print processLine+' '+jobInfos+', samples='+','.join(processIdList[processId]['samples'])
+                        print(processLine+' '+jobInfos+', samples='+','.join(processIdList[processId]['samples']))
 
 def killJobs(opt):
 
@@ -550,9 +550,9 @@ def killJobs(opt):
 
     processIdList = getProcessIdList(opt)
 
-    if len(processIdList.keys())==0:
+    if len(list(processIdList.keys()))==0:
         logprocessInfo = 'logprocess='+opt.logprocess+', ' if opt.logprocess!='*' else ''
-        print 'No job running for '+logprocessInfo+'year='+opt.year+', tag='+opt.tag+', and sigset='+opt.sigset
+        print('No job running for '+logprocessInfo+'year='+opt.year+', tag='+opt.tag+', and sigset='+opt.sigset)
         
     else:
         for processId in processIdList:    
@@ -568,7 +568,7 @@ def printJobErrors(opt):
         sample = errFile.split('__')[-1].split('.')[0]
         yeartag = errFile.split('__')[1].split('/')[0]
 
-        print '\n\n\n###### '+' '.join([ logprocess, sample, yeartag ])+' ######\n'
+        print('\n\n\n###### '+' '.join([ logprocess, sample, yeartag ])+' ######\n')
         os.system('cat '+errFile)
 
 def printKilledJobs(opt):
@@ -586,7 +586,7 @@ def printKilledJobs(opt):
             sample = logFile.split('__')[-1].split('.')[0]
             yeartag = logFile.split('__')[1].split('/')[0]
 
-            print '\n###### '+' '.join([ logprocess, sample, yeartag ])+processOutput
+            print('\n###### '+' '.join([ logprocess, sample, yeartag ])+processOutput)
 
 ### Methods for analyzing shapes 
 
@@ -623,7 +623,7 @@ def foundShapeFiles(opt, rawShapes=False, verbose=True):
             rawtag = tag.split('_')[0] if rawShapes else tag
 
             if not os.path.isfile(getShapeFileName(opt.shapedir, year, rawtag, opt.sigset, opt.fileset)): 
-                if verbose: print 'Error: input shape file', getShapeFileName(opt.shapedir, year, rawtag, opt.sigset, opt.fileset), 'is missing'
+                if verbose: print('Error: input shape file', getShapeFileName(opt.shapedir, year, rawtag, opt.sigset, opt.fileset), 'is missing')
                 missingShapeFiles = True
      
     return not missingShapeFiles
@@ -671,14 +671,14 @@ def yieldsTables(opt, masspoints=''):
 
     if 'fit' in opt.option.lower(): postFitYieldsTables(opt, masspoints)
     else: 
-        print 'please, complete me :('
-        print 'using postFitYieldsTables for the time being'
+        print('please, complete me :(')
+        print('using postFitYieldsTables for the time being')
         opt.option += 'prefit'
         postFitYieldsTables(opt, masspoints)
 
 def systematicsTables(opt):
 
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkSystematicsTables.py :('
+    print('please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkSystematicsTables.py :(')
 
 def mkPseudoData(opt, reftag=None, refsigset=None):
   
@@ -733,7 +733,7 @@ def getCombineOutputFileName(opt, signal, year='', tag='', combineAction=''):
         combineOutDir = 'impactdir'
         outputFileName = 'impacts.pdf'
     else:
-        print 'Error in getCombineOutputFileName: please speficy if you want the output from a limit or a ML fit'
+        print('Error in getCombineOutputFileName: please speficy if you want the output from a limit or a ML fit')
         exit()
 
     return getSignalDir(opt, year, tag, signal, combineOutDir)+'/'+outputFileName
@@ -780,7 +780,7 @@ def purgeMLFits(opt):
 
 def massScanLimits(opt):
 
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/analyzeLimits.py :('
+    print('please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/analyzeLimits.py :(')
 
 def fitMatrices(opt):
 
@@ -791,7 +791,7 @@ def fitMatrices(opt):
     if 'prefit' in opt.option.lower(): fitlevels.append('prefit')
     elif 'postfitb' in opt.option.lower(): fitlevels.append('fit_b')
     elif 'postfits' in opt.option.lower(): fitlevels.append('fit_s')
-    else: print 'Error in fitMatrices: please choose a fit level (prefit, postfitb, postfits)'
+    else: print('Error in fitMatrices: please choose a fit level (prefit, postfitb, postfits)')
 
     for year in yearList:
         for tag in opt.tag.split('-'):
@@ -857,7 +857,7 @@ def postFitYieldsTables(opt, cardNameStructure='cut', masspoints=''):
 def getPileupScenarioFromSimulation(opt):
 
     if 'pu:' not in opt.option:
-        print 'Please, specify the pileup variable name'
+        print('Please, specify the pileup variable name')
         exit()
 
     pileupVariable = opt.option.split('pu:')[-1].split(':')[0]
@@ -889,7 +889,7 @@ def pileupWeights(opt, dataFile = '', simulationFile = '', outputFile = ''):
         if hasattr(opt, 'dataPileupFile'):
             dataFile = opt.dataPileupFile
         else:
-            print 'Missing data input file'
+            print('Missing data input file')
             exit()
 
     if 'simulationFile:' in opt.option:
@@ -898,7 +898,7 @@ def pileupWeights(opt, dataFile = '', simulationFile = '', outputFile = ''):
         if hasattr(opt, 'simulationPileupFile'):
             simulationFile = opt.simulationPileupFile
         else:
-            print 'Missing simulation input file'
+            print('Missing simulation input file')
             exit()
 
     profileDir = '/'.join([ os.getenv('PWD'), '../../../LatinoAnalysis/NanoGardener/python/data/PUweights', opt.year, '' ]) 
@@ -920,7 +920,7 @@ def pileupWeights(opt, dataFile = '', simulationFile = '', outputFile = ''):
             outputFile = outputDir+'pileupWeights_'+dataFile.split('/')[-1]
     
     if opt.debug:
-        print 'dataFile:', dataFile, 'simulationFile:', simulationFile, 'plotFile:', plotFile, 'outputFile:', outputFile
+        print('dataFile:', dataFile, 'simulationFile:', simulationFile, 'plotFile:', plotFile, 'outputFile:', outputFile)
            
     dataRoot = openRootFile(dataFile+'.root')
     simulationRoot = openRootFile(simulationFile+'.root')   
@@ -968,13 +968,13 @@ def pileupWeights(opt, dataFile = '', simulationFile = '', outputFile = ''):
 
 def triggerEfficiencies(opt):
 
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkTriggerEfficiencies.py :('
+    print('please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkTriggerEfficiencies.py :(')
 
 def theoryNormalizations(opt):
 
-    print 'please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/computeTheoryNormalizations.py :('
+    print('please, port me from https://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/computeTheoryNormalizations.py :(')
 
 def backgroundScaleFactors(opt):
 
-    print 'please, port me fromhttps://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkBackgroundScaleFactors.py :('
+    print('please, port me fromhttps://github.com/scodella/PlotsConfigurations/blob/worker/Configurations/SUS-19-XXX/mkBackgroundScaleFactors.py :(')
 

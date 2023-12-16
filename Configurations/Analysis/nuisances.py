@@ -2,8 +2,8 @@
 
 ### general parameters
 
-if len(yearstag.keys())!=1:
-    print 'WARNING: nuisances.py cannot be used on multiple years'
+if len(list(yearstag.keys()))!=1:
+    print('WARNING: nuisances.py cannot be used on multiple years')
     exit()
 
 for key in yearstag:
@@ -31,7 +31,7 @@ for globalNuisance in globalNuisances:
                    'samples'  : { },
                    'type'  : 'lnN',
     }
-    for sample in samples.keys():
+    for sample in list(samples.keys()):
         if not samples[sample]['isDATA']:
             nuisances[globalNuisance]['samples'][sample] = globalNuisances[globalNuisance]['value']
 
@@ -44,7 +44,7 @@ if 'TrigLatino' not in opt.tag:
         'kind'    : 'weight',
         'samples' : { },
     }
-    for sample in samples.keys():
+    for sample in list(samples.keys()):
         if not samples[sample]['isDATA']:
             if 'SigV6' not in opt.tag or not samples[sample]['isSignal']:
                 nuisances['trigger']['samples'][sample] = [ 'triggerWeight[2]/triggerWeight[1]', 'triggerWeight[0]/triggerWeight[1]' ]
@@ -88,7 +88,7 @@ for scalefactor in leptonSF:
     nuisances[scalefactor]['type'] = leptonSF[scalefactor]['type']   
     if leptonSF[scalefactor]['type']=='shape':
         nuisances[scalefactor]['kind'] = 'weight'   
-    for sample in samples.keys():
+    for sample in list(samples.keys()):
         if not samples[sample]['isDATA']:
             if 'FS' not in scalefactor or samples[sample]['isFastsim']:
                 if ('EOY' not in sample and (not samples[sample]['isFastsim'] or 'SigV6' not in opt.tag)) or 'Extra' not in scalefactor:
@@ -103,9 +103,9 @@ bSelections = { '1b' : { 'weight' : btagWeight1tagSyst+'_syst/'+btagWeight1tagSy
                          'cuts'   : [ '_Veto', 'SSV_', '_NoTag', 'WZ_', 'WZtoWW_', 'ZZ', 'Zpeak' ] },
                }
 if 'ttZNormalization' in opt.tag or 'FitCRttZ' in opt.tag:
-    if len(btagweightmixtagSyst.keys())>0:
+    if len(list(btagweightmixtagSyst.keys()))>0:
         bSelections['ttZ'] = { 'weight' : btagweightmixtagSyst }
-        if len(btagweightmixtagISRSyst.keys())==0:
+        if len(list(btagweightmixtagISRSyst.keys()))==0:
             bSelections['ttZ']['cuts'] = [ '_Tag', 'ttZ' ] 
         else:
             bSelections['ttZ']['cuts'] = [ 'SR1_Tag', 'SR2_Tag', 'CR1_Tag', 'CR2_Tag' ]
@@ -113,7 +113,7 @@ if 'ttZNormalization' in opt.tag or 'FitCRttZ' in opt.tag:
                                    'cuts'   : [ 'SR3_Tag', 'SR4_Tag', 'CR3_Tag', 'CR4_Tag' ] }
         del bSelections['1b']
         del bSelections['0b']
-elif len(ISRWeightTagRelVar.keys())>0:
+elif len(list(ISRWeightTagRelVar.keys()))>0:
     bSelections['isr'] = { 'weight' : ISRWeightTagRelVar,
                            'cuts'   : [ 'SR3_Tag', 'SR4_Tag' ] }
     bSelections['1b']['cuts'].remove('_Tag')
@@ -130,7 +130,7 @@ for scalefactor in bTagNuisances:
         }
         bselweight = bSelections[bsel]['weight']
         scafactvar = bTagNuisances[scalefactor]['var']
-        for sample in samples.keys():
+        for sample in list(samples.keys()):
             if not samples[sample]['isDATA']:
                 if 'FS' not in scalefactor or samples[sample]['isFastsim']:
                     if ('EOY' not in sample and not samples[sample]['isFastsim']) or scalefactor!='btagcor': 
@@ -141,7 +141,7 @@ for scalefactor in bTagNuisances:
                             nuisances[scalefactor+bsel]['samples'][sample] = [ bselweight[scalefactor].replace('syst', scafactvar).replace('VAR', 'up'  ), 
                                                                                bselweight[scalefactor].replace('syst', scafactvar).replace('VAR', 'down') ] 
 
-        for cut in cuts.keys():
+        for cut in list(cuts.keys()):
             for bselcut in bSelections[bsel]['cuts']:
                 if bselcut in cut:
                     nuisances[scalefactor+bsel]['cuts'].append(cut)
@@ -156,7 +156,7 @@ if '_NoPU' not in opt.tag:
         'kind'  : 'weight',
         'type'  : 'shape',
     }
-    for sample in samples.keys():
+    for sample in list(samples.keys()):
         if not samples[sample]['isDATA']:
             nuisances['pileup']['samples'][sample] = [ 'puWeightUp/puWeight', 'puWeightDown/puWeight' ] 
 
@@ -169,7 +169,7 @@ if '2016' in opt.tag or '2017' in opt.tag:
         'kind'  : 'weight',
         'type'  : 'shape',
     }
-    for sample in samples.keys():
+    for sample in list(samples.keys()):
         if not samples[sample]['isDATA']:
             nuisances['prefiring']['samples'][sample] = [ 'PrefireWeight_Up/PrefireWeight', 'PrefireWeight_Down/PrefireWeight' ] 
 
@@ -181,7 +181,7 @@ nuisances['nonpromptLep']  = {
     'kind'  : 'weight',
     'type'  : 'shape',
 }
-for sample in samples.keys():
+for sample in list(samples.keys()):
     if not samples[sample]['isDATA']:
         nuisances['nonpromptLep']['samples'][sample] = [ nonpromptLepSF_Up+'/'+nonpromptLepSF, nonpromptLepSF_Down+'/'+nonpromptLepSF ] 
 
@@ -203,14 +203,14 @@ nuisances['isrFS']  = {
     'kind'  : 'weight',
     'type'  : 'shape',
 }
-for sample in samples.keys():
+for sample in list(samples.keys()):
     if 'isrObservable' in samples[sample]:
             if samples[sample]['isrObservable']=='njetISR':
                 isrWeight = [ '0.5*(3.*isrW-1.)/isrW', '0.5*(isrW+1.)/isrW' ]
             elif samples[sample]['isrObservable']=='ptISR':
                 isrWeight = [ '(2.*isrW-1.)/isrW', '1./isrW' ]
             else:
-                print 'ERROR: no isrW implementation for model', model
+                print('ERROR: no isrW implementation for model', model)
             nuisances['isrFS']['samples'][sample] = isrWeight
 
 ### mt2ll backgrounds (special case for shape uncertainties)
@@ -261,7 +261,7 @@ if addMT2Shapes:
                     'cuts'  : [ ]
                 } 
 
-                for cut in cuts.keys():
+                for cut in list(cuts.keys()):
                     if mt2llregion in cut:
                         nuisances[nuisancekey]['cuts'].append(cut)
 
@@ -289,7 +289,7 @@ if addMT2Shapes:
                         'cuts'  : [ ]
                     }
 
-                    for cut in cuts.keys():
+                    for cut in list(cuts.keys()):
                         if mt2llregion in cut:
                             nuisances[nuisancekey]['cuts'].append(cut)
 
@@ -309,7 +309,7 @@ if addMT2Shapes:
             elif '_WWcorrYear' in opt.tag: nuisances[nuisancekey]['correlatedName'] = 'WWtails_'+mt2llregion
             elif '_WWcorr' in opt.tag: nuisances[nuisancekey]['correlatedName'] = 'WWtails'
 
-            for cut in cuts.keys():
+            for cut in list(cuts.keys()):
                 if mt2llregion in cut:
                     nuisances[nuisancekey]['cuts'].append(cut)
 
@@ -386,7 +386,7 @@ if signalReco=='fast' and fastsimMetType!='reco' and '_NoPtMissFast' not in opt.
             'folderDown': directorySig.replace('__susyMT2fast', '__susyMT2genm').replace('Smear', 'Nomin'),
         }
         if fastsimMetType=='acceptance': nuisances['ptmissfastsim']['extremes'] = [ '_reco', '_gen' ]
-        for sample in samples.keys():
+        for sample in list(samples.keys()):
             if samples[sample]['isFastsim']:
                 nuisances['ptmissfastsim']['samples'][sample] = ['1.', '1.']
 
@@ -424,14 +424,14 @@ for yeartomerge in yearstaglist:
     # [7] is muR=0.20000E+01 muF=0.10000E+01
     # [8] is muR=0.20000E+01 muF=0.20000E+01
 
-    for sample in samples.keys():
+    for sample in list(samples.keys()):
         if not samples[sample]['isDATA']:
             if sample=='minor':
                 nuisances['qcdScale']['samples'][sample] = []
                 nuisances['pdf']['samples'][sample] = []
                 continue
             elif sample not in theoryNormalizations:
-                print 'Nuisance warning: sample', sample, 'not in theoryNormalizations'
+                print('Nuisance warning: sample', sample, 'not in theoryNormalizations')
                 continue
             if theoryNormalizations[sample]['qcdScaleStatus']==3:
                 qcdScaleVariations = [ ]
@@ -463,7 +463,7 @@ for treeNuisance in treeNuisances:
         if '_NoJES' in opt.tag and 'jes' in treeNuisance: continue
         if '_NoMET' in opt.tag and 'unc' in treeNuisance: continue
         if 'Down' not in treeNuisanceDirs[treeNuisance][mcType] or 'Up' not in treeNuisanceDirs[treeNuisance][mcType]:
-            print 'nuisance warning: missing trees for', treeNuisance, mcType, 'variations'
+            print('nuisance warning: missing trees for', treeNuisance, mcType, 'variations')
         else:
 
             mcTypeName = '_FS' if (mcType=='Sig' and not treeNuisances[treeNuisance]['BkgToSig']) else ''
@@ -479,12 +479,12 @@ for treeNuisance in treeNuisances:
                 'folderDown': treeNuisanceDirs[treeNuisance][mcType]['Down'],
                 'folderUp':   treeNuisanceDirs[treeNuisance][mcType]['Up'],
             }
-            for sample in samples.keys():
+            for sample in list(samples.keys()):
                 if not samples[sample]['isDATA'] and not ('NoDY' in opt.tag and treeNuisance=='jer' and '2017' in year and sample=='DY'):
                     if (mcType=='Bkg' and not samples[sample]['isSignal']) or (mcType=='Sig' and samples[sample]['isSignal']):
                         nuisances[treeNuisance+mcType]['samples'][sample] = ['1.', '1.']
 
-            if len(nuisances[treeNuisance+mcType]['samples'].keys())==0:
+            if len(list(nuisances[treeNuisance+mcType]['samples'].keys()))==0:
                 del nuisances[treeNuisance+mcType]
 
     if hasattr(opt, 'cardList') and treeNuisances[treeNuisance]['BkgToSig']:
@@ -549,7 +549,7 @@ if 'FitCR' in opt.tag:
     if '_NoZZ2Lrate' in opt.tag: backgroundCRs['ZZ']['samples'] = [ 'ZZTo4L' ]
     for controlregion in backgroundCRs:
         for sample in backgroundCRs[controlregion]['samples']:
-            for rateparam in rateparameters.keys():
+            for rateparam in list(rateparameters.keys()):
                 if sample in rateparameters[rateparam]['samples']: 
                     rateparameters[rateparam]['samples'].remove(sample)
         for region in backgroundCRs[controlregion]['regions']:
@@ -587,7 +587,7 @@ if hasattr(opt, 'outputDirDatacard'):
 
                 isControlSample = True if ('isControlSample' in samples[sample] and samples[sample]['isControlSample']==1) else False
 
-                initialValue = '1.00' if 'initval' not in rateparameters[rateparam].keys() else rateparameters[rateparam]['initval']
+                initialValue = '1.00' if 'initval' not in list(rateparameters[rateparam].keys()) else rateparameters[rateparam]['initval']
 
                 nuisances[sample+rateparamname]  = {
                     'name'  : rateparamname+year,
@@ -596,16 +596,16 @@ if hasattr(opt, 'outputDirDatacard'):
                     'cuts'  : [ ] 
                 }
                 
-                if 'limits' in rateparameters[rateparam].keys():
+                if 'limits' in list(rateparameters[rateparam].keys()):
                     nuisances[sample+rateparamname]['limits'] = rateparameters[rateparam]['limits'] 
                     
-                for cut in cuts.keys():
+                for cut in list(cuts.keys()):
                     if (mt2llregion in cut and not isControlSample) or (mt2llregion.replace('SR', 'CR').replace('VR1', 'CR0') in cut and 'CR_' in rateparam and rateparam.split('_')[2]==cut.split('_')[2]):
                         for subcut in rateparameters[rateparam]['subcuts']:
                             if subcut in cut:
                                 nuisances[sample+rateparamname]['cuts'].append(cut)
                         
-                if 'bondrate' in rateparameters[rateparam].keys():
+                if 'bondrate' in list(rateparameters[rateparam].keys()):
                                 
                     fileIn = ROOT.TFile(opt.inputFile, "READ")
 
@@ -615,7 +615,7 @@ if hasattr(opt, 'outputDirDatacard'):
 
                         nuisances[sample+rateparamname]['bond'][cut] = {}
 
-                        for variable in variables.keys():
+                        for variable in list(variables.keys()):
                             if 'cuts' in variables[variable] and cut not in variables[variable]['cuts']: continue
 
                             histoB = fileIn.Get(cut+'/'+variable+'/histo_'+sample)
@@ -637,7 +637,7 @@ if hasattr(opt, 'outputDirDatacard'):
 
 nuisanceToRemove = [ ]
 
-for nuisance in nuisances.keys():
+for nuisance in list(nuisances.keys()):
 
     if 'cuts' in nuisances[nuisance]:
         if len(nuisances[nuisance]['cuts'])==0:
@@ -683,7 +683,7 @@ for nuisance in nuisances.keys():
                     if qqnuis in nuisance: skipThis = False
                     elif qqnuis=='normX' and 'norm' in nuisance and 'normDY' not in nuisance: skipThis = False
                 if skipThis: continue
-            if 'cuts' not in nuisances[nuisance]: nuisances[nuisance]['cuts'] = cuts.keys()
+            if 'cuts' not in nuisances[nuisance]: nuisances[nuisance]['cuts'] = list(cuts.keys())
             nuisanceToRemove.append(nuisance)
             for mt2llregion in mt2llRegions:
                 nuisances[nuisance+'_'+mt2llregion] = {}
@@ -713,7 +713,7 @@ for nuisance in nuisances.keys():
             if 'norm' in nuisance and 'nonorm' in opt.tag: continue
             if 'nolep' in opt.tag and 'lep' in nuisance: continue
             if 'IdIsoFS' in nuisance and 'noidisofs' in opt.tag: continue
-            if 'cuts' not in nuisances[nuisance]: nuisances[nuisance]['cuts'] = cuts.keys()
+            if 'cuts' not in nuisances[nuisance]: nuisances[nuisance]['cuts'] = list(cuts.keys())
             nuisanceToRemove.append(nuisance)
             for flav in [ 'em', 'sf']:
                 nuisances[nuisance+'__'+flav] = {}

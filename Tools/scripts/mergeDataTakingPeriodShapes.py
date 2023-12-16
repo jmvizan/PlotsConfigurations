@@ -29,7 +29,7 @@ if __name__ == '__main__':
     years = opt.years.split('-')
 
     if len(years)==1:
-        print 'mergeDataTakingPeriodShapes: nothing to do with one year'
+        print('mergeDataTakingPeriodShapes: nothing to do with one year')
         exit()
 
     outputNuisancesFile = opt.outputNuisFile if opt.outputNuisFile!=None else opt.nuisancesFile.replace('.py', '_'.join([opt.years, opt.tag, opt.sigset])+'.py')
@@ -90,7 +90,7 @@ if __name__ == '__main__':
     inFiles = [ ]
     for year in years:
         if not os.path.isfile('/'.join([ opt.inputDir, year, tag ])+outFileName): 
-            print 'Error in mergeDataTakingPeriodShapes: input file', '/'.join([ opt.inputDir, year, tag ])+outFileName, 'not found' 
+            print('Error in mergeDataTakingPeriodShapes: input file', '/'.join([ opt.inputDir, year, tag ])+outFileName, 'not found') 
             exit()
         inFiles.append([ ROOT.TFile('/'.join([ opt.inputDir, year, tag ])+outFileName, 'READ') , year ])
 
@@ -105,7 +105,7 @@ if __name__ == '__main__':
                 folderName = cutName + '/' + variableName
                 outFile.mkdir(folderName)
 
-                if opt.verbose: print '################################', folderName
+                if opt.verbose: print('################################', folderName)
 
                 inDirs = [ ] 
                 for infile in inFiles:
@@ -118,11 +118,11 @@ if __name__ == '__main__':
 
                             if nuisance!='stat': 
                                 if 'type' not in allnuisances[nuisance]:
-                                    print 'Warning: nuisance without type -> ', nuisance
+                                    print('Warning: nuisance without type -> ', nuisance)
                                     continue
                                 if allnuisances[nuisance]['type']!='shape' and allnuisances[nuisance]['type']!='lnN':
                                     if allnuisances[nuisance]['type']!='rateParam':
-                                        print 'Warning: unknown nuisance type -> ', allnuisances[nuisance]['type']
+                                        print('Warning: unknown nuisance type -> ', allnuisances[nuisance]['type'])
                                     continue
 
                             shapeName = 'histo_' + sample
@@ -149,13 +149,13 @@ if __name__ == '__main__':
                                                     systNorm = float(allnuisances[nuisance]['samples_'+indir[1]][sample])
                                                     if var=='Down': systNorm = 2. - systNorm
                                                     tmpHisto.Scale(systNorm)
-                                                    if opt.verbose: print 'samples_'+indir[1], tmpHisto.Integral()
+                                                    if opt.verbose: print('samples_'+indir[1], tmpHisto.Integral())
                                             elif indir[1] in nuisance:
-                                                print 'Error: samples_'+indir[1]+' not in allnuisances['+nuisance+']'
+                                                print('Error: samples_'+indir[1]+' not in allnuisances['+nuisance+']')
 
                                     else:
                                         if indir[1]+'_'+sample not in missingSampleList:
-                                            print 'Warning:', sample, 'not in input shape file for', cutName, 'in', indir[1], 'year!'
+                                            print('Warning:', sample, 'not in input shape file for', cutName, 'in', indir[1], 'year!')
                                             missingSampleList.append(indir[1]+'_'+sample)
                                         for idir2, indir2 in enumerate(inDirs):
                                             if indir2[0].GetListOfKeys().Contains(shapeName):
@@ -163,7 +163,7 @@ if __name__ == '__main__':
                                                 tmpHisto.SetDirectory(0)
                                                 tmpHisto.Reset()
 
-                                    if opt.verbose: print indir[1], sample, nuisance,  var, tmpHisto.Integral()
+                                    if opt.verbose: print(indir[1], sample, nuisance,  var, tmpHisto.Integral())
 
                                     if idir==0:
                                         sumHisto = tmpHisto.Clone()
@@ -187,5 +187,5 @@ if __name__ == '__main__':
                 #file.write('nuisances[\''+nuisance+'\'] = '+json.dumps(allnuisances[nuisance])+'\n\n')
                 file.write('nuisances[\''+nuisance+'\'] = '+repr(allnuisances[nuisance])+'\n\n')
 
-    if opt.verbose: print "Output file:", outDirName+outFileName
+    if opt.verbose: print("Output file:", outDirName+outFileName)
     

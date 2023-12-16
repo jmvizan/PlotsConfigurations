@@ -125,7 +125,7 @@ for mStop in range( 150,  2001, 25):
     elif mStop<=2000:
         datasetName += '1200to2000'
     else :
-        print 'Squark top mass', mStop, 'not available'
+        print('Squark top mass', mStop, 'not available')
     for mNeutralino in range( 0,  min(mStop-74, 1151), 25):
             
         if (mStop-mNeutralino>300 and (mStop%50!=0 or mNeutralino%50!=0)):
@@ -230,7 +230,7 @@ def getTSlepSlepCrossSection(susyModel, susyMass):
 
     isusyMass = int(susyMass)
 
-    if str(isusyMass) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
+    if str(isusyMass) in list(SUSYCrossSections[susyProcess]['massPoints'].keys()) :
 
         return float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass)]['value'])
 
@@ -252,7 +252,7 @@ def getTSlepSlepCrossSection(susyModel, susyMass):
             isusyMass1 =  900
             isusyMass2 = 1000
 
-        if str(isusyMass1) in SUSYCrossSections[susyProcess]['massPoints'].keys() and str(isusyMass2) in SUSYCrossSections[susyProcess]['massPoints'].keys() :
+        if str(isusyMass1) in list(SUSYCrossSections[susyProcess]['massPoints'].keys()) and str(isusyMass2) in list(SUSYCrossSections[susyProcess]['massPoints'].keys()) :
 
             susyXsec1 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass1)]['value'])
             susyXsec2 = float(SUSYCrossSections[susyProcess]['massPoints'][str(isusyMass2)]['value'])
@@ -260,7 +260,7 @@ def getTSlepSlepCrossSection(susyModel, susyMass):
             slope = -math.log(susyXsec2/susyXsec1)/(isusyMass2-isusyMass1)
             return susyXsec1*math.exp(-slope*(isusyMass-isusyMass1))
 
-    print 'getCrossSection ERROR: cross section not available for', susyProcess, 'at mass =', susyMass, ', exiting'
+    print('getCrossSection ERROR: cross section not available for', susyProcess, 'at mass =', susyMass, ', exiting')
     exit()
 
 for mSlep in range( 100, 1301, 25):
@@ -272,7 +272,7 @@ for mSlep in range( 100, 1301, 25):
         datasetName = 'TSlepSlep_mSlep-500to1300'
         lspStep = 25
     mNeutralinoList = [ ] 
-    mNeutralinoList.extend(range( 0,  min(mSlep-40+1, 651), lspStep))
+    mNeutralinoList.extend(list(range( 0,  min(mSlep-40+1, 651), lspStep)))
     for dm in [1,5,10,20,30,40]:
         if mSlep-dm<=650 and (dm<40 or mSlep>=500):
             mNeutralinoList.append(mSlep-dm)

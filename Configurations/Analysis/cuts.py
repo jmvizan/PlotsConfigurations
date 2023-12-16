@@ -377,7 +377,7 @@ if 'HMControlRegion' in opt.tag:
     
 if 'WWControlRegion' in opt.tag:
     if 'Latino' in opt.tag:
-        print "im doing latinos"
+        print("im doing latinos")
         cuts['WW_Latino_em']   = '(' + OC+' && '+DF+' && '+pTll+'>30 && '+NoJets+' &&  ptmiss>=20 && mll>20) '
         cuts['WW_Latino_sf']   = '(' + OC+' && '+SF+' && '+pTll+'>30 && '+NoJets+' && ' +vetoZ+' && ptmiss>=20 && mll>40) '
     else:
@@ -652,7 +652,7 @@ if 'ttZNormalization' in opt.tag or 'FitCRttZ' in opt.tag:
             btagWeight2tagsystnuis = btagWeight2tagsyst.replace('SFVAR', nuisVAR).replace('JFLCUT', nuisJFL)
             btagweightmixtagsyst = '(('+btagWeight2tagsystnuis+')*('+nLooseLepton+'==3) + ('+btagWeight1tag+'_syst)*('+nLooseLepton+'==4))' 
             btagweightmixtagSyst[btagnuisance] = btagweightmixtagsyst+'/'+btagweightmixtag     
-            if len(ISRWeightTagRelVar.keys())>0:
+            if len(list(ISRWeightTagRelVar.keys()))>0:
                 ISRWeightMixTag = '(('+btagWeight2tagisr+')*('+nLooseLepton+'==3) + ('+ISRWeightTag+')*('+nLooseLepton+'==4))'
                 btagWeight2tagisrsystnuis = btagWeight2tagisrsyst.replace('SFVAR', nuisVAR).replace('JFLCUT', nuisJFL) 
                 btagweightmixtagISRSyst[btagnuisance] = '(('+btagWeight2tagisrsystnuis+')/('+btagWeight2tagisr+')*('+nLooseLepton+'==3)+'+ISRWeightTagRelVar[btagnuisance]+'*('+nLooseLepton+'==4))'
@@ -748,7 +748,7 @@ if 'SignalRegion' in opt.tag:
         if 'TChipmWWSignalRegions' in opt.tag:
             ptmiss_cuts['SR1'] = ptmiss_cuts['SR1'].replace('ptmiss>=160', 'ptmiss>=140')
 
-    SRlist = ptmiss_cuts.keys()
+    SRlist = list(ptmiss_cuts.keys())
     for sr in SRlist:
         if '_no'+sr in opt.tag:
             del ptmiss_cuts[sr]
@@ -834,7 +834,7 @@ if 'FitCR' in opt.tag and ('FitCRWZ' in opt.tag or 'FitCRttZ' in opt.tag or 'Fit
                 exprCR = exprCR.replace(OC, ttZselectionLoose)
                 crcuts[crcut.replace('_sf', '_ttZ')] = { 'expr' : exprCR, 'weight' : btagweightmixtag }
 
-                if len(ISRWeightTagRelVar.keys())>0:
+                if len(list(ISRWeightTagRelVar.keys()))>0:
                     if '3_Tag' in crcut or '4_Tag' in crcut:
                         crcuts[crcut.replace('_sf', '_ttZ')]['weight'] = ISRWeightMixTag
 
@@ -873,7 +873,7 @@ if '_Flav' in opt.tag:
 # For FastSim pTmiss
 if isShape and 'Fast' in opt.tag:
 
-    cutList = cuts.keys()
+    cutList = list(cuts.keys())
 
     for cut in cutList:
         if 'SR' in cut:
@@ -893,7 +893,7 @@ if isShape and 'Fast' in opt.tag:
 
 if 'SignalRegion' in opt.tag and 'JetUncertainties' in opt.tag:
 
-    cutList = cuts.keys()
+    cutList = list(cuts.keys())
 
     jetuncList = [ 'MET_T1Smear_pt' ]
     if isShape: jetuncList.extend([ 'MET_T1Smear_pt_jesTotalUp', 'MET_T1Smear_pt_jesTotalDown', 'MET_T1Smear_pt_jerUp', 'MET_T1Smear_pt_jerDown', 'MET_T1Smear_pt_unclustEnUp', 'MET_T1Smear_pt_unclustEnDown' ])
@@ -911,7 +911,7 @@ if 'SignalRegion' in opt.tag and 'JetUncertainties' in opt.tag:
 if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):
 
     cutList = [ ]
-    for cut in cuts.keys(): cutList.append(cut)
+    for cut in list(cuts.keys()): cutList.append(cut)
 
     for cut in cutList:
 
@@ -1040,7 +1040,7 @@ if normBackgrounds is not None:
 
                 cutList = [ ]
                 if 'cuts' not in normBackgrounds[background][region]:
-                    cutList = cuts.keys()
+                    cutList = list(cuts.keys())
                 else:
                     for cut in cuts:
                         for cutsegment in normBackgrounds[background][region]['cuts']:
@@ -1050,7 +1050,7 @@ if normBackgrounds is not None:
 
                 if len(cutList)>0:
 
-                    scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]
+                    scaleFactor = list(normBackgrounds[background][region]['scalefactor'].keys())[0]
 
                     normBackgroundNuisances[background][region] = { }
 
@@ -1058,20 +1058,20 @@ if normBackgrounds is not None:
                     normBackgroundNuisances[background][region]['cuts'] = cutList
                     normBackgroundNuisances[background][region]['scalefactorFromData'] = False if (region=='all' and scaleFactor=='1.00') else True
 
-            if len(normBackgroundNuisances[background].keys())>0:
+            if len(list(normBackgroundNuisances[background].keys()))>0:
 
                 if not exclusiveSelection and hasattr(opt, 'doHadd') and not opt.doHadd:
                     # Tricky because we can't define a weight for one sample and one cut!
                     # We need to run only on the background to which the SF apply. For other samples, L673 saves us!
                     for othersample in samples:
                         if othersample!=background:
-                            print 'Error: scale factors for', background, 'do not have exclusive selection: please run on this sample separately!'
+                            print('Error: scale factors for', background, 'do not have exclusive selection: please run on this sample separately!')
                             exit()
 
                 for region in normBackgrounds[background]:    
                     if region in normBackgroundNuisances[background]:
 
-                        scaleFactor = normBackgrounds[background][region]['scalefactor'].keys()[0]  
+                        scaleFactor = list(normBackgrounds[background][region]['scalefactor'].keys())[0]  
                         scaleFactorError = normBackgrounds[background][region]['scalefactor'][scaleFactor]
                         scaleFactorRelativeError = float(scaleFactorError)/float(scaleFactor)                    
 

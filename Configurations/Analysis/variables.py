@@ -1368,10 +1368,10 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
         # For FastSim pTmiss 
         if isShape and 'Fast' in opt.tag and 'FastReco' not in opt.tag:
 
-            variableList = variables.keys()
+            variableList = list(variables.keys())
             for variable in variableList:
 
-                if 'cuts' not in variables[variable]: variables[variable]['cuts'] = [ x for x in cuts.keys() if '_reco' in x ]
+                if 'cuts' not in variables[variable]: variables[variable]['cuts'] = [ x for x in list(cuts.keys()) if '_reco' in x ]
  
                 variables[variable+'_gen'] = { }
                 for key in variables[variable]:

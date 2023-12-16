@@ -124,7 +124,7 @@ for mStop in range( 150,  826, 25):
     elif mStop<=325: datasetName += '250to350'
     elif mStop<=400: datasetName += '350to400'
     elif mStop<=825: datasetName += '400to825'
-    else: print 'Squark top mass', mStop, 'not available'
+    else: print('Squark top mass', mStop, 'not available')
 
     for massSplit in [ 87, 100, 125, 150, 175 ]:
             

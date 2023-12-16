@@ -104,7 +104,7 @@ if __name__ == '__main__':
     plot['total_background'] = { 'isData' : 0, 'isSignal' : 0, 'nameHR' : 'SM Processes' }
 
     if refmasspoint=='SM':
-        for sample in plot.keys():
+        for sample in list(plot.keys()):
             if plot[sample]['isSignal']:
                 plot[sample]['isSignal'] = 0
 
@@ -166,7 +166,7 @@ if __name__ == '__main__':
 
                         for iteration in range(4):
                             if (iteration!=2 or opt.unblind) and (iteration!=3 or not opt.nosignal): table.write('\\hline\n')
-                            for sample in plot.keys():
+                            for sample in list(plot.keys()):
 
                                 if iteration==0 and (plot[sample]['isData'] or plot[sample]['isSignal'] or sample=='total_background'): continue
                                 if iteration==1 and sample!='total_background': continue
