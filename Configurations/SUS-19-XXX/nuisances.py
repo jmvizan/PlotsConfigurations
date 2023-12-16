@@ -375,7 +375,7 @@ if addMT2Shapes:
 # mt2ll ZZ (from k-factors)
 
 # mt2ll signal
-if signalReco=='fast' and fastsimMetType!='reco': 
+if signalReco=='fast' and fastsimMetType!='reco' and '_NoPtMissFast' not in opt.tag: 
     if fastsimMetType=='average' or not isFillShape:
         nuisances['ptmissfastsim']  = {
             'name'  : 'ptmissfastsim', # mismodeling correlated through the years?

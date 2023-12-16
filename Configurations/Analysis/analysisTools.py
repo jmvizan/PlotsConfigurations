@@ -545,7 +545,7 @@ def exclusionPlot(opt, plotoption='2'):
     fitOption = 'Blind'
     if opt.unblind:
         fitOption = 'Both'
-        if plotoption!='2' and (len(tagList)==1 or tagList[0]!=tagList[1]):
+        if plotoption!='2' and (len(tagList)==1 or tagList[0]!=tagList[1]) and 'significance' not in opt.option.lower():
             fitOption = 'Expected' if 'expected' in opt.option.lower() else 'Observed'
 
     sigset = ','.join(getSignalList(opt, opt.sigset, tagList[0]))
@@ -562,7 +562,11 @@ def exclusionPlot(opt, plotoption='2'):
         refTags = '-'.join([ tagList[x] for x in range(1,len(tagList)) ])
         plotCommandList.append('--compareto='+refTags)
     if plotoption=='0': plotCommandList.append('--nofillempties')
-    if '2sigma' in opt.option.lower(): plotCommandList.append('--add2sigma')
+    if 'significance' in opt.option.lower(): 
+        plotCommandList.append('--dosignificance')
+        plotCommandList.append('--add2sigma')
+        if len(tagList)==1: plotCommandList.append('--compareto='+tagList[0])
+    elif '2sigma' in opt.option.lower(): plotCommandList.append('--add2sigma')
 
     os.system('analyzeLimits.py '+' '.join(plotCommandList))
 

@@ -1242,6 +1242,9 @@ signalSet = signalSet.split(':')[-1]
 
 sigSetList = signalSet.split(',')
 
+if 'EventEven' in opt.tag: XSWeight += '*((event%2)==0)'
+if 'EventOdd'  in opt.tag: XSWeight += '*((event%2)==1)'
+
 for sigSetItem in sigSetList:
 
     if 'EOY' in sigSetItem:

@@ -161,14 +161,31 @@ def plotNuisances(opt):
    opt.samplesFile = commonTools.getCfgFileName(opt, 'samples')
    opt.option += 'keepratioplots'
 
-   for year in opt.year.split('-'):
+   yearList = opt.year.split('-') if 'merge' not in opt.option else [ opt.year ]
+
+   for year in yearList:
        for tag in opt.tag.split('-'):
 
            opt2 = copy.deepcopy(opt)
            opt2.year, opt2.tag = year, tag
-           samples, cuts, variables, nuisances = commonTools.getDictionaries(opt2)
-     
+
            singleNuisances = {}
+
+           if year.split('-')>1:
+
+               outputNuisances =  '_'.join([ 'nuisances', year, tag, opt.sigset+'.py' ])
+               commonTools.mergeDataTakingPeriodShapes(opt, year, tag, opt.fileset[1:], '', 'None', commonTools.getCfgFileName(opt, 'nuisances'), outputNuisances, opt.verbose)
+
+               samples, cuts, variables = commonTools.getDictionaries(opt2, 'variables')
+               nuisances = {}
+               handle = open(outputNuisances,'r')
+               exec(handle)
+               handle.close()
+               os.system('rm -f '+outputNuisances)
+
+           else:           
+
+               samples, cuts, variables, nuisances = commonTools.getDictionaries(opt2)
 
            for nuisance in nuisances:
                if nuisance=='stat' or ('type' in nuisances[nuisance] and nuisances[nuisance]['type']=='shape'):
