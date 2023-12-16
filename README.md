@@ -1,21 +1,17 @@
-# PlotsConfigurations
-Plots configuration for mkShapes, mkPlot, mkDatacards
+## Installation of the code
 
-To be downloaded anywhere, but remember to do 'cmsenv' of the cmssw release you are using:
+The code used is documented here:
 
-    git clone git@github.com:latinos/PlotsConfigurations.git
-    
-E.g. :
+    https://github.com/scodella/setup/blob/13.6TeV/SetupAnalysis.sh
 
-     mkShapes.py --pycfg=test/configuration.py  --inputDir=/media/data/amassiro/LatinoTrees/50ns/
-    
-See subfolders for detailed instructions.
+To install, try this
 
-The three steps are:
+    setenv SCRAM_ARCH el9_amd64_gcc12
+    cmsrel CMSSW_13_3_1
+    cd CMSSW_13_3_1/src
+    cmsenv
+    git clone --branch 13.6TeV https://github.com/scodella/setup LatinosSetup
+    ./LatinosSetup/SetupAnalysis.sh SUS23002
 
-    mkShape: creates a root file with a lot of histograms
-    
-    mkPlot: merge the histograms into canvases and saves images
-    
-    mkDatacards: merge the histograms into a root file and a text datacard digestible by combine
+Copy the file LatinoAnalysis/Tools/python/userConfig_TEMPLATE.py to LatinoAnalysis/Tools/python/userConfig.py and edit it to reflect your local paths. This is needed for batch jobs submission.
 
