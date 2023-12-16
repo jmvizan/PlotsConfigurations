@@ -720,7 +720,7 @@ def plotFastSimLeptonEfficiencies(opt):
             os.system('./mkFastSimDYMorePlots.py '+year+' DY')
         else:                                                 
             for signal in [ 'T2tt_mStop-525_mLSP-350', 'T2tt_mStop-525_mLSP-438' ]:
-	        os.system('./mkFastSimDYMorePlots.py '+year+' '+signal)
+                os.system('./mkFastSimDYMorePlots.py '+year+' '+signal)
 
 ### Miscellanea
 

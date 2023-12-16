@@ -1393,8 +1393,7 @@ elif 'Validation' in opt.tag or 'Signal' in opt.tag:
                                           'CRbins' : [1, 4] 
                                       }
 
-	    if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'FakeValidationRegion' in opt.tag:
-
+            if 'ZZValidationRegion' in opt.tag or 'ttZValidationRegion' in opt.tag or 'DYValidationRegion' in opt.tag or 'WZtoWWValidationRegion' in opt.tag or 'WZValidationRegion' in opt.tag or 'FakeValidationRegion' in opt.tag:
 
                 variables['mt2llOptimHigh'] = {   'name'  : mt2ll,                   #   variable name
                                                   'range' : (mt2llOptimHighBin,[1]), #   variable range

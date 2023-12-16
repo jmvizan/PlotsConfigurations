@@ -156,7 +156,7 @@ def getCfgFileName(opt, cfgName):
         print('getCfgFileName error: '+cfgName+' File line not found in '+opt.configuration)
         exit() 
 
-    return processOutput.split('=')[1].replace(' ','').replace('\'','').split('.')[0]+'.py'
+    return processOutput.decode().split('=')[1].replace(' ','').replace('\'','').split('.')[0]+'.py'
 
 def getDictionaries(optOrig, lastDictionary='nuisances'):
 
@@ -175,7 +175,7 @@ def getDictionaries(optOrig, lastDictionary='nuisances'):
 
         if os.path.exists(dictionaryCfg):
             handle = open(dictionaryCfg,'r')
-            exec(handle)
+            exec(handle.read())
             handle.close()
         else:
             print('    Error: sample cfg file', dictionaryCfg, 'not found')

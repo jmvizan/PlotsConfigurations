@@ -916,14 +916,14 @@ if hasattr(opt, 'batchQueue') and not hasattr(opt, 'dryRun'):
     for cut in cutList:
 
         if 'expr' in cuts[cut]:
-	    expr = cuts[cut]['expr']	
+            expr = cuts[cut]['expr']
             del cuts[cut]['expr']
 
             if 'weight' in cuts[cut]:
                 expr = '('+expr+')*'+cuts[cut]['weight']
                 del cuts[cut]['weight']
 
-        cuts[cut] = expr
+            cuts[cut] = expr
 
 # For postfit plots (old style)
 
