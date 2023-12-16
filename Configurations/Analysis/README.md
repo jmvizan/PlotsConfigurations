@@ -1,4 +1,4 @@
-:::Installation of the code
+Installation of the code
 
 The code used is documented here:
 
@@ -6,6 +6,7 @@ The code used is documented here:
 
 To install, try this
 
+    setenv SCRAM_ARCH el9_amd64_gcc12
     cmsrel CMSSW_13_3_1
     cd CMSSW_13_3_1/src
     cmsenv
