@@ -2,6 +2,7 @@ import os
 import copy
 import ROOT
 import math
+import ctypes
 import PlotsConfigurations.Tools.commonTools  as commonTools
 import PlotsConfigurations.Tools.latinoTools  as latinoTools
 import PlotsConfigurations.Tools.combineTools as combineTools
@@ -264,16 +265,16 @@ def ptRelInput(opt):
 
     for cutName in cutNameList:
         
-        errorDataYields = ROOT.double()
+        errorDataYields = ctypes.c_double()
         if 'JEU' in cutName: outputTemplates[cutName]['histo_DATA'] = copy.deepcopy(outputTemplates['_'.join([ cutName.split('_')[x] for x in range(3) ])]['histo_DATA'])
-        dataYields = outputTemplates[cutName]['histo_DATA'].IntegralAndError(-1,-1,errorDataYields) 
-        dataPS = pow(dataYields/errorDataYields, 2)/dataYields
+        dataYields = outputTemplates[cutName]['histo_DATA'].IntegralAndError(-1,-1,errorDataYields)
+        dataPS = pow(dataYields/errorDataYields.value, 2)/dataYields
 
         if doLCorrections:
             jetCutName = cutName if 'histo_Jet' in outputTemplates[cutName] else '_'.join([ cutName.split('_')[x] for x in range(3) ])
-            errorJetYields = ROOT.double()
+            errorJetYields = ctypes.c_double()
             jetYields = outputTemplates[jetCutName]['histo_Jet'].IntegralAndError(-1,-1,errorJetYields)
-            jetPS = pow(jetYields/errorJetYields, 2)/jetYields
+            jetPS = pow(jetYields/errorJetYields.value, 2)/jetYields
 
         for template in outputTemplates[cutName]:
             if 'histo_Jet' in template: 
@@ -946,11 +947,11 @@ def getPtRelEfficiency(opt, inputFile, fileType, btagWP, ptbin, systematic):
     histoPass = inputFile.Get(histoPath.replace('BTAGSTATUS','Pass'))
     histoFail = inputFile.Get(histoPath.replace('BTAGSTATUS','Fail'))
 
-    errorPassYield, errorFailYield = ROOT.double(), ROOT.double()
+    errorPassYield, errorFailYield = ctypes.c_double(), ctypes.c_double()
     passYield = histoPass.IntegralAndError(-1,-1,errorPassYield)
     failYield = histoFail.IntegralAndError(-1,-1,errorFailYield)
 
-    if opt.verbose and fileType=='fit' and (errorPassYield==0. or errorFailYield==0.): 
+    if opt.verbose and fileType=='fit' and (errorPassYield.value==0. or errorFailYield.value==0.): 
         print('    Warning: missing erros in ML fit for', btagWP, ptbin, systematic)
 
     efficiency = passYield/(passYield+failYield)
@@ -959,13 +960,13 @@ def getPtRelEfficiency(opt, inputFile, fileType, btagWP, ptbin, systematic):
 
     if fileType!='shapes': # Use a trick for the time being
         histoTotal = inputFile.Get('shapes_fit_s/total_signal')
-        errorTotalYield = ROOT.double()
+        errorTotalYield = ctypes.c_double()
         totalYield = histoTotal.IntegralAndError(-1,-1,errorTotalYield)
 
-        if errorPassYield*errorFailYield!=0:
-            correlation = (pow(errorTotalYield,2)-pow(errorPassYield,2)-pow(errorFailYield,2))/(2*errorPassYield*errorFailYield)
+        if errorPassYield.value*errorFailYield.value!=0:
+            correlation = (pow(errorTotalYield.value,2)-pow(errorPassYield.value,2)-pow(errorFailYield.value,2))/(2*errorPassYield.value*errorFailYield.value)
 
-    return efficiency, efficiencyError(passYield, failYield, errorPassYield, errorFailYield, correlation), passYield+failYield
+    return efficiency, efficiencyError(passYield, failYield, errorPassYield.value, errorFailYield.value, correlation), passYield+failYield
 
 def getPtRelFitResults(opt, btagWP, ptbin, systematic):
 
@@ -1116,8 +1117,8 @@ def makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos, resultToPlot):
                         if result in btaghisto.lower():
 
                             if systematic=='FinalSystematics': 
-                                bTagPerfHistos[tag][systematic][btaghisto].SetFillStyle(3005);
-                                bTagPerfHistos[tag][systematic][btaghisto].SetFillColor(2);
+                                bTagPerfHistos[tag][systematic][btaghisto].SetFillStyle(3005)
+                                bTagPerfHistos[tag][systematic][btaghisto].SetFillColor(2)
                                 drawOption = 'pe2'
 
                             if systematic=='Final':
@@ -1125,7 +1126,7 @@ def makeBTagPerformancePlot(opt, btagWP, bTagPerfHistos, resultToPlot):
                                 legend.AddEntry(bTagPerfHistos[tag][systematic+'Systematics'][btaghisto], 'Scale factor uncertainty', 'f')
 
                             bTagPerfHistos[tag][systematic][btaghisto].SetMarkerStyle(markerStyle+styleOffset)
-                            bTagPerfHistos[tag][systematic][btaghisto].SetMarkerColor(markerColor)                
+                            bTagPerfHistos[tag][systematic][btaghisto].SetMarkerColor(markerColor)  
                             bTagPerfHistos[tag][systematic][btaghisto].Draw(drawOption)
                             drawOption = 'psame'
                             styleOffset = 4
@@ -1237,6 +1238,9 @@ def computeFinalScaleFactors(opt):
 
                     if len(list(systematicVariations.keys()))==2:
                         if max(abs(systematicVariations['Up']),abs(systematicVariations['Down']))>0.1:
+                            if systematic in opt.systematicNuisances and min(abs(systematicVariations['Up']),abs(systematicVariations['Down']))>0.1:
+                                for variation in [ 'Up', 'Down' ]:
+                                    systematicVariations[variation] = wpSF[systematic+variation][ptbin]['scaleFactor']-centralSF
                             if min(abs(systematicVariations['Up']),abs(systematicVariations['Down']))>0.02:
                                 if abs(systematicVariations['Up'])>abs(systematicVariations['Down']): del systematicVariations['Up']
                                 else: del systematicVariations['Down']
@@ -1385,11 +1389,13 @@ def plotFinalBTagScaleFactors(opt):
 
 def storeBTagScaleFactors(opt):
 
+    ROOT.gROOT.ProcessLine('.L BTagCalibrationStandalone.cpp+')
+
     operatingPoints = { 'L'   : ROOT.BTagEntry.OperatingPoint.OP_LOOSE, 
                         'M'   : ROOT.BTagEntry.OperatingPoint.OP_MEDIUM, 
                         'T'   : ROOT.BTagEntry.OperatingPoint.OP_TIGHT,
-                        'VT'  : ROOT.BTagEntry.OperatingPoint.OP_LOOSE,
-                        'VVT' : ROOT.BTagEntry.OperatingPoint.OP_MEDIUM
+                        'XT'  : ROOT.BTagEntry.OperatingPoint.OP_EXTRATIGHT,
+                        'XXT' : ROOT.BTagEntry.OperatingPoint.OP_EXTRAEXTRATIGHT
                        } 
 
     bTagPerfResults(opt, action='store')
@@ -1400,7 +1406,10 @@ def storeBTagScaleFactors(opt):
 
     for tag in opt.bTagPerfResults:
  
-        csvDirectory = '/'.join([ '.', 'CSVFiles', tag, '' ])
+        if 'publish' in opt.option.lower():
+            csvDirectory = '../../../btv-scale-factors/'+opt.csvCampaign+'/csv/btagging_fixedWP_SFb/' 
+        else:
+            csvDirectory = '/'.join([ '.', 'CSVFiles', tag, opt.year, '' ])
         os.system('mkdir -p '+csvDirectory)
 
         btagAlgorithms = {}
@@ -1413,24 +1422,27 @@ def storeBTagScaleFactors(opt):
         for btagAlgorithm in btagAlgorithms:
              
             csvFileName = btagAlgorithm if len(btagAlgorithms[btagAlgorithm])>1 else btagAlgorithms[btagAlgorithm][0]
-            csvFile = ROOT.BTagCalibration(csvFileName+'_' +opt.method+opt.fitOption+'.csv')
+            csvFileName = csvFileName.replace(btagAlgorithm, opt.csvBTagAlgorithms[btagAlgorithm])+'_' +opt.csvMethod
+            if 'publish' in opt.option.lower(): csvFileName += opt.option.lower().replace('publish_','_').replace('publish','_')
+            else: csvFileName += opt.fitOption
+            csvFile = ROOT.BTagCalibration(csvFileName+'.csv')
 
             for btagWP in sorted(btagAlgorithms[btagAlgorithm]):
                 for systematic in opt.csvSystematics:
                     if opt.csvSystematics[systematic] in opt.bTagPerfResults[tag][btagWP]:
                         for ptbin in opt.bTagPerfResults[tag][btagWP][opt.csvSystematics[systematic]]:
-  
-                            ptMin = float(ptbin.replace('Pt','').split('to')[0])
-                            ptMax = float(ptbin.replace('Pt','').split('to')[1])
-                            params = ROOT.BTagEntry.Parameters(operatingPoints[btagWP.replace(btagAlgorithm,'')], opt.method.lower(), systematic, 
-                                                               ROOT.BTagEntry.FLAV_B, -opt.maxJetEta, opt.maxJetEta, ptMin, ptMax, 0., 1.)
+                            if opt.bTagPerfResults[tag][btagWP][opt.csvSystematics[systematic]][ptbin]['scaleFactor']>0.:
 
-                            SFFun = ROOT.TF1 ('SFFun', str(opt.bTagPerfResults[tag][btagWP][opt.csvSystematics[systematic]][ptbin]['scaleFactor']), ptMin, ptMax)
-                            entry = ROOT.BTagEntry(SFFun, params)
-                            csvFile.addEntry(entry)
-           
-            with open(csvDirectory+'/'+csvFileName+'_' +opt.method+opt.fitOption+'.csv', 'w') as f:
-                f.write(csvFile.makeCSV())
+                                ptMin = float(ptbin.replace('Pt','').split('to')[0])
+                                ptMax = float(ptbin.replace('Pt','').split('to')[1])
+                                params = ROOT.BTagEntry.Parameters(operatingPoints[btagWP.replace(btagAlgorithm,'')], opt.csvMethod, systematic,
+                                                                   ROOT.BTagEntry.FLAV_B, 0., opt.maxJetEta, ptMin, ptMax, 0., 1.)
+
+                                entry = ROOT.BTagEntry(str(opt.bTagPerfResults[tag][btagWP][opt.csvSystematics[systematic]][ptbin]['scaleFactor']), params)
+                                csvFile.addEntry(entry) 
+
+            with open(csvDirectory+'/'+csvFileName+'.csv', 'w') as f:
+                f.write(csvFile.makeNewCSV())
                                 
 ### Working points
 

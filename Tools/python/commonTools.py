@@ -460,13 +460,13 @@ def checkProxy(opt):
     proc=subprocess.Popen(cmd, stderr = subprocess.PIPE,stdout = subprocess.PIPE, shell = True)
     out, err = proc.communicate()
 
-    if 'Proxy not found' in err :
+    if 'Proxy not found' in err.decode():
         print('WARNING: No GRID proxy -> Get one first with:')
         print('voms-proxy-init -voms cms -rfc --valid 168:0')
         exit()
 
     timeLeft = 0
-    for line in out.split("\n"):
+    for line in out.decode().split("\n"):
         if 'timeleft' in line : timeLeft = int(line.split(':')[1])
 
     if timeLeft < 24 :

@@ -114,10 +114,12 @@ def remakeMissingShapes(opt, method='resubmit'):
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'RuntimeError'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'ImportError'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'OSError'): missingShape = True
+            if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'TypeError:'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'Segmentation fault'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'logic_error'): missingShape = True 
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'AttributeError'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), '(core dumped)'): missingShape = True
+            if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), '*** Break *** bus error'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), '*** Break *** segmentation violation'): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.log'), 0) and commonTools.hasString(shFile.replace('.sh','.log'), 'EXCEED'): missingShape = True
             if not commonTools.isGoodFile(shFile.replace('.sh','.jid'), 0) and not commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
@@ -135,6 +137,8 @@ def remakeMissingShapes(opt, method='resubmit'):
                 print('  Remaking missing shape for', opt.year, opt.tag, sample)
                 if opt.dryRun: print(makeShapeCommand)
                 else: os.system(makeShapeCommand)
+            
+            elif commonTools.isGoodFile(shFile.replace('.sh','.err'), 0): print('  Job with error to check:', opt.year, opt.tag, sample)
 
 ### Plots
 
@@ -172,7 +176,7 @@ def mkPlot(opt, year, tag, sigset, nuisances, fitoption='', yearInFit='', extraO
     plotCommand = 'mkPlot.py --pycfg='+opt.configuration+' --tag='+lumiYear+tag+' --sigset='+sigset+' --inputFile='+shapeFileName+' --outputDirPlots='+plotsDir+' --maxLogCratio=1000 --minLogCratio=0.1 --maxLogC=1000  --scaleToPlot=2 --nuisancesFile='+nuisances+' --fileFormats=\'png,root\''
 
     if 'normalizedCR' in opt.option: plotCommand += ' --plotNormalizedCRratio=1' # This is not yet re-implemented in latino's mkPlot.py
-    elif 'normalized' in opt.option: plotCommand += ' --plotNormalizedDistributions'
+    elif 'normalized' in opt.option: plotCommand += ' --plotNormalizedDistributions --plotNormalizedIncludeData'
     if plotAsExotics:                plotCommand += ' --showDataVsBkgOnly'       # This is not yet re-implemented in latino's mkPlot.py
     if 'noyields' not in opt.option: plotCommand += ' --showIntegralLegend=1'
     if 'saveC'        in opt.option: plotCommand  = plotCommand.replace('--fileFormats=\'','--fileFormats=\'C,')

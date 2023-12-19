@@ -416,7 +416,7 @@ if 'SM' in opt.sigset or 'MC' in opt.sigset:
             else: qcdMuTrees += ptHatTrees
 
         if opt.method+'Kinematics' in opt.tag or 'DataKinematics' in opt.tag:
-            samples['QCDMu'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight               , 'isSignal' : 0 }
+            samples['QCDMu'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight               , 'isSignal' : 1 }
 
         elif opt.method+'Templates' in opt.tag:
             samples['bjets'] = { 'name' : qcdMuTrees, 'weight'   : muJetKinematicWeight+'*'+muJetFromB, 'isSignal' : bIsSignal }
@@ -574,5 +574,8 @@ if hasattr(opt, 'getCampaignParameters') and opt.getCampaignParameters:
         opt.bTemplateCorrector = bTemplateCorrector
 
     elif opt.action=='storeBTagScaleFactors':
+        opt.csvCampaign = '2022_'+opt.campaign
+        opt.csvMethod = 'ptrel' if opt.method=='PtRel' else 'sys8'
+        opt.csvBTagAlgorithms = { 'DeepJet' : 'deepJet', 'ParticleNet' : 'particleNet', 'ParT' : 'robustParticleTransformer' }
         opt.csvSystematics = csvSystematics
 
