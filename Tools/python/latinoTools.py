@@ -107,7 +107,6 @@ def remakeMissingShapes(opt, method='resubmit'):
     for shFile in commonTools.getLogFileList(opt, 'sh'):
 
         sample = shFile.split('/')[3]
-
         if not commonTools.isGoodFile(sampleShapeDir+'/plots_'+opt.year+opt.tag+'_ALL_'+sample+'.root', 0):
             missingShape = False
             if commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
