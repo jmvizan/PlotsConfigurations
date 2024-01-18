@@ -1,6 +1,7 @@
 import os
 import copy
 import ROOT
+import ctypes
 import math
 import ctypes
 import PlotsConfigurations.Tools.commonTools  as commonTools
@@ -596,30 +597,130 @@ def ptRelInputForPtRelTools(opt):
                                                                 templateNuisance.SetTitle(templateNuisanceName.replace(variable.split('_')[1]+'_'+tagCondition,btagWP+btagCut))
                                                                 templateNuisance.Write()
 
+
 def system8Input(opt):
 
-    print('Please, complete me!')
 
-    motherFile = commonTools.openShapeFile(opt.shapedir, opt.year, opt.tag.split('__')[0], 'SM', 'SM')
+    #You run this method with ./runAnalysis.py --action=shapesForFit --year=CAMPAIGNNAME --tag=System8Templates.mujetpt.mujeteta/PtRelTemplates.mujetpt.mujeteta
+    #For example ./runAnalysis.py --action=shapesForFit --year=Summer22 --tag=System8Templates.mujetpt.mujeteta
+
+    
+    #input datafile are at: opt.shapedir/opt.year/System8Templates{typeOfSys}{VarUpOrDown}/Samples/plots_Summer22System8Templates{typeOfSys}{VarUpOrDown}_ALL_DATA.root
+    # for example: Shapes/Summer22/System8TemplatesAwayJetUp/Samples/plots_Summer22System8TemplatesAwayJetUp_ALL_DATA.root
+
+    #input mc files are at: opt.shapedir/opt.year/System8Templates{typeOfSys}{VarUpOrDown}.mujetpt.mujeteta/Samples/plots_Summer22System8TemplatesAwayJetDown.mujetpt.mujeteta_ALL_{bjets, light}.root
+    # for example: Shapes/Summer22/System8TemplatesAwayJetDown.mujetpt.mujeteta/Samples/plots_Summer22System8TemplatesAwayJetDown.mujetpt.mujeteta_ALL_light.root
+    
+
+
+    fulltag = opt.tag.split('.')
+    basetag = opt.tag.split('.')[0]
+    suffixtag = ''#this is the mujetpt.mujeteta
+    for i in range(1, len(fulltag)): suffixtag = suffixtag + '.' +  fulltag[i]
+    #print "basetag=", basetag
+    #print "suffixtag=", suffixtag
+
+
     
     samples, cuts, variables = commonTools.getDictionariesInLoop(opt.configuration, opt.year, opt.tag, opt.sigset, 'variables')
+
+
+    #print "samples:"
+    #for i in samples: print i
+    #print "----------"
+    #print "cuts (This is the folder):"
+    #for i in cuts: print i
+    #print "----------"
+    #print "variables:"
+    #for i in variables: print i
+    #print "----------"
+    
+    # example of "variables":
+    # ptrel_ParticleNetVVT
+    # ptrel_ParTL
+    # ptrel_DeepJetT
+    # ptrel_ParTVT
+    # ptrel_ParTT
+    # ptrel_ParticleNetT
+    # ptrel_ParTVVT
+    # ptrel_DeepJetM
+    # ptrel_DeepJetL
+    # ptrel
+    # ptrel_ParTM
+    # ptrel_ParticleNetM
+    # ptrel_ParticleNetL
+    # ptrel_DeepJetVVT
+    # ptrel_DeepJetVT
+    # ptrel_ParticleNetVT
+
+
+
+
+
 
     outputDir = '/'.join([ './System8Input', opt.year, opt.tag.split('__')[0] ])
     os.system('mkdir -p '+outputDir)
 
-    templateMap = { 'Data' : { 'lepton_in_jet' : [ 'n_pT'   , 'ntag_pT'   , 'p_pT'   , 'ptag_pT'    ] },
-                    'QCD'  : { 'lepton_in_jet' : [ 'n_pT'   , 'ntag_pT'   , 'p_pT'   , 'ptag_pT'    ],
-                               'MCTruth'       : [ 'n_pT_b' , 'ntag_pT_b' , 'p_pT_b' , 'ptag_pT_b', 'n_pT_cl', 'ntag_pT_cl', 'p_pT_cl', 'ptag_pT_cl' ] } }
 
-    for dataset in list(templateMap.keys()):
-        for btagWPcut in cuts:
-            if btagWPcut.count('_')==2 and 'Up' not in btagWPcut.split('_')[-1] and 'Down' not in btagWPcut.split('_')[-1]:
-                btagWP = btagWPcut.split('_')[2]
-                for systcut in cuts:
-                    if systcut.count('_')>=2 and btagWP in systcut.split('_')[2]:
-                        systematic = 'Central' if systcut.count('_')==2 else systcut.split('_')[3]
-                        outputFileName = '_'.join([ 'S8', dataset, systematic, btagWP, 'anyEta.root' ])
+    mapSyst = {'Central' : {''} , 'AwayJet': {'Up', 'Down'}, 'MuPt': {'Up', 'Down'}, 'MuDR': {'Up', 'Down'}, 'JEU': {'Up', 'Down'}}
+    #if you only want to run Central:
+    #mapSyst = {'Central' : {''}}
 
+    mapDataset = {'DATA'   : { 'lepton_in_jet' : [ 'n_pT'   , 'ntag_pT'   , 'p_pT'   , 'ptag_pT'    ] },
+                  'bjets'  : { 'MCTruth'       : [ 'n_pT_b' , 'ntag_pT_b' , 'p_pT_b' , 'ptag_pT_b'  ] },
+                  'light'  : { 'MCTruth'       : [ 'n_pT_cl', 'ntag_pT_cl', 'p_pT_cl', 'ptag_pT_cl' ] } }
+
+    ptEdges_Example = []
+    ptRelRange_Example = []
+    for syst in mapSyst:
+        print ("  syst=", syst)
+        syst_name = syst
+        isCentral = False
+        if 'Central' in syst:
+            isCentral = True
+            syst_name = ''
+        ###print "    isCentral =",  isCentral
+        for sysvar in mapSyst[syst]:
+            ###print "      sysvar=", '_' + sysvar + '_'
+
+            #define variable to book only the lepton_in_jet histograms for MC the first time we pass
+            isSecondMC= False
+            EnteredBjets = False
+            EnteredLight = False
+
+            for dataset_b_l_data in mapDataset.keys():#loop to DATA, bjets, and light
+                if ('bjets' in dataset_b_l_data): EnteredBjets = True
+                if ('light' in dataset_b_l_data): EnteredLight = True
+                if EnteredBjets and EnteredLight: isSecondMC = True
+
+                dataset_qcd_data = 'QCD'
+                isDATA= False
+                if 'DATA' in dataset_b_l_data:
+                    isDATA = True
+                    dataset_qcd_data = 'Data'
+
+                print ("        the dataset is", dataset_b_l_data)
+                dataset_suffix = dataset_b_l_data
+
+                tag = basetag + syst_name + sysvar
+                if not isDATA: tag = tag + suffixtag
+
+                if 'JEU' in syst_name and isDATA:  tag = basetag 
+                inputFile = commonTools.openSampleShapeFile(opt.shapedir, opt.year, tag, dataset_suffix)
+                ###print "        -->inputFile name: ", inputFile.GetName()
+                
+                ###print "        number of elements in cuts =", len(cuts)                
+                ###print "        number of elements in variables =", len(variables)                
+                for i_variables in variables:
+                    print ("          variables=", i_variables)
+                    if len(i_variables.split('_')) == 2:
+                        btagWP = i_variables.split('_')[1]
+                        #print "          btagWP=", btagWP
+                        outputFileName = '_'.join([ 'S8', dataset_qcd_data, syst + sysvar, btagWP, 'anyEta.root' ])
+                        print ("          outputFileName=", outputFileName)
+
+
+                        #First loop to cuts to define ptEdges
                         ptEdges = []
                         for ptbin in cuts:
                             if '_' not in ptbin: 
@@ -627,64 +728,175 @@ def system8Input(opt):
                                     if binedge not in ptEdges:
                                         ptEdges.append(binedge)
                         ptEdges.sort()
-
+                        ###print "          ptEdges=", ptEdges
                         ptRelRange = variables['ptrel']['range']
+                        ###print "          ptRelRange=", ptRelRange
 
-                        outputHistogram = {}
+                        #Vizan: I eliminated a layer of loops so I use a dummy loop with one iteration
+                        #to avoid reindenting everything
+                        #instead of looping to lepton_in_jet and MCTruth:
+                        #  for data I book and fill the histograms under ['lepton_in_jet', selection] (example: ['lepton_in_jet', 'ntag_pT'])
+                        #  for MC (bjets, or light):
+                        #     I book the histograms and filled them under ['MCTruth', selection_b/cl] (example: ['lepton_in_jet', 'ntag_pT_b'])
+                        #     I book the histograms only the first time (bjets or light) under ['lepton_in_jet', 'selection'] (example: ['lepton_in_jet', 'ntag_pT'])
+                        #      and fill them in the corresponding iteration (bjets or light)
+                        #     In a separate loop the histograms for bjets and light are added
 
-                        for directory in templateMap[dataset]:
+                        for idummy in range(0, 1):
+                            ###print "            isSecondMC", isSecondMC
+                            #i_cuts has the structure: ptrange_{'AwayJetTag, ''}
+                            #for example for Pt200to300 we have 'Pt200to300' and 'Pt200to300_AwayJetTag'
+                    
+
+                            if isDATA or (not isDATA and not isSecondMC): outputHistogram = {}
+
+
+                            directory = ''
+                            if isDATA: directory = 'lepton_in_jet'
+                            else: directory = 'MCTruth'
+
                             outputHistogram[directory] = {}
-                            for selection in templateMap[dataset][directory]:
+
+                            #for bjets and light I also will fill at once the lepton_in_jet histos (they are combined later)
+                            if not isDATA and not isSecondMC:
+                                ###print "            initializing outputHistogram['lepton_in_jet']"
+                                outputHistogram['lepton_in_jet'] = {}
+
+                            for selection in mapDataset[dataset_b_l_data][directory]:#loopt to for example: 'n_pT'   , 'ntag_pT'   , 'p_pT'   , 'ptag_pT'
 
                                 outputHistogram[directory][selection] = commonTools.bookHistogram(selection, [ ptEdges ], ptRelRange, selection)
 
-                                if dataset=='QCD' and directory=='lepton_in_jet': continue
+                                selection_for_lepton_in_jet = ''
+                                if dataset_qcd_data=='QCD':#bjets or light
+                                    if 'bjets' in dataset_b_l_data: selection_for_lepton_in_jet = selection.replace('_b', '')
+                                    if 'light' in dataset_b_l_data: selection_for_lepton_in_jet = selection.replace('_cl', '')
+                                    if selection_for_lepton_in_jet != 'n_pT' and selection_for_lepton_in_jet != 'ntag_pT' and  selection_for_lepton_in_jet != 'p_pT' and selection_for_lepton_in_jet != 'ptag_pT':
+                                        print ("ABORTING, UNKNOWN VALUE FOR selection_for_lepton_in_jet=", selection_for_lepton_in_jet)
+                                        print ("selection was=", selection)
+                                        return
 
-                                selectionList = [ ]
-                                if 'p' in selection: selectionList.append('AwayJetTag')
-                                if 'tag_' in selection: selectionList.append(btagWP)
-                                sample = 'bjets' if '_b' in selection else 'light' if '_cl' in selection else 'DATA'
+                                #For MC book the lepton_in_jet only the first time we enter (either bjets or light)
+                                if not isDATA and not isSecondMC: outputHistogram['lepton_in_jet'][selection_for_lepton_in_jet] = commonTools.bookHistogram(selection_for_lepton_in_jet, [ ptEdges ], ptRelRange, selection_for_lepton_in_jet)
+
+                                #this should never happen anyway
+                                if dataset_qcd_data=='QCD' and directory=='lepton_in_jet': continue
+
+
+                                ###print "              selection=", selection
+                                ###print "              sample=", dataset_b_l_data
  
-                                for ptbin in cuts:
-                                    if '_' not in ptbin:
-                                        
-                                        cutList = copy.deepcopy(selectionList)
-                                        cutList.insert(0, ptbin)
-                                        cutName = '_'.join(cutList)
-                                        motherHisto = motherFile.Get('/'.join([ cutName, 'ptrel', 'histo_'+sample ]))
+                                for dir_ptrange_nORp in cuts:
 
-                                        cutName = '_'.join(cutList)
-                                        motherHisto = motherFile.Get('/'.join([ cutName, 'ptrel', 'histo_'+sample ]))
+                                    ptrange = dir_ptrange_nORp.split('_')[0]
+                                    isAwayJet = False
+                                    if 'AwayJetTag' in dir_ptrange_nORp.split('_')[-1]: isAwayJet = True
 
-                                        ptValue = (float(ptbin.split('Pt')[1].split('to')[0])+float(ptbin.split('to')[1]))/2.
+                                    ###print "               ptbin=", dir_ptrange_nORp, " isAwayJet=", isAwayJet,  "prtange= ", ptrange
 
-                                        for ib in range(1, motherHisto.GetNbinsX()+1):
+                                    if not isAwayJet and 'p_' in selection: continue
+                                    if not isAwayJet and 'ptag_' in selection: continue
+                                    
+                                    if isAwayJet and 'n_' in selection: continue
+                                    if isAwayJet and 'ntag_' in selection: continue
 
-                                            ptRelValue = motherHisto.GetBinCenter(ib)
-                                            bin2D = outputHistogram[directory][selection].FindBin(ptValue, ptRelValue) 
-                                            outputHistogram[directory][selection].SetBinContent(bin2D, motherHisto.GetBinContent(ib))
-                                            outputHistogram[directory][selection].SetBinError(bin2D, motherHisto.GetBinError(ib)) 
+                                    string_motherHisto = ''
+                                            
+                                    if 'n_' in selection or 'p_' in selection: string_motherHisto = '/'.join([ dir_ptrange_nORp, 'ptrel', 'histo_'+dataset_b_l_data ])
+                                    elif 'ptag_' in selection or 'ntag_' in selection: string_motherHisto = '/'.join([ dir_ptrange_nORp, 'ptrel_' + btagWP, 'histo_'+dataset_b_l_data ])
+                                    else:
+                                        print ("we are in trouble cause I don't now which one is the motherHisto for selection=", selection)
+                                        return
 
-                        if dataset=='QCD':
-                            for selection in templateMap['QCD']['lepton_in_jet']:
+                                    ###print ("               string_motherHisto= ", string_motherHisto)
+
+                                    motherHisto = inputFile.Get(string_motherHisto)
+                                    ptValue = (float(ptrange.split('Pt')[1].split('to')[0])+float(ptrange.split('to')[1]))/2.
+                                    ###print "               ptValue=", ptValue
+
+                                    for ib in range(1, motherHisto.GetNbinsX()+1):
+
+                                        ptRelValue = motherHisto.GetBinCenter(ib)
+                                        bin2D = outputHistogram[directory][selection].FindBin(ptValue, ptRelValue) 
+                                        ###if ib == 1: print ("               ib==1: outputHistogram[directory=", directory, "][selection=", selection, "]=", motherHisto.GetBinContent(ib), " bin2D=", bin2D)
+
+                                        outputHistogram[directory][selection].SetBinContent(bin2D, motherHisto.GetBinContent(ib))
+                                        outputHistogram[directory][selection].SetBinError(bin2D, motherHisto.GetBinError(ib)) 
+
+                                #Vizan: Now I have finished all ptranges for a given region: for example n_tag
+                                #outputHistogram already set for data (but with scaled to the number of events if there was no prescale) under ['lepton_in_jet', selection]
+                                #outputHistogram already set for mc (bjets or light) under ['MCTruth', selection_b/cl]
                                 
-                                outputHistogram['lepton_in_jet'][selection].Add(outputHistogram['MCTruth'][selection+'_b'])
-                                outputHistogram['lepton_in_jet'][selection].Add(outputHistogram['MCTruth'][selection+'_cl'])
+                                #Vizan: I set outputHistogram for mc (bjets or light) under ['lepton_in_jet', selection]
+                                if dataset_qcd_data=='QCD':#bjets or light
+                                    if dataset_b_l_data =='bjets':
+                                        ###print "              filling lepton_in_jet for bjets"
+                                        outputHistogram['lepton_in_jet'][selection_for_lepton_in_jet].Add(outputHistogram['MCTruth'][selection_for_lepton_in_jet+'_b'])
+                                    if dataset_b_l_data =='light':
+                                        ###print "              filling lepton_in_jet for light"
+                                        outputHistogram['lepton_in_jet'][selection_for_lepton_in_jet].Add(outputHistogram['MCTruth'][selection_for_lepton_in_jet+'_cl'])
 
-                        outputFile = commonTools.openRootFile(outputDir+'/'+outputFileName, 'recreate')
 
-                        for directory in templateMap[dataset]:
 
-                            outputFile.mkdir(directory)
+                                #Vizan: Only for data I remove the prescale to recover the actual number of data events
+                                if isDATA:
+                                    errorDataYields = ctypes.c_double()
+                                    dataYields = outputHistogram['lepton_in_jet'][selection].IntegralAndError(-1, -1, -1, -1, errorDataYields)
+                                    dataPS = pow(dataYields/errorDataYields.value, 2)/dataYields
+                                    #print ("               for selection=", selection, "dataPS=", dataPS)
+                                    outputHistogram['lepton_in_jet'][selection].Scale(dataPS)
+
+
+                            #Vizan: for the second pass of MC (bjets or light) we update the file to write the histograms corresponding to the second flavor (either of _b or _cl)
+                            file_option = 'recreate'
+                            if not isDATA and isSecondMC: file_option = 'update'
+                            outputFile = commonTools.openRootFile(outputDir+'/'+outputFileName, file_option)
+
+
+                            if not isDATA and not isSecondMC: outputFile.mkdir(directory)#'MCTruth' directory
+                            if isDATA: outputFile.mkdir(directory)#'lepton_in_jet' directory
+
                             outputFile.cd(directory) 
 
-                            for selection in templateMap[dataset][directory]:
+                            for selection in mapDataset[dataset_b_l_data][directory]:#loopt to for example: 'n_pT'   , 'ntag_pT'   , 'p_pT'   , 'ptag_pT'
                                 outputHistogram[directory][selection].Write()
 
-                        outputFile.cd()
-                        outputFile.Write()
-                        outputFile.Close()
 
+
+                            outputFile.cd()
+                            outputFile.Write()
+                            outputFile.Close()
+
+
+            #Vizan: In this additional loop we pass first for WP and, then for (bjets or light). Instead of other way around
+            # The goal is simply to produce the histograms in the 'lepton_in_jet' for S8_QCD*.root rootfiles 
+            for i_variables in variables:
+
+                if len(i_variables.split('_')) == 2:
+                    btagWP = i_variables.split('_')[1]
+                    outFileName = '_'.join([ 'S8', 'QCD', syst + sysvar, btagWP, 'anyEta.root' ])
+                    outFile = commonTools.openRootFile(outputDir+'/'+outFileName, 'update')
+
+                    #Vizan: this could be done a little more elegantly
+                    outFile.mkdir('lepton_in_jet')
+                    outFile.cd('lepton_in_jet')
+
+                    
+                    for selection in ("n_pT"   , "ntag_pT"   , "p_pT"   , "ptag_pT"):
+
+                        h2b = outFile.Get("MCTruth/" + selection + "_b")
+                        h2Sum = h2b.Clone()
+                        h2Sum.Add(outFile.Get("MCTruth/" + selection + "_cl"))
+                        h2Sum.Write(selection)
+
+
+
+                    outFile.cd()
+                    outFile.Write()
+                    outFile.Close()
+
+
+
+                                                                
 def frameworkValidation(opt):
 
     if 'JEU' in opt.tag:
