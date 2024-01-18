@@ -1,7 +1,6 @@
 import os
 import copy
 import ROOT
-import ctypes
 import math
 import ctypes
 import PlotsConfigurations.Tools.commonTools  as commonTools
