@@ -103,14 +103,12 @@ def mergeall(opt):
 def remakeMissingShapes(opt, method='resubmit'):
 
     sampleShapeDir = '/'.join([ opt.shapedir, opt.year, opt.tag, 'AsMuchAsPossible' ])
-    #print ("commonTools.get: ", commonTools.getLogFileList(opt, 'sh'))
 
     for shFile in commonTools.getLogFileList(opt, 'sh'):
 
         sample = shFile.split('/')[3]
-        #print("sample=", sample)
+
         if not commonTools.isGoodFile(sampleShapeDir+'/plots_'+opt.year+opt.tag+'_ALL_'+sample+'.root', 0):
-            #print("shFile=", shFile)
             missingShape = False
             if commonTools.isGoodFile(shFile.replace('.sh','.done'), 0): missingShape = True
             if commonTools.isGoodFile(shFile.replace('.sh','.err'), 0) and commonTools.hasString(shFile.replace('.sh','.err'), 'RuntimeError'): missingShape = True
